@@ -8,5 +8,7 @@
         <file>icons/start-attack.png</file>
         <file>icons/help.png</file>
         <file>icons/homepage.png</file>
+        <file>icons/quit.png</file>
+        <file>icons/johnny.png</file>
     </qresource>
 </RCC>

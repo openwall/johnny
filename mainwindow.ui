@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>700</width>
-    <height>418</height>
+    <width>720</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources/resources.qrc">
+    <normaloff>:/icons/johnny.png</normaloff>:/icons/johnny.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -23,16 +27,85 @@
       <property name="currentIndex">
        <number>1</number>
       </property>
-      <widget class="QWidget" name="tab">
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tab_hashes">
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Hashes</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2"/>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tab_bruteforce">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Bruteforce</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QToolBox" name="toolBox">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="page_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>698</width>
+             <height>264</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Advanced options</string>
+           </attribute>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCommandLinkButton" name="commandLinkButton">
+          <property name="text">
+           <string>Crack'em</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_dictionary">
+       <attribute name="title">
+        <string>Dictionary</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_benchmark">
+       <attribute name="title">
+        <string>Benchmark</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_options">
+       <attribute name="title">
+        <string>Options</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_passwords">
+       <attribute name="title">
+        <string>Passwords</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -63,6 +136,7 @@
    <addaction name="actionHomepage"/>
    <addaction name="actionHelp_2"/>
    <addaction name="separator"/>
+   <addaction name="actionQuit_2"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -70,7 +144,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>700</width>
+     <width>720</width>
      <height>25</height>
     </rect>
    </property>
@@ -100,7 +174,9 @@
     <property name="title">
      <string>Session</string>
     </property>
+    <addaction name="actionOpen"/>
     <addaction name="actionNew"/>
+    <addaction name="actionSave_2"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSessions"/>
@@ -149,7 +225,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Open File</string>
+    <string>Open Passwd File</string>
    </property>
    <property name="toolTip">
     <string>Open a password file</string>
@@ -267,8 +343,36 @@
     <string>Ctrl+J</string>
    </property>
   </action>
+  <action name="actionQuit_2">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icons/quit.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit Johnny</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionSave_2">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

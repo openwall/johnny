@@ -1,7 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "tablemodel.h"
+
 #include <QToolButton>
+#include <QStringListModel>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,6 +31,25 @@ MainWindow::MainWindow(QWidget *parent) :
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
     ui->mainToolBar->insertWidget(ui->actionOpen_Password, sessionMenuButton);
+
+    TableModel *hashmodel = new TableModel();
+
+    ui->tableView_Hashes->setModel(hashmodel);
+
+    for(int i=0; i < TABLE_ROWS; i++){
+      hashmodel->setData(hashmodel->index(i, 0), QString("Rick%1").arg(i));
+      hashmodel->setData(hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+    }
+
+//    TableModel *passmodel = new TableModel();
+
+//    ui->tableView_Passwords->setModel(passmodel);
+
+//    for(int i=0; i < TABLE_ROWS; i++){
+//      passmodel->setData(passmodel->index(i, 0), QString("Rick%1").arg(i));
+//      passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
+//    }
+
 
 }
 

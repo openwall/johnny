@@ -25,7 +25,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>false</bool>
@@ -33,6 +33,25 @@
       <widget class="QWidget" name="tab_hashes">
        <attribute name="title">
         <string>Hashes</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTableView" name="tableView_Hashes">
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Single</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_dictionary">
+       <attribute name="title">
+        <string>Wordlist</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_bruteforce">
@@ -57,7 +76,7 @@
              <x>0</x>
              <y>0</y>
              <width>698</width>
-             <height>264</height>
+             <height>233</height>
             </rect>
            </property>
            <attribute name="label">
@@ -75,14 +94,26 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_dictionary">
+      <widget class="QWidget" name="tab_passwords">
        <attribute name="title">
-        <string>Dictionary</string>
+        <string>Passwords</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QTableView" name="tableView_Passwords">
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>200</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QWidget" name="tab_benchmark">
+      <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Benchmark</string>
+        <string>Statistics</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_options">
@@ -90,23 +121,23 @@
         <string>Options</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="tab_passwords">
+      <widget class="QWidget" name="tab_benchmark">
        <attribute name="title">
-        <string>Passwords</string>
+        <string>Benchmark</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QTableWidget" name="tableWidget">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Log</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>24</number>
+      </property>
      </widget>
     </item>
    </layout>

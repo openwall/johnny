@@ -5,10 +5,11 @@ Johnny is a GUI concept to John the Ripper written
 in C++ using the Qt framework.
 
 You can find more about by visiting:
+http://www.openwall.com/lists/john-dev/2011/04/02/1
 http://www.openwall.com/lists/john-dev/2011/03/27/2
 http://openwall.info/wiki/ideas
 
-*This is still in a very raw and concept form
+*Johnny is still in a very raw and concept form
 until this will be removed* :-)
 
 Compiling on Unix/Linux and Windows

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>720</width>
-    <height>500</height>
+    <width>743</width>
+    <height>522</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Johnny</string>
@@ -25,7 +31,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>false</bool>
@@ -86,9 +92,15 @@
           <layout class="QGridLayout" name="gridLayout_2">
            <item row="0" column="2">
             <widget class="QComboBox" name="comboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimumSize">
               <size>
-               <width>300</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>
@@ -120,19 +132,6 @@
               <string>Rules file:</string>
              </property>
             </widget>
-           </item>
-           <item row="0" column="4">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="1" column="0">
             <widget class="QCommandLinkButton" name="commandLinkButton_2">
@@ -209,9 +208,15 @@
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="0" column="2">
             <widget class="QComboBox" name="comboBox_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimumSize">
               <size>
-               <width>300</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>
@@ -256,9 +261,15 @@
            </item>
            <item row="1" column="2">
             <widget class="QComboBox" name="comboBox_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="minimumSize">
               <size>
-               <width>300</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>
@@ -280,19 +291,6 @@
               <string>Browse</string>
              </property>
             </widget>
-           </item>
-           <item row="0" column="5">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="2" column="0">
             <widget class="QCommandLinkButton" name="commandLinkButton_3">
@@ -445,7 +443,6 @@
              <property name="title">
               <string>Character set:</string>
              </property>
-             <zorder>groupBox_5</zorder>
             </widget>
            </item>
            <item>
@@ -545,7 +542,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="separator"/>
    <addaction name="actionOpen_Password"/>
    <addaction name="separator"/>
    <addaction name="actionStart_Attack"/>
@@ -562,7 +558,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>720</width>
+     <width>743</width>
      <height>25</height>
     </rect>
    </property>

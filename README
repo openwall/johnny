@@ -1,0 +1,44 @@
+About Johnny
+============
+
+Johnny is a GUI concept to John the Ripper.
+You can find more about by visiting:
+http://www.openwall.com/lists/john-dev/2011/03/27/2
+http://openwall.info/wiki/ideas
+
+*This is still in a very raw and concept form
+until this will be removed* :-)
+
+Compiling on Unix/Linux and Windows
+-----------------------------------
+
+Prerequisites:
+   * Qt 4.7.0 or later
+   * On Linux you have two choices for installing the Qt SDK:
+        1. Install Qt 4.7.0 or later using your distribution's
+            package manager. The minimum libraries you need are
+            libqt4-core, libqt4-gui and libqt4-dev. Besides that
+            you will need qt4-qmake for qmake and g++/libstdc++5, 
+            though these should be automatically installed as 
+            dependencies to libqt*.
+            For e.g. on debian you can:
+            apt-get install libqt4-core libqt4-gui libqt4-dev
+            and say yes to the dependencies and you get everything
+            you need.
+        2. Install the latest official Qt SDK available at:
+            http://qt.nokia.com/downloads/
+   * On Windows:
+     -  MinGW 4.4 or later, Visual Studio 2008 or later
+     -  jom
+     The Qt SDK provides you with most of the required software.
+     Grab the official Qt SDK from http://qt.nokia.com/downloads/
+     -  open an instance of Qt SDK Command Prompt
+
+Building:
+
+cd ncgui/
+qmake netcatqui.pro
+make (or mingw32-make or nmake or jom, depending on your platform)
+
+To clean the build directory:
+make clean && make distclean

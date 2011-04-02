@@ -1,7 +1,9 @@
 About Johnny
 ============
 
-Johnny is a GUI concept to John the Ripper.
+Johnny is a GUI concept to John the Ripper written
+in C++ using the Qt framework.
+
 You can find more about by visiting:
 http://www.openwall.com/lists/john-dev/2011/03/27/2
 http://openwall.info/wiki/ideas

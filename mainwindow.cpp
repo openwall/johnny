@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "tablemodel.h"
-
 #include <QToolButton>
 #include <QStringListModel>
 
@@ -11,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    this->hashmodel = NULL;
 
     QMenu *sessionMenu = new QMenu;
 
@@ -32,15 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->mainToolBar->insertWidget(ui->actionOpen_Password, sessionMenuButton);
 
-    TableModel *hashmodel = new TableModel();
-
-    ui->tableView_Hashes->setModel(hashmodel);
-
-    for(int i=0; i < TABLE_ROWS; i++){
-      hashmodel->setData(hashmodel->index(i, 0), QString("Rick%1").arg(i));
-      hashmodel->setData(hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
-    }
-
 //    TableModel *passmodel = new TableModel();
 
 //    ui->tableView_Passwords->setModel(passmodel);
@@ -56,4 +47,21 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    if(this->hashmodel != NULL){
+        delete this->hashmodel;
+        this->hashmodel = NULL;
+    }
+
+    hashmodel = new TableModel();
+
+    ui->tableView_Hashes->setModel(hashmodel);
+
+    for(int i=0; i < TABLE_ROWS; i++){
+      hashmodel->setData(hashmodel->index(i, 0), QString("Rick%1").arg(i));
+      hashmodel->setData(hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+    }
 }

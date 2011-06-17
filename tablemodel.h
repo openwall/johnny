@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.  See LICENSE.
+ */
+
 #ifndef TABLEMODEL_H
 #define TABLEMODEL_H
 

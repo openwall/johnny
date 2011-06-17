@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.  See LICENSE.
+ */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

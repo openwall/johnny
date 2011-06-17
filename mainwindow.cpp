@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.  See LICENSE.
+ */
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 

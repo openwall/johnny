@@ -21,3 +21,7 @@ FORMS    += mainwindow.ui
 
 RESOURCES += \
     resources/resources.qrc
+
+OTHER_FILES += \
+    README \
+    LICENSE

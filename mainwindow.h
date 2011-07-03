@@ -6,8 +6,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QListWidgetItem>
 
 #include "tablemodel.h"
+#include "johnThread.h"
 
 namespace Ui {
     class MainWindow;
@@ -23,11 +25,25 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+    void on_actionStart_Attack_triggered();
+    void updateJohnOutput(const QString session, QByteArray stdout, QByteArray stderr);
+
+    void on_actionPause_Attack_triggered();
+
+    void on_pushButton_JohnStatus_clicked();
+
+    void selectPage();
 
 private:
     Ui::MainWindow *ui;
-
     TableModel *hashmodel;
+    JohnThread *th;
+    QListWidgetItem *passwordsTab, *optionsTab, *statisticsTab, *benchmarkTab,
+                    *settingsTab, *logTab, *outputTab;
+
+signals:
+    void killJohn();
+    void johnStatus();
 };
 
 #endif // MAINWINDOW_H

@@ -19,32 +19,32 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(selectPage()));
 
     passwordsTab = new QListWidgetItem(ui->listWidgetTabs);
-    passwordsTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    passwordsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_passwords.png")));
     passwordsTab->setText(tr("Passwords"));
     passwordsTab->setSelected(true);
 
     optionsTab = new QListWidgetItem(ui->listWidgetTabs);
-    optionsTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    optionsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_options.png")));
     optionsTab->setText(tr("Options"));
 
     statisticsTab = new QListWidgetItem(ui->listWidgetTabs);
-    statisticsTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    statisticsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_statistics.png")));
     statisticsTab->setText(tr("Statistics"));
 
     benchmarkTab = new QListWidgetItem(ui->listWidgetTabs);
-    benchmarkTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    benchmarkTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_benchmark.png")));
     benchmarkTab->setText(tr("Benchmark"));
 
     settingsTab = new QListWidgetItem(ui->listWidgetTabs);
-    settingsTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    settingsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_settings.png")));
     settingsTab->setText(tr("Settings"));
 
     outputTab = new QListWidgetItem(ui->listWidgetTabs);
-    outputTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    outputTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_output.png")));
     outputTab->setText(tr("Output"));
 
     logTab = new QListWidgetItem(ui->listWidgetTabs);
-    logTab->setIcon(QIcon(QString::fromUtf8(":/icons/johnny.png")));
+    logTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_log.png")));
     logTab->setText(tr("Log"));
 
     ui->listWidgetTabs->setMaximumWidth(ui->listWidgetTabs->sizeHintForColumn(0)+2);

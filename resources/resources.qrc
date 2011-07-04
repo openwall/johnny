@@ -10,5 +10,12 @@
         <file>icons/homepage.png</file>
         <file>icons/quit.png</file>
         <file>icons/johnny.png</file>
+        <file>icons/tab_passwords.png</file>
+        <file>icons/tab_options.png</file>
+        <file>icons/tab_settings.png</file>
+        <file>icons/tab_statistics.png</file>
+        <file>icons/tab_benchmark.png</file>
+        <file>icons/tab_log.png</file>
+        <file>icons/tab_output.png</file>
     </qresource>
 </RCC>

@@ -143,7 +143,7 @@
           <string notr="true"/>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -196,14 +196,14 @@
            <item>
             <widget class="QToolBox" name="toolBox">
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="singleOptions">
               <property name="geometry">
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>564</width>
+                <width>538</width>
                 <height>421</height>
                </rect>
               </property>
@@ -521,6 +521,14 @@
               </layout>
              </widget>
              <widget class="QWidget" name="bruteforceOptions">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>553</width>
+                <height>286</height>
+               </rect>
+              </property>
               <attribute name="label">
                <string>Bruteforce Mode</string>
               </attribute>

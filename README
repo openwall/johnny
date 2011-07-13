@@ -39,8 +39,8 @@ Prerequisites:
 
 Building:
 
-cd ncgui/
-qmake netcatqui.pro
+cd johnny/
+qmake
 make (or mingw32-make or nmake or jom, depending on your platform)
 
 To clean the build directory:

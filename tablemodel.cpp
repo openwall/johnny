@@ -9,9 +9,10 @@
 TableModel::TableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
-    for(int i=0; i < TABLE_ROWS; i++)
-        for(int j=0; j < TABLE_COLUMNS; j++)
+    for (int i = 0; i < TABLE_ROWS; i++) {
+        for (int j = 0; j < TABLE_COLUMNS; j++)
             table.append("");
+    }
 }
 
 TableModel::~TableModel()
@@ -36,7 +37,9 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
     return table.at(index.row() * TABLE_COLUMNS + index.column());
 }
 
-bool TableModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+bool TableModel::setData(const QModelIndex &index,
+                         const QVariant &value,
+                         int role)
 {
     if (!index.isValid() || role != Qt::EditRole)
         return false;
@@ -53,20 +56,25 @@ QVariant TableModel::headerData(int section/* section */,
                                 int role) const
 {
     //if (role == Qt::SizeHintRole)
-     //   return QSize(1, 1);
+    //   return QSize(1, 1);
 
     if (role != Qt::DisplayRole)
-             return QVariant();
+        return QVariant();
 
     if (orientation == Qt::Vertical)
         return QString("%1").arg(section);
-    if (orientation == Qt::Horizontal)
-        switch(section){
-            case 0: return QString(tr("User"));
-                break;
-            case 1: return QString(tr("Hash"));
-                break;
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
+        case 0:
+            return QString(tr("User"));
+            break;
+        case 1:
+            return QString(tr("Hash"));
+            break;
+        default:
+            break;
         }
+    }
 
     return QVariant();
 }

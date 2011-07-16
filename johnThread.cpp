@@ -10,16 +10,15 @@
 
 #include "johnThread.h"
 
-JohnThread::JohnThread(QByteArray& procOut, QByteArray& procErr,
+JohnThread::JohnThread(QByteArray &procOut,
+                       QByteArray &procErr,
                        const QStringList parameters, QObject *parent)
-    : pout(procOut),
-      perr(procErr),
-      paramList(parameters),
-      parent(parent)
+    : pout(procOut), perr(procErr), paramList(parameters), parent(parent)
 {
 }
 
-void JohnThread::run() {
+void JohnThread::run()
+{
 
     proc = new QProcess();
 
@@ -40,29 +39,34 @@ void JohnThread::run() {
 
 }
 
-void JohnThread::readProcOutput() {
-    pout  = proc->readAllStandardOutput(); // read std buffer
-    perr  = proc->readAllStandardError(); // read error buffer
+void JohnThread::readProcOutput()
+{
+    pout = proc->readAllStandardOutput(); // read std buffer
+    perr = proc->readAllStandardError(); // read error buffer
 }
 
-void JohnThread::updateStatus() {
+void JohnThread::updateStatus()
+{
     proc->write("a\r\n");
     readProcOutput();
-    emit johnOutput(paramList[paramList.size()-1], pout, perr);
+    emit johnOutput(paramList[paramList.size() - 1], pout, perr);
 }
 
-void JohnThread::johnExit() {
+void JohnThread::johnExit()
+{
     readProcOutput();
-    emit johnOutput(paramList[paramList.size()-1], pout, perr);
+    emit johnOutput(paramList[paramList.size() - 1], pout, perr);
     exit(0);
 }
 
-void JohnThread::stopProcess() {
-    if(proc->state() == QProcess::Running) {
+void JohnThread::stopProcess()
+{
+    if (proc->state() == QProcess::Running) {
         proc->terminate();
 //#ifdef Q_OS_WIN
 //        QString abort_cmd;
-//        PROCESS_INFORMATION *pinfo = (PROCESS_INFORMATION*)proc->pid();
+// TODO: According to Qt coding style this cast should replaced by reinterpret_cast<...>(...).
+//        PROCESS_INFORMATION *pinfo = (PROCESS_INFORMATION *)proc->pid();
 //        abort_cmd = QString("cmd /c taskkill /PID %1 /F").arg(pinfo->dwProcessId);
 //        QProcess::execute(abort_cmd);
 //#endif

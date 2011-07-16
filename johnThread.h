@@ -4,6 +4,7 @@
 
 #ifndef JOHNTHREAD_H
 #define JOHNTHREAD_H
+
 #include <QThread>
 #include <QByteArray>
 #include <QStringList>
@@ -16,7 +17,9 @@ class JohnThread : public QThread
     Q_OBJECT
 
 public:
-    JohnThread(QByteArray& procOut, QByteArray& procErr, const QStringList parameters,
+    JohnThread(QByteArray &procOut,
+               QByteArray &procErr,
+               const QStringList parameters,
                QObject *parent = 0);
 
 signals:
@@ -34,8 +37,9 @@ private slots:
     void updateStatus();
 
 protected:
-    QObject* parent;
+    QObject *parent;
     QProcess *proc;
+
     void run();
 };
 

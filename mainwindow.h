@@ -26,7 +26,9 @@ public:
 private slots:
     void on_pushButton_clicked();
     void on_actionStart_Attack_triggered();
-    void updateJohnOutput(const QString session, QByteArray stdout, QByteArray stderr);
+    void updateJohnOutput(const QString session,
+                          QByteArray stdout,
+                          QByteArray stderr);
 
     void on_actionPause_Attack_triggered();
 
@@ -38,8 +40,13 @@ private:
     Ui::MainWindow *ui;
     TableModel *hashmodel;
     JohnThread *th;
-    QListWidgetItem *passwordsTab, *optionsTab, *statisticsTab, *benchmarkTab,
-                    *settingsTab, *logTab, *outputTab;
+    QListWidgetItem *passwordsTab;
+    QListWidgetItem *optionsTab;
+    QListWidgetItem *statisticsTab;
+    QListWidgetItem *benchmarkTab;
+    QListWidgetItem *settingsTab;
+    QListWidgetItem *logTab;
+    QListWidgetItem *outputTab;
 
 signals:
     void killJohn();

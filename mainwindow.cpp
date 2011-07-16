@@ -8,9 +8,8 @@
 #include <QToolButton>
 #include <QStringListModel>
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -47,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     logTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_log.png")));
     logTab->setText(tr("Log"));
 
-    ui->listWidgetTabs->setMaximumWidth(ui->listWidgetTabs->sizeHintForColumn(0)+2);
+    ui->listWidgetTabs->setMaximumWidth(ui->listWidgetTabs->sizeHintForColumn(0) + 2);
 
     passwordsTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
     optionsTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
@@ -67,7 +66,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->actionNew_Session->setIconVisibleInMenu(true);
     ui->actionSave_Session->setIconVisibleInMenu(true);
 
-
     QToolButton *sessionMenuButton = new QToolButton;
 
     sessionMenuButton->setMenu(sessionMenu);
@@ -83,9 +81,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //    ui->tableView_Passwords->setModel(passmodel);
 
-//    for(int i=0; i < TABLE_ROWS; i++){
-//      passmodel->setData(passmodel->index(i, 0), QString("Rick%1").arg(i));
-//      passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
+//    for (int i = 0; i < TABLE_ROWS; i++) {
+//        passmodel->setData(passmodel->index(i, 0), QString("Rick%1").arg(i));
+//        passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
 //    }
 
 }
@@ -97,26 +95,25 @@ MainWindow::~MainWindow()
 
 void MainWindow::selectPage()
 {
-    if (passwordsTab->isSelected()) {
+    if (passwordsTab->isSelected())
         ui->stackedWidget->setCurrentIndex(0);
-    } else if (optionsTab->isSelected()) {
+    else if (optionsTab->isSelected())
         ui->stackedWidget->setCurrentIndex(1);
-    } else if (statisticsTab->isSelected()) {
+    else if (statisticsTab->isSelected())
         ui->stackedWidget->setCurrentIndex(2);
-    } else if (benchmarkTab->isSelected()) {
+    else if (benchmarkTab->isSelected())
         ui->stackedWidget->setCurrentIndex(3);
-    } else if (settingsTab->isSelected()) {
+    else if (settingsTab->isSelected())
         ui->stackedWidget->setCurrentIndex(4);
-    } else if (outputTab->isSelected()) {
+    else if (outputTab->isSelected())
         ui->stackedWidget->setCurrentIndex(5);
-    } else if (logTab->isSelected()) {
+    else if (logTab->isSelected())
         ui->stackedWidget->setCurrentIndex(6);
-    }
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-    if(this->hashmodel != NULL){
+    if (this->hashmodel != NULL) {
         delete this->hashmodel;
         this->hashmodel = NULL;
     }
@@ -125,9 +122,9 @@ void MainWindow::on_pushButton_clicked()
 
     ui->tableView_Hashes->setModel(hashmodel);
 
-    for(int i=0; i < TABLE_ROWS; i++){
-      hashmodel->setData(hashmodel->index(i, 0), QString("Rick%1").arg(i));
-      hashmodel->setData(hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+    for (int i = 0; i < TABLE_ROWS; i++) {
+        hashmodel->setData(hashmodel->index(i, 0), QString("Rick%1").arg(i));
+        hashmodel->setData(hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
     }
 }
 
@@ -137,15 +134,17 @@ void MainWindow::on_actionStart_Attack_triggered()
 
     parameters << "--restore"; // no params for now
 
-    QByteArray johnOut, johnErr;
+    QByteArray johnOut;
+    QByteArray johnErr;
     th = new JohnThread(johnOut, johnErr, parameters, this);
 
     th->start();
-    connect(th, SIGNAL(johnOutput(QString,QByteArray,QByteArray)),
-      this, SLOT(updateJohnOutput(const QString, QByteArray, QByteArray))); // nmapParser.cpp
+    connect(th, SIGNAL(johnOutput(QString, QByteArray, QByteArray)),
+            this, SLOT(updateJohnOutput(const QString, QByteArray, QByteArray))); // nmapParser.cpp
 }
 
-void MainWindow::updateJohnOutput(const QString session, QByteArray stdout,
+void MainWindow::updateJohnOutput(const QString session,
+                                  QByteArray stdout,
                                   QByteArray stderr)
 {
     ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");

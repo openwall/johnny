@@ -886,6 +886,9 @@
    </property>
   </action>
   <action name="actionOpen_Password">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/fileopen.png</normalon>
@@ -902,6 +905,9 @@
    </property>
   </action>
   <action name="actionOpen_Session">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/projectopen.png</normalon>
@@ -918,6 +924,9 @@
    </property>
   </action>
   <action name="actionNew_Session">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/projectnew.png</normalon>
@@ -934,6 +943,9 @@
    </property>
   </action>
   <action name="actionSave_Session">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/projectsave.png</normalon>
@@ -947,6 +959,9 @@
    </property>
   </action>
   <action name="actionStart_Attack">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/start-attack.png</normalon>
@@ -963,6 +978,9 @@
    </property>
   </action>
   <action name="actionPause_Attack">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/pause-attack.png</normalon>
@@ -979,6 +997,9 @@
    </property>
   </action>
   <action name="actionHelp_2">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/help.png</normalon>
@@ -995,6 +1016,9 @@
    </property>
   </action>
   <action name="actionHomepage">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/homepage.png</normalon>
@@ -1011,6 +1035,9 @@
    </property>
   </action>
   <action name="actionQuit_2">
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normalon>:/icons/quit.png</normalon>

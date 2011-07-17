@@ -31,23 +31,28 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->hashmodel = NULL;
 
+    // We add a button to the toolbar but this button is not simple. It has
+    // menu. And that menu drops like from menu button. Just QAction could not
+    // do it. Just QPushButton looses it's main action for popping
+    // menu. Solution with the best looking is QToolButton. QtCreator could not
+    // put such element on tool bar. It is possible to put it by hands through
+    // .ui file but it does not seem to be reliable. So we make it here in
+    // code.
+    //
+    // We create a desired menu.
     QMenu *sessionMenu = new QMenu;
-
-    //sessionMenu->addAction(ui->actionOpen_Session);
     sessionMenu->addAction(ui->actionNew_Session);
     sessionMenu->addAction(ui->actionSave_Session);
-    ui->actionNew_Session->setIconVisibleInMenu(true);
-    ui->actionSave_Session->setIconVisibleInMenu(true);
-
+    // We create a button.
     QToolButton *sessionMenuButton = new QToolButton;
-
+    // We set default action and menu for the button.
+    sessionMenuButton->setDefaultAction(ui->actionOpen_Session);
     sessionMenuButton->setMenu(sessionMenu);
+    // We set button up to have desired look and behaviour.
     sessionMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
-    sessionMenuButton->setIcon(QIcon(":/icons/projectopen.png"));
-    sessionMenuButton->setText(tr("Open Session"));
-    sessionMenuButton->setToolTip(tr("Open a session file"));
+    // TODO: May it be better to derive this setting from the toolbar?
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
+    // We put the button onto the toolbar.
     ui->mainToolBar->insertWidget(ui->actionOpen_Password, sessionMenuButton);
 
 //    TableModel *passmodel = new TableModel();

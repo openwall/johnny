@@ -37,7 +37,6 @@ private slots:
     void updateStatus();
 
 protected:
-    QObject *parent;
     QProcess *proc;
 
     void run();

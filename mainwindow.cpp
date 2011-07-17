@@ -17,44 +17,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->listWidgetTabs, SIGNAL(itemSelectionChanged()),
             this, SLOT(selectPage()));
 
-    passwordsTab = new QListWidgetItem(ui->listWidgetTabs);
-    passwordsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_passwords.png")));
-    passwordsTab->setText(tr("Passwords"));
-    passwordsTab->setSelected(true);
-
-    optionsTab = new QListWidgetItem(ui->listWidgetTabs);
-    optionsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_options.png")));
-    optionsTab->setText(tr("Options"));
-
-    statisticsTab = new QListWidgetItem(ui->listWidgetTabs);
-    statisticsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_statistics.png")));
-    statisticsTab->setText(tr("Statistics"));
-
-    benchmarkTab = new QListWidgetItem(ui->listWidgetTabs);
-    benchmarkTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_benchmark.png")));
-    benchmarkTab->setText(tr("Benchmark"));
-
-    settingsTab = new QListWidgetItem(ui->listWidgetTabs);
-    settingsTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_settings.png")));
-    settingsTab->setText(tr("Settings"));
-
-    outputTab = new QListWidgetItem(ui->listWidgetTabs);
-    outputTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_output.png")));
-    outputTab->setText(tr("Output"));
-
-    logTab = new QListWidgetItem(ui->listWidgetTabs);
-    logTab->setIcon(QIcon(QString::fromUtf8(":/icons/tab_log.png")));
-    logTab->setText(tr("Log"));
-
     ui->listWidgetTabs->setMaximumWidth(ui->listWidgetTabs->sizeHintForColumn(0) + 2);
 
-    passwordsTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-    optionsTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-    statisticsTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-    benchmarkTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-    settingsTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-    outputTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-    logTab->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
+    // TODO: How to select Passwords tab through mainwindow.ui?
+    //       Property 'selected' with 'bool' value 'true' did not work for me.
+    // We select first item/tab on list.
+    ui->listWidgetTabs->setCurrentRow(0);
+
+    // TODO: Is it possible to make it through mainwindow.ui?
+    // TODO: Does this find condition works for all strings?
+    foreach (QListWidgetItem *item, ui->listWidgetTabs->findItems("", Qt::MatchContains))
+        item->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
 
     this->hashmodel = NULL;
 
@@ -95,20 +68,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::selectPage()
 {
-    if (passwordsTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(0);
-    else if (optionsTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(1);
-    else if (statisticsTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(2);
-    else if (benchmarkTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(3);
-    else if (settingsTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(4);
-    else if (outputTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(5);
-    else if (logTab->isSelected())
-        ui->stackedWidget->setCurrentIndex(6);
+    ui->stackedWidget->setCurrentIndex(ui->listWidgetTabs->currentRow());
 }
 
 void MainWindow::on_pushButton_clicked()

@@ -37,6 +37,76 @@
     </property>
     <item>
      <widget class="QListWidget" name="listWidgetTabs">
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_passwords.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Passwords</string>
+       </property>
+      </item>
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_options.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Options</string>
+       </property>
+      </item>
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_statistics.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Statistics</string>
+       </property>
+      </item>
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_benchmark.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Benchmark</string>
+       </property>
+      </item>
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_settings.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Settings</string>
+       </property>
+      </item>
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_output.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Output</string>
+       </property>
+      </item>
+      <item>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/tab_log.png</normalon>
+        </iconset>
+       </property>
+       <property name="text">
+        <string>Log</string>
+       </property>
+      </item>
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>

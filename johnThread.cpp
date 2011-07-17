@@ -13,7 +13,7 @@
 JohnThread::JohnThread(QByteArray &procOut,
                        QByteArray &procErr,
                        const QStringList parameters, QObject *parent)
-    : pout(procOut), perr(procErr), paramList(parameters), parent(parent)
+    : QThread(parent), pout(procOut), perr(procErr), paramList(parameters)
 {
 }
 
@@ -28,7 +28,7 @@ void JohnThread::run()
             this, SLOT(johnExit()));
 
     connect(parent, SIGNAL(killJohn()),
-            this, SLOT(stopProcess()),Qt::QueuedConnection);
+            this, SLOT(stopProcess()), Qt::QueuedConnection);
 
     connect(parent, SIGNAL(johnStatus()),
             this, SLOT(updateStatus()));

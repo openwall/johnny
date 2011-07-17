@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     foreach (QListWidgetItem *item, ui->listWidgetTabs->findItems("", Qt::MatchContains))
         item->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
 
-    this->hashmodel = NULL;
+    hashmodel = NULL;
 
     // We add a button to the toolbar but this button is not simple. It has
     // menu. And that menu drops like from menu button. Just QAction could not
@@ -78,9 +78,9 @@ void MainWindow::selectPage()
 
 void MainWindow::on_pushButton_clicked()
 {
-    if (this->hashmodel != NULL) {
-        delete this->hashmodel;
-        this->hashmodel = NULL;
+    if (hashmodel != NULL) {
+        delete hashmodel;
+        hashmodel = NULL;
     }
 
     hashmodel = new TableModel();

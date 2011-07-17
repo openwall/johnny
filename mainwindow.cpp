@@ -37,11 +37,11 @@ MainWindow::MainWindow(QWidget *parent)
     // code.
     //
     // We create a desired menu.
-    QMenu *sessionMenu = new QMenu;
+    QMenu *sessionMenu = new QMenu(this);
     sessionMenu->addAction(ui->actionNew_Session);
     sessionMenu->addAction(ui->actionSave_Session);
     // We create a button.
-    QToolButton *sessionMenuButton = new QToolButton;
+    QToolButton *sessionMenuButton = new QToolButton(this);
     // We set default action and menu for the button.
     sessionMenuButton->setDefaultAction(ui->actionOpen_Session);
     sessionMenuButton->setMenu(sessionMenu);

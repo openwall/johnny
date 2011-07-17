@@ -20,7 +20,7 @@ JohnThread::JohnThread(QByteArray &procOut,
 void JohnThread::run()
 {
 
-    proc = new QProcess();
+    proc = new QProcess(this);
 
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 

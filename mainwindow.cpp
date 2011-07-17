@@ -9,7 +9,7 @@
 #include <QStringListModel>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), hashmodel(NULL)
+    : QMainWindow(parent), ui(new Ui::MainWindow(this)), hashmodel(NULL)
 {
     ui->setupUi(this);
 
@@ -61,11 +61,6 @@ MainWindow::MainWindow(QWidget *parent)
 //        passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
 //    }
 
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
 }
 
 void MainWindow::selectPage()

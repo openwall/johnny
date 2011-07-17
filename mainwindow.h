@@ -40,13 +40,6 @@ private:
     Ui::MainWindow *ui;
     TableModel *hashmodel;
     JohnThread *th;
-    QListWidgetItem *passwordsTab;
-    QListWidgetItem *optionsTab;
-    QListWidgetItem *statisticsTab;
-    QListWidgetItem *benchmarkTab;
-    QListWidgetItem *settingsTab;
-    QListWidgetItem *logTab;
-    QListWidgetItem *outputTab;
 
 signals:
     void killJohn();

@@ -27,10 +27,10 @@ void JohnThread::run()
     connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(johnExit()));
 
-    connect(parent, SIGNAL(killJohn()),
+    connect(parent(), SIGNAL(killJohn()),
             this, SLOT(stopProcess()), Qt::QueuedConnection);
 
-    connect(parent, SIGNAL(johnStatus()),
+    connect(parent(), SIGNAL(johnStatus()),
             this, SLOT(updateStatus()));
 
     proc->start("/usr/sbin/john", paramList);

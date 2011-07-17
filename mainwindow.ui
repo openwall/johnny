@@ -21,7 +21,8 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resources/resources.qrc">
-    <normaloff>:/icons/johnny.png</normaloff>:/icons/johnny.png</iconset>
+    <normaloff>:/icons/johnny.png</normaloff>
+   </iconset>
   </property>
   <property name="dockNestingEnabled">
    <bool>false</bool>

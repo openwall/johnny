@@ -13,7 +13,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Create listview items
     connect(ui->listWidgetTabs, SIGNAL(itemSelectionChanged()),
             this, SLOT(selectPage()));
 

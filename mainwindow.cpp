@@ -9,7 +9,7 @@
 #include <QStringListModel>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow)
+    : QMainWindow(parent), ui(new Ui::MainWindow), hashmodel(NULL)
 {
     ui->setupUi(this);
 
@@ -28,8 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: Does this find condition works for all strings?
     foreach (QListWidgetItem *item, ui->listWidgetTabs->findItems("", Qt::MatchContains))
         item->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
-
-    hashmodel = NULL;
 
     // We add a button to the toolbar but this button is not simple. It has
     // menu. And that menu drops like from menu button. Just QAction could not

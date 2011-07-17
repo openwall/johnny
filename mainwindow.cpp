@@ -80,7 +80,7 @@ void MainWindow::on_pushButton_clicked()
         hashmodel = NULL;
     }
 
-    hashmodel = new TableModel();
+    hashmodel = new TableModel(this);
 
     ui->tableView_Hashes->setModel(hashmodel);
 

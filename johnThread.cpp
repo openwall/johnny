@@ -19,8 +19,19 @@ JohnThread::JohnThread(QByteArray &procOut,
 
 void JohnThread::run()
 {
-
-    proc = new QProcess(this);
+    // Process object should be created and then deleted. When process
+    // object is parented by this warning occur: "QObject: Cannot
+    // create children for a parent that is in a different
+    // thread. (Parent is JohnThread(0x186798), parent's thread is
+    // QThread(0x39948), current thread is JohnThread(0x186798)" One
+    // way to solve it is to delete process in thread's
+    // destructor. Other way is to place process object on stack.
+    //
+    // It is ok to place process object on stack because process
+    // object should not live without a thread while method could be
+    // finished only with thread.
+    QProcess johnProcess;
+    proc = &johnProcess;
 
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 

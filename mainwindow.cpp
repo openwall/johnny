@@ -98,6 +98,8 @@ void MainWindow::on_actionStart_Attack_triggered()
 
     QByteArray johnOut;
     QByteArray johnErr;
+    // TODO: It is not good to pass local variables by reference to
+    //       code that will run longer than variables will live.
     th = new JohnThread(johnOut, johnErr, parameters, this);
 
     th->start();

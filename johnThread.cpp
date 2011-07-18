@@ -30,6 +30,12 @@ void JohnThread::run()
     // It is ok to place process object on stack because process
     // object should not live without a thread while method could be
     // finished only with thread.
+    //
+    // However it does not matter and app crashes on any status
+    // update. Thread finishes and johnProcess is not a real
+    // object. But there is code that still accesses it.
+    // TODO: Fix crash.
+    // TODO: Why is not signal disconnected when thread finishes?
     QProcess johnProcess;
     proc = &johnProcess;
 

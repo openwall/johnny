@@ -7,9 +7,9 @@
 
 #include <QMainWindow>
 #include <QListWidgetItem>
+#include <QProcess>
 
 #include "tablemodel.h"
-#include "johnThread.h"
 
 namespace Ui {
     class MainWindow;
@@ -40,10 +40,6 @@ private:
     Ui::MainWindow *ui;
     TableModel *hashmodel;
     QProcess johnProcess;
-
-signals:
-    void killJohn();
-    void johnStatus();
 };
 
 #endif // MAINWINDOW_H

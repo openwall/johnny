@@ -13,12 +13,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     tablemodel.cpp \
-    johnParser.cpp \
-    johnThread.cpp
+    johnParser.cpp
 
 HEADERS  += mainwindow.h \
     tablemodel.h \
-    johnThread.h \
     johnParser.h
 
 FORMS    += mainwindow.ui

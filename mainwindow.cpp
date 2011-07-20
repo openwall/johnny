@@ -162,6 +162,7 @@ void MainWindow::showJohnStarted()
     // button.
     // TODO: Is it ok if user clicks between his previous click and
     //       button disables?
+    // TODO: Should we disable/enable status button?
     ui->actionPause_Attack->setEnabled(true);
     ui->actionStart_Attack->setEnabled(false);
 }

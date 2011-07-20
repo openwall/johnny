@@ -55,9 +55,12 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: Could we make connections easier?
     // We connect John process' signals with our slots.
     // John was ended.
-    // TODO
+    // TODO: It will good to show exit status and exit code to user.
+    connect(&johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SLOT(showJohnFinished()));
     // John was started.
-    // TODO
+    connect(&johnProcess, SIGNAL(started()),
+            this, SLOT(showJohnStarted()));
     // John wrote something.
     connect(&johnProcess, SIGNAL(readyReadStandardOutput()),
             this, SLOT(updateJohnOutput()));
@@ -149,4 +152,25 @@ void MainWindow::on_pushButton_JohnStatus_clicked()
     // output.
     // TODO: However it does not work as of we do not have terminal.
     johnProcess.write("a\r\n");
+}
+
+void MainWindow::showJohnStarted()
+{
+    // TODO: Are these signals called always in order
+    //       started-finished? Or is it unpredictable?
+    // When John starts we enable stop button and disable start
+    // button.
+    // TODO: Is it ok if user clicks between his previous click and
+    //       button disables?
+    ui->actionPause_Attack->setEnabled(true);
+    ui->actionStart_Attack->setEnabled(false);
+}
+
+void MainWindow::showJohnFinished()
+{
+    // TODO: Should we place a message about it into output buffer?
+    // When John finishes we enable start button and disable stop
+    // button.
+    ui->actionPause_Attack->setEnabled(false);
+    ui->actionStart_Attack->setEnabled(true);
 }

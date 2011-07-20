@@ -27,6 +27,8 @@ private slots:
     void on_pushButton_clicked();
     void on_actionStart_Attack_triggered();
     void updateJohnOutput();
+    void showJohnFinished();
+    void showJohnStarted();
 
     void on_actionPause_Attack_triggered();
 

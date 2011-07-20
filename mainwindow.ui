@@ -978,6 +978,9 @@
    </property>
   </action>
   <action name="actionPause_Attack">
+   <property name="enabled">
+     <bool>false</bool>
+   </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
    </property>

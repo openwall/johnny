@@ -26,9 +26,7 @@ public:
 private slots:
     void on_pushButton_clicked();
     void on_actionStart_Attack_triggered();
-    void updateJohnOutput(const QString session,
-                          QByteArray stdout,
-                          QByteArray stderr);
+    void updateJohnOutput();
 
     void on_actionPause_Attack_triggered();
 
@@ -39,7 +37,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     TableModel *hashmodel;
-    JohnThread *th;
+    QProcess johnProcess;
 
 signals:
     void killJohn();

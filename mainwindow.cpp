@@ -52,6 +52,18 @@ MainWindow::MainWindow(QWidget *parent)
     // We put the button onto the toolbar.
     ui->mainToolBar->insertWidget(ui->actionOpen_Password, sessionMenuButton);
 
+    // TODO: Could we make connections easier?
+    // We connect John process' signals with our slots.
+    // John was ended.
+    // TODO
+    // John was started.
+    // TODO
+    // John wrote something.
+    connect(&johnProcess, SIGNAL(readyReadStandardOutput()),
+            this, SLOT(updateJohnOutput()));
+    connect(&johnProcess, SIGNAL(readyReadStandardError()),
+            this, SLOT(updateJohnOutput()));
+
 //    TableModel *passmodel = new TableModel();
 
 //    ui->tableView_Passwords->setModel(passmodel);
@@ -96,32 +108,45 @@ void MainWindow::on_actionStart_Attack_triggered()
 
     parameters << "--restore"; // no params for now
 
-    QByteArray johnOut;
-    QByteArray johnErr;
-    // TODO: It is not good to pass local variables by reference to
-    //       code that will run longer than variables will live.
-    th = new JohnThread(johnOut, johnErr, parameters, this);
-
-    th->start();
-    connect(th, SIGNAL(johnOutput(QString, QByteArray, QByteArray)),
-            this, SLOT(updateJohnOutput(const QString, QByteArray, QByteArray))); // nmapParser.cpp
+    // To start John we have predefined process object. That object's
+    // signals are already connected with our slots. So we need only
+    // start it.
+    //
+    // We start John.
+    johnProcess.start("/usr/sbin/john", parameters);
 }
 
-void MainWindow::updateJohnOutput(const QString session,
-                                  QByteArray stdout,
-                                  QByteArray stderr)
+void MainWindow::updateJohnOutput()
 {
-    ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");
-    ui->plainTextEdit_JohnOut->insertPlainText(QString(stdout));
-    ui->plainTextEdit_JohnOut->insertPlainText(QString(stderr));
+    // TODO: There was a session string passed here. Hence the
+    //       question what is right: one window could have multiple sessions or at one
+    //       time there could be only one sesson opened?
+    // NOTE: If there could be only one session in/per window then it
+    //       is possible to have session name here through window's field.
+    // TODO: Session name should be displayed.
+    //ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");
+    ui->plainTextEdit_JohnOut->insertPlainText(johnProcess.readAllStandardOutput()); // read output buffer
+    ui->plainTextEdit_JohnOut->insertPlainText(johnProcess.readAllStandardError()); // read error buffer
 }
 
 void MainWindow::on_actionPause_Attack_triggered()
 {
-    emit killJohn();
+    // We ask John to exit.
+    // TODO: Is it ok to call it even if process is not running?
+    // TODO: Do not we need to call kill instead if John is too busy?
+    // NOTE: We could leave it for user: we count button presses and for
+    //       the first time we call terminate and for next times we
+    //       call kill.
+    johnProcess.terminate();
 }
 
 void MainWindow::on_pushButton_JohnStatus_clicked()
 {
-    emit johnStatus();
+    // When we want to get John status we send enter to John. Then
+    // John write something to its stdout. We do not need to read its
+    // output here because when output is ready to be read a signal is
+    // fired and we read John output with status as any other John's
+    // output.
+    // TODO: However it does not work as of we do not have terminal.
+    johnProcess.write("a\r\n");
 }

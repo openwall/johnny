@@ -57,8 +57,9 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
             data[column].append("");
     }
     // We convert our lists into vectors to store data.
-    for (int column = 0; column < columnCount(); column++)
-        m_data[column] = data.at(column).toVector();
+    for (int column = 0; column < columnCount(); column++) {
+        m_data << data.at(column).toVector();
+    }
     // TODO: Should we emit a signal to notice all that we changed our
     //       state?
 }
@@ -72,9 +73,7 @@ int FileTableModel::rowCount(const QModelIndex &/* parent */) const
 
 int FileTableModel::columnCount(const QModelIndex &/* parent */) const
 {
-    // We have predefined array with columns names. It length equals
-    // column count.
-    return sizeof(m_columns) / sizeof(m_columns[0]);
+    return m_columns.size();
 }
 
 QVariant FileTableModel::data(const QModelIndex &index,

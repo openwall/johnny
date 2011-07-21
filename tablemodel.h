@@ -31,7 +31,7 @@ public:
                         int role = Qt::DisplayRole) const;
 
 private:
-    QStringList table;
+    QStringList m_table;
 };
 
 #endif // TABLEMODEL_H

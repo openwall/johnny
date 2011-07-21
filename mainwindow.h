@@ -37,9 +37,9 @@ private slots:
     void selectPage();
 
 private:
-    Ui::MainWindow *ui;
-    TableModel *hashmodel;
-    QProcess johnProcess;
+    Ui::MainWindow *m_ui;
+    TableModel *m_hashmodel;
+    QProcess m_johnProcess;
 };
 
 #endif // MAINWINDOW_H

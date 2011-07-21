@@ -12,9 +12,6 @@
 //       place file loading into model. Though it seems to be
 //       good.
 
-// TODO: Change type of data field to QAbstractTableModel
-//       because it does not matter for us what model we use.
-
 FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     : QAbstractTableModel(parent)
 {

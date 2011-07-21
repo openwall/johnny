@@ -1,3 +1,40 @@
 /*
  * Copyright © 2011 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
+
+#ifndef FILETABLEMODEL_H
+#define FILETABLEMODEL_H
+
+#include <QAbstractTableModel>
+#include <QStringList>
+#include <QVector>
+#include <QString>
+
+class FileTableModel : public QAbstractTableModel
+{
+    Q_OBJECT
+
+public:
+    FileTableModel(const QString &fileName, QObject *parent = 0);
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool setData(const QModelIndex &index,
+                 const QVariant &value,
+                 int role = Qt::EditRole);
+    QVariant headerData(int section,
+                        Qt::Orientation orientation,
+                        int role = Qt::DisplayRole) const;
+
+private:
+    QVector<QVector<QString> > m_data;
+
+    static const QString sm_columns[];
+};
+
+// We initialize static member.
+const QString FileTableModel::sm_columns[] = {tr("User"), tr("Hash")};
+
+#endif // FILETABLEMODEL_H

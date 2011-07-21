@@ -31,10 +31,7 @@ public:
 private:
     QVector<QVector<QString> > m_data;
 
-    static const QString sm_columns[];
+    QVector<QString> m_columns;
 };
-
-// We initialize static member.
-const QString FileTableModel::sm_columns[] = {tr("User"), tr("Hash")};
 
 #endif // FILETABLEMODEL_H

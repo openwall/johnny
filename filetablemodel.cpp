@@ -18,6 +18,8 @@
 FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     : QAbstractTableModel(parent)
 {
+    // We make it as object field because we could not make class field.
+    m_columns << tr("User") << tr("Hash");
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -72,7 +74,7 @@ int FileTableModel::columnCount(const QModelIndex &/* parent */) const
 {
     // We have predefined array with columns names. It length equals
     // column count.
-    return sizeof(sm_columns) / sizeof(sm_columns[0]);
+    return sizeof(m_columns) / sizeof(m_columns[0]);
 }
 
 QVariant FileTableModel::data(const QModelIndex &index,
@@ -112,7 +114,7 @@ QVariant FileTableModel::headerData(int section,
         return QString("%1").arg(section + 1);
     // For horizontal header we return names from fields array.
     if (orientation == Qt::Horizontal)
-        return sm_columns[section];
+        return m_columns[section];
     // TODO: Could we rich this place? Should we do something special
     //       here?
     return QVariant();

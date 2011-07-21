@@ -26,15 +26,15 @@ public:
 private slots:
     void on_pushButton_clicked();
     void on_actionStart_Attack_triggered();
+    void on_actionPause_Attack_triggered();
+    void on_actionOpen_Password_triggered();
+    void on_pushButton_JohnStatus_clicked();
+
     void updateJohnOutput();
     void showJohnFinished();
     void showJohnStarted();
-
-    void on_actionPause_Attack_triggered();
-
-    void on_pushButton_JohnStatus_clicked();
-
     void selectPage();
+    void replaceTableModel(TableModel *newTableModel);
 
 private:
     Ui::MainWindow *m_ui;

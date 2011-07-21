@@ -9,24 +9,24 @@
 #include <QStringListModel>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), hashmodel(NULL)
+    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashmodel(NULL)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    connect(ui->listWidgetTabs, SIGNAL(itemSelectionChanged()),
+    connect(m_ui->listWidgetTabs, SIGNAL(itemSelectionChanged()),
             this, SLOT(selectPage()));
 
-    ui->listWidgetTabs->setMaximumWidth(ui->listWidgetTabs->sizeHintForColumn(0) + 2);
+    m_ui->listWidgetTabs->setMaximumWidth(m_ui->listWidgetTabs->sizeHintForColumn(0) + 2);
 
     // TODO: How to select Passwords tab through mainwindow.ui?
     //       Property 'selected' with 'bool' value 'true' did not work for me.
     // We select first item/tab on list.
-    ui->listWidgetTabs->setCurrentRow(0);
+    m_ui->listWidgetTabs->setCurrentRow(0);
 
     // TODO: Is it possible to make it through mainwindow.ui?
     // TODO: Does this find condition works for all strings?
-    foreach (QListWidgetItem *item, ui->listWidgetTabs->findItems("", Qt::MatchContains))
-        item->setSizeHint(QSize(ui->listWidgetTabs->sizeHintForColumn(0), 60));
+    foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("", Qt::MatchContains))
+        item->setSizeHint(QSize(m_ui->listWidgetTabs->sizeHintForColumn(0), 60));
 
     // We add a button to the toolbar but this button is not simple. It has
     // menu. And that menu drops like from menu button. Just QAction could not
@@ -38,33 +38,33 @@ MainWindow::MainWindow(QWidget *parent)
     //
     // We create a desired menu.
     QMenu *sessionMenu = new QMenu(this);
-    sessionMenu->addAction(ui->actionNew_Session);
-    sessionMenu->addAction(ui->actionSave_Session);
+    sessionMenu->addAction(m_ui->actionNew_Session);
+    sessionMenu->addAction(m_ui->actionSave_Session);
     // We create a button.
     QToolButton *sessionMenuButton = new QToolButton(this);
     // We set default action and menu for the button.
-    sessionMenuButton->setDefaultAction(ui->actionOpen_Session);
+    sessionMenuButton->setDefaultAction(m_ui->actionOpen_Session);
     sessionMenuButton->setMenu(sessionMenu);
     // We set button up to have desired look and behaviour.
     sessionMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
     // TODO: May it be better to derive this setting from the toolbar?
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     // We put the button onto the toolbar.
-    ui->mainToolBar->insertWidget(ui->actionOpen_Password, sessionMenuButton);
+    m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
 
     // TODO: Could we make connections easier?
     // We connect John process' signals with our slots.
     // John was ended.
     // TODO: It will good to show exit status and exit code to user.
-    connect(&johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+    connect(&m_johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(showJohnFinished()));
     // John was started.
-    connect(&johnProcess, SIGNAL(started()),
+    connect(&m_johnProcess, SIGNAL(started()),
             this, SLOT(showJohnStarted()));
     // John wrote something.
-    connect(&johnProcess, SIGNAL(readyReadStandardOutput()),
+    connect(&m_johnProcess, SIGNAL(readyReadStandardOutput()),
             this, SLOT(updateJohnOutput()));
-    connect(&johnProcess, SIGNAL(readyReadStandardError()),
+    connect(&m_johnProcess, SIGNAL(readyReadStandardError()),
             this, SLOT(updateJohnOutput()));
 
 //    TableModel *passmodel = new TableModel();
@@ -80,28 +80,28 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete m_ui;
 }
 
 void MainWindow::selectPage()
 {
-    ui->stackedWidget->setCurrentIndex(ui->listWidgetTabs->currentRow());
+    m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-    if (hashmodel != NULL) {
-        delete hashmodel;
-        hashmodel = NULL;
+    if (m_hashmodel != NULL) {
+        delete m_hashmodel;
+        m_hashmodel = NULL;
     }
 
-    hashmodel = new TableModel(this);
+    m_hashmodel = new TableModel(this);
 
-    ui->tableView_Hashes->setModel(hashmodel);
+    m_ui->tableView_Hashes->setModel(m_hashmodel);
 
     for (int i = 0; i < TABLE_ROWS; i++) {
-        hashmodel->setData(hashmodel->index(i, 0), QString("Rick%1").arg(i));
-        hashmodel->setData(hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+        m_hashmodel->setData(m_hashmodel->index(i, 0), QString("Rick%1").arg(i));
+        m_hashmodel->setData(m_hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
     }
 }
 
@@ -116,7 +116,7 @@ void MainWindow::on_actionStart_Attack_triggered()
     // start it.
     //
     // We start John.
-    johnProcess.start("/usr/sbin/john", parameters);
+    m_johnProcess.start("/usr/sbin/john", parameters);
 }
 
 void MainWindow::updateJohnOutput()
@@ -128,8 +128,8 @@ void MainWindow::updateJohnOutput()
     //       is possible to have session name here through window's field.
     // TODO: Session name should be displayed.
     //ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");
-    ui->plainTextEdit_JohnOut->insertPlainText(johnProcess.readAllStandardOutput()); // read output buffer
-    ui->plainTextEdit_JohnOut->insertPlainText(johnProcess.readAllStandardError()); // read error buffer
+    m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardOutput()); // read output buffer
+    m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardError()); // read error buffer
 }
 
 void MainWindow::on_actionPause_Attack_triggered()
@@ -140,7 +140,7 @@ void MainWindow::on_actionPause_Attack_triggered()
     // NOTE: We could leave it for user: we count button presses and for
     //       the first time we call terminate and for next times we
     //       call kill.
-    johnProcess.terminate();
+    m_johnProcess.terminate();
 }
 
 void MainWindow::on_pushButton_JohnStatus_clicked()
@@ -151,7 +151,7 @@ void MainWindow::on_pushButton_JohnStatus_clicked()
     // fired and we read John output with status as any other John's
     // output.
     // TODO: However it does not work as of we do not have terminal.
-    johnProcess.write("a\r\n");
+    m_johnProcess.write("a\r\n");
 }
 
 void MainWindow::showJohnStarted()
@@ -163,8 +163,8 @@ void MainWindow::showJohnStarted()
     // TODO: Is it ok if user clicks between his previous click and
     //       button disables?
     // TODO: Should we disable/enable status button?
-    ui->actionPause_Attack->setEnabled(true);
-    ui->actionStart_Attack->setEnabled(false);
+    m_ui->actionPause_Attack->setEnabled(true);
+    m_ui->actionStart_Attack->setEnabled(false);
 }
 
 void MainWindow::showJohnFinished()
@@ -172,6 +172,6 @@ void MainWindow::showJohnFinished()
     // TODO: Should we place a message about it into output buffer?
     // When John finishes we enable start button and disable stop
     // button.
-    ui->actionPause_Attack->setEnabled(false);
-    ui->actionStart_Attack->setEnabled(true);
+    m_ui->actionPause_Attack->setEnabled(false);
+    m_ui->actionStart_Attack->setEnabled(true);
 }

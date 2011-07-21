@@ -11,13 +11,13 @@ TableModel::TableModel(QObject *parent)
 {
     for (int i = 0; i < TABLE_ROWS; i++) {
         for (int j = 0; j < TABLE_COLUMNS; j++)
-            table.append("");
+            m_table.append("");
     }
 }
 
 TableModel::~TableModel()
 {
-    table.empty();
+    m_table.empty();
 }
 
 int TableModel::rowCount(const QModelIndex & /* parent */) const
@@ -34,7 +34,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || role != Qt::DisplayRole)
         return QVariant();
-    return table.at(index.row() * TABLE_COLUMNS + index.column());
+    return m_table.at(index.row() * TABLE_COLUMNS + index.column());
 }
 
 bool TableModel::setData(const QModelIndex &index,
@@ -44,7 +44,7 @@ bool TableModel::setData(const QModelIndex &index,
     if (!index.isValid() || role != Qt::EditRole)
         return false;
 
-    table.replace(index.row() * TABLE_COLUMNS + index.column(), value.toString());
+    m_table.replace(index.row() * TABLE_COLUMNS + index.column(), value.toString());
 
     emit TableModel::dataChanged(index, index);
 

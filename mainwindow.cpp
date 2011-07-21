@@ -7,6 +7,8 @@
 
 #include <QToolButton>
 #include <QStringListModel>
+#include <QFileDialog>
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashmodel(NULL)
@@ -88,20 +90,87 @@ void MainWindow::selectPage()
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::replaceTableModel(TableModel *newTableModel)
 {
+    // TODO: Check argument.
+
+    // We delete existing model if any.
     if (m_hashmodel != NULL) {
         delete m_hashmodel;
         m_hashmodel = NULL;
     }
+    // We remember new model.
+    m_hashmodel = newTableModel;
+    // We connect table view with new model.
+    m_ui->tableView_Hashes->setModel(newTableModel);
+}
 
-    m_hashmodel = new TableModel(this);
-
-    m_ui->tableView_Hashes->setModel(m_hashmodel);
+void MainWindow::on_pushButton_clicked()
+{
+    replaceTableModel(new TableModel(this));
 
     for (int i = 0; i < TABLE_ROWS; i++) {
         m_hashmodel->setData(m_hashmodel->index(i, 0), QString("Rick%1").arg(i));
         m_hashmodel->setData(m_hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+    }
+}
+
+void MainWindow::on_actionOpen_Password_triggered()
+{
+    // When user asks to open password file we should read desired
+    // file, parse it and present values in the table. Model and view
+    // simplifies presentation. We just make and fill model and then
+    // we set it to existing view.
+    // TODO: However there are variants: we could replace existing
+    //       model or append new values to existing model.
+    //       For now user could not choose what to do. We always
+    //       replace existing model.
+
+    // We pops a dialog to choose a file to open.
+    // TODO: What happens when John writes something while dialog
+    //       opened?
+    // TODO: Move dialog creation and setting up into window constructor.
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    // TODO: Dialog could allow user to select multiple files. May it
+    //       be good to support this ability? There are variants: to
+    //       concatenate selected file or to unshadow them.
+    if (dialog.exec()) {
+        QString fileName = dialog.selectedFiles()[0];
+        // We read and parse the file.
+        // We create and fill model.
+        // TODO: Move this stuff into TableModel class.
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            // TODO: Notice user that file could be open.
+            return;
+        // TODO: We have prefilled table with 0.5M rows. Develop other
+        //       model.
+        // NOTE: Model could be resizable but it is easy to not
+        //       implement it. Instead it is possible to load full
+        //       file into memory and count rows. However it needs to
+        //       place file loading into model. Though it seems to be
+        //       good.
+        // TODO: Change type of data field to QAbstractTableModel
+        //       because it does not matter for us what model we use.
+        TableModel *newModel = new TableModel(this);
+        int lineNumber = -1;
+        while (!file.atEnd()) {
+            lineNumber++;
+            QString line = file.readLine();
+            // To parse the line we split it by colon and take first
+            // two fields.
+            // TODO: We have more than two fields. Parse them too. 
+            QStringList fields = line.split(':');
+            // TODO: Is it safe to show untrusted input in gui?
+            for (int column = 0; column < TABLE_COLUMNS && column < fields.size(); column++) {
+                QModelIndex index = newModel->index(lineNumber, column);
+                newModel->setData(index, fields.at(column));
+            }
+        }
+
+        // We replace existing model with new one.
+        replaceTableModel(newModel);
     }
 }
 
@@ -123,7 +192,7 @@ void MainWindow::updateJohnOutput()
 {
     // TODO: There was a session string passed here. Hence the
     //       question what is right: one window could have multiple sessions or at one
-    //       time there could be only one sesson opened?
+    //       time there could be only one session opened?
     // NOTE: If there could be only one session in/per window then it
     //       is possible to have session name here through window's field.
     // TODO: Session name should be displayed.
@@ -176,3 +245,4 @@ void MainWindow::showJohnFinished()
     m_ui->actionPause_Attack->setEnabled(false);
     m_ui->actionStart_Attack->setEnabled(true);
 }
+

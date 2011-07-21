@@ -5,6 +5,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// Include for all table models we use
+#include "tablemodel.h"
+#include "filetablemodel.h"
+
 #include <QToolButton>
 #include <QStringListModel>
 #include <QFileDialog>
@@ -137,40 +141,8 @@ void MainWindow::on_actionOpen_Password_triggered()
     //       concatenate selected file or to unshadow them.
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
-        // We read and parse the file.
-        // We create and fill model.
-        // TODO: Move this stuff into TableModel class.
-        QFile file(fileName);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-            // TODO: Notice user that file could be open.
-            return;
-        // TODO: We have prefilled table with 0.5M rows. Develop other
-        //       model.
-        // NOTE: Model could be resizable but it is easy to not
-        //       implement it. Instead it is possible to load full
-        //       file into memory and count rows. However it needs to
-        //       place file loading into model. Though it seems to be
-        //       good.
-        // TODO: Change type of data field to QAbstractTableModel
-        //       because it does not matter for us what model we use.
-        TableModel *newModel = new TableModel(this);
-        int lineNumber = -1;
-        while (!file.atEnd()) {
-            lineNumber++;
-            QString line = file.readLine();
-            // To parse the line we split it by colon and take first
-            // two fields.
-            // TODO: We have more than two fields. Parse them too. 
-            QStringList fields = line.split(':');
-            // TODO: Is it safe to show untrusted input in gui?
-            for (int column = 0; column < TABLE_COLUMNS && column < fields.size(); column++) {
-                QModelIndex index = newModel->index(lineNumber, column);
-                newModel->setData(index, fields.at(column));
-            }
-        }
-
         // We replace existing model with new one.
-        replaceTableModel(newModel);
+        replaceTableModel(new FileTableModel(fileName, this));
     }
 }
 

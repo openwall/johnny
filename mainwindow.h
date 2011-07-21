@@ -38,7 +38,7 @@ private slots:
 
 private:
     Ui::MainWindow *m_ui;
-    TableModel *m_hashmodel;
+    TableModel *m_hashsTable;
     QProcess m_johnProcess;
 };
 

@@ -62,6 +62,8 @@ QVariant TableModel::headerData(int section/* section */,
         return QVariant();
 
     if (orientation == Qt::Vertical)
+        // TODO: Row numbers starting from 0 seems to not be user
+        //       friendly.
         return QString("%1").arg(section);
     if (orientation == Qt::Horizontal) {
         switch (section) {

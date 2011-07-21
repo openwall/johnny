@@ -34,11 +34,11 @@ private slots:
     void showJohnFinished();
     void showJohnStarted();
     void selectPage();
-    void replaceTableModel(TableModel *newTableModel);
+    void replaceTableModel(QAbstractTableModel *newTableModel);
 
 private:
     Ui::MainWindow *m_ui;
-    TableModel *m_hashsTable;
+    QAbstractTableModel *m_hashsTable;
     QProcess m_johnProcess;
 };
 

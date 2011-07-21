@@ -90,7 +90,7 @@ void MainWindow::selectPage()
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
 }
 
-void MainWindow::replaceTableModel(TableModel *newTableModel)
+void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // TODO: Check argument.
 

@@ -151,6 +151,7 @@ void MainWindow::on_pushButton_JohnStatus_clicked()
     // fired and we read John output with status as any other John's
     // output.
     // TODO: However it does not work as of we do not have terminal.
+    // TODO: Why do we write to John even when it is not running?
     m_johnProcess.write("a\r\n");
 }
 

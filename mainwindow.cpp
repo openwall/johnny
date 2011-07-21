@@ -11,7 +11,7 @@
 #include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashmodel(NULL)
+    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashsTable(NULL)
 {
     m_ui->setupUi(this);
 
@@ -95,12 +95,12 @@ void MainWindow::replaceTableModel(TableModel *newTableModel)
     // TODO: Check argument.
 
     // We delete existing model if any.
-    if (m_hashmodel != NULL) {
-        delete m_hashmodel;
-        m_hashmodel = NULL;
+    if (m_hashsTable != NULL) {
+        delete m_hashsTable;
+        m_hashsTable = NULL;
     }
     // We remember new model.
-    m_hashmodel = newTableModel;
+    m_hashsTable = newTableModel;
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
 }
@@ -110,8 +110,8 @@ void MainWindow::on_pushButton_clicked()
     replaceTableModel(new TableModel(this));
 
     for (int i = 0; i < TABLE_ROWS; i++) {
-        m_hashmodel->setData(m_hashmodel->index(i, 0), QString("Rick%1").arg(i));
-        m_hashmodel->setData(m_hashmodel->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+        m_hashsTable->setData(m_hashsTable->index(i, 0), QString("Rick%1").arg(i));
+        m_hashsTable->setData(m_hashsTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
     }
 }
 

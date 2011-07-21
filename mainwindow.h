@@ -8,8 +8,7 @@
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QProcess>
-
-#include "tablemodel.h"
+#include <QAbstractTableModel>
 
 namespace Ui {
     class MainWindow;

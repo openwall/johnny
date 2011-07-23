@@ -5,7 +5,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-// Include for all table models we use
+// We include all table models we use.
 #include "tablemodel.h"
 #include "filetablemodel.h"
 

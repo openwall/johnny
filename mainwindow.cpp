@@ -112,6 +112,9 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 void MainWindow::on_pushButton_clicked()
 {
     replaceTableModel(new TableModel(this));
+    // We reset file name because this model is generated and does not
+    // have connected file.
+    m_hashsFileName = "";
 
     for (int i = 0; i < TABLE_ROWS; i++) {
         m_hashsTable->setData(m_hashsTable->index(i, 0), QString("Rick%1").arg(i));
@@ -143,6 +146,8 @@ void MainWindow::on_actionOpen_Password_triggered()
         QString fileName = dialog.selectedFiles()[0];
         // We replace existing model with new one.
         replaceTableModel(new FileTableModel(fileName, this));
+        // After new model remembered we remember its file name.
+        m_hashsFileName = fileName;
     }
 }
 

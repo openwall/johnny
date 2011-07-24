@@ -155,8 +155,6 @@ void MainWindow::on_actionStart_Attack_triggered()
 {
     QStringList parameters;
 
-    parameters << "--restore"; // no params for now
-
     // To start John we have predefined process object. That object's
     // signals are already connected with our slots. So we need only
     // start it.

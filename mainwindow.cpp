@@ -157,6 +157,8 @@ void MainWindow::on_actionStart_Attack_triggered()
 
     // We check that we have file name.
     if (m_hashsFileName != "") {
+        // If file name is not empty then we have file, pass it to
+        // John.
         // We add file name onto parameters list.
         parameters << m_hashsFileName;
         // To start John we have predefined process object. That object's
@@ -166,7 +168,7 @@ void MainWindow::on_actionStart_Attack_triggered()
         // We start John.
         m_johnProcess.start("/usr/sbin/john", parameters);
     } else {
-        // Else we do not have connected file name ask user to save
+        // Else we do not have connected file name so we ask user to save
         // file.
         // TODO: Do something here.
     }

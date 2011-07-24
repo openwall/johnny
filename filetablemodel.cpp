@@ -16,7 +16,7 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
-    m_columns << tr("User") << tr("Hash");
+    m_columns << tr("User") << tr("Password") << tr("Hash");
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -41,10 +41,18 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
         QStringList fields = line.split(':');
         // TODO: Is it safe to show untrusted input in gui?
         int column;
-        for (column = 0; column < columnCount() && column < fields.size(); column++)
+        // NOTE: Here + 1 caused by 1 field that is not from file.
+        for (column = 0; column < columnCount() && column < fields.size() + 1; column++) {
             // NOTE: When we want we change lists we use [] as of .at()
             //       gives us only const.
-            data[column].append(fields.at(column));
+            // We have one field that is not from file so we skip it.
+            if (column == 1)
+                data[column].append("");
+            else if (column == 0)
+                data[column].append(fields.at(column));
+            else
+                data[column].append(fields.at(column - 1));
+        }
         // Line in file could contain fewer amount of fields than we
         // want. So we fill our table with empty values.
         // We continue column traversing.

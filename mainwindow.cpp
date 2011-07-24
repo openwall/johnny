@@ -155,12 +155,21 @@ void MainWindow::on_actionStart_Attack_triggered()
 {
     QStringList parameters;
 
-    // To start John we have predefined process object. That object's
-    // signals are already connected with our slots. So we need only
-    // start it.
-    //
-    // We start John.
-    m_johnProcess.start("/usr/sbin/john", parameters);
+    // We check that we have file name.
+    if (m_hashsFileName != "") {
+        // We add file name onto parameters list.
+        parameters << m_hashsFileName;
+        // To start John we have predefined process object. That object's
+        // signals are already connected with our slots. So we need only
+        // start it.
+        //
+        // We start John.
+        m_johnProcess.start("/usr/sbin/john", parameters);
+    } else {
+        // Else we do not have connected file name ask user to save
+        // file.
+        // TODO: Do something here.
+    }
 }
 
 void MainWindow::updateJohnOutput()

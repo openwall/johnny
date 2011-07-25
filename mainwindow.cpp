@@ -185,6 +185,10 @@ void MainWindow::updateJohnOutput()
     //ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");
     m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardOutput()); // read output buffer
     m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardError()); // read error buffer
+    // NOTE: Probably here we want to parse John's output, catch newly
+    //       cracked passwords and so on. However John's output is buffered.
+    //       So we do not obtain it as soon as it occurs. Timer and
+    //       --show work for us.
 }
 
 void MainWindow::on_actionPause_Attack_triggered()

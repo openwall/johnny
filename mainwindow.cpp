@@ -13,6 +13,8 @@
 #include <QStringListModel>
 #include <QFileDialog>
 #include <QFile>
+#include <QByteArray>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashsTable(NULL)
@@ -72,6 +74,13 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(updateJohnOutput()));
     connect(&m_johnProcess, SIGNAL(readyReadStandardError()),
             this, SLOT(updateJohnOutput()));
+
+    // We connect timer with calling for john to show us status.
+    connect(&m_showTimer, SIGNAL(timeout()),
+            this, SLOT(callJohnShow()));
+    // We connect 'john --show' process with our object.
+    connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SLOT(readJohnShow()));
 
 //    TableModel *passmodel = new TableModel();
 
@@ -196,6 +205,8 @@ void MainWindow::on_actionPause_Attack_triggered()
     // We ask John to exit.
     // TODO: Is it ok to call it even if process is not running?
     // TODO: Do not we need to call kill instead if John is too busy?
+    // TODO: We need to call this before exit too. In the other case Qt
+    //       will show warning about closing with running process.
     // NOTE: We could leave it for user: we count button presses and for
     //       the first time we call terminate and for next times we
     //       call kill.
@@ -225,6 +236,12 @@ void MainWindow::showJohnStarted()
     // TODO: Should we disable/enable status button?
     m_ui->actionPause_Attack->setEnabled(true);
     m_ui->actionStart_Attack->setEnabled(false);
+    // When John starts we start capturing passwords.
+    // TODO: Currently we set timer to 10 seconds. Make it
+    //       customizable.
+    // TODO: What about adoptive time intervals? Something like 1, 1,
+    //       2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 10, 10, ...
+    m_showTimer.start(10000);
 }
 
 void MainWindow::showJohnFinished()
@@ -234,5 +251,58 @@ void MainWindow::showJohnFinished()
     // button.
     m_ui->actionPause_Attack->setEnabled(false);
     m_ui->actionStart_Attack->setEnabled(true);
+    // When John stops we need to stop timer and to look status last
+    // time.
+    m_showTimer.stop();
+    callJohnShow();
 }
 
+void MainWindow::callJohnShow()
+{
+    QStringList parameters;
+    parameters << "--show" << m_hashsFileName;
+    // TODO: Customizable path to John.
+    m_showJohnProcess.start("/usr/sbin/john", parameters);
+}
+
+void MainWindow::readJohnShow()
+{
+    // TODO: Read John's output while it runs. Do not wait before it
+    //       finishes. For 0.5M of password this code should not work.
+    //       Even if it works it seems to be ineffective for big
+    //       files.
+    // We read all output.
+    QByteArray output = m_showJohnProcess.readAllStandardOutput();
+    QTextStream outputStream(output);
+    // We parse it.
+    // We read output line by line and take user name and password.
+    // Then we find a row with such user and insert password there.
+    // TODO: This is ineffective implementation. May QVector::index()
+    //       be god for search in model internals?
+    // TODO: We could have more than 2 fields. It seems to be useful
+    //       to look on them too.
+    // TODO: What if there are 2 or more rows with 1 user name?
+    QString line;
+    line = outputStream.readLine();
+    // We read to the end or before empty line.
+    // TODO: In the end John says count of cracked password. Read it.
+    while (!line.isNull() && line != "") {
+        // We split lines to fields.
+        // TODO: What if password contains semicolon?
+        // TODO: What if password contains new line?
+        QStringList fields = line.split(':');
+        // We handle password.
+        // We check all rows to have such user name.
+        for (int i = 0; i < m_hashsTable->rowCount(); i++) {
+            if (m_hashsTable->data(m_hashsTable->index(i, 0)) == fields.at(0)) {
+                // If we found user then we put password in table.
+                // TODO: What if there two rows with one user name?
+                // TODO: Whet if we did not have 2 fields? Could
+                //       John's output be wrong?
+                m_hashsTable->setData(m_hashsTable->index(i, 1), fields.at(1));
+            }
+        }
+        // We continue reading with next line.
+        line = outputStream.readLine();
+    }
+}

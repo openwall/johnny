@@ -10,6 +10,9 @@
 #include <QProcess>
 #include <QAbstractTableModel>
 #include <QString>
+#include <QTimer>
+#include <QByteArray>
+#include <QTextStream>
 
 namespace Ui {
     class MainWindow;
@@ -36,6 +39,9 @@ private slots:
     void selectPage();
     void replaceTableModel(QAbstractTableModel *newTableModel);
 
+    void callJohnShow();
+    void readJohnShow();
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashsTable;
@@ -48,6 +54,9 @@ private:
     //       However now this is here.
     QString m_hashsFileName;
     QProcess m_johnProcess;
+    // To catch cracked passwords we use timer and john --show.
+    QTimer m_showTimer;
+    QProcess m_showJohnProcess;
 };
 
 #endif // MAINWINDOW_H

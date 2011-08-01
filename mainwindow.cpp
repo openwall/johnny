@@ -17,7 +17,7 @@
 #include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashsTable(NULL)
+    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashesTable(NULL)
 {
     m_ui->setupUi(this);
 
@@ -105,12 +105,12 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     // TODO: Check argument.
 
     // We delete existing model if any.
-    if (m_hashsTable != NULL) {
-        delete m_hashsTable;
-        m_hashsTable = NULL;
+    if (m_hashesTable != NULL) {
+        delete m_hashesTable;
+        m_hashesTable = NULL;
     }
     // We remember new model.
-    m_hashsTable = newTableModel;
+    m_hashesTable = newTableModel;
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
 }
@@ -120,11 +120,11 @@ void MainWindow::on_pushButton_clicked()
     replaceTableModel(new TableModel(this));
     // We reset file name because this model is generated and does not
     // have connected file.
-    m_hashsFileName = "";
+    m_hashesFileName = "";
 
     for (int i = 0; i < TABLE_ROWS; i++) {
-        m_hashsTable->setData(m_hashsTable->index(i, 0), QString("Rick%1").arg(i));
-        m_hashsTable->setData(m_hashsTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+        m_hashesTable->setData(m_hashesTable->index(i, 0), QString("Rick%1").arg(i));
+        m_hashesTable->setData(m_hashesTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
     }
 }
 
@@ -153,7 +153,7 @@ void MainWindow::on_actionOpen_Password_triggered()
         // We replace existing model with new one.
         replaceTableModel(new FileTableModel(fileName, this));
         // After new model remembered we remember its file name.
-        m_hashsFileName = fileName;
+        m_hashesFileName = fileName;
     }
 }
 
@@ -162,11 +162,11 @@ void MainWindow::on_actionStart_Attack_triggered()
     QStringList parameters;
 
     // We check that we have file name.
-    if (m_hashsFileName != "") {
+    if (m_hashesFileName != "") {
         // If file name is not empty then we have file, pass it to
         // John.
         // We add file name onto parameters list.
-        parameters << m_hashsFileName;
+        parameters << m_hashesFileName;
         // To start John we have predefined process object. That object's
         // signals are already connected with our slots. So we need only
         // start it.
@@ -258,7 +258,7 @@ void MainWindow::showJohnFinished()
 void MainWindow::callJohnShow()
 {
     QStringList parameters;
-    parameters << "--show" << m_hashsFileName;
+    parameters << "--show" << m_hashesFileName;
     // TODO: Customizable path to John.
     m_showJohnProcess.start("/usr/sbin/john", parameters);
 }
@@ -291,14 +291,14 @@ void MainWindow::readJohnShow()
         QStringList fields = line.split(':');
         // We handle password.
         // We check all rows to have such user name.
-        for (int i = 0; i < m_hashsTable->rowCount(); i++) {
-            if (m_hashsTable->data(m_hashsTable->index(i, 0)) == fields.at(0)) {
+        for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+            if (m_hashesTable->data(m_hashesTable->index(i, 0)) == fields.at(0)) {
                 // If we found user then we put password in table.
                 // TODO: What if there two rows with one user name?
                 // TODO: What if we did not have 2 fields? Could
                 //       John's output be wrong?
                 // TODO: What if we did not find row? Note user.
-                m_hashsTable->setData(m_hashsTable->index(i, 1), fields.at(1));
+                m_hashesTable->setData(m_hashesTable->index(i, 1), fields.at(1));
             }
         }
         // We continue reading with next line.

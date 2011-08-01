@@ -44,7 +44,7 @@ private slots:
 
 private:
     Ui::MainWindow *m_ui;
-    QAbstractTableModel *m_hashsTable;
+    QAbstractTableModel *m_hashesTable;
     // TODO: Probably the right place for this field is in table model.
     //       But this needs to have abstract interface that supports
     //       connection with files. Someone could suppose to drop
@@ -52,7 +52,7 @@ private:
     //       joining, editing and so on tables that is not connected
     //       with files yet are necessary.
     //       However now this is here.
-    QString m_hashsFileName;
+    QString m_hashesFileName;
     QProcess m_johnProcess;
     // To catch cracked passwords we use timer and john --show.
     QTimer m_showTimer;

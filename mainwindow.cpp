@@ -239,6 +239,9 @@ void MainWindow::showJohnStarted()
     // TODO: What about adoptive time intervals? Something like 1, 1,
     //       2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 10, 10, ...
     m_showTimer.start(10000);
+    // If we continue cracking than there could already be cracked
+    // passwords so we check status.
+    callJohnShow();
 }
 
 void MainWindow::showJohnFinished()
@@ -254,7 +257,6 @@ void MainWindow::showJohnFinished()
     callJohnShow();
 }
 
-// TODO: This method should be called at John start too.
 void MainWindow::callJohnShow()
 {
     QStringList parameters;

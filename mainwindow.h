@@ -32,11 +32,11 @@ private slots:
     void on_actionPause_Attack_triggered();
     void on_actionOpen_Password_triggered();
     void on_pushButton_JohnStatus_clicked();
+    void on_listWidgetTabs_itemSelectionChanged();
 
     void updateJohnOutput();
     void showJohnFinished();
     void showJohnStarted();
-    void selectPage();
     void replaceTableModel(QAbstractTableModel *newTableModel);
 
     void callJohnShow();

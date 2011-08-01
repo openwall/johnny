@@ -254,6 +254,7 @@ void MainWindow::showJohnFinished()
     callJohnShow();
 }
 
+// TODO: This method should be called at John start too.
 void MainWindow::callJohnShow()
 {
     QStringList parameters;
@@ -303,4 +304,26 @@ void MainWindow::readJohnShow()
         // We continue reading with next line.
         line = outputStream.readLine();
     }
+    // We are on the last line.
+    // TODO: Really?
+    // We take counts of cracked passwords and of left hashes.
+    // We read count of cracked password hashes.
+    // TODO: Could we read after end?
+    // TODO: Is following sequence always right?
+    int crackedCount;
+    outputStream >> crackedCount;
+    // We skip 3 words.
+    QString skippedWord;
+    outputStream >> skippedWord >> skippedWord >> skippedWord;
+    // We read left count.
+    int leftCount;
+    outputStream >> leftCount;
+    // We update progress bar.
+    // TODO: May it be better to show entire string from John?
+    //       Translation?
+    m_ui->progressBar->setRange(0, crackedCount + leftCount);
+    m_ui->progressBar->setValue(crackedCount);
+    // TODO: Is not such format too complex?
+    // TODO: May it be better to not change format during run?
+    m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left)").arg(crackedCount).arg(leftCount));
 }

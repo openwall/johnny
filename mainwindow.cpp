@@ -297,8 +297,9 @@ void MainWindow::readJohnShow()
             if (m_hashsTable->data(m_hashsTable->index(i, 0)) == fields.at(0)) {
                 // If we found user then we put password in table.
                 // TODO: What if there two rows with one user name?
-                // TODO: Whet if we did not have 2 fields? Could
+                // TODO: What if we did not have 2 fields? Could
                 //       John's output be wrong?
+                // TODO: What if we did not find row? Note user.
                 m_hashsTable->setData(m_hashsTable->index(i, 1), fields.at(1));
             }
         }

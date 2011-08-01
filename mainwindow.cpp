@@ -21,9 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    connect(m_ui->listWidgetTabs, SIGNAL(itemSelectionChanged()),
-            this, SLOT(selectPage()));
-
     m_ui->listWidgetTabs->setMaximumWidth(m_ui->listWidgetTabs->sizeHintForColumn(0) + 2);
 
     // TODO: How to select Passwords tab through mainwindow.ui?
@@ -98,7 +95,7 @@ MainWindow::~MainWindow()
     delete m_ui;
 }
 
-void MainWindow::selectPage()
+void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
 }

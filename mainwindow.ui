@@ -752,7 +752,17 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="logPage"/>
+         <widget class="QWidget" name="logPage">
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <item>
+            <widget class="QPlainTextEdit" name="plainTextEdit_JohnLog">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
        <item>

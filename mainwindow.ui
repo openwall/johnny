@@ -267,6 +267,27 @@
          <widget class="QWidget" name="optionsPage">
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>General options</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_3">
+             <property name="text">
+              <string>Edit config</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Mode selection and settings</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QRadioButton" name="radioButton">
              <property name="text">
               <string>Default behaviour</string>
@@ -343,6 +364,9 @@
               <layout class="QHBoxLayout" name="horizontalLayout">
                <item>
                 <widget class="QLabel" name="label">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Wordlist file:</string>
                  </property>
@@ -350,6 +374,9 @@
                </item>
                <item>
                 <widget class="QComboBox" name="comboBox">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="editable">
                   <bool>true</bool>
                  </property>
@@ -357,6 +384,9 @@
                </item>
                <item>
                 <widget class="QPushButton" name="pushButton_2">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Browse</string>
                  </property>
@@ -368,6 +398,9 @@
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
                 <widget class="QCheckBox" name="checkBox">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Rules, name:</string>
                  </property>
@@ -375,15 +408,11 @@
                </item>
                <item>
                 <widget class="QComboBox" name="comboBox_2">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="editable">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_3">
-                 <property name="text">
-                  <string>Edit config</string>
                  </property>
                 </widget>
                </item>
@@ -417,6 +446,9 @@
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
                 <widget class="QCheckBox" name="checkBox_2">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>Name:</string>
                  </property>
@@ -424,15 +456,11 @@
                </item>
                <item>
                 <widget class="QComboBox" name="comboBox_3">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="editable">
                   <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_4">
-                 <property name="text">
-                  <string>Edit config</string>
                  </property>
                 </widget>
                </item>

@@ -137,6 +137,26 @@ MainWindow::~MainWindow()
     delete m_ui;
 }
 
+void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
+{
+    // We pops a dialog to choose a file to open.
+    // TODO: *.lst for file extension?
+    // TODO: Copy-pasting is evil! (open password file)
+    // TODO: What happens when John writes something while dialog
+    //       opened?
+    // TODO: Move dialog creation and setting up into window constructor.
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    // TODO: Dialog could allow user to select multiple files. May it
+    //       be good to support this ability? To concatenate selected file?
+    if (dialog.exec()) {
+        QString fileName = dialog.selectedFiles()[0];
+        // We put file name into field for it.
+        // TODO: File name does not appear in history (drop down list).
+        m_ui->comboBox_WordlistFile->setEditText(fileName);
+    }
+}
+
 void MainWindow::on_comboBox_Format_currentIndexChanged(const QString& text)
 {
     // When selected format changed to "md5-gen" we enable subformat

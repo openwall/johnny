@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1107</width>
-    <height>829</height>
+    <width>908</width>
+    <height>993</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -213,7 +213,7 @@
           <string notr="true"/>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -268,6 +268,12 @@
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
             <widget class="QLabel" name="label_6">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>General options</string>
              </property>
@@ -279,8 +285,14 @@
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QLabel" name="label_10">
+                 <property name="font">
+                  <font>
+                   <family>Sans Serif</family>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
                  <property name="text">
-                  <string>Your John the Ripper might not support all formats listed. You could ask it to correct the list.</string>
+                  <string>Your version of John the Ripper might support different formats than listed. You could ask John to correct the list.</string>
                  </property>
                  <property name="wordWrap">
                   <bool>true</bool>
@@ -639,6 +651,10 @@
                  </item>
                 </widget>
                </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
                <item>
                 <widget class="QLabel" name="label_9">
                  <property name="enabled">
@@ -864,6 +880,12 @@
            </item>
            <item>
             <widget class="QLabel" name="label_7">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Mode selection and settings</string>
              </property>
@@ -871,6 +893,13 @@
            </item>
            <item>
             <widget class="QRadioButton" name="radioButton">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Default behaviour</string>
              </property>
@@ -886,6 +915,12 @@
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
               <widget class="QLabel" name="label_2">
+               <property name="font">
+                <font>
+                 <family>Sans Serif</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>With default behaviour John the Ripper will run &quot;single crack&quot; mode, then wordlist mode, then &quot;incremental&quot; mode. All with default settings.</string>
                </property>
@@ -898,6 +933,13 @@
            </item>
            <item>
             <widget class="QRadioButton" name="radioButton_2">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>&quot;Single crack&quot; mode</string>
              </property>
@@ -910,6 +952,12 @@
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
               <widget class="QLabel" name="label_3">
+               <property name="font">
+                <font>
+                 <family>Sans Serif</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>&quot;Single crack&quot; mode is the most fast mode. It uses login names and other information with word mangling rules named &quot;Single&quot;.</string>
                </property>
@@ -918,10 +966,41 @@
                </property>
               </widget>
              </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <item>
+                <widget class="QCheckBox" name="checkBox_3">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Use external mode, filter name:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox_7">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </item>
            <item>
             <widget class="QRadioButton" name="radioButton_3">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Wordlist mode</string>
              </property>
@@ -934,6 +1013,12 @@
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
               <widget class="QLabel" name="label_4">
+               <property name="font">
+                <font>
+                 <family>Sans Serif</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. So there are two fields: path to wordlist file and name of rule you want to apply (for instance, &quot;Single&quot;)</string>
                </property>
@@ -984,7 +1069,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="text">
-                  <string>Rules, name:</string>
+                  <string>Use rules, name:</string>
                  </property>
                 </widget>
                </item>
@@ -1000,10 +1085,41 @@
                </item>
               </layout>
              </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QCheckBox" name="checkBox_4">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Use external mode, filter name:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox_8">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </item>
            <item>
             <widget class="QRadioButton" name="radioButton_4">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>&quot;Incremental&quot; mode</string>
              </property>
@@ -1016,6 +1132,12 @@
             <layout class="QVBoxLayout" name="verticalLayout_7">
              <item>
               <widget class="QLabel" name="label_5">
+               <property name="font">
+                <font>
+                 <family>Sans Serif</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
                <property name="text">
                 <string>&quot;Incremental&quot; mode is the most powerfull mode because it can try all possible combinations. Yes, it is long so order of tries is based on frequencies of single characters, pairs and trigraphs. However it could be too long so try this mode as the last chance. Information about frequencies is taken from file called charset. Such files are listed with names in configuration file. So if you would not like to use default charset file turn checkbox on and enter name of charset.</string>
                </property>
@@ -1038,6 +1160,88 @@
                </item>
                <item>
                 <widget class="QComboBox" name="comboBox_3">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QCheckBox" name="checkBox_5">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Use external mode, filter name:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox_9">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton_5">
+             <property name="font">
+              <font>
+               <family>Sans Serif</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>External mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <widget class="QLabel" name="label_11">
+               <property name="font">
+                <font>
+                 <family>Sans Serif</family>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>External mode is the most flexible mode because you could define your own code to generate candidates. Also you could create filters to reduce amount of candidates to try (such filters are available for use with other modes). There are predefined external routines in configuration file.</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Name:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="comboBox_6">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -1155,7 +1359,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1107</width>
+     <width>908</width>
      <height>25</height>
     </rect>
    </property>

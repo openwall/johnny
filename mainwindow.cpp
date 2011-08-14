@@ -79,6 +79,48 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
+    // We connect all widgets for option with radio buttons to keep
+    // enabled only widgets of selected mode.
+    // TODO: Easier way? Maybe make connections in designer?
+    // "Single crack" mode
+    connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
+            m_ui->checkBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
+    // TODO: Should not we keep comboBox disabled until checkbox would
+    //       not be checked? (in other places too)
+    connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
+    // Wordlist mode
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->label_WordlistFile, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_WordlistFile, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->pushButton_WordlistFileBrowse, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->checkBox_WordlistModeRules, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->checkBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->checkBox_WordlistModeExternalName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_WordlistModeExternalName, SLOT(setEnabled(bool)));
+    // Incremental mode
+    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
+            m_ui->checkBox_IncrementalModeName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_IncrementalModeName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
+            m_ui->checkBox_IncrementalModeExternalName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_IncrementalModeExternalName, SLOT(setEnabled(bool)));
+    // External mode
+    connect(m_ui->radioButton_ExternalMode, SIGNAL(toggled(bool)),
+            m_ui->label_ExternalModeName, SLOT(setEnabled(bool)));
+    connect(m_ui->radioButton_ExternalMode, SIGNAL(toggled(bool)),
+            m_ui->comboBox_ExternalModeName, SLOT(setEnabled(bool)));
+
 //    TableModel *passmodel = new TableModel();
 
 //    ui->tableView_Passwords->setModel(passmodel);

@@ -137,6 +137,15 @@ MainWindow::~MainWindow()
     delete m_ui;
 }
 
+void MainWindow::on_comboBox_Format_currentIndexChanged(const QString& text)
+{
+    // When selected format changed to "md5-gen" we enable subformat
+    // list. In other cases it should be disabled.
+    bool enabled = text == "md5-gen";
+    m_ui->label_Subformat->setEnabled(enabled);
+    m_ui->comboBox_Subformat->setEnabled(enabled);
+}
+
 void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());

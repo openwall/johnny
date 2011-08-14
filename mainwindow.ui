@@ -661,7 +661,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="text">
-                  <string>Subformat (md5_gen(n)):</string>
+                  <string>Subformat (md5-gen):</string>
                  </property>
                 </widget>
                </item>
@@ -670,11 +670,6 @@
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
-                 <item>
-                  <property name="text">
-                   <string>Default</string>
-                  </property>
-                 </item>
                  <item>
                   <property name="text">
                    <string>md5_gen(0): md5($p)  (raw-md5) </string>

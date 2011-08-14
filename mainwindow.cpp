@@ -220,9 +220,10 @@ void MainWindow::on_actionStart_Attack_triggered()
     //       not exist and format is handled as other options.
     //       It could give an ability to unify all options and keep
     //       them not as code.
-    if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
+    if (m_ui->comboBox_Format->currentText() != tr("Auto detect"))
+        // TODO: What is better format to use for keys: -key: or
+        //       --key= or something else?
         parameters << ("-format:" + m_ui->comboBox_Format->currentText());
-    }
     // Subformat
     // TODO: We put logic to determine either we need subformat
     //       option into enable/disable switcher. Bad design.
@@ -240,6 +241,64 @@ void MainWindow::on_actionStart_Attack_triggered()
         QString subformat = m_ui->comboBox_Subformat->currentText();
         subformat.truncate(subformat.indexOf(")") + 1);
         parameters << ("-subformat:" + subformat);
+    }
+    // Modes
+    if (m_ui->radioButton_DefaultBehaviour->isChecked()) {
+        // Default behaviour - no modes
+        // There are no options here.
+    } else if (m_ui->radioButton_SingleCrackMode->isChecked()) {
+        // "Single crack" mode
+        parameters << "-single";
+        // External mode, filter
+        // TODO: It is applicable for 3 formats. Copy-pasting is evil!
+        // TODO: Warn if checkbox is checked and there is not text in
+        //       combobox. For other empty fields it would great to
+        //       warn too.
+        if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
+            parameters << ("-external:" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
+    } else if (m_ui->radioButton_WordlistMode->isChecked()) {
+        // Wordlist mode
+        parameters << ("-wordlist:" + m_ui->comboBox_WordlistFile->currentText());
+        // Rules
+        // They could appear with or without name.
+        // TODO: It would be great to disable name selection before
+        //       rules are chosen. It is opposite design to subformat list.
+        if (m_ui->checkBox_WordlistModeRules->isChecked()) {
+            // If rules are selected then we distinguish either name
+            // is needed two.
+            if (m_ui->checkBox_WordlistModeRulesName->isChecked()) {
+                // If name for rules is selected to be then we take it.
+                // NOTE: Not all versions support this.
+                // TODO: It would be great to notice user about this.
+                // TODO: It would be great to notice user on any
+                //       fails, not only here.
+                // TODO: Fails causes interface to stick a bit.
+                parameters << ("-rules:" + m_ui->comboBox_WordlistModeRulesName->currentText());
+            } else {
+                // If no name is needed then we use just rules,
+                // without name.
+                parameters << "-rules";
+            }
+        }
+        // External mode, filter
+        if (m_ui->checkBox_WordlistModeExternalName->isChecked())
+            parameters << ("-external:" + m_ui->comboBox_WordlistModeExternalName->currentText());
+    } else if (m_ui->radioButton_IncrementalMode->isChecked()) {
+        // "Incremental" mode
+        // It could be with or without name.
+        if (m_ui->checkBox_IncrementalModeName->isChecked()) {
+            // With name
+            parameters << ("-incremental:" + m_ui->comboBox_IncrementalModeName->currentText());
+        } else {
+            // Without name
+            parameters << "-incremental";
+        }
+        // External mode, filter
+        if (m_ui->checkBox_IncrementalModeExternalName->isChecked())
+            parameters << ("-external:" + m_ui->comboBox_IncrementalModeExternalName->currentText());
+    } else if (m_ui->radioButton_ExternalMode->isChecked()) {
+        // External mode
+        parameters << ("-external:" + m_ui->comboBox_ExternalModeName->currentText());
     }
 
     // We check that we have file name.

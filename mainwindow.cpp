@@ -240,10 +240,20 @@ void MainWindow::on_actionStart_Attack_triggered()
     //       not exist and format is handled as other options.
     //       It could give an ability to unify all options and keep
     //       them not as code.
-    if (m_ui->comboBox_Format->currentText() != tr("Auto detect"))
+    if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
         // TODO: What is better format to use for keys: -key: or
         //       --key= or something else?
-        parameters << ("-format:" + m_ui->comboBox_Format->currentText());
+        // We remember format key to be used with '-show' to take
+        // progress.
+        // TODO: Instead of remembering of keys we could lock options.
+        //       What is better?
+        m_format = ("-format:" + m_ui->comboBox_Format->currentText());
+        parameters << m_format;
+    } else {
+        // In case we do not have explicit format we erase remembered
+        // key.
+        m_format = "";
+    }
     // Subformat
     // TODO: We put logic to determine either we need subformat
     //       option into enable/disable switcher. Bad design.
@@ -260,7 +270,13 @@ void MainWindow::on_actionStart_Attack_triggered()
         // We copy string, truncate it to end with right brace.
         QString subformat = m_ui->comboBox_Subformat->currentText();
         subformat.truncate(subformat.indexOf(")") + 1);
-        parameters << ("-subformat:" + subformat);
+        // We remember subformat to use later with '-show' to take
+        // progress.
+        m_subformat = "-subformat:" + subformat;
+        parameters << m_subformat;
+    } else {
+        // If we do not use subformat key we remember it.
+        m_subformat = "";
     }
     // Modes
     if (m_ui->radioButton_DefaultBehaviour->isChecked()) {
@@ -292,7 +308,8 @@ void MainWindow::on_actionStart_Attack_triggered()
                 // TODO: It would be great to notice user about this.
                 // TODO: It would be great to notice user on any
                 //       fails, not only here.
-                // TODO: Fails causes interface to stick a bit.
+                // TODO: Calls to John makes interface to stick a bit.
+                //       It is actual with often -show calls.
                 parameters << ("-rules:" + m_ui->comboBox_WordlistModeRulesName->currentText());
             } else {
                 // If no name is needed then we use just rules,
@@ -420,6 +437,11 @@ void MainWindow::showJohnFinished()
 void MainWindow::callJohnShow()
 {
     QStringList parameters;
+    // We add current format and subformat keys if they are not empty.
+    if (m_format != "")
+        parameters << m_format;
+    if (m_subformat != "")
+        parameters << m_subformat;
     parameters << "--show" << m_hashesFileName;
     // TODO: Customizable path to John.
     m_showJohnProcess.start("/usr/sbin/john", parameters);
@@ -489,5 +511,8 @@ void MainWindow::readJohnShow()
     // TODO: May it be better to not change format during run?
     // TODO: When attack starts progress bar goes left to right and back before
     //       we set new format up.
-    m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left)").arg(crackedCount).arg(leftCount));
+    // TODO: Format and subformat are shown as keys. Enough good?
+    //       Brackets are shown always.
+    // TODO: This string is too long.
+    m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left) [%3 %4]").arg(crackedCount).arg(leftCount).arg(m_format).arg(m_subformat));
 }

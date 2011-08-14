@@ -211,6 +211,36 @@ void MainWindow::on_actionOpen_Password_triggered()
 void MainWindow::on_actionStart_Attack_triggered()
 {
     QStringList parameters;
+    // We prepare parameters list from options section.
+    // TODO: Make it as separate method. It also will be needed to
+    //       preview command line that not done now.
+    // General options
+    // Format
+    // TODO: If format is with checkbox then 'auto detect' does
+    //       not exist and format is handled as other options.
+    //       It could give an ability to unify all options and keep
+    //       them not as code.
+    if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
+        parameters << ("-format:" + m_ui->comboBox_Format->currentText());
+    }
+    // Subformat
+    // TODO: We put logic to determine either we need subformat
+    //       option into enable/disable switcher. Bad design.
+    if (m_ui->comboBox_Subformat->isEnabled()) {
+        // We need to cut subformat from string because strings in this
+        // list contain comments/descriptions.
+        // Strings could be like:
+        // md5_gen(0): md5($p)  (raw-md5) 
+        // md5_gen(1001) md5(md5(md5(md5($p))))
+        // User formats does not have semicolon between format name
+        // and description. So we will restrict our pattern with right
+        // brace.
+        //
+        // We copy string, truncate it to end with right brace.
+        QString subformat = m_ui->comboBox_Subformat->currentText();
+        subformat.truncate(subformat.indexOf(")") + 1);
+        parameters << ("-subformat:" + subformat);
+    }
 
     // We check that we have file name.
     if (m_hashesFileName != "") {
@@ -378,5 +408,7 @@ void MainWindow::readJohnShow()
     m_ui->progressBar->setValue(crackedCount);
     // TODO: Is not such format too complex?
     // TODO: May it be better to not change format during run?
+    // TODO: When attack starts progress bar goes left to right and back before
+    //       we set new format up.
     m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left)").arg(crackedCount).arg(leftCount));
 }

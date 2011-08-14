@@ -1015,7 +1015,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. So there are two fields: path to wordlist file and name of rule you want to apply (for instance, &quot;Single&quot;)</string>
+                <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. So there are two fields: path to wordlist file and name of rule you want to apply (for instance, &quot;Single&quot;). However not all John's versions support named rules.</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
@@ -1159,7 +1159,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="text">
-                  <string>Name:</string>
+                  <string>Charset (name):</string>
                  </property>
                 </widget>
                </item>

@@ -321,7 +321,7 @@
                 <widget class="QComboBox" name="comboBox_Format">
                  <item>
                   <property name="text">
-                   <string>Auto</string>
+                   <string>Auto detect</string>
                   </property>
                  </item>
                  <item>

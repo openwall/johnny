@@ -869,7 +869,7 @@
            <item>
             <widget class="QPushButton" name="pushButton_EditConfig">
              <property name="text">
-              <string>Edit config</string>
+              <string>Edit John's configuration file</string>
              </property>
             </widget>
            </item>

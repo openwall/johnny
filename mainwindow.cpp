@@ -159,9 +159,9 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
 
 void MainWindow::on_comboBox_Format_currentIndexChanged(const QString& text)
 {
-    // When selected format changed to "md5-gen" we enable subformat
+    // When selected format changed to "md5-gen(n)" we enable subformat
     // list. In other cases it should be disabled.
-    bool enabled = text == "md5-gen";
+    bool enabled = text == "md5-gen(n)";
     m_ui->label_Subformat->setEnabled(enabled);
     m_ui->comboBox_Subformat->setEnabled(enabled);
 }

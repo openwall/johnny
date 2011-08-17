@@ -646,7 +646,7 @@
                  </item>
                  <item>
                   <property name="text">
-                   <string>md5-gen</string>
+                   <string>md5-gen(n)</string>
                   </property>
                  </item>
                 </widget>
@@ -661,7 +661,7 @@
                   <bool>false</bool>
                  </property>
                  <property name="text">
-                  <string>Subformat (md5-gen):</string>
+                  <string>Subformat (md5-gen(n)):</string>
                  </property>
                 </widget>
                </item>

@@ -243,40 +243,48 @@ void MainWindow::on_actionStart_Attack_triggered()
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
         // TODO: What is better format to use for keys: -key: or
         //       --key= or something else?
+        // First part of format key
         // We remember format key to be used with '-show' to take
         // progress.
         // TODO: Instead of remembering of keys we could lock options.
         //       What is better?
-        m_format = ("-format:" + m_ui->comboBox_Format->currentText());
+        m_format = "-format:";
+        // Subformat
+        // NOTE: $ john -format:md5-gen -subformat:md5_gen(0)
+        //       is deprecated. So we will use
+        //       $ john -format:md5_gen(0)
+        //       instead. See
+        //       http://www.openwall.com/lists/john-users/2011/08/17/2
+        // If have enabled subformat then we replace current format
+        // with chosen subformat.
+        // TODO: We put logic to determine either we need subformat
+        //       option into enable/disable switcher. Bad design.
+        if (m_ui->comboBox_Subformat->isEnabled()) {
+            // We need to cut subformat from string because strings in this
+            // list contain comments/descriptions.
+            // Strings could be like:
+            // md5_gen(0): md5($p)  (raw-md5) 
+            // md5_gen(1001) md5(md5(md5(md5($p))))
+            // User formats does not have semicolon between format name
+            // and description. So we will restrict our pattern with right
+            // brace.
+            //
+            // We copy string, truncate it to end with right brace.
+            QString subformat = m_ui->comboBox_Subformat->currentText();
+            subformat.truncate(subformat.indexOf(")") + 1);
+            // We append subformat to format key's text.
+            m_format += subformat;
+        } else {
+            // Else (if we do not have subformat) we use current
+            // format.
+            m_format += m_ui->comboBox_Format->currentText();
+        }
+        // We add format key onto parameters list.
         parameters << m_format;
     } else {
         // In case we do not have explicit format we erase remembered
         // key.
         m_format = "";
-    }
-    // Subformat
-    // TODO: We put logic to determine either we need subformat
-    //       option into enable/disable switcher. Bad design.
-    if (m_ui->comboBox_Subformat->isEnabled()) {
-        // We need to cut subformat from string because strings in this
-        // list contain comments/descriptions.
-        // Strings could be like:
-        // md5_gen(0): md5($p)  (raw-md5) 
-        // md5_gen(1001) md5(md5(md5(md5($p))))
-        // User formats does not have semicolon between format name
-        // and description. So we will restrict our pattern with right
-        // brace.
-        //
-        // We copy string, truncate it to end with right brace.
-        QString subformat = m_ui->comboBox_Subformat->currentText();
-        subformat.truncate(subformat.indexOf(")") + 1);
-        // We remember subformat to use later with '-show' to take
-        // progress.
-        m_subformat = "-subformat:" + subformat;
-        parameters << m_subformat;
-    } else {
-        // If we do not use subformat key we remember it.
-        m_subformat = "";
     }
     // Modes
     if (m_ui->radioButton_DefaultBehaviour->isChecked()) {
@@ -437,11 +445,9 @@ void MainWindow::showJohnFinished()
 void MainWindow::callJohnShow()
 {
     QStringList parameters;
-    // We add current format and subformat keys if they are not empty.
+    // We add current format key if it is not empty.
     if (m_format != "")
         parameters << m_format;
-    if (m_subformat != "")
-        parameters << m_subformat;
     parameters << "--show" << m_hashesFileName;
     // TODO: Customizable path to John.
     m_showJohnProcess.start("/usr/sbin/john", parameters);
@@ -511,8 +517,8 @@ void MainWindow::readJohnShow()
     // TODO: May it be better to not change format during run?
     // TODO: When attack starts progress bar goes left to right and back before
     //       we set new format up.
-    // TODO: Format and subformat are shown as keys. Enough good?
+    // TODO: Format is shown as key. Enough good?
     //       Brackets are shown always.
     // TODO: This string is too long.
-    m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left) [%3 %4]").arg(crackedCount).arg(leftCount).arg(m_format).arg(m_subformat));
+    m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(crackedCount).arg(leftCount).arg(m_format));
 }

@@ -59,10 +59,9 @@ private:
     // To catch cracked passwords we use timer and john --show.
     QTimer m_showTimer;
     QProcess m_showJohnProcess;
-    // Format and subformat keys to use with --show.
-    // With this keys current John was started.
+    // Format key to use with --show.
+    // With this key current John was started.
     QString m_format;
-    QString m_subformat;
 };
 
 #endif // MAINWINDOW_H

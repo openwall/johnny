@@ -419,11 +419,17 @@ void MainWindow::showJohnStarted()
     m_ui->actionPause_Attack->setEnabled(true);
     m_ui->actionStart_Attack->setEnabled(false);
     // When John starts we start capturing passwords.
-    // TODO: Currently we set timer to 10 seconds. Make it
+    // TODO: Currently we set timer to 10 minutes. Make it
     //       customizable.
     // TODO: What about adoptive time intervals? Something like 1, 1,
     //       2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 10, 10, ...
-    m_showTimer.start(10000);
+    // TODO: John updates pot in time listed in configuration file.
+    //       So it is needed to force John update file using sighup or
+    //       similar way or to change configuration file.
+    //       Also it is possible to implement terminal emulator to
+    //       take passwords from stdout without buffering.
+    //       It relates with picking status of John.
+    m_showTimer.start(1000 * 60 * 10);
     // If we continue cracking than there could already be cracked
     // passwords so we check status.
     callJohnShow();

@@ -646,32 +646,6 @@
                  </item>
                  <item>
                   <property name="text">
-                   <string>md5-gen(n)</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_11">
-               <item>
-                <widget class="QLabel" name="label_Subformat">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Subformat (md5-gen(n)):</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QComboBox" name="comboBox_Subformat">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <item>
-                  <property name="text">
                    <string>md5_gen(0): md5($p)  (raw-md5) </string>
                   </property>
                  </item>

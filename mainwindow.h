@@ -33,7 +33,6 @@ private slots:
     void on_actionOpen_Password_triggered();
     void on_pushButton_JohnStatus_clicked();
     void on_listWidgetTabs_itemSelectionChanged();
-    void on_comboBox_Format_currentIndexChanged(const QString& text);
     void on_pushButton_WordlistFileBrowse_clicked();
 
     void updateJohnOutput();

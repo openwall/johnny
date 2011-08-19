@@ -157,15 +157,6 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
     }
 }
 
-void MainWindow::on_comboBox_Format_currentIndexChanged(const QString& text)
-{
-    // When selected format changed to "md5-gen(n)" we enable subformat
-    // list. In other cases it should be disabled.
-    bool enabled = text == "md5-gen(n)";
-    m_ui->label_Subformat->setEnabled(enabled);
-    m_ui->comboBox_Subformat->setEnabled(enabled);
-}
-
 void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
@@ -241,43 +232,36 @@ void MainWindow::on_actionStart_Attack_triggered()
     //       It could give an ability to unify all options and keep
     //       them not as code.
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
-        // TODO: What is better format to use for keys: -key: or
-        //       --key= or something else?
-        // First part of format key
-        // We remember format key to be used with '-show' to take
-        // progress.
-        // TODO: Instead of remembering of keys we could lock options.
-        //       What is better?
-        m_format = "-format:";
-        // Subformat
+        // We have one list for formats and subformats. Subformats
+        // contain short description after it. 
+        // Strings could be like:
+        // des
+        // md5_gen(0): md5($p)  (raw-md5) 
+        // md5_gen(1001) md5(md5(md5(md5($p))))
+        // User formats does not have semicolon between format name
+        // and description. So we will restrict our pattern with right
+        // brace.
         // NOTE: $ john -format:md5-gen -subformat:md5_gen(0)
         //       is deprecated. So we will use
         //       $ john -format:md5_gen(0)
         //       instead. See
         //       http://www.openwall.com/lists/john-users/2011/08/17/2
-        // If have enabled subformat then we replace current format
-        // with chosen subformat.
-        // TODO: We put logic to determine either we need subformat
-        //       option into enable/disable switcher. Bad design.
-        if (m_ui->comboBox_Subformat->isEnabled()) {
-            // We need to cut subformat from string because strings in this
-            // list contain comments/descriptions.
-            // Strings could be like:
-            // md5_gen(0): md5($p)  (raw-md5) 
-            // md5_gen(1001) md5(md5(md5(md5($p))))
-            // User formats does not have semicolon between format name
-            // and description. So we will restrict our pattern with right
-            // brace.
-            //
-            // We copy string, truncate it to end with right brace.
-            QString subformat = m_ui->comboBox_Subformat->currentText();
-            subformat.truncate(subformat.indexOf(")") + 1);
-            // We append subformat to format key's text.
-            m_format += subformat;
-        } else {
-            // Else (if we do not have subformat) we use current
-            // format.
-            m_format += m_ui->comboBox_Format->currentText();
+        // TODO: What is better format to use for keys: -key: or
+        //       --key= or something else?
+        // We remember format key to be used with '-show' to take
+        // progress.
+        // TODO: Instead of remembering of keys we could lock options.
+        //       What is better?
+        m_format = "-format:" + m_ui->comboBox_Format->currentText();
+        // Now we have '-format:format' or '-format:format(N)description'.
+        // So we truncate string to ')' if brace is in string.
+        //
+        // We try to find ')'.
+        int index = m_format.indexOf(")");
+        // We check that we have brace in string.
+        if (index >= 0) {
+            // We truncate line to index keeping index.
+            m_format.truncate(index + 1);
         }
         // We add format key onto parameters list.
         parameters << m_format;
@@ -305,8 +289,6 @@ void MainWindow::on_actionStart_Attack_triggered()
         parameters << ("-wordlist:" + m_ui->comboBox_WordlistFile->currentText());
         // Rules
         // They could appear with or without name.
-        // TODO: It would be great to disable name selection before
-        //       rules are chosen. It is opposite design to subformat list.
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
             // If rules are selected then we distinguish either name
             // is needed two.

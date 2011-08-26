@@ -1275,6 +1275,13 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_BrowsePathToJohn">
+               <property name="text">
+                <string>Browse</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
            <item>
@@ -1328,7 +1335,7 @@
              <item>
               <widget class="QPushButton" name="pushButton_ApplySaveSettings">
                <property name="text">
-                <string>Apply and Save settings</string>
+                <string>Apply and Save Settings</string>
                </property>
               </widget>
              </item>

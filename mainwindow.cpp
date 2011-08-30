@@ -139,7 +139,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
 {
-    // We pops a dialog to choose a file to open.
+    // We pop a dialog to choose a file to open.
     // TODO: *.lst for file extension?
     // TODO: Copy-pasting is evil! (open password file)
     // TODO: What happens when John writes something while dialog
@@ -201,7 +201,7 @@ void MainWindow::on_actionOpen_Password_triggered()
     //       For now user could not choose what to do. We always
     //       replace existing model.
 
-    // We pops a dialog to choose a file to open.
+    // We pop a dialog to choose a file to open.
     // TODO: What happens when John writes something while dialog
     //       opened?
     // TODO: Move dialog creation and setting up into window constructor.
@@ -339,7 +339,7 @@ void MainWindow::on_actionStart_Attack_triggered()
         // start it.
         //
         // We start John.
-        m_johnProcess.start("/usr/sbin/john", parameters);
+        m_johnProcess.start(m_pathToJohn, parameters);
     } else {
         // Else we do not have connected file name so we ask user to save
         // file.
@@ -411,7 +411,23 @@ void MainWindow::showJohnStarted()
     //       Also it is possible to implement terminal emulator to
     //       take passwords from stdout without buffering.
     //       It relates with picking status of John.
-    m_showTimer.start(1000 * 60 * 10);
+    // TODO: When user change respective setting time for current run
+    //       is not changed. Probably user expects other.
+    // TODO: Should we distinguish settings for current run and for
+    //       next runs? At least we should mark settings that could be
+    //       changed while John works as having such behaviour.
+    // NOTE: m_timeIntervalPickCracked is limited to int (maximum is
+    //       MAX_INT) but here we multiple it by 1000. So we could
+    //       have integer overflow. At this time value is borrowed from
+    //       spin box. It could have customized limit. But currently
+    //       we do not want to set it up at runtime so we should use
+    //       value appropriate for multiple platforms but enough big
+    //       to be comfortable for users.
+    //       So current value corresponds to one day. However it is
+    //       not suitable for platforms with int of two bytes.
+    // TODO: Do all platforms supported by Qt have 4 or bytes in int?
+    // TODO: Better maximum value for spin box? Conceptually other way?
+    m_showTimer.start(m_timeIntervalPickCracked * 1000);
     // If we continue cracking than there could already be cracked
     // passwords so we check status.
     callJohnShow();
@@ -437,8 +453,7 @@ void MainWindow::callJohnShow()
     if (m_format != "")
         parameters << m_format;
     parameters << "--show" << m_hashesFileName;
-    // TODO: Customizable path to John.
-    m_showJohnProcess.start("/usr/sbin/john", parameters);
+    m_showJohnProcess.start(m_pathToJohn, parameters);
 }
 
 void MainWindow::readJohnShow()
@@ -509,4 +524,129 @@ void MainWindow::readJohnShow()
     //       Brackets are shown always.
     // TODO: This string is too long.
     m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(crackedCount).arg(leftCount).arg(m_format));
+}
+
+// Settings page code
+// NOTE: To add new setting you should add data member to form's
+//       class, then you should add copying line to every method on
+//       the list:
+//       on_pushButton_FillSettingsWithDefaults_clicked,
+//       on_pushButton_ApplySettings_clicked,
+//       on_pushButton_ApplySaveSettings_clicked,
+//       on_pushButton_ResetSettings_clicked.
+//       And of course you should put elements on the form.
+//       And for each setting there should method for auto
+//       application.
+// TODO: It seems to be ugly. Refactoring is needed.
+
+void MainWindow::on_pushButton_FillSettingsWithDefaults_clicked()
+{
+    // We have hard coded default settings in here.
+    // TODO: Any better solution?
+    // We just write all our values to elements on the form.
+    // TODO: Translated path? Any better solution for package
+    //       maintainers in distributions?
+    m_ui->comboBox_PathToJohn->setEditText(tr("/usr/sbin/john"));
+    m_ui->spinBox_TimeIntervalPickCracked->setValue(10 * 60);
+    m_ui->checkBox_AutoApplySettings->setChecked(false);
+}
+
+void MainWindow::on_pushButton_BrowsePathToJohn_clicked()
+{
+    // We pop a dialog to choose a file to open.
+    // TODO: Copy-pasting is evil! (on_pushButton_WordlistFileBrowse_clicked)
+    // TODO: What happens when John writes something while dialog
+    //       opened?
+    // TODO: Move dialog creation and setting up into window constructor.
+    // TODO: Should we save this dialog on form to make it remember
+    //       last path?
+    // TODO: Yet another "browse" button... Do not you want to make
+    //       without copying of code?
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::ExistingFile);
+    // TODO: Dialog could allow user to select multiple files. May it
+    //       be good to support this ability? To concatenate selected file?
+    if (dialog.exec()) {
+        QString fileName = dialog.selectedFiles()[0];
+        // We put file name into field for it.
+        // TODO: File name does not appear in history (drop down list).
+        m_ui->comboBox_PathToJohn->setEditText(fileName);
+    }
+}
+
+void MainWindow::on_pushButton_ApplySettings_clicked()
+{
+    // We copy settings from elements on the form to the settings
+    // object with current settings.
+    m_pathToJohn = m_ui->comboBox_PathToJohn->currentText();
+    m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
+    m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
+}
+
+void MainWindow::on_pushButton_ApplySaveSettings_clicked()
+{
+    // We apply settings first.
+    // TODO: It is not a good design that we call button's handler
+    //       that is really do something useful.
+    on_pushButton_ApplySettings_clicked();
+    // We store settings.
+    m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
+    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
+    m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
+}
+
+void MainWindow::on_pushButton_ResetSettings_clicked()
+{
+    // We copy settings from stored settings object to our current
+    // settings points.
+    // Really we copy stored settings to the form and then apply
+    // settings.
+    m_ui->comboBox_PathToJohn->setEditText(m_settings.value("PathToJohn").toString());
+    m_ui->spinBox_TimeIntervalPickCracked->setValue(m_settings.value("TimeIntervalPickCracked").toInt());
+    m_ui->checkBox_AutoApplySettings->setChecked(m_settings.value("AutoApplySettings").toBool());
+    // We apply settings.
+    // TODO: Again... Button's handler do useful work but named
+    //       inappropriately because it is handler.
+    on_pushButton_ApplySettings_clicked();
+}
+
+// Handlers for settings auto application
+
+void MainWindow::on_comboBox_PathToJohn_editTextChanged()
+{
+    // If auto application is turned on then we apply settings.
+    // TODO: Should we apply only one settings or all?
+    //       Currently we apply all settings (copy the same values).
+    //       Maybe it would be better to postpone settings application
+    //       to the moment when settings are really needed. Lazy
+    //       application.
+    if (m_autoApplySettings)
+        on_pushButton_ApplySettings_clicked();
+}
+
+void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged()
+{
+    // TODO: Copy-pasting is evil!
+    //       (on_comboBox_PathToJohn_valueChanged)
+    if (m_autoApplySettings)
+        on_pushButton_ApplySettings_clicked();
+}
+
+void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
+{
+    // First goal is to disable 'apply' button and to apply settings
+    // when auto application is turned on.
+    // TODO: At program start we might need to do it too. Check!
+    bool autoApply = m_ui->checkBox_AutoApplySettings->isChecked();
+    m_ui->pushButton_ApplySettings->setEnabled(!autoApply);
+    if (autoApply)
+        on_pushButton_ApplySettings_clicked();
+    // Second goal is auto application for auto application setting itself.
+    // NOTE: Deactivation of auto application will be auto applied.
+    // NOTE: Auto application is a setting too. At least it would be
+    //       good to remember its state between program runs.
+    // TODO: Copy-pasting is evil!
+    //       (on_comboBox_PathToJohn_valueChanged)
+    if (m_autoApplySettings)
+        on_pushButton_ApplySettings_clicked();
 }

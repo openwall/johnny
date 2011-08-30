@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QByteArray>
 #include <QTextStream>
+#include <QSettings>
 
 namespace Ui {
     class MainWindow;
@@ -34,6 +35,14 @@ private slots:
     void on_pushButton_JohnStatus_clicked();
     void on_listWidgetTabs_itemSelectionChanged();
     void on_pushButton_WordlistFileBrowse_clicked();
+    void on_pushButton_FillSettingsWithDefaults_clicked();
+    void on_pushButton_BrowsePathToJohn_clicked();
+    void on_pushButton_ApplySettings_clicked();
+    void on_pushButton_ApplySaveSettings_clicked();
+    void on_pushButton_ResetSettings_clicked();
+    void on_comboBox_PathToJohn_editTextChanged();
+    void on_spinBox_TimeIntervalPickCracked_valueChanged();
+    void on_checkBox_AutoApplySettings_stateChanged();
 
     void updateJohnOutput();
     void showJohnFinished();
@@ -61,6 +70,22 @@ private:
     // Format key to use with --show.
     // With this key current John was started.
     QString m_format;
+    // Current application settings
+    // Modified settings are stored on the form, this settings
+    // is used during this instance of application work. Stored
+    // settings are stored on the disk and will be loaded next time
+    // application start.
+    // TODO: Group settings into separate class with support for
+    //       saving and so on.
+    // Path to John's binary
+    QString m_pathToJohn;
+    // Interval between loading of cracked passwords
+    int m_timeIntervalPickCracked;
+    // Should we use modified settings right after modification? Or
+    // should we wait user to click 'apply' button.
+    bool m_autoApplySettings;
+    // Stored settings
+    QSettings m_settings;
 };
 
 #endif // MAINWINDOW_H

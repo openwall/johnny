@@ -233,10 +233,10 @@ void MainWindow::on_actionStart_Attack_triggered()
     //       them not as code.
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
         // We have one list for formats and subformats. Subformats
-        // contain short description after it. 
+        // contain short description after it.
         // Strings could be like:
         // des
-        // md5_gen(0): md5($p)  (raw-md5) 
+        // md5_gen(0): md5($p)  (raw-md5)
         // md5_gen(1001) md5(md5(md5(md5($p))))
         // User formats does not have semicolon between format name
         // and description. So we will restrict our pattern with right

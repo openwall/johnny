@@ -37,7 +37,7 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
         QString line = file.readLine();
         // To parse the line we split it by colon and take first
         // two fields.
-        // TODO: We have more than two fields. Parse them too. 
+        // TODO: We have more than two fields. Parse them too.
         // TODO: Make customizable separator. It should be an option.
         QStringList fields = line.split(':');
         // TODO: Is it safe to show untrusted input in gui?

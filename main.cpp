@@ -9,10 +9,10 @@ int main(int argc, char *argv[])
 {
     // We set application info up.
     // It is needed to be able to store settings easily.
-    // TODO: Is this info right?
+    // TODO: Could we use openwall.com/john as domain?
     // TODO: Is that the right place for this?
-    QCoreApplication::setOrganizationName("OpenWall");
-    QCoreApplication::setOrganizationDomain("OpenWall.com");
+    QCoreApplication::setOrganizationName("Openwall");
+    QCoreApplication::setOrganizationDomain("openwall.com");
     QCoreApplication::setApplicationName("Johnny, the GUI for John the Ripper");
 
     QApplication app(argc, argv);

@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QTextStream>
 #include <QSettings>
+#include <QDateTime>
 
 namespace Ui {
     class MainWindow;
@@ -43,6 +44,7 @@ private slots:
     void on_comboBox_PathToJohn_editTextChanged();
     void on_spinBox_TimeIntervalPickCracked_valueChanged();
     void on_checkBox_AutoApplySettings_stateChanged();
+    void on_pushButton_StatisticsUpdateStatus_clicked();
 
     void updateJohnOutput();
     void showJohnFinished();
@@ -86,6 +88,8 @@ private:
     bool m_autoApplySettings;
     // Stored settings
     QSettings m_settings;
+    // Date and time of the start of the sttack
+    QDateTime m_startDateTime;
 };
 
 #endif // MAINWINDOW_H

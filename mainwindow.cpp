@@ -340,6 +340,8 @@ void MainWindow::on_actionStart_Attack_triggered()
         //
         // We start John.
         m_johnProcess.start(m_pathToJohn, parameters);
+        // We remember date and time of the start.
+        m_startDateTime = QDateTime::currentDateTime();
     } else {
         // Else we do not have connected file name so we ask user to save
         // file.
@@ -649,4 +651,47 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
     //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)
         on_pushButton_ApplySettings_clicked();
+}
+
+// Statistics page code
+
+void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
+{
+    // Working time
+    // We could not just subtract one time from another. But we could
+    // know days and seconds between two time points.
+    //
+    // We check whether John is running.
+    if (m_johnProcess.state() == QProcess::Running) {
+        // If John is running then we put time of its work on the
+        // form.
+        // We remember current time.
+        QDateTime currentDateTime = QDateTime::currentDateTime();
+        // We count days and seconds since attack start.
+        int days = m_startDateTime.daysTo(currentDateTime),
+            seconds = m_startDateTime.secsTo(currentDateTime);
+        // We compute minutes and hours since attack start.
+        int minutes = seconds / 60 % 60,
+            hours = seconds / 60 / 60 % 24;
+        // We modify seconds value to be shorter than minute.
+        seconds %= 60;
+        // We produce a string representing distance between time points.
+        QString workingTime;
+        QTextStream stream(&workingTime);
+        // TODO: Other format?
+        // TODO: String translation?
+        stream << days << tr(":");
+        // Hours, minutes and seconds have padding with zeroes to two
+        // chars.
+        stream.setPadChar('0');
+        stream.setFieldAlignment(QTextStream::AlignRight);
+        stream << qSetFieldWidth(2) << hours << qSetFieldWidth(1) << tr(":");
+        stream << qSetFieldWidth(2) << minutes << qSetFieldWidth(1) << tr(":");
+        stream << qSetFieldWidth(2) << seconds;
+        // We put prepared string on the form.
+        m_ui->label_StatisticsWorkingTime->setText(workingTime);
+    } else {
+        // Else (if John is not running) we put dash instead of time.
+        m_ui->label_StatisticsWorkingTime->setText(tr("-"));
+    }
 }

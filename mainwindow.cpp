@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("", Qt::MatchContains))
         item->setSizeHint(QSize(m_ui->listWidgetTabs->sizeHintForColumn(0), 60));
 
+    /*
     // We add a button to the toolbar but this button is not simple. It has
     // menu. And that menu drops like from menu button. Just QAction could not
     // do it. Just QPushButton looses it's main action for popping
@@ -56,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     // We put the button onto the toolbar.
     m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
+    */
 
     // TODO: Could we make connections easier?
     // We connect John process' signals with our slots.

@@ -147,16 +147,16 @@
         </iconset>
        </property>
       </item>
-      <item>
-       <property name="text">
-        <string>Benchmark</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normalon>:/icons/tab_benchmark.png</normalon>
-        </iconset>
-       </property>
-      </item>
+<!--      <item>-->
+<!--       <property name="text">-->
+<!--        <string>Benchmark</string>-->
+<!--       </property>-->
+<!--       <property name="icon">-->
+<!--        <iconset>-->
+<!--         <normalon>:/icons/tab_benchmark.png</normalon>-->
+<!--        </iconset>-->
+<!--       </property>-->
+<!--      </item>-->
       <item>
        <property name="text">
         <string>Settings</string>
@@ -177,16 +177,16 @@
         </iconset>
        </property>
       </item>
-      <item>
-       <property name="text">
-        <string>Log</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normalon>:/icons/tab_log.png</normalon>
-        </iconset>
-       </property>
-      </item>
+<!--      <item>-->
+<!--       <property name="text">-->
+<!--        <string>Log</string>-->
+<!--       </property>-->
+<!--       <property name="icon">-->
+<!--        <iconset>-->
+<!--         <normalon>:/icons/tab_log.png</normalon>-->
+<!--        </iconset>-->
+<!--       </property>-->
+<!--      </item>-->
      </widget>
     </item>
     <item>
@@ -217,34 +217,34 @@
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QGroupBox" name="groupBox">
-             <property name="title">
-              <string>General</string>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-             <layout class="QGridLayout" name="gridLayout">
-              <item row="0" column="0">
-               <widget class="QPushButton" name="pushButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Load 500000 hashes</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
+<!--           <item>-->
+<!--            <widget class="QGroupBox" name="groupBox">-->
+<!--             <property name="title">-->
+<!--              <string>General</string>-->
+<!--             </property>-->
+<!--             <property name="flat">-->
+<!--              <bool>false</bool>-->
+<!--             </property>-->
+<!--             <property name="checkable">-->
+<!--              <bool>false</bool>-->
+<!--             </property>-->
+<!--             <layout class="QGridLayout" name="gridLayout">-->
+<!--              <item row="0" column="0">-->
+<!--               <widget class="QPushButton" name="pushButton">-->
+<!--                <property name="sizePolicy">-->
+<!--                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">-->
+<!--                  <horstretch>0</horstretch>-->
+<!--                  <verstretch>0</verstretch>-->
+<!--                 </sizepolicy>-->
+<!--                </property>-->
+<!--                <property name="text">-->
+<!--                 <string>Load 500000 hashes</string>-->
+<!--                </property>-->
+<!--               </widget>-->
+<!--              </item>-->
+<!--             </layout>-->
+<!--            </widget>-->
+<!--           </item>-->
            <item>
             <widget class="QTableView" name="tableView_Hashes">
              <attribute name="horizontalHeaderStretchLastSection">
@@ -252,13 +252,13 @@
              </attribute>
             </widget>
            </item>
-           <item>
-            <widget class="QCommandLinkButton" name="commandLinkButton_6">
-             <property name="text">
-              <string>Make charset</string>
-             </property>
-            </widget>
-           </item>
+<!--           <item>-->
+<!--            <widget class="QCommandLinkButton" name="commandLinkButton_6">-->
+<!--             <property name="text">-->
+<!--              <string>Make charset</string>-->
+<!--             </property>-->
+<!--            </widget>-->
+<!--           </item>-->
           </layout>
          </widget>
          <widget class="QWidget" name="optionsPage">
@@ -1290,7 +1290,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="benchmarkPage"/>
+<!--         <widget class="QWidget" name="benchmarkPage"/>-->
          <widget class="QWidget" name="settingsPage">
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
@@ -1418,17 +1418,17 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="logPage">
-          <layout class="QVBoxLayout" name="verticalLayout_13">
-           <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit_JohnLog">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+<!--         <widget class="QWidget" name="logPage">-->
+<!--          <layout class="QVBoxLayout" name="verticalLayout_13">-->
+<!--           <item>-->
+<!--            <widget class="QPlainTextEdit" name="plainTextEdit_JohnLog">-->
+<!--             <property name="readOnly">-->
+<!--              <bool>true</bool>-->
+<!--             </property>-->
+<!--            </widget>-->
+<!--           </item>-->
+<!--          </layout>-->
+<!--         </widget>-->
         </widget>
        </item>
        <item>
@@ -1476,10 +1476,10 @@
    <addaction name="actionStart_Attack"/>
    <addaction name="actionPause_Attack"/>
    <addaction name="separator"/>
-   <addaction name="actionHomepage"/>
-   <addaction name="actionHelp_2"/>
+<!--   <addaction name="actionHomepage"/>-->
+<!--   <addaction name="actionHelp_2"/>-->
    <addaction name="separator"/>
-   <addaction name="actionQuit_2"/>
+<!--   <addaction name="actionQuit_2"/>-->
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -1496,8 +1496,8 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Password"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionQuit"/>
+<!--    <addaction name="actionSave"/>-->
+<!--    <addaction name="actionQuit"/>-->
    </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
@@ -1513,18 +1513,18 @@
     <addaction name="actionHelp"/>
     <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuSessions">
-    <property name="title">
-     <string>Session</string>
-    </property>
-    <addaction name="actionOpen"/>
-    <addaction name="actionNew"/>
-    <addaction name="actionSave_2"/>
-   </widget>
+<!--   <widget class="QMenu" name="menuSessions">-->
+<!--    <property name="title">-->
+<!--     <string>Session</string>-->
+<!--    </property>-->
+<!--    <addaction name="actionOpen"/>-->
+<!--    <addaction name="actionNew"/>-->
+<!--    <addaction name="actionSave_2"/>-->
+<!--   </widget>-->
    <addaction name="menuFile"/>
-   <addaction name="menuSessions"/>
-   <addaction name="menuOptions"/>
-   <addaction name="menuHelp"/>
+<!--   <addaction name="menuSessions"/>-->
+<!--   <addaction name="menuOptions"/>-->
+<!--   <addaction name="menuHelp"/>-->
   </widget>
   <action name="actionSave">
    <property name="text">
@@ -1580,60 +1580,60 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionOpen_Session">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/projectopen.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>Open Session</string>
-   </property>
-   <property name="toolTip">
-    <string>Open a saved session</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+P</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionNew_Session">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/projectnew.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>New Session</string>
-   </property>
-   <property name="toolTip">
-    <string>Create a new session</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionSave_Session">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/projectsave.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>Save Session</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
+<!--  <action name="actionOpen_Session">-->
+<!--   <property name="icon">-->
+<!--    <iconset>-->
+<!--     <normalon>:/icons/projectopen.png</normalon>-->
+<!--    </iconset>-->
+<!--   </property>-->
+<!--   <property name="text">-->
+<!--    <string>Open Session</string>-->
+<!--   </property>-->
+<!--   <property name="toolTip">-->
+<!--    <string>Open a saved session</string>-->
+<!--   </property>-->
+<!--   <property name="shortcut">-->
+<!--    <string>Ctrl+P</string>-->
+<!--   </property>-->
+<!--   <property name="iconVisibleInMenu">-->
+<!--    <bool>true</bool>-->
+<!--   </property>-->
+<!--  </action>-->
+<!--  <action name="actionNew_Session">-->
+<!--   <property name="icon">-->
+<!--    <iconset>-->
+<!--     <normalon>:/icons/projectnew.png</normalon>-->
+<!--    </iconset>-->
+<!--   </property>-->
+<!--   <property name="text">-->
+<!--    <string>New Session</string>-->
+<!--   </property>-->
+<!--   <property name="toolTip">-->
+<!--    <string>Create a new session</string>-->
+<!--   </property>-->
+<!--   <property name="shortcut">-->
+<!--    <string>Ctrl+N</string>-->
+<!--   </property>-->
+<!--   <property name="iconVisibleInMenu">-->
+<!--    <bool>true</bool>-->
+<!--   </property>-->
+<!--  </action>-->
+<!--  <action name="actionSave_Session">-->
+<!--   <property name="icon">-->
+<!--    <iconset>-->
+<!--     <normalon>:/icons/projectsave.png</normalon>-->
+<!--    </iconset>-->
+<!--   </property>-->
+<!--   <property name="text">-->
+<!--    <string>Save Session</string>-->
+<!--   </property>-->
+<!--   <property name="shortcut">-->
+<!--    <string>Ctrl+S</string>-->
+<!--   </property>-->
+<!--   <property name="iconVisibleInMenu">-->
+<!--    <bool>true</bool>-->
+<!--   </property>-->
+<!--  </action>-->
   <action name="actionStart_Attack">
    <property name="icon">
     <iconset>
@@ -1675,73 +1675,73 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionHelp_2">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/help.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>Help</string>
-   </property>
-   <property name="toolTip">
-    <string>Help on using Johnny</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+H</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionHomepage">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/homepage.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>Homepage</string>
-   </property>
-   <property name="toolTip">
-    <string>Go to Johnny's homepage</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+J</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionQuit_2">
-   <property name="icon">
-    <iconset>
-     <normalon>:/icons/quit.png</normalon>
-    </iconset>
-   </property>
-   <property name="text">
-    <string>Quit</string>
-   </property>
-   <property name="toolTip">
-    <string>Quit Johnny</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
-   </property>
-  </action>
-  <action name="actionSave_2">
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </action>
-  <action name="actionOpen">
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </action>
+<!--  <action name="actionHelp_2">-->
+<!--   <property name="icon">-->
+<!--    <iconset>-->
+<!--     <normalon>:/icons/help.png</normalon>-->
+<!--    </iconset>-->
+<!--   </property>-->
+<!--   <property name="text">-->
+<!--    <string>Help</string>-->
+<!--   </property>-->
+<!--   <property name="toolTip">-->
+<!--    <string>Help on using Johnny</string>-->
+<!--   </property>-->
+<!--   <property name="shortcut">-->
+<!--    <string>Ctrl+H</string>-->
+<!--   </property>-->
+<!--   <property name="iconVisibleInMenu">-->
+<!--    <bool>true</bool>-->
+<!--   </property>-->
+<!--  </action>-->
+<!--  <action name="actionHomepage">-->
+<!--   <property name="icon">-->
+<!--    <iconset>-->
+<!--     <normalon>:/icons/homepage.png</normalon>-->
+<!--    </iconset>-->
+<!--   </property>-->
+<!--   <property name="text">-->
+<!--    <string>Homepage</string>-->
+<!--   </property>-->
+<!--   <property name="toolTip">-->
+<!--    <string>Go to Johnny's homepage</string>-->
+<!--   </property>-->
+<!--   <property name="shortcut">-->
+<!--    <string>Ctrl+J</string>-->
+<!--   </property>-->
+<!--   <property name="iconVisibleInMenu">-->
+<!--    <bool>true</bool>-->
+<!--   </property>-->
+<!--  </action>-->
+<!--  <action name="actionQuit_2">-->
+<!--   <property name="icon">-->
+<!--    <iconset>-->
+<!--     <normalon>:/icons/quit.png</normalon>-->
+<!--    </iconset>-->
+<!--   </property>-->
+<!--   <property name="text">-->
+<!--    <string>Quit</string>-->
+<!--   </property>-->
+<!--   <property name="toolTip">-->
+<!--    <string>Quit Johnny</string>-->
+<!--   </property>-->
+<!--   <property name="shortcut">-->
+<!--    <string>Ctrl+Q</string>-->
+<!--   </property>-->
+<!--   <property name="iconVisibleInMenu">-->
+<!--    <bool>true</bool>-->
+<!--   </property>-->
+<!--  </action>-->
+<!--  <action name="actionSave_2">-->
+<!--   <property name="text">-->
+<!--    <string>Save</string>-->
+<!--   </property>-->
+<!--  </action>-->
+<!--  <action name="actionOpen">-->
+<!--   <property name="text">-->
+<!--    <string>Open</string>-->
+<!--   </property>-->
+<!--  </action>-->
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

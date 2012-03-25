@@ -123,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // To open respective tab on mode selection
     QButtonGroup *group = m_ui->radioButton_ExternalMode->group();
-    // %% Maybe cycle?
+    // TODO: Maybe cycle?
     group->setId(m_ui->radioButton_DefaultBehaviour, 0);
     group->setId(m_ui->radioButton_SingleCrackMode, 1);
     group->setId(m_ui->radioButton_WordlistMode, 2);

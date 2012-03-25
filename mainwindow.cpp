@@ -121,6 +121,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui->radioButton_ExternalMode, SIGNAL(toggled(bool)),
             m_ui->comboBox_ExternalModeName, SLOT(setEnabled(bool)));
 
+    // To open respective tab on mode selection
+    QButtonGroup *group = m_ui->radioButton_ExternalMode->group();
+    // %% Maybe cycle?
+    group->setId(m_ui->radioButton_DefaultBehaviour, 0);
+    group->setId(m_ui->radioButton_SingleCrackMode, 1);
+    group->setId(m_ui->radioButton_WordlistMode, 2);
+    group->setId(m_ui->radioButton_IncrementalMode, 3);
+    group->setId(m_ui->radioButton_ExternalMode, 4);
+    connect(group, SIGNAL(buttonClicked(int)),
+            m_ui->tabWidget, SLOT(setCurrentIndex(int)));
+
 //    TableModel *passmodel = new TableModel();
 
 //    ui->tableView_Passwords->setModel(passmodel);

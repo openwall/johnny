@@ -278,33 +278,33 @@
            </item>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
-               <item>
-                <widget class="QLabel" name="label_10">
-                 <property name="font">
-                  <font>
-                   <family>Sans Serif</family>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>Your version of John the Ripper might support different formats than listed. You could ask John to correct the list.</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButton_CallJohnForFormatList">
-                 <property name="text">
-                  <string>Call John for formats list</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
+<!--             <item>-->
+<!--              <layout class="QHBoxLayout" name="horizontalLayout_6">-->
+<!--               <item>-->
+<!--                <widget class="QLabel" name="label_10">-->
+<!--                 <property name="font">-->
+<!--                  <font>-->
+<!--                   <family>Sans Serif</family>-->
+<!--                   <pointsize>8</pointsize>-->
+<!--                  </font>-->
+<!--                 </property>-->
+<!--                 <property name="text">-->
+<!--                  <string>Your version of John the Ripper might support different formats than listed. You could ask John to correct the list.</string>-->
+<!--                 </property>-->
+<!--                 <property name="wordWrap">-->
+<!--                  <bool>true</bool>-->
+<!--                 </property>-->
+<!--                </widget>-->
+<!--               </item>-->
+<!--               <item>-->
+<!--                <widget class="QPushButton" name="pushButton_CallJohnForFormatList">-->
+<!--                 <property name="text">-->
+<!--                  <string>Call John for formats list</string>-->
+<!--                 </property>-->
+<!--                </widget>-->
+<!--               </item>-->
+<!--              </layout>-->
+<!--             </item>-->
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
@@ -837,13 +837,13 @@
              </item>
             </layout>
            </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_EditConfig">
-             <property name="text">
-              <string>Edit John's configuration file</string>
-             </property>
-            </widget>
-           </item>
+<!--           <item>-->
+<!--            <widget class="QPushButton" name="pushButton_EditConfig">-->
+<!--             <property name="text">-->
+<!--              <string>Edit John's configuration file</string>-->
+<!--             </property>-->
+<!--            </widget>-->
+<!--           </item>-->
            <item>
             <widget class="QLabel" name="label_7">
              <property name="font">
@@ -1554,7 +1554,7 @@
           </sizepolicy>
          </property>
          <property name="value">
-          <number>24</number>
+          <number>0</number>
          </property>
         </widget>
        </item>

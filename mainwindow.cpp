@@ -143,6 +143,10 @@ MainWindow::MainWindow(QWidget *parent)
 //        passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
 //    }
 
+    // We load old settings.
+    // TODO: bad name.
+    on_pushButton_ResetSettings_clicked();
+
 }
 
 MainWindow::~MainWindow()

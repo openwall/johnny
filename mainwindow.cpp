@@ -265,6 +265,7 @@ void MainWindow::on_actionStart_Attack_triggered()
         // progress.
         // TODO: Instead of remembering of keys we could lock options.
         //       What is better?
+        // TODO: use = instead of : and -- instead of - .
         m_format = "-format:" + m_ui->comboBox_Format->currentText();
         // Now we have '-format:format' or '-format:format(N)description'.
         // So we truncate string to ')' if brace is in string.
@@ -490,6 +491,10 @@ void MainWindow::readJohnShow()
     // TODO: What if there are 2 or more rows with 1 user name?
     QString line;
     line = outputStream.readLine();
+    // If john did not yet cracked anything then john does not emit
+    // empty line before statistics.
+    QString firstLine;
+    firstLine = line;
     // We read to the end or before empty line.
     // TODO: In the end John says count of cracked password. Read it.
     while (!line.isNull() && line != "") {
@@ -512,33 +517,53 @@ void MainWindow::readJohnShow()
         // We continue reading with next line.
         line = outputStream.readLine();
     }
-    // We are on the last line.
-    // TODO: Really?
-    // We take counts of cracked passwords and of left hashes.
-    // We read count of cracked password hashes.
-    // TODO: Could we read after end?
-    // TODO: Is following sequence always right?
-    int crackedCount;
-    outputStream >> crackedCount;
-    // We skip 3 words.
-    QString skippedWord;
-    outputStream >> skippedWord >> skippedWord >> skippedWord;
-    // We read left count.
-    int leftCount;
-    outputStream >> leftCount;
-    // We update progress bar.
-    // TODO: May it be better to show entire string from John?
-    //       Translation?
-    m_ui->progressBar->setRange(0, crackedCount + leftCount);
-    m_ui->progressBar->setValue(crackedCount);
-    // TODO: Is not such format too complex?
-    // TODO: May it be better to not change format during run?
-    // TODO: When attack starts progress bar goes left to right and back before
-    //       we set new format up.
-    // TODO: Format is shown as key. Enough good?
-    //       Brackets are shown always.
-    // TODO: This string is too long.
-    m_ui->progressBar->setFormat(tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(crackedCount).arg(leftCount).arg(m_format));
+    QString lastLine;
+    if (!line.isNull()) {
+        // We are on the last line.
+        // TODO: Really? We are after empty line.
+        // We take counts of cracked passwords and of left hashes.
+        // We read count of cracked password hashes.
+        // TODO: Could we read after end?
+        lastLine = outputStream.readLine();
+    } else {
+        lastLine = firstLine;
+    }
+    // TODO: Is following regexp always right?
+    QRegExp crackedLeft("(\\d+)\\D+(\\d+)");
+    int pos = crackedLeft.indexIn(lastLine);
+    if (pos > -1) {
+        // TODO: check toInt success.
+        int crackedCount = crackedLeft.cap(1).toInt();
+        int leftCount = crackedLeft.cap(2).toInt();
+        // We update progress bar.
+        if (crackedCount + leftCount == 0) {
+            // There are no hashes.
+            m_ui->progressBar->setRange(0, 1);
+            m_ui->progressBar->setValue(0);
+            m_ui->progressBar->setFormat(
+                tr("No hashes loaded [%1], see output").arg(
+                    m_format));
+        } else {
+            // TODO: May it be better to show entire string from John?
+            //       Translation?
+            m_ui->progressBar->setRange(0, crackedCount + leftCount);
+            m_ui->progressBar->setValue(crackedCount);
+            // TODO: Is not such format too complex?
+            // TODO: May it be better to not change format during run?
+            // TODO: When attack starts progress bar goes left to
+            //       right and back before we set new format up.
+            // TODO: Format is shown as key. Enough good?
+            //       Brackets are shown always.
+            m_ui->progressBar->setFormat(
+                tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(
+                    crackedCount).arg(
+                        leftCount).arg(
+                            m_format));
+        }
+    } else {
+        // TODO: Error: unexpected john output.
+        // TODO: Unknown cyphertext format is here. Read stderr to check exactly.
+    }
 }
 
 // Settings page code

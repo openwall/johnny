@@ -143,6 +143,18 @@ MainWindow::MainWindow(QWidget *parent)
 //        passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
 //    }
 
+
+    // We fill form with default values. Then we load settings. When
+    // there is no setting old value is used. So if there is no
+    // configuration file then we get default values. Also it means
+    // that when user pushes "reset to stored settings" button he
+    // resets only fields with values. It is nice but may seem
+    // strange: probably user would expect reset to be like default +
+    // reset because storing of a part of settings is not normal
+    // behaviour (only possible with upgrades).
+    // TODO: somewhat ugly.
+    on_pushButton_FillSettingsWithDefaults_clicked();
+
     // We load old settings.
     // TODO: bad name.
     on_pushButton_ResetSettings_clicked();
@@ -645,9 +657,18 @@ void MainWindow::on_pushButton_ResetSettings_clicked()
     // settings points.
     // Really we copy stored settings to the form and then apply
     // settings.
-    m_ui->comboBox_PathToJohn->setEditText(m_settings.value("PathToJohn").toString());
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(m_settings.value("TimeIntervalPickCracked").toInt());
-    m_ui->checkBox_AutoApplySettings->setChecked(m_settings.value("AutoApplySettings").toBool());
+    m_ui->comboBox_PathToJohn->setEditText(
+        m_settings.value(
+            "PathToJohn",
+            m_ui->comboBox_PathToJohn->currentText()).toString());
+    m_ui->spinBox_TimeIntervalPickCracked->setValue(
+        m_settings.value(
+            "TimeIntervalPickCracked",
+            m_ui->spinBox_TimeIntervalPickCracked->value()).toInt());
+    m_ui->checkBox_AutoApplySettings->setChecked(
+        m_settings.value(
+            "AutoApplySettings",
+            m_ui->checkBox_AutoApplySettings->isChecked()).toBool());
     // We apply settings.
     // TODO: Again... Button's handler do useful work but named
     //       inappropriately because it is handler.

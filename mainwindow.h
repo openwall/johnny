@@ -15,6 +15,7 @@
 #include <QTextStream>
 #include <QSettings>
 #include <QDateTime>
+#include <QMultiMap>
 
 namespace Ui {
     class MainWindow;
@@ -93,6 +94,8 @@ private:
     QSettings m_settings;
     // Date and time of the start of the sttack
     QDateTime m_startDateTime;
+    // Map (hash table) for fast access after `john --show`
+    QMultiMap<QString, int> m_tableMap;
 };
 
 #endif // MAINWINDOW_H

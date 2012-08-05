@@ -212,6 +212,14 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     m_hashesTable = newTableModel;
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
+
+    // We build hash table for fast access.
+    m_tableMap = QMultiMap<QString, int>();
+    for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+        m_tableMap.insert(
+            m_hashesTable->data(m_hashesTable->index(i, 0)).toString(),
+            i);
+    }
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -519,23 +527,22 @@ void MainWindow::readJohnShow()
     QString firstLine;
     firstLine = line;
     // We read to the end or before empty line.
-    // TODO: In the end John says count of cracked password. Read it.
     while (!line.isNull() && line != "") {
         // We split lines to fields.
         // TODO: What if password contains semicolon?
         // TODO: What if password contains new line?
         QStringList fields = line.split(':');
         // We handle password.
-        // We check all rows to have such user name.
-        for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-            if (m_hashesTable->data(m_hashesTable->index(i, 0)) == fields.at(0)) {
-                // If we found user then we put password in table.
-                // TODO: What if there two rows with one user name?
-                // TODO: What if we did not have 2 fields? Could
-                //       John's output be wrong?
-                // TODO: What if we did not find row? Note user.
-                m_hashesTable->setData(m_hashesTable->index(i, 1), fields.at(1));
-            }
+        // If we found user then we put password in table.
+        // TODO: What if there two rows with one user name?
+        // TODO: What if we did not have 2 fields? Could
+        //       John's output be wrong?
+        // TODO: What if we do not find row? Note user.
+        // TODO: We overwrite values each time.
+        foreach (int row, m_tableMap.values(fields.at(0))) {
+            m_hashesTable->setData(
+                m_hashesTable->index(row, 1),
+                fields.at(1));
         }
         // We continue reading with next line.
         line = outputStream.readLine();

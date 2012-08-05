@@ -156,6 +156,8 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: somewhat ugly.
     // TODO: if there are no config or it is partial then claim. Do
     //       not silently do something tricky.
+    // TODO: do not search john if it is in stored settings. It is
+    //       similar to other settings. It is at least start up speed up.
     fillSettingsWithDefaults();
 
     // We load old settings.

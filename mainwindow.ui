@@ -1523,13 +1523,13 @@
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_JohnStatus">
-             <property name="text">
-              <string>Status</string>
-             </property>
-            </widget>
-           </item>
+           <!-- <item> -->
+           <!--  <widget class="QPushButton" name="pushButton_JohnStatus"> -->
+           <!--   <property name="text"> -->
+           <!--    <string>Status</string> -->
+           <!--   </property> -->
+           <!--  </widget> -->
+           <!-- </item> -->
           </layout>
          </widget>
 <!--         <widget class="QWidget" name="logPage">-->

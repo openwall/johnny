@@ -1077,7 +1077,7 @@
                     </font>
                    </property>
                    <property name="text">
-                    <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. So there are two fields: path to wordlist file and name of rule you want to apply (for instance, &quot;Single&quot;). However not all John's versions support named rules.</string>
+                    <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. Section "Wordlist" would be used to mangle words with rules.</string>
                    </property>
                    <property name="wordWrap">
                     <bool>true</bool>
@@ -1130,26 +1130,26 @@
                      </property>
                     </widget>
                    </item>
-                   <item>
-                    <widget class="QCheckBox" name="checkBox_WordlistModeRulesName">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="text">
-                      <string>Rules name:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QComboBox" name="comboBox_WordlistModeRulesName">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="editable">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
+                   <!-- <item> -->
+                   <!--  <widget class="QCheckBox" name="checkBox_WordlistModeRulesName"> -->
+                   <!--   <property name="enabled"> -->
+                   <!--    <bool>false</bool> -->
+                   <!--   </property> -->
+                   <!--   <property name="text"> -->
+                   <!--    <string>Rules name:</string> -->
+                   <!--   </property> -->
+                   <!--  </widget> -->
+                   <!-- </item> -->
+                   <!-- <item> -->
+                   <!--  <widget class="QComboBox" name="comboBox_WordlistModeRulesName"> -->
+                   <!--   <property name="enabled"> -->
+                   <!--    <bool>false</bool> -->
+                   <!--   </property> -->
+                   <!--   <property name="editable"> -->
+                   <!--    <bool>true</bool> -->
+                   <!--   </property> -->
+                   <!--  </widget> -->
+                   <!-- </item> -->
                   </layout>
                  </item>
                  <item>

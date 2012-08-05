@@ -289,9 +289,8 @@ void MainWindow::on_actionStart_Attack_triggered()
         // progress.
         // TODO: Instead of remembering of keys we could lock options.
         //       What is better?
-        // TODO: use = instead of : and -- instead of - .
-        m_format = "-format:" + m_ui->comboBox_Format->currentText();
-        // Now we have '-format:format' or '-format:format(N)description'.
+        m_format = "--format=" + m_ui->comboBox_Format->currentText();
+        // Now we have '--format=format' or '--format=format(N)description'.
         // So we truncate string to ')' if brace is in string.
         //
         // We try to find ')'.
@@ -314,17 +313,17 @@ void MainWindow::on_actionStart_Attack_triggered()
         // There are no options here.
     } else if (m_ui->radioButton_SingleCrackMode->isChecked()) {
         // "Single crack" mode
-        parameters << "-single";
+        parameters << "--single";
         // External mode, filter
         // TODO: It is applicable for 3 formats. Copy-pasting is evil!
         // TODO: Warn if checkbox is checked and there is not text in
         //       combobox. For other empty fields it would great to
         //       warn too.
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
-            parameters << ("-external:" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
     } else if (m_ui->radioButton_WordlistMode->isChecked()) {
         // Wordlist mode
-        parameters << ("-wordlist:" + m_ui->comboBox_WordlistFile->currentText());
+        parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
         // Rules
         // They could appear with or without name.
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
@@ -338,32 +337,32 @@ void MainWindow::on_actionStart_Attack_triggered()
             //     //       fails, not only here.
             //     // TODO: Calls to John makes interface to stick a bit.
             //     //       It is actual with often -show calls.
-            //     parameters << ("-rules:" + m_ui->comboBox_WordlistModeRulesName->currentText());
+            //     parameters << ("--rules=" + m_ui->comboBox_WordlistModeRulesName->currentText());
             // } else {
                 // If no name is needed then we use just rules,
                 // without name.
-                parameters << "-rules";
+                parameters << "--rules";
             // }
         }
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked())
-            parameters << ("-external:" + m_ui->comboBox_WordlistModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
     } else if (m_ui->radioButton_IncrementalMode->isChecked()) {
         // "Incremental" mode
         // It could be with or without name.
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
             // With name
-            parameters << ("-incremental:" + m_ui->comboBox_IncrementalModeName->currentText());
+            parameters << ("--incremental=" + m_ui->comboBox_IncrementalModeName->currentText());
         } else {
             // Without name
-            parameters << "-incremental";
+            parameters << "--incremental";
         }
         // External mode, filter
         if (m_ui->checkBox_IncrementalModeExternalName->isChecked())
-            parameters << ("-external:" + m_ui->comboBox_IncrementalModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
     } else if (m_ui->radioButton_ExternalMode->isChecked()) {
         // External mode
-        parameters << ("-external:" + m_ui->comboBox_ExternalModeName->currentText());
+        parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
     }
 
     // We check that we have file name.

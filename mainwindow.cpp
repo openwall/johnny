@@ -613,7 +613,8 @@ void MainWindow::warnAboutDefaultPathToJohn()
         tr("Currently Johnny filled settings with default path to John the Ripper (%1). "
            "You could set your preferred path in settings "
            "(use just 'john' there to make Johnny to search John "
-           "on PATH before every start of John).").arg(
+           "on PATH before every start of John). "
+           "If you are satisfied with defaults then save settings to avoid this message.").arg(
                m_ui->comboBox_PathToJohn->currentText()));
 }
 

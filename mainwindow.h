@@ -54,6 +54,9 @@ private slots:
     void callJohnShow();
     void readJohnShow();
 
+    void fillSettingsWithDefaults();
+    void warnAboutDefaultPathToJohn();
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;

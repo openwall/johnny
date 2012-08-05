@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QByteArray>
 #include <QTextStream>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashesTable(NULL)
@@ -153,11 +154,16 @@ MainWindow::MainWindow(QWidget *parent)
     // reset because storing of a part of settings is not normal
     // behaviour (only possible with upgrades).
     // TODO: somewhat ugly.
-    on_pushButton_FillSettingsWithDefaults_clicked();
+    // TODO: if there are no config or it is partial then claim. Do
+    //       not silently do something tricky.
+    fillSettingsWithDefaults();
 
     // We load old settings.
     // TODO: bad name.
     on_pushButton_ResetSettings_clicked();
+
+    if (!m_settings.contains("PathToJohn"))
+        warnAboutDefaultPathToJohn();
 
 }
 
@@ -586,7 +592,7 @@ void MainWindow::readJohnShow()
 // NOTE: To add new setting you should add data member to form's
 //       class, then you should add copying line to every method on
 //       the list:
-//       on_pushButton_FillSettingsWithDefaults_clicked,
+//       fillSettingsWithDefaults,
 //       on_pushButton_ApplySettings_clicked,
 //       on_pushButton_ApplySaveSettings_clicked,
 //       on_pushButton_ResetSettings_clicked.
@@ -595,16 +601,64 @@ void MainWindow::readJohnShow()
 //       application.
 // TODO: It seems to be ugly. Refactoring is needed.
 
-void MainWindow::on_pushButton_FillSettingsWithDefaults_clicked()
+void MainWindow::warnAboutDefaultPathToJohn()
 {
+    // TODO: Handle empty path specifically.
+    // TODO: On startup this message is shown before main window. Bad?
+    QMessageBox::warning(
+        this,
+        tr("Johnny: default path to john"),
+        tr("Currently Johnny filled settings with default path to John the Ripper (%1). "
+           "You could set your preferred path in settings "
+           "(use just 'john' there to make Johnny to search John "
+           "on PATH before every start of John).").arg(
+               m_ui->comboBox_PathToJohn->currentText()));
+}
+
+void MainWindow::fillSettingsWithDefaults()
+{
+    // Find john on PATH
+    QString john;
+    QStringList possiblePaths;
+    // TODO: list of names for john.
+    // TODO: list of common names for john (i.e. john-gpu).
+    // TODO: hint for user that he could use just 'john' for the
+    //       setting but it has its specific pros and cons.
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    // TODO: Windows portability (semicolon instead of colon as delimiter).
+    // TODO: could there be escaped delimiter?
+    // TODO: Translated path to john? Any better solution for package
+    //       maintainers in distributions?
+    // TODO: it is bad implementation of search on PATH. Are not there
+    //       predefined better one?
+    QString johnName = tr("john");
+    foreach (QString dir, env.value("PATH").split(":")) {
+        possiblePaths << QDir(dir).filePath(johnName);
+    }
+    // Predefined defaults
+    // TODO: we should not check paths default for linux on windows. On cygwin?
+    possiblePaths << "/usr/sbin/john";
+    // Find first readable, executable file from possible
+    foreach (QString path, possiblePaths) {
+        QFileInfo iJohn (path);
+        if (iJohn.isReadable() && iJohn.isExecutable()) {
+            john = path;
+            break;
+        }
+    }
+
     // We have hard coded default settings in here.
     // TODO: Any better solution?
     // We just write all our values to elements on the form.
-    // TODO: Translated path? Any better solution for package
-    //       maintainers in distributions?
-    m_ui->comboBox_PathToJohn->setEditText(tr("/usr/sbin/john"));
+    m_ui->comboBox_PathToJohn->setEditText(john);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(10 * 60);
     m_ui->checkBox_AutoApplySettings->setChecked(false);
+}
+
+void MainWindow::on_pushButton_FillSettingsWithDefaults_clicked()
+{
+    fillSettingsWithDefaults();
+    warnAboutDefaultPathToJohn();
 }
 
 void MainWindow::on_pushButton_BrowsePathToJohn_clicked()

@@ -101,10 +101,10 @@ MainWindow::MainWindow(QWidget *parent)
             m_ui->pushButton_WordlistFileBrowse, SLOT(setEnabled(bool)));
     connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
             m_ui->checkBox_WordlistModeRules, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->checkBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
+    // connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+    //         m_ui->checkBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
+    // connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
+    //         m_ui->comboBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
     connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
             m_ui->checkBox_WordlistModeExternalName, SLOT(setEnabled(bool)));
     connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
@@ -330,20 +330,20 @@ void MainWindow::on_actionStart_Attack_triggered()
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
             // If rules are selected then we distinguish either name
             // is needed two.
-            if (m_ui->checkBox_WordlistModeRulesName->isChecked()) {
-                // If name for rules is selected to be then we take it.
-                // NOTE: Not all versions support this.
-                // TODO: It would be great to notice user about this.
-                // TODO: It would be great to notice user on any
-                //       fails, not only here.
-                // TODO: Calls to John makes interface to stick a bit.
-                //       It is actual with often -show calls.
-                parameters << ("-rules:" + m_ui->comboBox_WordlistModeRulesName->currentText());
-            } else {
+            // if (m_ui->checkBox_WordlistModeRulesName->isChecked()) {
+            //     // If name for rules is selected to be then we take it.
+            //     // NOTE: Not all versions support this.
+            //     // TODO: It would be great to notice user about this.
+            //     // TODO: It would be great to notice user on any
+            //     //       fails, not only here.
+            //     // TODO: Calls to John makes interface to stick a bit.
+            //     //       It is actual with often -show calls.
+            //     parameters << ("-rules:" + m_ui->comboBox_WordlistModeRulesName->currentText());
+            // } else {
                 // If no name is needed then we use just rules,
                 // without name.
                 parameters << "-rules";
-            }
+            // }
         }
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked())

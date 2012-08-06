@@ -316,6 +316,9 @@
                </item>
                <item>
                 <widget class="QComboBox" name="comboBox_Format">
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
                  <item>
                   <property name="text">
                    <string>Auto detect</string>

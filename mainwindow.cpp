@@ -384,6 +384,12 @@ void MainWindow::on_actionStart_Attack_triggered()
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
     }
 
+    // Session for johnny
+    // TODO: Easier way is to cd to ~/.john/johnny but it needs
+    //       checks. In any case without that dir it will not work.
+    parameters << QString("--session=%1").arg(
+        QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).filePath("default"));
+
     // We check that we have file name.
     if (m_hashesFileName != "") {
         // If file name is not empty then we have file, pass it to

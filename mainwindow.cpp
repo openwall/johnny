@@ -399,6 +399,24 @@ void MainWindow::on_actionStart_Attack_triggered()
         if (button == QMessageBox::No)
             return;
     }
+
+    QFile description(session + ".johnny");
+    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            // TODO: More informative message.
+            tr("Johnny could not open file to save session description!"));
+        return;
+    }
+    QTextStream descriptionStream(&description);
+    // TODO: john stores file name so itself. It could be changed
+    //       later though.
+    // TODO: ensure to convert file name into absolute path.
+    descriptionStream << m_hashesFileName << endl;
+    descriptionStream << m_format << endl;
+    description.close();
+
     // TODO: Easier way is to cd to ~/.john/johnny but it needs
     //       checks. In any case without that dir it will not work.
     parameters << QString("--session=%1").arg(session);
@@ -679,7 +697,7 @@ void MainWindow::fillSettingsWithDefaults()
     possiblePaths << "/usr/sbin/john";
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
-        QFileInfo iJohn (path);
+        QFileInfo iJohn(path);
         if (iJohn.isReadable() && iJohn.isExecutable()) {
             john = path;
             break;

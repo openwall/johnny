@@ -145,6 +145,17 @@ MainWindow::MainWindow(QWidget *parent)
 //    }
 
 
+    // We create folder for us in home dir if it does not exist.
+    // TODO: Are this checks are enough?
+    // TODO: Claim on mkdir fails.
+    // TODO: Do not do it on start up. Choose other good time.
+    if (!QDir(QDir::home().filePath(".john")).exists()) {
+        QDir::home().mkdir(".john");
+    }
+    if (!QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).exists()) {
+        QDir(QDir::home().filePath(".john")).mkdir("johnny");
+    }
+
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
     // configuration file then we get default values. Also it means

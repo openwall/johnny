@@ -385,10 +385,23 @@ void MainWindow::on_actionStart_Attack_triggered()
     }
 
     // Session for johnny
+    QString session = QDir(
+        QDir(QDir::home().filePath(
+                 ".john")).filePath(
+                     "johnny")).filePath(
+                         "default");
+    if (QFileInfo(session + ".rec").isReadable()) {
+        int button = QMessageBox::question(
+            this,
+            tr("Johnny"),
+            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
+            QMessageBox::Yes | QMessageBox::No);
+        if (button == QMessageBox::No)
+            return;
+    }
     // TODO: Easier way is to cd to ~/.john/johnny but it needs
     //       checks. In any case without that dir it will not work.
-    parameters << QString("--session=%1").arg(
-        QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).filePath("default"));
+    parameters << QString("--session=%1").arg(session);
 
     // We check that we have file name.
     if (m_hashesFileName != "") {

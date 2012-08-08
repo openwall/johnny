@@ -17,6 +17,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashesTable(NULL)
 {
@@ -191,6 +193,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::checkNToggleActionsLastSession()
 {
+    m_ui->actionStart_Attack->setEnabled(m_hashesFileName != "");
+
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
         m_ui->actionOpen_Last_Session->setEnabled(true);
@@ -209,6 +213,8 @@ void MainWindow::checkNToggleActionsLastSession()
         m_ui->actionResume_Attack->setEnabled(
             hashesFileName == m_hashesFileName
             && hashesFileName != "");
+        m_ui->actionOpen_Last_Session->setEnabled(
+            hashesFileName != m_hashesFileName);
     } else {
         m_ui->actionOpen_Last_Session->setEnabled(false);
         m_ui->actionResume_Attack->setEnabled(false);
@@ -248,9 +254,6 @@ void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // TODO: Check argument.
-
-    // TODO: We assume this is a place called on each passwd file open.
-    checkNToggleActionsLastSession();
 
     // We delete existing model if any.
     if (m_hashesTable != NULL) {
@@ -310,6 +313,7 @@ void MainWindow::on_actionOpen_Password_triggered()
         replaceTableModel(new FileTableModel(fileName, this));
         // After new model remembered we remember its file name.
         m_hashesFileName = fileName;
+        checkNToggleActionsLastSession();
     }
 }
 
@@ -331,6 +335,7 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     description.close();
     // We replace existing model with new one.
     replaceTableModel(new FileTableModel(m_hashesFileName, this));
+    checkNToggleActionsLastSession();
 }
 
 void MainWindow::on_actionStart_Attack_triggered()

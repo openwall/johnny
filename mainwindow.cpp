@@ -330,6 +330,7 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     }
     QTextStream descriptionStream(&description);
     // TODO: errors?
+    // TODO: end of line? Should not we "chomp" it? See other places too.
     m_hashesFileName = descriptionStream.readLine();
     m_format = descriptionStream.readLine();
     description.close();

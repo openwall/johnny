@@ -28,6 +28,7 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     QVector<QStringList> data(columnCount());
     // We read and parse the file.
     // We create and fill our internal model representation.
+    // TODO: Restore could call us with empty name. We crash.
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         // TODO: Notice user that file could not be opened.

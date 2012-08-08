@@ -156,6 +156,15 @@ MainWindow::MainWindow(QWidget *parent)
         QDir(QDir::home().filePath(".john")).mkdir("johnny");
     }
 
+    // Session for johnny
+    m_session = QDir(
+        QDir(QDir::home().filePath(
+                 ".john")).filePath(
+                     "johnny")).filePath(
+                         "default");
+
+    checkNToggleActionsLastSession();
+
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
     // configuration file then we get default values. Also it means
@@ -178,6 +187,32 @@ MainWindow::MainWindow(QWidget *parent)
     if (!m_settings.contains("PathToJohn"))
         warnAboutDefaultPathToJohn();
 
+}
+
+void MainWindow::checkNToggleActionsLastSession()
+{
+    if (QFileInfo(m_session + ".rec").isReadable()
+        && QFileInfo(m_session + ".johnny").isReadable()) {
+        m_ui->actionOpen_Last_Session->setEnabled(true);
+
+        // TODO: very similar to open last session code.
+        QFile description(m_session + ".johnny");
+        if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            m_ui->actionResume_Attack->setEnabled(false);
+            return;
+        }
+        QTextStream descriptionStream(&description);
+        // TODO: errors?
+        QString hashesFileName = descriptionStream.readLine();
+        description.close();
+
+        m_ui->actionResume_Attack->setEnabled(
+            hashesFileName == m_hashesFileName
+            && hashesFileName != "");
+    } else {
+        m_ui->actionOpen_Last_Session->setEnabled(false);
+        m_ui->actionResume_Attack->setEnabled(false);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -213,6 +248,9 @@ void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // TODO: Check argument.
+
+    // TODO: We assume this is a place called on each passwd file open.
+    checkNToggleActionsLastSession();
 
     // We delete existing model if any.
     if (m_hashesTable != NULL) {
@@ -273,6 +311,26 @@ void MainWindow::on_actionOpen_Password_triggered()
         // After new model remembered we remember its file name.
         m_hashesFileName = fileName;
     }
+}
+
+void MainWindow::on_actionOpen_Last_Session_triggered()
+{
+    QFile description(m_session + ".johnny");
+    if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            // TODO: More informative message.
+            tr("Johnny could not open file to read session description!"));
+        return;
+    }
+    QTextStream descriptionStream(&description);
+    // TODO: errors?
+    m_hashesFileName = descriptionStream.readLine();
+    m_format = descriptionStream.readLine();
+    description.close();
+    // We replace existing model with new one.
+    replaceTableModel(new FileTableModel(m_hashesFileName, this));
 }
 
 void MainWindow::on_actionStart_Attack_triggered()
@@ -385,12 +443,7 @@ void MainWindow::on_actionStart_Attack_triggered()
     }
 
     // Session for johnny
-    QString session = QDir(
-        QDir(QDir::home().filePath(
-                 ".john")).filePath(
-                     "johnny")).filePath(
-                         "default");
-    if (QFileInfo(session + ".rec").isReadable()) {
+    if (QFileInfo(m_session + ".rec").isReadable()) {
         int button = QMessageBox::question(
             this,
             tr("Johnny"),
@@ -402,7 +455,7 @@ void MainWindow::on_actionStart_Attack_triggered()
 
     // TODO: Saving so two instances of johnny overwrites description
     //       but not .rec so they become not synchronized.
-    QFile description(session + ".johnny");
+    QFile description(m_session + ".johnny");
     if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(
             this,
@@ -421,7 +474,7 @@ void MainWindow::on_actionStart_Attack_triggered()
 
     // TODO: Easier way is to cd to ~/.john/johnny but it needs
     //       checks. In any case without that dir it will not work.
-    parameters << QString("--session=%1").arg(session);
+    parameters << QString("--session=%1").arg(m_session);
 
     // We check that we have file name.
     if (m_hashesFileName != "") {
@@ -442,6 +495,18 @@ void MainWindow::on_actionStart_Attack_triggered()
         // file.
         // TODO: Do something here.
     }
+}
+
+void MainWindow::on_actionResume_Attack_triggered()
+{
+    QStringList parameters;
+    parameters << QString("--restore=%1").arg(m_session);
+
+    // TODO: copy-pasting is evil! It is copied from start attack.
+    // We start John.
+    m_johnProcess.start(m_pathToJohn, parameters);
+    // We remember date and time of the start.
+    m_startDateTime = QDateTime::currentDateTime();
 }
 
 void MainWindow::updateJohnOutput()
@@ -497,6 +562,9 @@ void MainWindow::showJohnStarted()
     // TODO: Should we disable/enable status button?
     m_ui->actionPause_Attack->setEnabled(true);
     m_ui->actionStart_Attack->setEnabled(false);
+    m_ui->actionResume_Attack->setEnabled(false);
+    m_ui->actionOpen_Password->setEnabled(false);
+    m_ui->actionOpen_Last_Session->setEnabled(false);
     // When John starts we start capturing passwords.
     // TODO: Currently we set timer to 10 minutes. Make it
     //       customizable.
@@ -537,6 +605,8 @@ void MainWindow::showJohnFinished()
     // button.
     m_ui->actionPause_Attack->setEnabled(false);
     m_ui->actionStart_Attack->setEnabled(true);
+    m_ui->actionOpen_Password->setEnabled(true);
+    checkNToggleActionsLastSession();
     // When John stops we need to stop timer and to look status last
     // time.
     m_showTimer.stop();

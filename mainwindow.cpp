@@ -400,6 +400,8 @@ void MainWindow::on_actionStart_Attack_triggered()
             return;
     }
 
+    // TODO: Saving so two instances of johnny overwrites description
+    //       but not .rec so they become not synchronized.
     QFile description(session + ".johnny");
     if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(

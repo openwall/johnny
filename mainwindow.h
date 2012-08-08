@@ -32,8 +32,10 @@ public:
 private slots:
     void on_pushButton_clicked();
     void on_actionStart_Attack_triggered();
+    void on_actionResume_Attack_triggered();
     void on_actionPause_Attack_triggered();
     void on_actionOpen_Password_triggered();
+    void on_actionOpen_Last_Session_triggered();
     void on_pushButton_JohnStatus_clicked();
     void on_listWidgetTabs_itemSelectionChanged();
     void on_pushButton_WordlistFileBrowse_clicked();
@@ -58,6 +60,8 @@ private slots:
     void fillSettingsWithDefaults();
     void warnAboutDefaultPathToJohn();
 
+    void checkNToggleActionsLastSession();
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;
@@ -69,6 +73,7 @@ private:
     //       with files yet are necessary.
     //       However now this is here.
     QString m_hashesFileName;
+    QString m_session;
     QProcess m_johnProcess;
     // To catch cracked passwords we use timer and john --show.
     QTimer m_showTimer;

@@ -1124,8 +1124,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionOpen_Password"/>
+   <addaction name="actionOpen_Last_Session"/>
    <addaction name="separator"/>
    <addaction name="actionStart_Attack"/>
+   <addaction name="actionResume_Attack"/>
    <addaction name="actionPause_Attack"/>
    <addaction name="separator"/>
 <!--   <addaction name="actionHomepage"/>-->
@@ -1148,6 +1150,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Password"/>
+    <addaction name="actionOpen_Last_Session"/>
 <!--    <addaction name="actionSave"/>-->
 <!--    <addaction name="actionQuit"/>-->
    </widget>
@@ -1232,6 +1235,25 @@
     <bool>true</bool>
    </property>
   </action>
+  <action name="actionOpen_Last_Session">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icons/fileopen.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Open Last Session</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Last Session</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
 <!--  <action name="actionOpen_Session">-->
 <!--   <property name="icon">-->
 <!--    <iconset>-->
@@ -1303,6 +1325,28 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionResume_Attack">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icons/start-attack.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Resume Attack</string>
+   </property>
+   <property name="toolTip">
+    <string>Resume cracking passwords</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
   </action>
   <action name="actionPause_Attack">

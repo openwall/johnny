@@ -16,7 +16,7 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
-    m_columns << tr("User") << tr("Password") << tr("Hash");
+    m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS");
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -36,30 +36,40 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
         return;
     while (!file.atEnd()) {
         QString line = file.readLine();
-        // To parse the line we split it by colon and take first
-        // two fields.
-        // TODO: We have more than two fields. Parse them too.
+        // TODO: right? Should not we keep \r in middle of line?
+        line.remove(QRegExp("\\r?\\n"));
+        // TODO: Parse gecos well.
         // TODO: Make customizable separator. It should be an option.
         QStringList fields = line.split(':');
         // TODO: Is it safe to show untrusted input in gui?
-        int column;
-        // NOTE: Here + 1 caused by 1 field that is not from file.
-        for (column = 0; column < columnCount() && column < fields.size() + 1; column++) {
-            // NOTE: When we want we change lists we use [] as of .at()
-            //       gives us only const.
-            // We have one field that is not from file so we skip it.
-            if (column == 1)
-                data[column].append("");
-            else if (column == 0)
-                data[column].append(fields.at(column));
-            else
-                data[column].append(fields.at(column - 1));
+        int column = 0;
+        // NOTE: When we want we change lists we use [] as of .at()
+        //       gives us only const.
+        if (fields.size() == 1) {
+            // Lonely hash
+            // TODO: Special mark to show that ? is not from file. Color? How?
+            data[column++].append("?");
+            data[column++].append("");
+            data[column++].append(fields.at(0));
+        } else if (fields.size() >= 3 && fields.at(2).indexOf(QRegExp("^[0-9a-fA-F]{32}$")) == 0) {
+            // Pwdump format
+            data[column++].append(fields.at(0));
+            data[column++].append("");
+            data[column++].append(fields.at(2));
+            // TODO: It is not good to pack it so. Parse gecos well.
+            // TODO: split and join back seem slower than optimal.
+            fields.removeAt(2);
+            fields.removeAt(0);
+            data[column++].append(fields.join(":"));
+        } else {
+            // user:hash:other
+            data[column++].append(fields.at(0));
+            data[column++].append("");
+            data[column++].append(fields.at(1));
+            fields.removeAt(1);
+            fields.removeAt(0);
+            data[column++].append(fields.join(":"));
         }
-        // Line in file could contain fewer amount of fields than we
-        // want. So we fill our table with empty values.
-        // We continue column traversing.
-        // NOTE: It is not possible to skip such lines because later we
-        //       will have more fields and not all should be presented.
         for (; column < columnCount(); column++)
             data[column].append("");
     }

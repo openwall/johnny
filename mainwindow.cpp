@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // To open respective tab on mode selection
     QButtonGroup *group = m_ui->radioButton_ExternalMode->group();
-    // TODO: Maybe cycle?
+    // TODO: Maybe cycle? Maybe put this into .ui?
     group->setId(m_ui->radioButton_DefaultBehaviour, 0);
     group->setId(m_ui->radioButton_SingleCrackMode, 1);
     group->setId(m_ui->radioButton_WordlistMode, 2);
@@ -453,6 +453,16 @@ void MainWindow::on_actionStart_Attack_triggered()
         // External mode
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
     }
+
+    // Selectors
+    if (m_ui->checkBox_LimitUsers->isChecked())
+        parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
+    if (m_ui->checkBox_LimitGroups->isChecked())
+        parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
+    if (m_ui->checkBox_LimitShells->isChecked())
+        parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
+    if (m_ui->checkBox_LimitSalts->isChecked())
+        parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
 
     // Session for johnny
     if (QFileInfo(m_session + ".rec").isReadable()) {

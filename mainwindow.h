@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QMultiMap>
+#include <QTemporaryFile>
 
 namespace Ui {
     class MainWindow;
@@ -101,6 +102,8 @@ private:
     QDateTime m_startDateTime;
     // Map (hash table) for fast access after `john --show`
     QMultiMap<QString, int> m_tableMap;
+    // Holder for temporary file for `john --show`
+    QTemporaryFile *m_temp;
 };
 
 #endif // MAINWINDOW_H

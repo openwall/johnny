@@ -725,6 +725,7 @@ void MainWindow::readJohnShow()
         // TODO: What if we do not find row? Note user.
         // TODO: We overwrite values each time.
         foreach (int row, m_tableMap.values(hash)) {
+            // TODO: claim if overwrite with other value.
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
                 password);

@@ -26,7 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
       m_settings(
           // TODO: is not .ini better than .conf?
           QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
-          QSettings::IniFormat)
+          QSettings::IniFormat),
+      m_temp(NULL)
 {
     m_ui->setupUi(this);
 
@@ -230,6 +231,11 @@ void MainWindow::checkNToggleActionsLastSession()
 MainWindow::~MainWindow()
 {
     delete m_ui;
+    m_ui = 0;
+    delete m_hashesTable;
+    m_hashesTable = 0;
+    delete m_temp;
+    m_temp = 0;
 }
 
 void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
@@ -261,6 +267,14 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // TODO: Check argument.
 
+    // Remove temporary file is exist
+    // TODO: should not I check pointers like ptr != NULL instead of just ptr?
+    // TODO: should not I assign NULL instead of 0?
+    if (m_temp) {
+        delete m_temp;
+        m_temp = 0;
+    }
+
     // We delete existing model if any.
     if (m_hashesTable != NULL) {
         delete m_hashesTable;
@@ -275,7 +289,7 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     m_tableMap = QMultiMap<QString, int>();
     for (int i = 0; i < m_hashesTable->rowCount(); i++) {
         m_tableMap.insert(
-            m_hashesTable->data(m_hashesTable->index(i, 0)).toString(),
+            m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
             i);
     }
 }
@@ -575,18 +589,41 @@ void MainWindow::on_pushButton_JohnStatus_clicked()
 
 void MainWindow::showJohnStarted()
 {
-    // TODO: Are these signals called always in order
-    //       started-finished? Or is it unpredictable?
-    // When John starts we enable stop button and disable start
-    // button.
-    // TODO: Is it ok if user clicks between his previous click and
-    //       button disables?
-    // TODO: Should we disable/enable status button?
-    m_ui->actionPause_Attack->setEnabled(true);
+    // We disable all buttons.
+    m_ui->actionPause_Attack->setEnabled(false);
     m_ui->actionStart_Attack->setEnabled(false);
     m_ui->actionResume_Attack->setEnabled(false);
     m_ui->actionOpen_Password->setEnabled(false);
     m_ui->actionOpen_Last_Session->setEnabled(false);
+
+    // We make a file with original hash in gecos to connect password
+    // with original hash during `john --show`.
+    if (!m_temp) {
+        m_temp = new QTemporaryFile();
+        // TODO: check return from new.
+        if (m_temp->open()) {
+            QTextStream temp(m_temp);
+            for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+                // TODO: could it be done faster?
+                // TODO: is it ok to use "?" inserted for lonely hash as user name?
+                QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
+                QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
+                // TODO: is it ok to use \n?
+                temp << QString("%1:%2:%3\n").arg(user).arg(hash).arg(hash);
+            }
+            m_temp->close();
+        } else {
+            // TODO: Error: could not open temp file.
+        }
+    }
+
+    // TODO: Are these signals called always in order
+    //       started-finished? Or is it unpredictable?
+    // When John starts we enable stop button.
+    // TODO: Is it ok if user clicks between his previous click and
+    //       button disables?
+    // TODO: Should we disable/enable status button?
+    m_ui->actionPause_Attack->setEnabled(true);
     // When John starts we start capturing passwords.
     // TODO: Currently we set timer to 10 minutes. Make it
     //       customizable.
@@ -641,7 +678,7 @@ void MainWindow::callJohnShow()
     // We add current format key if it is not empty.
     if (m_format != "")
         parameters << m_format;
-    parameters << "--show" << m_hashesFileName;
+    parameters << "--show" << m_temp->fileName();
     m_showJohnProcess.start(m_pathToJohn, parameters);
 }
 
@@ -670,10 +707,16 @@ void MainWindow::readJohnShow()
     firstLine = line;
     // We read to the end or before empty line.
     while (!line.isNull() && line != "") {
+        // TODO: could not it be done faster?
+        line.remove(QRegExp("\\r?\\n"));
         // We split lines to fields.
         // TODO: What if password contains semicolon?
         // TODO: What if password contains new line?
-        QStringList fields = line.split(':');
+        int left = line.indexOf(":");
+        int right = line.lastIndexOf(":");
+        // TODO: check we found left and right and left is not right.
+        QString password = line.mid(left + 1, right - left - 1);
+        QString hash = line.mid(right + 1);
         // We handle password.
         // If we found user then we put password in table.
         // TODO: What if there two rows with one user name?
@@ -681,10 +724,10 @@ void MainWindow::readJohnShow()
         //       John's output be wrong?
         // TODO: What if we do not find row? Note user.
         // TODO: We overwrite values each time.
-        foreach (int row, m_tableMap.values(fields.at(0))) {
+        foreach (int row, m_tableMap.values(hash)) {
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
-                fields.at(1));
+                password);
         }
         // We continue reading with next line.
         line = outputStream.readLine();

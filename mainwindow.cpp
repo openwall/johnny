@@ -20,7 +20,13 @@
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), m_ui(new Ui::MainWindow), m_hashesTable(NULL)
+    : QMainWindow(parent),
+      m_ui(new Ui::MainWindow),
+      m_hashesTable(NULL),
+      m_settings(
+          // TODO: is not .ini better than .conf?
+          QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
+          QSettings::IniFormat)
 {
     m_ui->setupUi(this);
 

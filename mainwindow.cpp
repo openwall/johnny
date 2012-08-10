@@ -16,6 +16,7 @@
 #include <QByteArray>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QClipboard>
 
 #include <QDebug>
 
@@ -397,6 +398,42 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     if (readPasswdFile(fileName)) {
         m_format = format;
     }
+}
+
+void MainWindow::on_actionCopyToClipboard_triggered()
+{
+    if (!m_hashesTable)
+        return;
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    // TODO: maybe copy everything if nothing is selected?
+    if (indexes.count() == 0)
+        return;
+    QString out;
+    if (indexes.count() == 1) {
+        out = indexes.at(0).data().toString();
+    } else {
+        qSort(indexes);
+        int previousRow = -1;
+        foreach (const QModelIndex &index, indexes) {
+            // TODO: do it faster.
+            // TODO: check for tabs inside.
+            // TODO: use mimetype to make good tables.
+            if (previousRow == index.row()) {
+                out += "\t";
+            } else if (previousRow != -1) {
+                out += "\n";
+            }
+            out += index.data().toString();
+            previousRow = index.row();
+        }
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->clear();
+    // TODO: we copy in two modes. I guess only one should be used.
+    //       Selection mode on linux and clipboard on windows?
+    if (clipboard->supportsSelection())
+        clipboard->setText(out, QClipboard::Selection);
+    clipboard->setText(out);
 }
 
 bool MainWindow::checkSettings()

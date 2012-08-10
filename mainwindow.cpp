@@ -228,8 +228,32 @@ void MainWindow::checkNToggleActionsLastSession()
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (m_johnProcess.state() != QProcess::NotRunning) {
+        int answer = QMessageBox::question(
+            this,
+            tr("Johnny"),
+            // TODO: More informative message.
+            tr("John still runs! John will be stopped if you proceed. Do you really want to quit?"),
+            QMessageBox::Yes | QMessageBox::No);
+        if (answer == QMessageBox::No) {
+            event->ignore();
+            return;
+        }
+    }
+    event->accept();
+}
+
 MainWindow::~MainWindow()
 {
+    m_johnProcess.terminate();
+    m_showJohnProcess.terminate();
+    // TODO: we wait 1 second.
+    if (!m_johnProcess.waitForFinished(1000))
+        m_johnProcess.kill();
+    if (!m_showJohnProcess.waitForFinished(1000))
+        m_showJohnProcess.kill();
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;

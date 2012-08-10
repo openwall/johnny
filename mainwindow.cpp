@@ -487,6 +487,9 @@ void MainWindow::on_actionStart_Attack_triggered()
             QMessageBox::Yes | QMessageBox::No);
         if (button == QMessageBox::No)
             return;
+        // Remove .rec file to avoid problem when john does not write it.
+        // TODO: Should not we say something if/when we could not remove file?
+        QFile(m_session + ".rec").remove();
     }
 
     // TODO: Saving so two instances of johnny overwrite description

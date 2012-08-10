@@ -64,6 +64,8 @@ private slots:
 
     void checkNToggleActionsLastSession();
 
+    bool readPasswdFile(const QString &fileName);
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;

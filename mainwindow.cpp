@@ -331,6 +331,25 @@ void MainWindow::on_pushButton_clicked()
     }
 }
 
+bool MainWindow::readPasswdFile(const QString &fileName)
+{
+    FileTableModel *model = new FileTableModel(this);
+    if (model->readFile(fileName)) {
+        // We replace existing model with new one.
+        replaceTableModel(model);
+        // After new model remembered we remember its file name.
+        m_hashesFileName = fileName;
+        checkNToggleActionsLastSession();
+        return true;
+    }
+    QMessageBox::warning(
+            this,
+            tr("Johnny"),
+            // TODO: More informative message.
+            tr("Johnny could not read desired passwd file."));
+    return false;
+}
+
 void MainWindow::on_actionOpen_Password_triggered()
 {
     // When user asks to open password file we should read desired
@@ -353,11 +372,7 @@ void MainWindow::on_actionOpen_Password_triggered()
     //       concatenate selected file or to unshadow them.
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
-        // We replace existing model with new one.
-        replaceTableModel(new FileTableModel(fileName, this));
-        // After new model remembered we remember its file name.
-        m_hashesFileName = fileName;
-        checkNToggleActionsLastSession();
+        readPasswdFile(fileName);
     }
 }
 
@@ -375,12 +390,12 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     QTextStream descriptionStream(&description);
     // TODO: errors?
     // TODO: end of line? Should not we "chomp" it? See other places too.
-    m_hashesFileName = descriptionStream.readLine();
-    m_format = descriptionStream.readLine();
+    QString fileName = descriptionStream.readLine();
+    QString format = descriptionStream.readLine();
     description.close();
-    // We replace existing model with new one.
-    replaceTableModel(new FileTableModel(m_hashesFileName, this));
-    checkNToggleActionsLastSession();
+    if (readPasswdFile(fileName)) {
+        m_format = format;
+    }
 }
 
 void MainWindow::on_actionStart_Attack_triggered()

@@ -15,7 +15,7 @@ class FileTableModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    FileTableModel(const QString &fileName, QObject *parent = 0);
+    FileTableModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -27,6 +27,9 @@ public:
     QVariant headerData(int section,
                         Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const;
+
+
+    bool readFile(const QString &fileName);
 
 private:
     QVector<QVector<QString> > m_data;

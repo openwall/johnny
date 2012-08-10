@@ -1234,6 +1234,7 @@
    <addaction name="actionResume_Attack"/>
    <addaction name="actionPause_Attack"/>
    <addaction name="separator"/>
+   <addaction name="actionCopyToClipboard"/>
 <!--   <addaction name="actionHomepage"/>-->
 <!--   <addaction name="actionHelp_2"/>-->
    <addaction name="separator"/>
@@ -1412,6 +1413,25 @@
 <!--    <bool>true</bool>-->
 <!--   </property>-->
 <!--  </action>-->
+  <action name="actionCopyToClipboard">
+   <property name="icon">
+    <iconset>
+     <normalon>:/icons/projectsave.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy selected part or full table to clipboard</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
   <action name="actionStart_Attack">
    <property name="icon">
     <iconset>
@@ -1425,7 +1445,7 @@
     <string>Start cracking passwords</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+C</string>
+    <string>Ctrl+K</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -1469,7 +1489,7 @@
     <string>Pause the cracking of passwords</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+D</string>
+    <string>Ctrl+P</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>

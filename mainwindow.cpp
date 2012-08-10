@@ -193,7 +193,8 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: bad name.
     on_pushButton_ResetSettings_clicked();
 
-    if (!m_settings.contains("PathToJohn"))
+    // TODO: default values for other settings are accepted silently.
+    if (m_settings.value("PathToJohn").toString() == "")
         warnAboutDefaultPathToJohn();
 
 }
@@ -398,8 +399,23 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     }
 }
 
+bool MainWindow::checkSettings()
+{
+    if (m_pathToJohn == "") {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Please specify path to John the Ripper binary in settings!"));
+        return false;
+    }
+    return true;
+}
+
 void MainWindow::on_actionStart_Attack_triggered()
 {
+    if (!checkSettings())
+        return;
+
     QStringList parameters;
     // We prepare parameters list from options section.
     // TODO: Make it as separate method. It also will be needed to
@@ -571,12 +587,16 @@ void MainWindow::on_actionStart_Attack_triggered()
     } else {
         // Else we do not have connected file name so we ask user to save
         // file.
+        // TODO: Unreachable until we get fileless tables.
         // TODO: Do something here.
     }
 }
 
 void MainWindow::on_actionResume_Attack_triggered()
 {
+    if (!checkSettings())
+        return;
+
     QStringList parameters;
     parameters << QString("--restore=%1").arg(m_session);
 
@@ -948,18 +968,20 @@ void MainWindow::on_pushButton_ResetSettings_clicked()
     // settings points.
     // Really we copy stored settings to the form and then apply
     // settings.
+    // TODO: claim on empty fields. Probably on all together.
+    QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
     m_ui->comboBox_PathToJohn->setEditText(
-        m_settings.value(
-            "PathToJohn",
-            m_ui->comboBox_PathToJohn->currentText()).toString());
+        settingsPathToJohn == ""
+        ? m_ui->comboBox_PathToJohn->currentText()
+        : settingsPathToJohn);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(
-        m_settings.value(
-            "TimeIntervalPickCracked",
-            m_ui->spinBox_TimeIntervalPickCracked->value()).toInt());
+        m_settings.value("TimeIntervalPickCracked").toString() == ""
+        ? m_ui->spinBox_TimeIntervalPickCracked->value()
+        : m_settings.value("TimeIntervalPickCracked").toInt());
     m_ui->checkBox_AutoApplySettings->setChecked(
-        m_settings.value(
-            "AutoApplySettings",
-            m_ui->checkBox_AutoApplySettings->isChecked()).toBool());
+        m_settings.value("AutoApplySettings").toString() == ""
+        ? m_ui->checkBox_AutoApplySettings->isChecked()
+        : m_settings.value("AutoApplySettings").toBool());
     // We apply settings.
     // TODO: Again... Button's handler do useful work but named
     //       inappropriately because it is handler.

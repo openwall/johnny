@@ -66,6 +66,8 @@ private slots:
 
     bool readPasswdFile(const QString &fileName);
 
+    bool checkSettings();
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;

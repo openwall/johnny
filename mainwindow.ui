@@ -1054,6 +1054,13 @@
          <widget class="QWidget" name="settingsPage">
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
+            <widget class="QPushButton" name="pushButton_ResetSettings">
+             <property name="text">
+              <string>Reset Settings back to saved state</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="pushButton_FillSettingsWithDefaults">
              <property name="text">
               <string>Fill Settings with default values</string>
@@ -1128,22 +1135,11 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_15">
-             <item>
-              <widget class="QPushButton" name="pushButton_ResetSettings">
-               <property name="text">
-                <string>Reset Settings back to saved state</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_ApplySaveSettings">
-               <property name="text">
-                <string>Apply and Save Settings</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QPushButton" name="pushButton_ApplySaveSettings">
+             <property name="text">
+              <string>Apply and Save Settings</string>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="verticalSpacer_2">

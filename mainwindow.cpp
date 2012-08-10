@@ -609,7 +609,7 @@ void MainWindow::showJohnStarted()
                 QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                 QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
                 // TODO: is it ok to use \n?
-                temp << QString("%1:%2:%3\n").arg(user).arg(hash).arg(hash);
+                temp << QString("%1:%2::%3\n").arg(user).arg(hash).arg(hash);
             }
             m_temp->close();
         } else {
@@ -713,10 +713,10 @@ void MainWindow::readJohnShow()
         // TODO: What if password contains semicolon?
         // TODO: What if password contains new line?
         int left = line.indexOf(":");
-        int right = line.lastIndexOf(":");
+        int right = line.lastIndexOf("::");
         // TODO: check we found left and right and left is not right.
         QString password = line.mid(left + 1, right - left - 1);
-        QString hash = line.mid(right + 1);
+        QString hash = line.mid(right + 2);
         // We handle password.
         // If we found user then we put password in table.
         // TODO: What if there two rows with one user name?
@@ -725,7 +725,8 @@ void MainWindow::readJohnShow()
         // TODO: What if we do not find row? Note user.
         // TODO: We overwrite values each time.
         foreach (int row, m_tableMap.values(hash)) {
-            // TODO: claim if overwrite with other value.
+            // TODO: claim if overwrite with other value. Be aware of
+            //       lm with its ???????HALF2.
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
                 password);

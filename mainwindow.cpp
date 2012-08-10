@@ -414,6 +414,9 @@ void MainWindow::on_actionCopyToClipboard_triggered()
     } else {
         qSort(indexes);
         int previousRow = -1;
+        // TODO: such table making works bad with ctrl+mouse
+        //       selection. I'd say in such case not selected fields
+        //       inside the rectangle should be exported as empty.
         foreach (const QModelIndex &index, indexes) {
             // TODO: do it faster.
             // TODO: check for tabs inside.

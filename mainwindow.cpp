@@ -594,8 +594,7 @@ void MainWindow::on_actionPause_Attack_triggered()
     // We ask John to exit.
     // TODO: Is it ok to call it even if process is not running?
     // TODO: Do not we need to call kill instead if John is too busy?
-    // TODO: We need to call this before exit too. In the other case Qt
-    //       will show warning about closing with running process.
+    // TODO: Call kill on windows.
     // NOTE: We could leave it for user: we count button presses and for
     //       the first time we call terminate and for next times we
     //       call kill.

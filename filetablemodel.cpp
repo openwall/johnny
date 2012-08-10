@@ -12,11 +12,19 @@
 //       place file loading into model. Though it seems to be
 //       good.
 
-FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
+FileTableModel::FileTableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
     m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS");
+    // TODO: we leave object in inconsistent state.
+}
+
+// TODO: more codes? Other way to describe reason?
+// TODO: this should not be called twice. Either check that it was
+//       called or begin cleaning m_data.
+bool FileTableModel::readFile(const QString &fileName)
+{
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -31,9 +39,7 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     // TODO: Restore could call us with empty name. We crash.
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        // TODO: Notice user that file could not be opened.
-        // TODO: As of we in constructor we should raise an exception.
-        return;
+        return false;
     while (!file.atEnd()) {
         QString line = file.readLine();
         // TODO: right? Should not we keep \r in middle of line?
@@ -79,6 +85,8 @@ FileTableModel::FileTableModel(const QString &fileName, QObject *parent)
     }
     // TODO: Should we emit a signal to notice all that we changed our
     //       state?
+
+    return true;
 }
 
 int FileTableModel::rowCount(const QModelIndex &/* parent */) const

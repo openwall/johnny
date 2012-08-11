@@ -1259,6 +1259,20 @@
 <!--    <addaction name="actionSave"/>-->
 <!--    <addaction name="actionQuit"/>-->
    </widget>
+   <widget class="QMenu" name="menuAttack">
+    <property name="title">
+     <string>Attack</string>
+    </property>
+    <addaction name="actionStart_Attack"/>
+    <addaction name="actionResume_Attack"/>
+    <addaction name="actionPause_Attack"/>
+   </widget>
+   <widget class="QMenu" name="menuPasswords">
+    <property name="title">
+     <string>Passwords</string>
+    </property>
+    <addaction name="actionCopyToClipboard"/>
+   </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
      <string>Options</string>
@@ -1282,6 +1296,8 @@
 <!--    <addaction name="actionSave_2"/>-->
 <!--   </widget>-->
    <addaction name="menuFile"/>
+   <addaction name="menuAttack"/>
+   <addaction name="menuPasswords"/>
 <!--   <addaction name="menuSessions"/>-->
 <!--   <addaction name="menuOptions"/>-->
 <!--   <addaction name="menuHelp"/>-->

@@ -288,6 +288,8 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
 void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
+    // TODO: We assume here that passwords tab is at 0.
+    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == 0);
 }
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)

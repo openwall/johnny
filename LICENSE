@@ -2,7 +2,7 @@ All files except graphics files in this software are subject to these license
 terms:
 ------------
 Copyright (c) 2011 Shinnok <raydenxy at gmail.com>
-Copyright © 2011 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>
+Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted.
@@ -21,6 +21,7 @@ SUCH DAMAGE.
 
 ------------
 
+Written with great help of Frank Dittrich.
+
 The license for the graphics files(icons, images, etc..) can be found in the
 source tree at "resources/icons/README.icons".
-

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2011 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
 #ifndef FILETABLEMODEL_H

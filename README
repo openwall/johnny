@@ -1,29 +1,23 @@
 About Johnny
 ============
 
-Johnny is a GUI concept to John the Ripper written
-in C++ using the Qt framework.
+Johnny is a GUI for John the Ripper written in C++ using the Qt
+framework.
 
-You can find more about by visiting:
-http://www.openwall.com/lists/john-dev/2011/04/02/1
-http://www.openwall.com/lists/john-dev/2011/03/27/2
-http://openwall.info/wiki/ideas
-
-*Johnny is still in a very raw and concept form
-until this will be removed* :-)
+You can find more about Johnny by visiting:
+http://openwall.info/wiki/john/johnny
 
 Compiling on Unix/Linux and Windows
 -----------------------------------
 
 Prerequisites:
-   * Qt 4.7.0 or later
+   * Qt 4.6.3 or later (may or may not work on earlier versions too)
    * On Linux you have two choices for installing the Qt SDK:
-        1. Install Qt 4.7.0 or later using your distribution's
-            package manager. The minimum libraries you need are
-            libqt4-core, libqt4-gui and libqt4-dev. Besides that
-            you will need qt4-qmake for qmake and g++/libstdc++5, 
-            though these should be automatically installed as 
-            dependencies to libqt*.
+        1. Install Qt using your distribution's package manager. The
+            minimum libraries you need are libqt4-core, libqt4-gui and
+            libqt4-dev. Besides that you will need qt4-qmake for qmake
+            and g++/libstdc++5, though these should be automatically
+            installed as dependencies to libqt*.
             For e.g. on debian you can:
             apt-get install libqt4-core libqt4-gui libqt4-dev
             and say yes to the dependencies and you get everything

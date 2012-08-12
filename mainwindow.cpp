@@ -323,18 +323,18 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     }
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    replaceTableModel(new TableModel(this));
-    // We reset file name because this model is generated and does not
-    // have connected file.
-    m_hashesFileName = "";
+// void MainWindow::on_pushButton_clicked()
+// {
+//     replaceTableModel(new TableModel(this));
+//     // We reset file name because this model is generated and does not
+//     // have connected file.
+//     m_hashesFileName = "";
 
-    for (int i = 0; i < TABLE_ROWS; i++) {
-        m_hashesTable->setData(m_hashesTable->index(i, 0), QString("Rick%1").arg(i));
-        m_hashesTable->setData(m_hashesTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
-    }
-}
+//     for (int i = 0; i < TABLE_ROWS; i++) {
+//         m_hashesTable->setData(m_hashesTable->index(i, 0), QString("Rick%1").arg(i));
+//         m_hashesTable->setData(m_hashesTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
+//     }
+// }
 
 bool MainWindow::readPasswdFile(const QString &fileName)
 {
@@ -679,17 +679,17 @@ void MainWindow::on_actionPause_Attack_triggered()
     m_johnProcess.terminate();
 }
 
-void MainWindow::on_pushButton_JohnStatus_clicked()
-{
-    // When we want to get John status we send enter to John. Then
-    // John write something to its stdout. We do not need to read its
-    // output here because when output is ready to be read a signal is
-    // fired and we read John output with status as any other John's
-    // output.
-    // TODO: However it does not work as of we do not have terminal.
-    // TODO: Why do we write to John even when it is not running?
-    m_johnProcess.write("a\r\n");
-}
+// void MainWindow::on_pushButton_JohnStatus_clicked()
+// {
+//     // When we want to get John status we send enter to John. Then
+//     // John write something to its stdout. We do not need to read its
+//     // output here because when output is ready to be read a signal is
+//     // fired and we read John output with status as any other John's
+//     // output.
+//     // TODO: However it does not work as of we do not have terminal.
+//     // TODO: Why do we write to John even when it is not running?
+//     m_johnProcess.write("a\r\n");
+// }
 
 void MainWindow::showJohnStarted()
 {

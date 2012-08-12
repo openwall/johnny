@@ -527,13 +527,13 @@
                 </spacer>
                </item>
               </layout>
-              <zorder>label_2</zorder>
-              <zorder></zorder>
-              <zorder>label_2</zorder>
-              <zorder>label_2</zorder>
-              <zorder></zorder>
-              <zorder>label_2</zorder>
-              <zorder>verticalSpacer_4</zorder>
+              <!-- <zorder>label_2</zorder> -->
+              <!-- <zorder></zorder> -->
+              <!-- <zorder>label_2</zorder> -->
+              <!-- <zorder>label_2</zorder> -->
+              <!-- <zorder></zorder> -->
+              <!-- <zorder>label_2</zorder> -->
+              <!-- <zorder>verticalSpacer_4</zorder> -->
              </widget>
              <widget class="QWidget" name="tab_2">
               <attribute name="title">

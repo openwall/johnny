@@ -33,14 +33,14 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    /* void on_pushButton_clicked(); */
     void on_actionStart_Attack_triggered();
     void on_actionResume_Attack_triggered();
     void on_actionPause_Attack_triggered();
     void on_actionCopyToClipboard_triggered();
     void on_actionOpen_Password_triggered();
     void on_actionOpen_Last_Session_triggered();
-    void on_pushButton_JohnStatus_clicked();
+    /* void on_pushButton_JohnStatus_clicked(); */
     void on_listWidgetTabs_itemSelectionChanged();
     void on_pushButton_WordlistFileBrowse_clicked();
     void on_pushButton_FillSettingsWithDefaults_clicked();

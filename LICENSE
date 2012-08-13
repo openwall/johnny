@@ -1,6 +1,6 @@
-All files except graphics files in this software are subject to these license
-terms:
-------------
+All files except graphics files in this software are subject to these
+license terms:
+
 Copyright (c) 2011 Shinnok <raydenxy at gmail.com>
 Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>
 
@@ -21,7 +21,16 @@ SUCH DAMAGE.
 
 ------------
 
-Written with great help of Frank Dittrich.
+This software was written with great help of Frank Dittrich.
 
-The license for the graphics files(icons, images, etc..) can be found in the
-source tree at "resources/icons/README.icons".
+------------
+
+The license for the graphics files (icons, images, etc..) can be found
+in the source tree at "resources/icons/README.icons".
+
+------------
+
+This software is intended to be linked against Qt. Qt is available
+under LGPL 2.1 with additional exception, GPL 3.0 or commercial
+license. Binaries of this software are subject to one of these
+licenses too. See license terms enclosed with binaries and/or your Qt.

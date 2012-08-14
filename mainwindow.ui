@@ -261,6 +261,10 @@
 <!--           </item>-->
           </layout>
          </widget>
+         <widget class="QScrollArea" name="optionsScrollArea">
+           <property name="widgetResizable">
+             <bool>true</bool>
+           </property>
          <widget class="QWidget" name="optionsPage">
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <item>
@@ -1007,6 +1011,7 @@
             </spacer>
            </item>
           </layout>
+         </widget>
          </widget>
          <widget class="QWidget" name="statisticsPage">
           <layout class="QVBoxLayout" name="verticalLayout_14">

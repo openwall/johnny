@@ -778,6 +778,13 @@ void MainWindow::showJohnFinished()
 
 void MainWindow::callJohnShow()
 {
+    // TODO: if john returns immediately then we call it again before
+    //       it finishes. No good solution. Only workaround.
+    m_showJohnProcess.waitForFinished(1000);
+    if (m_showJohnProcess.state() != QProcess::NotRunning)
+        m_showJohnProcess.kill();
+    m_showJohnProcess.waitForFinished(1000);
+
     QStringList parameters;
     // We add current format key if it is not empty.
     if (m_format != "")

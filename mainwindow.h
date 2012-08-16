@@ -19,6 +19,7 @@
 #include <QDateTime>
 #include <QMultiMap>
 #include <QTemporaryFile>
+#include <QProcess>
 
 namespace Ui {
     class MainWindow;
@@ -57,6 +58,7 @@ private slots:
     void updateJohnOutput();
     void showJohnFinished();
     void showJohnStarted();
+    void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
 
     void startJohn(QStringList params);

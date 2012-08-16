@@ -11,6 +11,7 @@
 #include <QProcess>
 #include <QAbstractTableModel>
 #include <QString>
+#include <QStringList>
 #include <QTimer>
 #include <QByteArray>
 #include <QTextStream>
@@ -57,6 +58,8 @@ private slots:
     void showJohnFinished();
     void showJohnStarted();
     void replaceTableModel(QAbstractTableModel *newTableModel);
+
+    void startJohn(QStringList params);
 
     void callJohnShow();
     void readJohnShow();

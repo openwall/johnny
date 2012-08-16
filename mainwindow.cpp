@@ -774,7 +774,10 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 #define C(code, text) case QProcess :: code: message = tr(text); break;
 #define P(code) C(code, "Problem with john: " # code);
     switch (error) {
-        C(FailedToStart, "John failed to start. Check your Path to John setting.");
+        C(FailedToStart,
+          "John failed to start. "
+          "Check your Path to John setting. "
+          "Check permissions on respective file.");
         C(Crashed, "John crashed.");
         P(Timedout);
         P(WriteError);

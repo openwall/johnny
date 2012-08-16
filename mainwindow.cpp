@@ -80,6 +80,10 @@ MainWindow::MainWindow(QWidget *parent)
     // John was started.
     connect(&m_johnProcess, SIGNAL(started()),
             this, SLOT(showJohnStarted()));
+    // John got problem.
+    // TODO: catch problems from `john --show`?
+    connect(&m_johnProcess, SIGNAL(error(QProcess::ProcessError)),
+            this, SLOT(showJohnError(QProcess::ProcessError)));
     // John wrote something.
     connect(&m_johnProcess, SIGNAL(readyReadStandardOutput()),
             this, SLOT(updateJohnOutput()));
@@ -762,6 +766,32 @@ void MainWindow::showJohnStarted()
     callJohnShow();
 }
 
+void MainWindow::showJohnError(QProcess::ProcessError error)
+{
+    QString message;
+    // TODO: define is a bad style for c++.
+    // NOTE: space before :: is necessary.
+#define C(code, text) case QProcess :: code: message = tr(text); break;
+#define P(code) C(code, "Problem with john: " # code);
+    switch (error) {
+        C(FailedToStart, "John failed to start. Check your Path to John setting.");
+        C(Crashed, "John crashed.");
+        P(Timedout);
+        P(WriteError);
+        P(ReadError);
+        P(UnknownError);
+    default:
+        message = tr("There is a problem. Johnny could not handle it.");
+    }
+#undef P
+#undef C
+    QMessageBox::critical(
+        this,
+        tr("Johnny"),
+        // TODO: show path to john in error messages.
+        message);
+}
+
 void MainWindow::showJohnFinished()
 {
     // TODO: Should we place a message about it into output buffer?
@@ -773,6 +803,7 @@ void MainWindow::showJohnFinished()
     checkNToggleActionsLastSession();
     // When John stops we need to stop timer and to look status last
     // time.
+    // TODO: currently if john crashed we do not call john.
     m_showTimer.stop();
     callJohnShow();
 }

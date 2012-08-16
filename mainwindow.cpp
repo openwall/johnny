@@ -619,20 +619,25 @@ void MainWindow::on_actionStart_Attack_triggered()
         // John.
         // We add file name onto parameters list.
         parameters << m_hashesFileName;
-        // To start John we have predefined process object. That object's
-        // signals are already connected with our slots. So we need only
-        // start it.
-        //
-        // We start John.
-        m_johnProcess.start(m_pathToJohn, parameters);
-        // We remember date and time of the start.
-        m_startDateTime = QDateTime::currentDateTime();
+        startJohn(parameters);
     } else {
         // Else we do not have connected file name so we ask user to save
         // file.
         // TODO: Unreachable until we get fileless tables.
         // TODO: Do something here.
     }
+}
+
+void MainWindow::startJohn(QStringList params)
+{
+    // To start John we have predefined process object. That object's
+    // signals are already connected with our slots. So we need only
+    // start it.
+    //
+    // We start John.
+    m_johnProcess.start(m_pathToJohn, params);
+    // We remember date and time of the start.
+    m_startDateTime = QDateTime::currentDateTime();
 }
 
 void MainWindow::on_actionResume_Attack_triggered()
@@ -643,11 +648,7 @@ void MainWindow::on_actionResume_Attack_triggered()
     QStringList parameters;
     parameters << QString("--restore=%1").arg(m_session);
 
-    // TODO: copy-pasting is evil! It is copied from start attack.
-    // We start John.
-    m_johnProcess.start(m_pathToJohn, parameters);
-    // We remember date and time of the start.
-    m_startDateTime = QDateTime::currentDateTime();
+    startJohn(parameters);
 }
 
 void MainWindow::updateJohnOutput()

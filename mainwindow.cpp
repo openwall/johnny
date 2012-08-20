@@ -199,9 +199,11 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: bad name.
     on_pushButton_ResetSettings_clicked();
 
+    // TODO: do this message on every invocation of john. Provide
+    //       checkbox to not show this again.
     // TODO: default values for other settings are accepted silently.
-    if (m_settings.value("PathToJohn").toString() == "")
-        warnAboutDefaultPathToJohn();
+    // if (m_settings.value("PathToJohn").toString() == "")
+    //     warnAboutDefaultPathToJohn();
 
 }
 

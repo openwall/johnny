@@ -1056,7 +1056,7 @@
           </layout>
          </widget>
 <!--         <widget class="QWidget" name="benchmarkPage"/>-->
-         <widget class="QScrollArea" name="optionsScrollArea">
+         <widget class="QScrollArea" name="settingsScrollArea">
            <property name="widgetResizable">
              <bool>true</bool>
            </property>

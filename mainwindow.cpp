@@ -871,7 +871,8 @@ void MainWindow::readJohnShow()
         // TODO: What if there two rows with one user name?
         // TODO: What if we did not have 2 fields? Could
         //       John's output be wrong?
-        // TODO: What if we do not find row? Note user.
+        // TODO: What if we do not find row? Note user. Take into
+        //       account that we remove value after use.
         // TODO: We overwrite values each time.
         foreach (int row, m_tableMap.values(hash)) {
             // TODO: claim if overwrite with other value. Be aware of
@@ -880,6 +881,8 @@ void MainWindow::readJohnShow()
                 m_hashesTable->index(row, 1),
                 password);
         }
+        // We remove value to speed up.
+        m_tableMap.remove(hash);
         // We continue reading with next line.
         line = outputStream.readLine();
     }

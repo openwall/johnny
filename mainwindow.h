@@ -6,8 +6,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QListWidgetItem>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QListWidgetItem>
 #include <QProcess>
 #include <QAbstractTableModel>
 #include <QString>

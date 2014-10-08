@@ -3,7 +3,8 @@
  * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#include <QtGui/QApplication>
+#include <QtCore/QCoreApplication>
+#include <QtWidgets/QApplication>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Johnny, the GUI for John the Ripper");
 
     QApplication app(argc, argv);
+
     MainWindow window;
     window.show();
 

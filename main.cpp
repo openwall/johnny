@@ -5,6 +5,9 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QApplication>
+#include <QtCore/QTranslator>
+#include <QtCore/QLibraryInfo>
+#include <QtDebug>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -18,6 +21,17 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("Johnny, the GUI for John the Ripper");
 
     QApplication app(argc, argv);
+
+    //Translator needed to translate Qt's own strings
+    QTranslator qtTranslator;
+    qtTranslator.load("qt_" + QLocale::system().name(),
+            QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    app.installTranslator(&qtTranslator);
+
+    //Translator needed to translate Johnny's strings
+    QTranslator johnnyTranslator;
+    johnnyTranslator.load("johnny_" + QLocale::system().name(), ":/translations");
+    app.installTranslator(&johnnyTranslator);
 
     MainWindow window;
     window.show();

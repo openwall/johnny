@@ -772,25 +772,26 @@ void MainWindow::showJohnStarted()
 void MainWindow::showJohnError(QProcess::ProcessError error)
 {
     QString message;
-    // TODO: define is a bad style for c++.
-    // NOTE: space before :: is necessary.
-#define C(code, text) case QProcess :: code: message = tr(text); break;
-#define P(code) C(code, "Problem with john: " # code);
     switch (error) {
-        C(FailedToStart,
-          "John failed to start. "
-          "Check your Path to John setting. "
-          "Check permissions on respective file.");
-        C(Crashed, "John crashed.");
-        P(Timedout);
-        P(WriteError);
-        P(ReadError);
-        P(UnknownError);
+    case QProcess::FailedToStart:
+        message = QString(tr("John failed to start."
+                         "Check your Path to John setting."
+                         "Check permissions on respective file."));
+        break;
+
+    case QProcess::Crashed:
+        message = tr("John crashed.");
+        break;
+
+    case QProcess::Timedout: case QProcess::WriteError:
+    case QProcess::ReadError: case QProcess::UnknownError:
+        message = tr("Problem with john #") + QString::number(error);
+        break;
+
     default:
         message = tr("There is a problem. Johnny could not handle it.");
     }
-#undef P
-#undef C
+
     QMessageBox::critical(
         this,
         tr("Johnny"),

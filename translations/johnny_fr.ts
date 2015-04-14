@@ -6,12 +6,12 @@
     <message>
         <location filename="../filetablemodel.cpp" line="19"/>
         <source>User</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisateur</translation>
     </message>
     <message>
         <location filename="../filetablemodel.cpp" line="19"/>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <location filename="../filetablemodel.cpp" line="19"/>
@@ -46,78 +46,78 @@
     <message>
         <location filename="../mainwindow.ui" line="141"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="151"/>
         <source>Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Statistiques</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="161"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="171"/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultat</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="250"/>
         <source>General options</source>
-        <translation type="unfinished"></translation>
+        <translation>Options générales</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="261"/>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="272"/>
         <location filename="../mainwindow.cpp" line="472"/>
         <source>Auto detect</source>
-        <translation type="unfinished"></translation>
+        <translation>Détecter automatiquement</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="277"/>
         <source>des</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="282"/>
         <source>bsdi</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="287"/>
         <source>md5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="292"/>
         <source>bf</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="297"/>
         <source>afs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="302"/>
         <source>lm</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="307"/>
         <source>crypt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="312"/>
         <source>trip</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="317"/>
@@ -127,13 +127,13 @@
     <message>
         <location filename="../mainwindow.ui" line="335"/>
         <source>Mode selection and settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection du mode et des paramètres</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="349"/>
         <location filename="../mainwindow.ui" line="434"/>
         <source>Default behaviour</source>
-        <translation type="unfinished"></translation>
+        <translation>Comportement par défault</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="369"/>
@@ -190,7 +190,7 @@
         <location filename="../mainwindow.ui" line="587"/>
         <location filename="../mainwindow.ui" line="1015"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="601"/>
@@ -276,7 +276,7 @@
     <message>
         <location filename="../mainwindow.ui" line="1001"/>
         <source>Path to John the Ripper executable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin de l&apos;éxécutable de John the Ripper:</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1026"/>
@@ -291,37 +291,37 @@
     <message>
         <location filename="../mainwindow.ui" line="1057"/>
         <source>Apply Settings but do NOT SAVE them</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les paramètres sans les sauvegarder</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1066"/>
         <source>Apply and Save Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer et sauvegarder les paramètres</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1161"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1168"/>
         <source>Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>Attaque</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1186"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarder</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1191"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1196"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1201"/>
@@ -331,103 +331,103 @@
     <message>
         <location filename="../mainwindow.ui" line="1206"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1211"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>À propos de</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1216"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Préférences</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1226"/>
         <source>Open Passwd File</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir un fichier de mots de passes</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1229"/>
         <source>Open a password file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir un fichier de mots de passes</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1232"/>
         <source>Ctrl+O</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1245"/>
         <location filename="../mainwindow.ui" line="1248"/>
         <source>Open Last Session</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir dernière session</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1251"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1264"/>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1267"/>
         <source>Copy selected part or full table to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier la partie sélectionnée ou la table complète dans le presse-papier</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1270"/>
         <source>Ctrl+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1283"/>
         <source>Start Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>Débuter l&apos;attaque</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1286"/>
         <source>Start cracking passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Débuter le cracking des mots de passes</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1289"/>
         <source>Ctrl+K</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1305"/>
         <source>Resume Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>Reprendre l&apos;attaque</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1308"/>
         <source>Resume cracking passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Reprendre le cracking de mots de passes</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1311"/>
         <source>Ctrl+R</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1327"/>
         <source>Pause Attack</source>
-        <translation type="unfinished"></translation>
+        <translation>Mettre l&apos;attaque en pause</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1330"/>
         <source>Pause the cracking of passwords</source>
-        <translation type="unfinished"></translation>
+        <translation>Mettre en pause le cracking de most de passes</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="1333"/>
         <source>Ctrl+P</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="241"/>
@@ -452,7 +452,7 @@
     <message>
         <location filename="../mainwindow.cpp" line="584"/>
         <source>Johnny is about to overwrite your previous session file. Do you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Johnny s&apos;apprête à remplacer votre fichier de dernière  session. Êtes-vous certain de vouloir cela? </translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="601"/>
@@ -489,7 +489,7 @@
         <location filename="../mainwindow.cpp" line="1114"/>
         <location filename="../mainwindow.cpp" line="1115"/>
         <source>:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

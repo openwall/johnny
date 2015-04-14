@@ -7,7 +7,6 @@
 #include <QtWidgets/QApplication>
 #include <QtCore/QTranslator>
 #include <QtCore/QLibraryInfo>
-#include <QtDebug>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])

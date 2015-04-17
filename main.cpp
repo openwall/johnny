@@ -3,10 +3,10 @@
  * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#include <QtCore/QCoreApplication>
-#include <QtWidgets/QApplication>
-#include <QtCore/QTranslator>
-#include <QtCore/QLibraryInfo>
+#include <QCoreApplication>
+#include <QApplication>
+#include <QTranslator>
+#include <QLibraryInfo>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])

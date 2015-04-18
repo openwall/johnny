@@ -590,7 +590,7 @@ void MainWindow::on_actionStart_Attack_triggered()
             tr("Johnny"),
             tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
             QMessageBox::Yes | QMessageBox::No);
-        if (button == QMessageBox::No)
+       if (button == QMessageBox::No)
             return;
         // Remove .rec file to avoid problem when john does not write it.
         // TODO: Should not we say something if/when we could not remove file?
@@ -774,18 +774,29 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
     QString message;
     switch (error) {
     case QProcess::FailedToStart:
-        message = QString(tr("John failed to start."
-                         "Check your Path to John setting."
-                         "Check permissions on respective file."));
+        message = tr("John failed to start."
+                     "Check your Path to John setting."
+                     "Check permissions on respective file.");
         break;
 
     case QProcess::Crashed:
         message = tr("John crashed.");
         break;
 
-    case QProcess::Timedout: case QProcess::WriteError:
-    case QProcess::ReadError: case QProcess::UnknownError:
-        message = tr("Problem with john #") + QString::number(error);
+    case QProcess::Timedout:
+        message = tr("A timed out error happened to John.");
+        break;
+
+    case QProcess::WriteError:
+        message = tr("A write error happened to John.");
+        break;
+
+    case QProcess::ReadError:
+        message = tr("A read error happened to John.");
+        break;
+
+    case QProcess::UnknownError:
+        message = tr("An unknown problem happened to John.");
         break;
 
     default:

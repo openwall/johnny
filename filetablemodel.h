@@ -1,23 +1,21 @@
 /*
- * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.  See LICENSE.
+ * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#ifndef TABLEMODEL_H
-#define TABLEMODEL_H
+#ifndef FILETABLEMODEL_H
+#define FILETABLEMODEL_H
 
 #include <QAbstractTableModel>
 #include <QStringList>
+#include <QVector>
+#include <QString>
 
-#define TABLE_ROWS 500000
-#define TABLE_COLUMNS 2
-
-class TableModel : public QAbstractTableModel
+class FileTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    TableModel(QObject *parent = 0);
-    ~TableModel();
+    FileTableModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -30,8 +28,13 @@ public:
                         Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const;
 
+
+    bool readFile(const QString &fileName);
+
 private:
-    QStringList m_table;
+    QVector<QVector<QString> > m_data;
+
+    QVector<QString> m_columns;
 };
 
-#endif // TABLEMODEL_H
+#endif // FILETABLEMODEL_H

@@ -9,14 +9,15 @@
 TableModel::TableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
-    for(int i=0; i < TABLE_ROWS; i++)
-        for(int j=0; j < TABLE_COLUMNS; j++)
-            table.append("");
+    for (int i = 0; i < TABLE_ROWS; i++) {
+        for (int j = 0; j < TABLE_COLUMNS; j++)
+            m_table.append("");
+    }
 }
 
 TableModel::~TableModel()
 {
-    table.empty();
+    m_table.empty();
 }
 
 int TableModel::rowCount(const QModelIndex & /* parent */) const
@@ -33,15 +34,17 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || role != Qt::DisplayRole)
         return QVariant();
-    return table.at(index.row() * TABLE_COLUMNS + index.column());
+    return m_table.at(index.row() * TABLE_COLUMNS + index.column());
 }
 
-bool TableModel::setData ( const QModelIndex & index, const QVariant & value, int role )
+bool TableModel::setData(const QModelIndex &index,
+                         const QVariant &value,
+                         int role)
 {
     if (!index.isValid() || role != Qt::EditRole)
         return false;
 
-    table.replace(index.row() * TABLE_COLUMNS + index.column(), value.toString());
+    m_table.replace(index.row() * TABLE_COLUMNS + index.column(), value.toString());
 
     emit TableModel::dataChanged(index, index);
 
@@ -53,20 +56,27 @@ QVariant TableModel::headerData(int section/* section */,
                                 int role) const
 {
     //if (role == Qt::SizeHintRole)
-     //   return QSize(1, 1);
+    //   return QSize(1, 1);
 
     if (role != Qt::DisplayRole)
-             return QVariant();
+        return QVariant();
 
     if (orientation == Qt::Vertical)
+        // TODO: Row numbers starting from 0 seems to not be user
+        //       friendly.
         return QString("%1").arg(section);
-    if (orientation == Qt::Horizontal)
-        switch(section){
-            case 0: return QString(tr("User"));
-                break;
-            case 1: return QString(tr("Hash"));
-                break;
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
+        case 0:
+            return QString(tr("User"));
+            break;
+        case 1:
+            return QString(tr("Hash"));
+            break;
+        default:
+            break;
         }
+    }
 
     return QVariant();
 }

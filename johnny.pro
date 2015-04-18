@@ -13,13 +13,11 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     tablemodel.cpp \
-    johnParser.cpp \
-    johnThread.cpp
+    filetablemodel.cpp
 
 HEADERS  += mainwindow.h \
     tablemodel.h \
-    johnThread.h \
-    johnParser.h
+    filetablemodel.h
 
 FORMS    += mainwindow.ui
 
@@ -29,3 +27,7 @@ RESOURCES += \
 OTHER_FILES += \
     README \
     LICENSE
+
+# Default build is debug
+CONFIG -= release
+CONFIG += debug

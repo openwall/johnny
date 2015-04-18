@@ -1093,8 +1093,9 @@ void MainWindow::on_comboBox_PathToJohn_editTextChanged()
         on_pushButton_ApplySettings_clicked();
 }
 
-void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged()
+void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged(int value)
 {
+    Q_UNUSED(value);
     // TODO: Copy-pasting is evil!
     //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)

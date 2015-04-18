@@ -51,7 +51,7 @@ private slots:
     void on_pushButton_ApplySaveSettings_clicked();
     void on_pushButton_ResetSettings_clicked();
     void on_comboBox_PathToJohn_editTextChanged();
-    void on_spinBox_TimeIntervalPickCracked_valueChanged();
+    void on_spinBox_TimeIntervalPickCracked_valueChanged(int value);
     void on_checkBox_AutoApplySettings_stateChanged();
     void on_pushButton_StatisticsUpdateStatus_clicked();
 

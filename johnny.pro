@@ -16,11 +16,13 @@ TEMPLATE = app
 SOURCES +=	main.cpp\
 			mainwindow.cpp \
 			tablemodel.cpp \
-			filetablemodel.cpp
+			filetablemodel.cpp \
+                        translator.cpp
 
 HEADERS  += mainwindow.h \
 			tablemodel.h \
-			filetablemodel.h
+			filetablemodel.h \
+                        translator.h
 
 FORMS    += mainwindow.ui
 TRANSLATIONS    = translations/johnny_fr.ts

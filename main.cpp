@@ -5,10 +5,9 @@
 
 #include <QCoreApplication>
 #include <QApplication>
-#include <QTranslator>
-#include <QLibraryInfo>
+#include <QDir>
 #include "mainwindow.h"
-
+#include "translator.h"
 int main(int argc, char *argv[])
 {
     // We set application info up.
@@ -21,16 +20,23 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    //Translator needed to translate Qt's own strings
-    QTranslator qtTranslator;
-    qtTranslator.load("qt_" + QLocale::system().name(),
-            QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    app.installTranslator(&qtTranslator);
+    QSettings settings(QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
+                QSettings::IniFormat);
 
-    //Translator needed to translate Johnny's strings
-    QTranslator johnnyTranslator;
-    johnnyTranslator.load("johnny_" + QLocale::system().name(), ":/translations");
-    app.installTranslator(&johnnyTranslator);
+    QString settingLanguage = settings.value("Language").toString();
+    Translator* translator = Translator::getInstance();
+
+    // If no language is saved : default behavior is to use system language
+    if(settingLanguage.isEmpty())
+    {
+        QString systemLanguage =  QLocale::languageToString(QLocale().language());
+        translator->translateApplication(&app,systemLanguage);
+    }
+    else
+    {
+        //Use the language specified in the settings
+        translator->translateApplication(&app,settingLanguage);
+    }
 
     MainWindow window;
     window.show();

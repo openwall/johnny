@@ -9,6 +9,7 @@
 // We include all table models we use.
 #include "tablemodel.h"
 #include "filetablemodel.h"
+#include "translator.h"
 
 #include <QToolButton>
 #include <QStringListModel>
@@ -205,6 +206,10 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: default values for other settings are accepted silently.
     // if (m_settings.value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
+    Translator* translator = Translator::getInstance();
+    m_ui->comboBox_LanguageSelection->insertItems(0,translator->getListOfAvailableLanguages());
+    m_ui->comboBox_LanguageSelection->setCurrentText(translator->getCurrentLanguage());
+
 
 }
 
@@ -721,7 +726,7 @@ void MainWindow::showJohnStarted()
                 QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                 QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
                 // TODO: is it ok to use \n?
-                temp << QString("%1:%2::%3\n").arg(user).arg(hash).arg(hash);
+                temp << user << ":" << hash << "::" << hash << '\n';
             }
             m_temp->close();
         } else {
@@ -1051,11 +1056,27 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     m_pathToJohn = m_ui->comboBox_PathToJohn->currentText();
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
+
+    //If the language changed
+    Translator* translator = Translator::getInstance();
+    QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
+    if(newLanguage != translator->getCurrentLanguage().toLower())
+    {
+        translator->translateApplication(qApp,newLanguage);
+        m_ui->retranslateUi(this);
+    }
 }
 
 void MainWindow::on_pushButton_ApplySaveSettings_clicked()
 {
-    // We apply settings first.
+    // Before applying new language, verify if it changed(if not we keep default = system language)
+    Translator* translator = Translator::getInstance();
+    QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
+    if(newLanguage != translator->getCurrentLanguage().toLower())
+    {
+        m_settings.setValue("Language", newLanguage);
+    }
+    // Apply settings first.
     // TODO: It is not a good design that we call button's handler
     //       that is really do something useful.
     on_pushButton_ApplySettings_clicked();

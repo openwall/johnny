@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     // TODO: Is that the right place for this?
     QCoreApplication::setOrganizationName("Openwall");
     QCoreApplication::setOrganizationDomain("openwall.com");
-    QCoreApplication::setApplicationName("Johnny, the GUI for John the Ripper");
+    QCoreApplication::setApplicationName("Johnny");
 
     QApplication app(argc, argv);
 

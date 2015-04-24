@@ -46,7 +46,7 @@
     <item>
      <widget class="QListWidget" name="listWidgetTabs">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -69,6 +69,9 @@
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
       <property name="autoScrollMargin">
        <number>0</number>
       </property>
@@ -77,6 +80,9 @@
       </property>
       <property name="tabKeyNavigation">
        <bool>true</bool>
+      </property>
+      <property name="showDropIndicator" stdset="0">
+       <bool>false</bool>
       </property>
       <property name="dragDropMode">
        <enum>QAbstractItemView::NoDragDrop</enum>
@@ -105,11 +111,11 @@
       <property name="flow">
        <enum>QListView::TopToBottom</enum>
       </property>
-      <property name="isWrapping" stdset="0">
-       <bool>false</bool>
-      </property>
       <property name="resizeMode">
        <enum>QListView::Adjust</enum>
+      </property>
+      <property name="layoutMode">
+       <enum>QListView::Batched</enum>
       </property>
       <property name="spacing">
        <number>0</number>
@@ -118,7 +124,7 @@
        <enum>QListView::IconMode</enum>
       </property>
       <property name="uniformItemSizes">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="wordWrap">
        <bool>false</bool>
@@ -181,7 +187,7 @@
     <item>
      <widget class="QWidget" name="widget" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -211,7 +217,7 @@
           <string notr="true"/>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -233,8 +239,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>650</width>
-             <height>852</height>
+             <width>808</width>
+             <height>868</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -427,7 +433,7 @@
             <item>
              <widget class="QTabWidget" name="tabWidget">
               <property name="currentIndex">
-               <number>4</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="tab">
                <attribute name="title">
@@ -974,8 +980,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>650</width>
-             <height>852</height>
+             <width>599</width>
+             <height>316</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1043,20 +1049,20 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="language_layout">
-              <item>
-               <widget class="QLabel" name="label_Language">
-                <property name="text">
-                 <string>Language:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="comboBox_LanguageSelection"/>
-              </item>
-             </layout>
-            </item>
-            <item>
+            <layout class="QHBoxLayout" name="language_layout">
+             <item>
+              <widget class="QLabel" name="label_Language">
+               <property name="text">
+                <string>Language:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_LanguageSelection"/>
+             </item>
+            </layout>
+           </item>
+           <item>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
                <widget class="QCheckBox" name="checkBox_AutoApplySettings">
@@ -1167,7 +1173,7 @@
      <x>0</x>
      <y>0</y>
      <width>908</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

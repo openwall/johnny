@@ -34,8 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     m_ui->setupUi(this);
 
-    // TODO: Magic number. It seems to be wrong approach.
-    m_ui->listWidgetTabs->setMaximumWidth(m_ui->listWidgetTabs->sizeHintForColumn(0) + 4);
+    m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
+    m_ui->listWidgetTabs->setMaximumWidth(m_ui->listWidgetTabs->sizeHintForColumn(0));
 
     // TODO: How to select Passwords tab through mainwindow.ui?
     //       Property 'selected' with 'bool' value 'true' did not work for me.

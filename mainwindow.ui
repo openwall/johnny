@@ -69,6 +69,9 @@
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
       <property name="autoScrollMargin">
        <number>0</number>
       </property>
@@ -77,6 +80,9 @@
       </property>
       <property name="tabKeyNavigation">
        <bool>true</bool>
+      </property>
+      <property name="showDropIndicator" stdset="0">
+       <bool>false</bool>
       </property>
       <property name="dragDropMode">
        <enum>QAbstractItemView::NoDragDrop</enum>
@@ -105,11 +111,11 @@
       <property name="flow">
        <enum>QListView::TopToBottom</enum>
       </property>
-      <property name="isWrapping" stdset="0">
-       <bool>false</bool>
-      </property>
       <property name="resizeMode">
        <enum>QListView::Adjust</enum>
+      </property>
+      <property name="layoutMode">
+       <enum>QListView::Batched</enum>
       </property>
       <property name="spacing">
        <number>0</number>
@@ -118,7 +124,7 @@
        <enum>QListView::IconMode</enum>
       </property>
       <property name="uniformItemSizes">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="wordWrap">
        <bool>false</bool>
@@ -233,7 +239,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>650</width>
+             <width>808</width>
              <height>868</height>
             </rect>
            </property>

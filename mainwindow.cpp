@@ -204,8 +204,6 @@ MainWindow::MainWindow(QSettings *settings, QWidget *parent)
     Translator* translator = &Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0,translator->getListOfAvailableLanguages());
     m_ui->comboBox_LanguageSelection->setCurrentText(translator->getCurrentLanguage());
-
-
 }
 
 void MainWindow::checkNToggleActionsLastSession()
@@ -1139,6 +1137,13 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
     //       good to remember its state between program runs.
     // TODO: Copy-pasting is evil!
     //       (on_comboBox_PathToJohn_valueChanged)
+    if (m_autoApplySettings)
+        on_pushButton_ApplySettings_clicked();
+}
+
+void MainWindow::on_comboBox_LanguageSelection_currentIndexChanged(int index)
+{
+    Q_UNUSED(index);
     if (m_autoApplySettings)
         on_pushButton_ApplySettings_clicked();
 }

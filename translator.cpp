@@ -1,7 +1,6 @@
 #include "translator.h"
 #include <QTranslator>
 #include <QLibraryInfo>
-Translator* Translator::m_instance = NULL;
 
 Translator::Translator()
 {
@@ -15,13 +14,12 @@ Translator::Translator()
     m_currentLanguage = "english"; // default
 }
 
-Translator* Translator::getInstance()
+Translator& Translator::getInstance()
 {
-    if(m_instance == NULL){
-        m_instance = new Translator();
-    }
-    return m_instance;
+    static Translator instance;
+    return instance;
 }
+
 void Translator::translateApplication(QApplication* app, QString language)
 {
     if(isTranslationAvailable(language))

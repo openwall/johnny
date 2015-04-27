@@ -19,7 +19,6 @@
 #include <QDateTime>
 #include <QMultiMap>
 #include <QTemporaryFile>
-#include <QProcess>
 
 namespace Ui {
     class MainWindow;
@@ -30,7 +29,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QSettings *settings, QWidget *parent = 0);
     void closeEvent(QCloseEvent *event);
     ~MainWindow();
 
@@ -109,7 +108,7 @@ private:
     // should we wait user to click 'apply' button.
     bool m_autoApplySettings;
     // Stored settings
-    QSettings m_settings;
+    QSettings* m_settings;
     // Date and time of the start of the sttack
     QDateTime m_startDateTime;
     // Map (hash table) for fast access after `john --show`

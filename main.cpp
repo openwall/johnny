@@ -3,11 +3,12 @@
  * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#include <QCoreApplication>
-#include <QApplication>
-#include <QDir>
 #include "mainwindow.h"
 #include "translator.h"
+#include <QApplication>
+#include <QCoreApplication>
+#include <QDir>
+
 int main(int argc, char *argv[])
 {
     // We set application info up.
@@ -24,7 +25,7 @@ int main(int argc, char *argv[])
                 QSettings::IniFormat);
 
     QString settingLanguage = settings.value("Language").toString();
-    Translator* translator = Translator::getInstance();
+    Translator* translator = &Translator::getInstance();
 
     // If no language is saved : default behavior is to use system language
     if(settingLanguage.isEmpty())
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
         translator->translateApplication(&app,settingLanguage);
     }
 
-    MainWindow window;
+    MainWindow window(&settings);
     window.show();
 
     return app.exec();

@@ -5,11 +5,11 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "translator.h"
 
 // We include all table models we use.
 #include "tablemodel.h"
 #include "filetablemodel.h"
-#include "translator.h"
 
 #include <QToolButton>
 #include <QStringListModel>
@@ -20,18 +20,13 @@
 #include <QMessageBox>
 #include <QClipboard>
 
-#include <QDebug>
-
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QSettings *settings, QWidget *parent)
     : QMainWindow(parent),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
-      m_settings(
-          // TODO: is not .ini better than .conf?
-          QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
-          QSettings::IniFormat),
       m_temp(NULL)
 {
+    m_settings = settings;
     m_ui->setupUi(this);
 
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
@@ -204,9 +199,9 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: do this message on every invocation of john. Provide
     //       checkbox to not show this again.
     // TODO: default values for other settings are accepted silently.
-    // if (m_settings.value("PathToJohn").toString() == "")
+    // if (m_settings->value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
-    Translator* translator = Translator::getInstance();
+    Translator* translator = &Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0,translator->getListOfAvailableLanguages());
     m_ui->comboBox_LanguageSelection->setCurrentText(translator->getCurrentLanguage());
 
@@ -1058,7 +1053,7 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
     //If the language changed
-    Translator* translator = Translator::getInstance();
+    Translator* translator = &Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
     if(newLanguage != translator->getCurrentLanguage().toLower())
     {
@@ -1069,21 +1064,15 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
 
 void MainWindow::on_pushButton_ApplySaveSettings_clicked()
 {
-    // Before applying new language, verify if it changed(if not we keep default = system language)
-    Translator* translator = Translator::getInstance();
-    QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
-    if(newLanguage != translator->getCurrentLanguage().toLower())
-    {
-        m_settings.setValue("Language", newLanguage);
-    }
     // Apply settings first.
     // TODO: It is not a good design that we call button's handler
     //       that is really do something useful.
     on_pushButton_ApplySettings_clicked();
     // We store settings.
-    m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
-    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
-    m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
+    m_settings->setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
+    m_settings->setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
+    m_settings->setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
+    m_settings->setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
 void MainWindow::on_pushButton_ResetSettings_clicked()
@@ -1093,19 +1082,19 @@ void MainWindow::on_pushButton_ResetSettings_clicked()
     // Really we copy stored settings to the form and then apply
     // settings.
     // TODO: claim on empty fields. Probably on all together.
-    QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
+    QString settingsPathToJohn = m_settings->value("PathToJohn").toString();
     m_ui->comboBox_PathToJohn->setEditText(
         settingsPathToJohn == ""
         ? m_ui->comboBox_PathToJohn->currentText()
         : settingsPathToJohn);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(
-        m_settings.value("TimeIntervalPickCracked").toString() == ""
+        m_settings->value("TimeIntervalPickCracked").toString() == ""
         ? m_ui->spinBox_TimeIntervalPickCracked->value()
-        : m_settings.value("TimeIntervalPickCracked").toInt());
+        : m_settings->value("TimeIntervalPickCracked").toInt());
     m_ui->checkBox_AutoApplySettings->setChecked(
-        m_settings.value("AutoApplySettings").toString() == ""
+        m_settings->value("AutoApplySettings").toString() == ""
         ? m_ui->checkBox_AutoApplySettings->isChecked()
-        : m_settings.value("AutoApplySettings").toBool());
+        : m_settings->value("AutoApplySettings").toBool());
     // We apply settings.
     // TODO: Again... Button's handler do useful work but named
     //       inappropriately because it is handler.

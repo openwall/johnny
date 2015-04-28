@@ -57,9 +57,6 @@
         <height>16777215</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
       <property name="frameShadow">
        <enum>QFrame::Sunken</enum>
       </property>
@@ -100,7 +97,7 @@
        </size>
       </property>
       <property name="textElideMode">
-       <enum>Qt::ElideMiddle</enum>
+       <enum>Qt::ElideRight</enum>
       </property>
       <property name="verticalScrollMode">
        <enum>QAbstractItemView::ScrollPerItem</enum>
@@ -213,14 +210,23 @@
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
          </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QTableView" name="tableView_Hashes">
              <attribute name="horizontalHeaderStretchLastSection">
@@ -931,6 +937,18 @@
          </widget>
          <widget class="QWidget" name="statisticsPage">
           <layout class="QVBoxLayout" name="verticalLayout_14">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QPushButton" name="pushButton_StatisticsUpdateStatus">
              <property name="text">
@@ -980,8 +998,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>316</height>
+             <width>808</width>
+             <height>868</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1049,20 +1067,20 @@
              </layout>
             </item>
             <item>
-            <layout class="QHBoxLayout" name="language_layout">
-             <item>
-              <widget class="QLabel" name="label_Language">
-               <property name="text">
-                <string>Language:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_LanguageSelection"/>
-             </item>
-            </layout>
-           </item>
-           <item>
+             <layout class="QHBoxLayout" name="language_layout">
+              <item>
+               <widget class="QLabel" name="label_Language">
+                <property name="text">
+                 <string>Language:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_LanguageSelection"/>
+              </item>
+             </layout>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
                <widget class="QCheckBox" name="checkBox_AutoApplySettings">
@@ -1105,6 +1123,18 @@
          </widget>
          <widget class="QWidget" name="outputPage">
           <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit_JohnOut">
              <property name="readOnly">

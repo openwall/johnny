@@ -17,5 +17,6 @@
         <file>icons/tab_benchmark.png</file>
         <file>icons/tab_log.png</file>
         <file>icons/tab_output.png</file>
+        <file>../translations/johnny_fr.qm</file>
     </qresource>
 </RCC>

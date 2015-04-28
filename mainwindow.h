@@ -6,8 +6,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QListWidgetItem>
+#include <QMainWindow>
+#include <QListWidgetItem>
 #include <QProcess>
 #include <QAbstractTableModel>
 #include <QString>
@@ -19,7 +19,6 @@
 #include <QDateTime>
 #include <QMultiMap>
 #include <QTemporaryFile>
-#include <QProcess>
 
 namespace Ui {
     class MainWindow;
@@ -30,7 +29,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QSettings& settings);
     void closeEvent(QCloseEvent *event);
     ~MainWindow();
 
@@ -54,6 +53,7 @@ private slots:
     void on_spinBox_TimeIntervalPickCracked_valueChanged(int value);
     void on_checkBox_AutoApplySettings_stateChanged();
     void on_pushButton_StatisticsUpdateStatus_clicked();
+    void on_comboBox_LanguageSelection_currentIndexChanged(int index);
 
     void updateJohnOutput();
     void showJohnFinished();
@@ -109,7 +109,7 @@ private:
     // should we wait user to click 'apply' button.
     bool m_autoApplySettings;
     // Stored settings
-    QSettings m_settings;
+    QSettings& m_settings;
     // Date and time of the start of the sttack
     QDateTime m_startDateTime;
     // Map (hash table) for fast access after `john --show`

@@ -2,9 +2,9 @@
  * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.  See LICENSE.
  */
 
-#include <QtGui>
-
 #include "tablemodel.h"
+
+#include <QtGui>
 
 TableModel::TableModel(QObject *parent)
     : QAbstractTableModel(parent)

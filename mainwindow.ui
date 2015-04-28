@@ -1049,6 +1049,20 @@
              </layout>
             </item>
             <item>
+            <layout class="QHBoxLayout" name="language_layout">
+             <item>
+              <widget class="QLabel" name="label_Language">
+               <property name="text">
+                <string>Language:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="comboBox_LanguageSelection"/>
+             </item>
+            </layout>
+           </item>
+           <item>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
                <widget class="QCheckBox" name="checkBox_AutoApplySettings">

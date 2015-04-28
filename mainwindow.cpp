@@ -5,6 +5,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "translator.h"
 
 // We include all table models we use.
 #include "tablemodel.h"
@@ -19,16 +20,11 @@
 #include <QMessageBox>
 #include <QClipboard>
 
-#include <QDebug>
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
+MainWindow::MainWindow(QSettings &settings)
+    : QMainWindow(0),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
-      m_settings(
-          // TODO: is not .ini better than .conf?
-          QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
-          QSettings::IniFormat),
+      m_settings(settings),
       m_temp(NULL)
 {
     m_ui->setupUi(this);
@@ -205,7 +201,9 @@ MainWindow::MainWindow(QWidget *parent)
     // TODO: default values for other settings are accepted silently.
     // if (m_settings.value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
-
+    Translator& translator = Translator::getInstance();
+    m_ui->comboBox_LanguageSelection->insertItems(0,translator.getListOfAvailableLanguages());
+    m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
 }
 
 void MainWindow::checkNToggleActionsLastSession()
@@ -590,7 +588,7 @@ void MainWindow::on_actionStart_Attack_triggered()
             tr("Johnny"),
             tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
             QMessageBox::Yes | QMessageBox::No);
-        if (button == QMessageBox::No)
+       if (button == QMessageBox::No)
             return;
         // Remove .rec file to avoid problem when john does not write it.
         // TODO: Should not we say something if/when we could not remove file?
@@ -721,7 +719,7 @@ void MainWindow::showJohnStarted()
                 QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                 QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
                 // TODO: is it ok to use \n?
-                temp << QString("%1:%2::%3\n").arg(user).arg(hash).arg(hash);
+                temp << user << ":" << hash << "::" << hash << '\n';
             }
             m_temp->close();
         } else {
@@ -772,25 +770,37 @@ void MainWindow::showJohnStarted()
 void MainWindow::showJohnError(QProcess::ProcessError error)
 {
     QString message;
-    // TODO: define is a bad style for c++.
-    // NOTE: space before :: is necessary.
-#define C(code, text) case QProcess :: code: message = tr(text); break;
-#define P(code) C(code, "Problem with john: " # code);
     switch (error) {
-        C(FailedToStart,
-          "John failed to start. "
-          "Check your Path to John setting. "
-          "Check permissions on respective file.");
-        C(Crashed, "John crashed.");
-        P(Timedout);
-        P(WriteError);
-        P(ReadError);
-        P(UnknownError);
+    case QProcess::FailedToStart:
+        message = tr("John failed to start."
+                     "Check your Path to John setting."
+                     "Check permissions on respective file.");
+        break;
+
+    case QProcess::Crashed:
+        message = tr("John crashed.");
+        break;
+
+    case QProcess::Timedout:
+        message = tr("A timed out error happened to John.");
+        break;
+
+    case QProcess::WriteError:
+        message = tr("A write error happened to John.");
+        break;
+
+    case QProcess::ReadError:
+        message = tr("A read error happened to John.");
+        break;
+
+    case QProcess::UnknownError:
+        message = tr("An unknown problem happened to John.");
+        break;
+
     default:
         message = tr("There is a problem. Johnny could not handle it.");
     }
-#undef P
-#undef C
+
     QMessageBox::critical(
         this,
         tr("Johnny"),
@@ -1039,11 +1049,20 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     m_pathToJohn = m_ui->comboBox_PathToJohn->currentText();
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
+
+    //If the language changed
+    Translator& translator = Translator::getInstance();
+    QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
+    if(newLanguage != translator.getCurrentLanguage().toLower())
+    {
+        translator.translateApplication(qApp,newLanguage);
+        m_ui->retranslateUi(this);
+    }
 }
 
 void MainWindow::on_pushButton_ApplySaveSettings_clicked()
 {
-    // We apply settings first.
+    // Apply settings first.
     // TODO: It is not a good design that we call button's handler
     //       that is really do something useful.
     on_pushButton_ApplySettings_clicked();
@@ -1051,6 +1070,7 @@ void MainWindow::on_pushButton_ApplySaveSettings_clicked()
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
     m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
+    m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
 void MainWindow::on_pushButton_ResetSettings_clicked()
@@ -1117,6 +1137,13 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
     //       good to remember its state between program runs.
     // TODO: Copy-pasting is evil!
     //       (on_comboBox_PathToJohn_valueChanged)
+    if (m_autoApplySettings)
+        on_pushButton_ApplySettings_clicked();
+}
+
+void MainWindow::on_comboBox_LanguageSelection_currentIndexChanged(int index)
+{
+    Q_UNUSED(index);
     if (m_autoApplySettings)
         on_pushButton_ApplySettings_clicked();
 }

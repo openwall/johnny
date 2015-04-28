@@ -29,7 +29,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QSettings *settings, QWidget *parent = 0);
+    explicit MainWindow(QSettings& settings);
     void closeEvent(QCloseEvent *event);
     ~MainWindow();
 
@@ -109,7 +109,7 @@ private:
     // should we wait user to click 'apply' button.
     bool m_autoApplySettings;
     // Stored settings
-    QSettings* m_settings;
+    QSettings& m_settings;
     // Date and time of the start of the sttack
     QDateTime m_startDateTime;
     // Map (hash table) for fast access after `john --show`

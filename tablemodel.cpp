@@ -3,6 +3,7 @@
  */
 
 #include "tablemodel.h"
+
 #include <QtGui>
 
 TableModel::TableModel(QObject *parent)

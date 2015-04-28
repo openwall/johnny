@@ -3,6 +3,7 @@
 
 #include <QTranslator>
 #include <QApplication>
+
 #include <map>
 #include <string>
 

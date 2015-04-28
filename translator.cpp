@@ -1,4 +1,5 @@
 #include "translator.h"
+
 #include <QTranslator>
 #include <QLibraryInfo>
 

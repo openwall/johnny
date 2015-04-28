@@ -5,6 +5,7 @@
 
 #include "mainwindow.h"
 #include "translator.h"
+
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
         translator->translateApplication(&app,settingLanguage);
     }
 
-    MainWindow window(&settings);
+    MainWindow window(settings);
     window.show();
 
     return app.exec();

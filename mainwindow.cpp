@@ -20,13 +20,13 @@
 #include <QMessageBox>
 #include <QClipboard>
 
-MainWindow::MainWindow(QSettings *settings, QWidget *parent)
-    : QMainWindow(parent),
+MainWindow::MainWindow(QSettings &settings)
+    : QMainWindow(0),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
+      m_settings(settings),
       m_temp(NULL)
 {
-    m_settings = settings;
     m_ui->setupUi(this);
 
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
@@ -199,11 +199,11 @@ MainWindow::MainWindow(QSettings *settings, QWidget *parent)
     // TODO: do this message on every invocation of john. Provide
     //       checkbox to not show this again.
     // TODO: default values for other settings are accepted silently.
-    // if (m_settings->value("PathToJohn").toString() == "")
+    // if (m_settings.value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
-    Translator* translator = &Translator::getInstance();
-    m_ui->comboBox_LanguageSelection->insertItems(0,translator->getListOfAvailableLanguages());
-    m_ui->comboBox_LanguageSelection->setCurrentText(translator->getCurrentLanguage());
+    Translator& translator = Translator::getInstance();
+    m_ui->comboBox_LanguageSelection->insertItems(0,translator.getListOfAvailableLanguages());
+    m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
 }
 
 void MainWindow::checkNToggleActionsLastSession()
@@ -1051,11 +1051,11 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
     //If the language changed
-    Translator* translator = &Translator::getInstance();
+    Translator& translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
-    if(newLanguage != translator->getCurrentLanguage().toLower())
+    if(newLanguage != translator.getCurrentLanguage().toLower())
     {
-        translator->translateApplication(qApp,newLanguage);
+        translator.translateApplication(qApp,newLanguage);
         m_ui->retranslateUi(this);
     }
 }
@@ -1067,10 +1067,10 @@ void MainWindow::on_pushButton_ApplySaveSettings_clicked()
     //       that is really do something useful.
     on_pushButton_ApplySettings_clicked();
     // We store settings.
-    m_settings->setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
-    m_settings->setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
-    m_settings->setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
-    m_settings->setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
+    m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
+    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
+    m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
+    m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
 void MainWindow::on_pushButton_ResetSettings_clicked()
@@ -1080,19 +1080,19 @@ void MainWindow::on_pushButton_ResetSettings_clicked()
     // Really we copy stored settings to the form and then apply
     // settings.
     // TODO: claim on empty fields. Probably on all together.
-    QString settingsPathToJohn = m_settings->value("PathToJohn").toString();
+    QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
     m_ui->comboBox_PathToJohn->setEditText(
         settingsPathToJohn == ""
         ? m_ui->comboBox_PathToJohn->currentText()
         : settingsPathToJohn);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(
-        m_settings->value("TimeIntervalPickCracked").toString() == ""
+        m_settings.value("TimeIntervalPickCracked").toString() == ""
         ? m_ui->spinBox_TimeIntervalPickCracked->value()
-        : m_settings->value("TimeIntervalPickCracked").toInt());
+        : m_settings.value("TimeIntervalPickCracked").toInt());
     m_ui->checkBox_AutoApplySettings->setChecked(
-        m_settings->value("AutoApplySettings").toString() == ""
+        m_settings.value("AutoApplySettings").toString() == ""
         ? m_ui->checkBox_AutoApplySettings->isChecked()
-        : m_settings->value("AutoApplySettings").toBool());
+        : m_settings.value("AutoApplySettings").toBool());
     // We apply settings.
     // TODO: Again... Button's handler do useful work but named
     //       inappropriately because it is handler.

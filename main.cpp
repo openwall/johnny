@@ -26,18 +26,18 @@ int main(int argc, char *argv[])
                 QSettings::IniFormat);
 
     QString settingLanguage = settings.value("Language").toString();
-    Translator* translator = &Translator::getInstance();
+    Translator& translator = Translator::getInstance();
 
     // If no language is saved : default behavior is to use system language
     if(settingLanguage.isEmpty())
     {
         QString systemLanguage =  QLocale::languageToString(QLocale().language());
-        translator->translateApplication(&app,systemLanguage);
+        translator.translateApplication(&app,systemLanguage);
     }
     else
     {
         //Use the language specified in the settings
-        translator->translateApplication(&app,settingLanguage);
+        translator.translateApplication(&app,settingLanguage);
     }
 
     MainWindow window(settings);

@@ -239,8 +239,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>808</width>
-             <height>868</height>
+             <width>814</width>
+             <height>860</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -433,7 +433,7 @@
             <item>
              <widget class="QTabWidget" name="tabWidget">
               <property name="currentIndex">
-               <number>0</number>
+               <number>4</number>
               </property>
               <widget class="QWidget" name="tab">
                <attribute name="title">
@@ -914,6 +914,63 @@
              </layout>
             </item>
             <item>
+             <widget class="QWidget" name="advancesOptionsWidget" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_21">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_advancedOptions">
+                 <property name="font">
+                  <font>
+                   <family>Sans Serif</family>
+                   <pointsize>12</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Advanced Options</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_Fork" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_15">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QCheckBox" name="checkBox_UseFork">
+                    <property name="text">
+                     <string>Use multiple processes:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_nbOfProcess">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -980,8 +1037,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>316</height>
+             <width>814</width>
+             <height>860</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1049,20 +1106,20 @@
              </layout>
             </item>
             <item>
-            <layout class="QHBoxLayout" name="language_layout">
-             <item>
-              <widget class="QLabel" name="label_Language">
-               <property name="text">
-                <string>Language:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_LanguageSelection"/>
-             </item>
-            </layout>
-           </item>
-           <item>
+             <layout class="QHBoxLayout" name="language_layout">
+              <item>
+               <widget class="QLabel" name="label_Language">
+                <property name="text">
+                 <string>Language:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_LanguageSelection"/>
+              </item>
+             </layout>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
                <widget class="QCheckBox" name="checkBox_AutoApplySettings">
@@ -1173,7 +1230,7 @@
      <x>0</x>
      <y>0</y>
      <width>908</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -19,6 +19,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QThread>
 
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
@@ -204,6 +205,15 @@ MainWindow::MainWindow(QSettings &settings)
     Translator& translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0,translator.getListOfAvailableLanguages());
     m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
+
+    //We set the default and maximum of fork thread to the idealThreadCount.
+    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
+    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
+
+    #ifndef linux
+    //As of now, fork is only supported on Linux platform
+        m_ui->widget_Fork->hide();
+    #endif
 }
 
 void MainWindow::checkNToggleActionsLastSession()
@@ -581,6 +591,11 @@ void MainWindow::on_actionStart_Attack_triggered()
     if (m_ui->checkBox_LimitSalts->isChecked())
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
 
+    // Advanced options
+    if(m_ui->checkBox_UseFork->isChecked())
+    {
+        parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
+    }
     // Session for johnny
     if (QFileInfo(m_session + ".rec").isReadable()) {
         int button = QMessageBox::question(

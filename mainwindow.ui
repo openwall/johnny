@@ -57,9 +57,6 @@
         <height>16777215</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
       <property name="frameShadow">
        <enum>QFrame::Sunken</enum>
       </property>
@@ -100,7 +97,7 @@
        </size>
       </property>
       <property name="textElideMode">
-       <enum>Qt::ElideMiddle</enum>
+       <enum>Qt::ElideRight</enum>
       </property>
       <property name="verticalScrollMode">
        <enum>QAbstractItemView::ScrollPerItem</enum>
@@ -213,14 +210,23 @@
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
          </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QTableView" name="tableView_Hashes">
              <attribute name="horizontalHeaderStretchLastSection">
@@ -433,7 +439,7 @@
             <item>
              <widget class="QTabWidget" name="tabWidget">
               <property name="currentIndex">
-               <number>4</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="tab">
                <attribute name="title">
@@ -988,6 +994,18 @@
          </widget>
          <widget class="QWidget" name="statisticsPage">
           <layout class="QVBoxLayout" name="verticalLayout_14">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QPushButton" name="pushButton_StatisticsUpdateStatus">
              <property name="text">
@@ -1037,8 +1055,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>814</width>
-             <height>860</height>
+             <width>808</width>
+             <height>868</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1162,6 +1180,18 @@
          </widget>
          <widget class="QWidget" name="outputPage">
           <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QPlainTextEdit" name="plainTextEdit_JohnOut">
              <property name="readOnly">
@@ -1230,7 +1260,7 @@
      <x>0</x>
      <y>0</y>
      <width>908</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

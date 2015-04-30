@@ -28,20 +28,14 @@ MainWindow::MainWindow(QSettings &settings)
       m_settings(settings),
       m_temp(NULL)
 {
+    // UI initializations
     m_ui->setupUi(this);
 
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
-    m_ui->listWidgetTabs->setMaximumWidth(m_ui->listWidgetTabs->sizeHintForColumn(0));
-
-    // TODO: How to select Passwords tab through mainwindow.ui?
-    //       Property 'selected' with 'bool' value 'true' did not work for me.
     // We select first item/tab on list.
     m_ui->listWidgetTabs->setCurrentRow(0);
-
-    // TODO: Is it possible to make it through mainwindow.ui?
-    // TODO: Does this find condition works for all strings?
-    foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("", Qt::MatchContains))
-        item->setSizeHint(QSize(m_ui->listWidgetTabs->sizeHintForColumn(0), 60));
+    foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("*", Qt::MatchWildcard))
+        item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
 
     /*
     // We add a button to the toolbar but this button is not simple. It has
@@ -1065,7 +1059,7 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
-    //If the language changed
+    //If the language changed, retranslate the UI
     Translator& translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
     if(newLanguage != translator.getCurrentLanguage().toLower())

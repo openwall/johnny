@@ -20,6 +20,7 @@
 #include <QMessageBox>
 #include <QClipboard>
 #include <QThread>
+#include <QTextCursor>
 
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
@@ -649,15 +650,17 @@ void MainWindow::startJohn(QStringList params)
     // start it.
 
     // to visually separate sessions in the console output (make it clearer for the user)
-    m_ui->plainTextEdit_JohnOut->appendPlainText("--------------------------------------------------------------------------------\n");
-    //print cmd with time
-    m_ui->plainTextEdit_JohnOut->appendPlainText(QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + "\n");
+    QString cmd = "--------------------------------------------------------------------------------\n" +
+            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + '\n';
+
+    insertText(m_ui->plainTextEdit_JohnOut,cmd);
 
     // We start John.
     m_johnProcess.start(m_pathToJohn, params);
     // We remember date and time of the start.
     m_startDateTime = QDateTime::currentDateTime();
 }
+
 
 void MainWindow::on_actionResume_Attack_triggered()
 {
@@ -678,9 +681,12 @@ void MainWindow::updateJohnOutput()
     // NOTE: If there could be only one session in/per window then it
     //       is possible to have session name here through window's field.
     // TODO: Session name should be displayed.
-    //ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");
-    m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardOutput()); // read output buffer
-    m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardError()); // read error buffer
+    //ui->plainTextEdit_JohnOut->appendPlainText("Session file: " + session + "\n");
+
+    //read output and error buffers
+    insertText(m_ui->plainTextEdit_JohnOut,m_johnProcess.readAllStandardOutput()
+               + m_johnProcess.readAllStandardError());
+
     // NOTE: Probably here we want to parse John's output, catch newly
     //       cracked passwords and so on. However John's output is buffered.
     //       So we do not obtain it as soon as it occurs. Timer and
@@ -1203,4 +1209,20 @@ void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
         // Else (if John is not running) we put dash instead of time.
         m_ui->label_StatisticsWorkingTime->setText(tr("-"));
     }
+}
+
+/*
+ * Since QPlainTextEdit::appendPlainText() add newLines without asking us and
+ * QPlainTextEdit::insertPlainText() insert text by default at the cursor pos,
+ * which can be modified by the user, this function assures the text is
+ * inserted at the end without new line by default.
+ */
+
+void MainWindow::insertText(QPlainTextEdit *textEdit,const QString& text)
+{
+    // Preserving cursor preserves selection by user
+    QTextCursor prev_cursor = textEdit->textCursor();
+    textEdit->moveCursor (QTextCursor::End);
+    textEdit->insertPlainText (text);
+    textEdit->setTextCursor (prev_cursor);
 }

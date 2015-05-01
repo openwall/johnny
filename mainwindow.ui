@@ -171,7 +171,7 @@
       </item>
       <item>
        <property name="text">
-        <string>Output</string>
+        <string>Console log</string>
        </property>
        <property name="icon">
         <iconset>
@@ -245,8 +245,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>814</width>
-             <height>860</height>
+             <width>504</width>
+             <height>848</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1055,8 +1055,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>808</width>
-             <height>868</height>
+             <width>501</width>
+             <height>275</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1260,7 +1260,7 @@
      <x>0</x>
      <y>0</y>
      <width>908</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

@@ -647,7 +647,12 @@ void MainWindow::startJohn(QStringList params)
     // To start John we have predefined process object. That object's
     // signals are already connected with our slots. So we need only
     // start it.
-    //
+
+    // to visually separate sessions in the console output (make it clearer for the user)
+    m_ui->plainTextEdit_JohnOut->appendPlainText("--------------------------------------------------------------------------------\n");
+    //print cmd with time
+    m_ui->plainTextEdit_JohnOut->appendPlainText(QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + "\n");
+
     // We start John.
     m_johnProcess.start(m_pathToJohn, params);
     // We remember date and time of the start.

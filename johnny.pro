@@ -17,12 +17,14 @@ SOURCES +=	main.cpp\
 			mainwindow.cpp \
 			tablemodel.cpp \
 			filetablemodel.cpp \
-                        translator.cpp
+                        translator.cpp \
+                        johnprocess.cpp
 
 HEADERS  += mainwindow.h \
 			tablemodel.h \
 			filetablemodel.h \
-                        translator.h
+                        translator.h \
+                        johnprocess.h
 
 FORMS    += mainwindow.ui
 TRANSLATIONS    = translations/johnny_fr.ts

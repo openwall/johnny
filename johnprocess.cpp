@@ -13,8 +13,8 @@ JohnProcess::~JohnProcess()
 
 void JohnProcess::setupChildProcess()
 {
-#ifdef OS_FORK
-    //Create a group for children created by
+#if OS_FORK
+    // Create a group for children created by
     // JtR when -- fork option is available (unix-like)
     setsid();
 #endif
@@ -24,7 +24,7 @@ void JohnProcess::setupChildProcess()
 
 void JohnProcess::terminate()
 {
-#ifdef OS_FORK
+#if OS_FORK
     if(processId() != 0)
     {
         /* Send sigterm to all processes of the group

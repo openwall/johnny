@@ -205,7 +205,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
 
-    #ifndef OS_FORK
+    #if !OS_FORK
     //As of now, fork is only supported on Linux platform
         m_ui->widget_Fork->hide();
     #endif

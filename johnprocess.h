@@ -1,15 +1,15 @@
 #ifndef JOHNPROCESS_H
 #define JOHNPROCESS_H
 
-#if defined(__DJGPP__) || defined(__CYGWIN32__)
-#define OS_FORK				0
-#else
+#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
 #define OS_FORK				1
+#else
+#define OS_FORK				0
 #endif
 
 #include <QProcess>
 
-#ifdef OS_FORK
+#if OS_FORK
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>

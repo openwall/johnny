@@ -1,13 +1,14 @@
 #ifndef JOHNPROCESS_H
 #define JOHNPROCESS_H
 
-#if !defined(_WIN32) && (defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__)))
+#include <QtGlobal> // to define Q_OS_
+#include <QProcess>
+
+#if defined Q_OS_UNIX
 #define OS_FORK				1
 #else
 #define OS_FORK				0
 #endif
-
-#include <QProcess>
 
 #if OS_FORK
 #include <unistd.h>

@@ -34,6 +34,7 @@ void JohnProcess::terminate()
          * compatibility with those versions of John for now */
         ::kill(-processId(),SIGTERM);
     }
-#endif
+#else
     QProcess::terminate();
+#endif
 }

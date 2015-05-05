@@ -40,7 +40,7 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="134"/>
-        <location filename="../mainwindow.ui" line="1315"/>
+        <location filename="../mainwindow.ui" line="1324"/>
         <source>Passwords</source>
         <translation>Mots de passes</translation>
     </message>
@@ -193,7 +193,7 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="599"/>
-        <location filename="../mainwindow.ui" line="1128"/>
+        <location filename="../mainwindow.ui" line="1137"/>
         <source>Browse</source>
         <translation>Parcourir</translation>
     </message>
@@ -258,204 +258,213 @@
         <translation>Options avancées</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="962"/>
         <source>Use multiple processes:</source>
-        <translation>Utiliser plusieurs processus:</translation>
+        <translation type="vanished">Utiliser plusieurs processus:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="994"/>
+        <location filename="../mainwindow.ui" line="947"/>
+        <source>Parallelization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="968"/>
+        <source>Use multiple processes (--fork):</source>
+        <translation>Utilisez plusieurs processus (--fork):</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1000"/>
         <source>If using OpenMP build, specify number of threads:</source>
         <translation>Si John supporte OpenMP, spécifiez le nombre de threads:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1001"/>
+        <location filename="../mainwindow.ui" line="1007"/>
         <source>default</source>
         <translation>par défault</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1044"/>
+        <location filename="../mainwindow.ui" line="1053"/>
         <source>Update Status/Collect Statistics</source>
         <translation>Mettre à jour le status/Collectez des statistiques</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1053"/>
+        <location filename="../mainwindow.ui" line="1062"/>
         <source>Working time:</source>
         <translation>Temps écoulé:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1060"/>
+        <location filename="../mainwindow.ui" line="1069"/>
         <location filename="../mainwindow.cpp" line="1220"/>
         <source>-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1098"/>
+        <location filename="../mainwindow.ui" line="1107"/>
         <source>Reset Settings back to saved state</source>
         <translation>Réinitialisez les paramètres au dernier état sauvegardé</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1105"/>
+        <location filename="../mainwindow.ui" line="1114"/>
         <source>Fill Settings with default values</source>
         <translation>Rétablir les paramètres par défault</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1114"/>
+        <location filename="../mainwindow.ui" line="1123"/>
         <source>Path to John the Ripper executable:</source>
         <translation>Chemin de l&apos;éxécutable de John the Ripper:</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1139"/>
+        <location filename="../mainwindow.ui" line="1148"/>
         <source>Time interval in seconds between cracked passwords picking (edit john.conf respectively):</source>
         <translation>Interval de temps en secondes entre le choix de mots de passes à cracker (modifie respectivement le fichier john.conf):</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1163"/>
+        <location filename="../mainwindow.ui" line="1172"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1177"/>
+        <location filename="../mainwindow.ui" line="1186"/>
         <source>Apply Settings as soon as they are changed</source>
         <translation>Appliquez automatiquement les paramètres dès qu&apos;ils sont changés</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1184"/>
+        <location filename="../mainwindow.ui" line="1193"/>
         <source>Apply Settings but do NOT SAVE them</source>
         <translation>Appliquer les paramètres sans les sauvegarder</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1193"/>
+        <location filename="../mainwindow.ui" line="1202"/>
         <source>Apply and Save Settings</source>
         <translation>Appliquer et sauvegarder les paramètres</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1300"/>
+        <location filename="../mainwindow.ui" line="1309"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1307"/>
+        <location filename="../mainwindow.ui" line="1316"/>
         <source>Attack</source>
         <translation>Attaque</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1325"/>
+        <location filename="../mainwindow.ui" line="1334"/>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1330"/>
+        <location filename="../mainwindow.ui" line="1339"/>
         <source>Quit</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1335"/>
+        <location filename="../mainwindow.ui" line="1344"/>
         <source>New</source>
         <translation>Nouveau</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1340"/>
+        <location filename="../mainwindow.ui" line="1349"/>
         <source>Getting Started</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1345"/>
+        <location filename="../mainwindow.ui" line="1354"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1350"/>
+        <location filename="../mainwindow.ui" line="1359"/>
         <source>About</source>
         <translation>À propos de</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1355"/>
+        <location filename="../mainwindow.ui" line="1364"/>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1365"/>
+        <location filename="../mainwindow.ui" line="1374"/>
         <source>Open Passwd File</source>
         <translation>Ouvrir un fichier de mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1368"/>
+        <location filename="../mainwindow.ui" line="1377"/>
         <source>Open a password file</source>
         <translation>Ouvrir un fichier de mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1371"/>
+        <location filename="../mainwindow.ui" line="1380"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1384"/>
-        <location filename="../mainwindow.ui" line="1387"/>
+        <location filename="../mainwindow.ui" line="1393"/>
+        <location filename="../mainwindow.ui" line="1396"/>
         <source>Open Last Session</source>
         <translation>Ouvrir dernière session</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1390"/>
+        <location filename="../mainwindow.ui" line="1399"/>
         <source>Ctrl+L</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1403"/>
+        <location filename="../mainwindow.ui" line="1412"/>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1406"/>
+        <location filename="../mainwindow.ui" line="1415"/>
         <source>Copy selected part or full table to clipboard</source>
         <translation>Copier la partie sélectionnée ou la table complète dans le presse-papier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1409"/>
+        <location filename="../mainwindow.ui" line="1418"/>
         <source>Ctrl+C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1422"/>
+        <location filename="../mainwindow.ui" line="1431"/>
         <source>Start Attack</source>
         <translation>Débuter l&apos;attaque</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1425"/>
+        <location filename="../mainwindow.ui" line="1434"/>
         <source>Start cracking passwords</source>
         <translation>Débuter le cracking des mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1428"/>
+        <location filename="../mainwindow.ui" line="1437"/>
         <source>Ctrl+K</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1444"/>
+        <location filename="../mainwindow.ui" line="1453"/>
         <source>Resume Attack</source>
         <translation>Reprendre l&apos;attaque</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1447"/>
+        <location filename="../mainwindow.ui" line="1456"/>
         <source>Resume cracking passwords</source>
         <translation>Reprendre le cracking de mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1450"/>
+        <location filename="../mainwindow.ui" line="1459"/>
         <source>Ctrl+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1466"/>
+        <location filename="../mainwindow.ui" line="1475"/>
         <source>Pause Attack</source>
         <translation>Mettre l&apos;attaque en pause</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1469"/>
+        <location filename="../mainwindow.ui" line="1478"/>
         <source>Pause the cracking of passwords</source>
         <translation>Mettre en pause le cracking de most de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1472"/>
+        <location filename="../mainwindow.ui" line="1481"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>

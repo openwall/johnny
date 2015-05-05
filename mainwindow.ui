@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>908</width>
-    <height>993</height>
+    <width>920</width>
+    <height>1018</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -245,8 +245,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>800</width>
-             <height>891</height>
+             <width>812</width>
+             <height>941</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -922,6 +922,9 @@
             <item>
              <widget class="QWidget" name="advancesOptionsWidget" native="true">
               <layout class="QVBoxLayout" name="verticalLayout_21">
+               <property name="spacing">
+                <number>6</number>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -947,6 +950,12 @@
                   <string>Parallelization</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_12">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QWidget" name="widget_Fork" native="true">
                     <layout class="QHBoxLayout" name="horizontalLayout_15">
@@ -982,6 +991,9 @@
                   <item>
                    <widget class="QWidget" name="widget_OpenMP" native="true">
                     <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <property name="spacing">
+                      <number>6</number>
+                     </property>
                      <property name="leftMargin">
                       <number>0</number>
                      </property>
@@ -1010,6 +1022,53 @@
                      </item>
                     </layout>
                    </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_instructionEnvironmentVar">
+                 <property name="font">
+                  <font>
+                   <family>Ubuntu</family>
+                   <pointsize>9</pointsize>
+                   <weight>50</weight>
+                   <bold>false</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Format to specify new environment variables must be varName1 = value1, varName2 = value2 etc...</string>
+                 </property>
+                 <property name="margin">
+                  <number>0</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_EnvironmentVar" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_20">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QCheckBox" name="checkBox_EnvironmentVar">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_10">
+                    <property name="text">
+                     <string>Use environment variables : </string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_EnvironmentVar"/>
                   </item>
                  </layout>
                 </widget>
@@ -1300,7 +1359,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>908</width>
+     <width>920</width>
      <height>20</height>
     </rect>
    </property>

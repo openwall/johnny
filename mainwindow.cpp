@@ -663,6 +663,29 @@ void MainWindow::startJohn(QStringList params)
     {
         env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
     }
+
+    if(m_ui->checkBox_EnvironmentVar->isChecked())
+    {
+        // Parse the input
+        QStringList varList = m_ui->lineEdit_EnvironmentVar->text().split(",", QString::SkipEmptyParts);
+        for(int i=0;i<varList.size();i++)
+        {
+            QStringList varPair = varList[i].split("=",QString::SkipEmptyParts);
+            if(varPair.size() == 2) // we assume value of variable doesn't have = inside
+            {
+                env.insert(varPair[0].trimmed(),varPair[1].trimmed());
+            }
+            else
+            {
+                QMessageBox::warning(
+                        this,
+                        tr("Environment variables"),
+                        tr("The format to set environment variable must be in the format : varName1 = value, varName2 = value etc.. "));
+            }
+        }
+
+
+    }
     m_johnProcess.setProcessEnvironment(env);
 
     // We start John.

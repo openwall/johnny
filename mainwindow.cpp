@@ -655,6 +655,16 @@ void MainWindow::startJohn(QStringList params)
 
     insertText(m_ui->plainTextEdit_JohnOut,cmd);
 
+    //We set up environment variables, ex : useful for openMP
+    QProcessEnvironment env;
+    // If default is chosen, we don't specify OMP_NUM_THREADS and john will choose the number of
+    // threads based on the number of processors.
+    if(m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText())
+    {
+        env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
+    }
+    m_johnProcess.setProcessEnvironment(env);
+
     // We start John.
     m_johnProcess.start(m_pathToJohn, params);
     // We remember date and time of the start.

@@ -211,7 +211,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -245,8 +245,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>504</width>
-             <height>848</height>
+             <width>814</width>
+             <height>860</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -967,6 +967,38 @@
                    <widget class="QSpinBox" name="spinBox_nbOfProcess">
                     <property name="minimum">
                      <number>1</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_OpenMP" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_openMP">
+                    <property name="text">
+                     <string>If using OpenMP build, specify number of threads:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_nbOfOpenMPThread">
+                    <property name="specialValueText">
+                     <string>default</string>
                     </property>
                    </widget>
                   </item>

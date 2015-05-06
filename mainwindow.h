@@ -35,7 +35,7 @@ public:
     explicit MainWindow(QSettings& settings);
     void closeEvent(QCloseEvent *event);
     ~MainWindow();
-    void insertText(QPlainTextEdit *textEdit,const QString& text);
+    void appendLog(const QString& text);
 
 private slots:
     /* void on_pushButton_clicked(); */

@@ -198,7 +198,7 @@ MainWindow::MainWindow(QSettings &settings)
     // if (m_settings.value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
     Translator& translator = Translator::getInstance();
-    m_ui->comboBox_LanguageSelection->insertItems(0,translator.getListOfAvailableLanguages());
+    m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
 
     //We set the default and maximum of fork thread to the idealThreadCount.
@@ -653,7 +653,7 @@ void MainWindow::startJohn(QStringList params)
     QString cmd = "--------------------------------------------------------------------------------\n" +
             QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + '\n';
 
-    insertText(m_ui->plainTextEdit_JohnOut,cmd);
+    appendLog(cmd);
 
     //We set up environment variables, ex : useful for openMP
     QProcessEnvironment env;
@@ -664,27 +664,26 @@ void MainWindow::startJohn(QStringList params)
         env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
     }
 
+    // User specified environment variables
     if(m_ui->checkBox_EnvironmentVar->isChecked())
     {
         // Parse the input
         QStringList varList = m_ui->lineEdit_EnvironmentVar->text().split(",", QString::SkipEmptyParts);
-        for(int i=0;i<varList.size();i++)
+        for(int i=0; i < varList.size(); i++)
         {
-            QStringList varPair = varList[i].split("=",QString::SkipEmptyParts);
+            QStringList varPair = varList[i].split("=", QString::SkipEmptyParts);
             if(varPair.size() == 2) // we assume value of variable doesn't have = inside
             {
-                env.insert(varPair[0].trimmed(),varPair[1].trimmed());
+                env.insert(varPair[0].trimmed(), varPair[1].trimmed());
             }
             else
             {
                 QMessageBox::warning(
                         this,
                         tr("Environment variables"),
-                        tr("The format to set environment variable must be in the format : varName1 = value, varName2 = value etc.. "));
+                        tr("The format to set environment variable must be in the format : varName1=value, varName2=value etc.. "));
             }
         }
-
-
     }
     m_johnProcess.setProcessEnvironment(env);
 
@@ -717,8 +716,8 @@ void MainWindow::updateJohnOutput()
     //ui->plainTextEdit_JohnOut->appendPlainText("Session file: " + session + "\n");
 
     //read output and error buffers
-    insertText(m_ui->plainTextEdit_JohnOut,m_johnProcess.readAllStandardOutput()
-               + m_johnProcess.readAllStandardError());
+    appendLog(m_johnProcess.readAllStandardOutput()
+              + m_johnProcess.readAllStandardError());
 
     // NOTE: Probably here we want to parse John's output, catch newly
     //       cracked passwords and so on. However John's output is buffered.
@@ -1251,11 +1250,11 @@ void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
  * inserted at the end without new line by default.
  */
 
-void MainWindow::insertText(QPlainTextEdit *textEdit,const QString& text)
+void MainWindow::appendLog(const QString& text)
 {
     // Preserving cursor preserves selection by user
-    QTextCursor prev_cursor = textEdit->textCursor();
-    textEdit->moveCursor (QTextCursor::End);
-    textEdit->insertPlainText (text);
-    textEdit->setTextCursor (prev_cursor);
+    QTextCursor prev_cursor = m_ui->plainTextEdit_JohnOut->textCursor();
+    m_ui->plainTextEdit_JohnOut->moveCursor (QTextCursor::End);
+    m_ui->plainTextEdit_JohnOut->insertPlainText (text);
+    m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
 }

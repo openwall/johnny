@@ -6,9 +6,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "johnprocess.h"
+
 #include <QMainWindow>
 #include <QListWidgetItem>
-#include <QProcess>
 #include <QAbstractTableModel>
 #include <QString>
 #include <QStringList>
@@ -19,6 +20,8 @@
 #include <QDateTime>
 #include <QMultiMap>
 #include <QTemporaryFile>
+#include <QPlainTextEdit>
+
 
 namespace Ui {
     class MainWindow;
@@ -32,6 +35,7 @@ public:
     explicit MainWindow(QSettings& settings);
     void closeEvent(QCloseEvent *event);
     ~MainWindow();
+    void appendLog(const QString& text);
 
 private slots:
     /* void on_pushButton_clicked(); */
@@ -87,7 +91,7 @@ private:
     //       However now this is here.
     QString m_hashesFileName;
     QString m_session;
-    QProcess m_johnProcess;
+    JohnProcess m_johnProcess;
     // To catch cracked passwords we use timer and john --show.
     QTimer m_showTimer;
     QProcess m_showJohnProcess;

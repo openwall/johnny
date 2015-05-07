@@ -19,6 +19,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QThread>
+#include <QTextCursor>
 
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
@@ -196,8 +198,17 @@ MainWindow::MainWindow(QSettings &settings)
     // if (m_settings.value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
     Translator& translator = Translator::getInstance();
-    m_ui->comboBox_LanguageSelection->insertItems(0,translator.getListOfAvailableLanguages());
+    m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
+
+    //We set the default and maximum of fork thread to the idealThreadCount.
+    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
+    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
+
+    #if !OS_FORK
+    //As of now, fork is only supported on Linux platform
+        m_ui->widget_Fork->hide();
+    #endif
 }
 
 void MainWindow::checkNToggleActionsLastSession()
@@ -575,6 +586,11 @@ void MainWindow::on_actionStart_Attack_triggered()
     if (m_ui->checkBox_LimitSalts->isChecked())
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
 
+    // Advanced options
+    if(m_ui->checkBox_UseFork->isChecked())
+    {
+        parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
+    }
     // Session for johnny
     if (QFileInfo(m_session + ".rec").isReadable()) {
         int button = QMessageBox::question(
@@ -632,12 +648,51 @@ void MainWindow::startJohn(QStringList params)
     // To start John we have predefined process object. That object's
     // signals are already connected with our slots. So we need only
     // start it.
-    //
+
+    // to visually separate sessions in the console output (make it clearer for the user)
+    QString cmd = "--------------------------------------------------------------------------------\n" +
+            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + '\n';
+
+    appendLog(cmd);
+
+    //We set up environment variables, ex : useful for openMP
+    QProcessEnvironment env;
+    // If default is chosen, we don't specify OMP_NUM_THREADS and john will choose the number of
+    // threads based on the number of processors.
+    if(m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText())
+    {
+        env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
+    }
+
+    // User specified environment variables
+    if(m_ui->checkBox_EnvironmentVar->isChecked())
+    {
+        // Parse the input
+        QStringList varList = m_ui->lineEdit_EnvironmentVar->text().split(",", QString::SkipEmptyParts);
+        for(int i=0; i < varList.size(); i++)
+        {
+            QStringList varPair = varList[i].split("=", QString::SkipEmptyParts);
+            if(varPair.size() == 2) // we assume value of variable doesn't have = inside
+            {
+                env.insert(varPair[0].trimmed(), varPair[1].trimmed());
+            }
+            else
+            {
+                QMessageBox::warning(
+                        this,
+                        tr("Environment variables"),
+                        tr("The format to set environment variable must be in the format : varName1=value, varName2=value etc.. "));
+            }
+        }
+    }
+    m_johnProcess.setProcessEnvironment(env);
+
     // We start John.
     m_johnProcess.start(m_pathToJohn, params);
     // We remember date and time of the start.
     m_startDateTime = QDateTime::currentDateTime();
 }
+
 
 void MainWindow::on_actionResume_Attack_triggered()
 {
@@ -658,9 +713,12 @@ void MainWindow::updateJohnOutput()
     // NOTE: If there could be only one session in/per window then it
     //       is possible to have session name here through window's field.
     // TODO: Session name should be displayed.
-    //ui->plainTextEdit_JohnOut->insertPlainText("Session file: " + session + "\n");
-    m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardOutput()); // read output buffer
-    m_ui->plainTextEdit_JohnOut->insertPlainText(m_johnProcess.readAllStandardError()); // read error buffer
+    //ui->plainTextEdit_JohnOut->appendPlainText("Session file: " + session + "\n");
+
+    //read output and error buffers
+    appendLog(m_johnProcess.readAllStandardOutput()
+              + m_johnProcess.readAllStandardError());
+
     // NOTE: Probably here we want to parse John's output, catch newly
     //       cracked passwords and so on. However John's output is buffered.
     //       So we do not obtain it as soon as it occurs. Timer and
@@ -1183,4 +1241,20 @@ void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
         // Else (if John is not running) we put dash instead of time.
         m_ui->label_StatisticsWorkingTime->setText(tr("-"));
     }
+}
+
+/*
+ * Since QPlainTextEdit::appendPlainText() add newLines without asking us and
+ * QPlainTextEdit::insertPlainText() insert text by default at the cursor pos,
+ * which can be modified by the user, this function assures the text is
+ * inserted at the end without new line by default.
+ */
+
+void MainWindow::appendLog(const QString& text)
+{
+    // Preserving cursor preserves selection by user
+    QTextCursor prev_cursor = m_ui->plainTextEdit_JohnOut->textCursor();
+    m_ui->plainTextEdit_JohnOut->moveCursor (QTextCursor::End);
+    m_ui->plainTextEdit_JohnOut->insertPlainText (text);
+    m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
 }

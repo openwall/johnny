@@ -36,6 +36,7 @@ public:
     void closeEvent(QCloseEvent *event);
     ~MainWindow();
     void appendLog(const QString& text);
+    QStringList getAttackParameters();
 
 private slots:
     /* void on_pushButton_clicked(); */

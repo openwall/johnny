@@ -64,10 +64,8 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
     */
 
-    // TODO: Could we make connections easier?
     // We connect John process' signals with our slots.
     // John was ended.
-    // TODO: It will good to show exit status and exit code to user.
     connect(&m_johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(showJohnFinished()));
     // John was started.
@@ -92,12 +90,10 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We connect all widgets for option with radio buttons to keep
     // enabled only widgets of selected mode.
-    // TODO: Easier way? Maybe make connections in designer?
     // "Single crack" mode
     connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
             m_ui->checkBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
-    // TODO: Should not we keep comboBox disabled until checkbox would
-    //       not be checked? (in other places too)
+
     connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
             m_ui->comboBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
     // Wordlist mode
@@ -205,6 +201,9 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
 
+    // Disable copy button since there is no hash_tables (UI friendly)
+    m_ui->actionCopyToClipboard->setEnabled(false);
+
     #if !OS_FORK
     //As of now, fork is only supported on Linux platform
         m_ui->widget_Fork->hide();
@@ -247,7 +246,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
         int answer = QMessageBox::question(
             this,
             tr("Johnny"),
-            // TODO: More informative message.
             tr("John still runs! John will be stopped if you proceed. Do you really want to quit?"),
             QMessageBox::Yes | QMessageBox::No);
         if (answer == QMessageBox::No) {
@@ -298,7 +296,7 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
 void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
-    // TODO: We assume here that passwords tab is at 0.
+    // We assume here that passwords tab is at 0.
     m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == 0);
 }
 
@@ -307,8 +305,7 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     // TODO: Check argument.
 
     // Remove temporary file is exist
-    // TODO: should not I check pointers like ptr != NULL instead of just ptr?
-    // TODO: should not I assign NULL instead of 0?
+
     if (m_temp) {
         delete m_temp;
         m_temp = 0;
@@ -355,12 +352,12 @@ bool MainWindow::readPasswdFile(const QString &fileName)
         // After new model remembered we remember its file name.
         m_hashesFileName = fileName;
         checkNToggleActionsLastSession();
+        m_ui->actionCopyToClipboard->setEnabled(true);
         return true;
     }
     QMessageBox::warning(
             this,
             tr("Johnny"),
-            // TODO: More informative message.
             tr("Johnny could not read desired passwd file."));
     return false;
 }
@@ -398,7 +395,6 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            // TODO: More informative message.
             tr("Johnny could not open file to read session description!"));
         return;
     }
@@ -418,9 +414,16 @@ void MainWindow::on_actionCopyToClipboard_triggered()
     if (!m_hashesTable)
         return;
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
-    // TODO: maybe copy everything if nothing is selected?
     if (indexes.count() == 0)
+    {
+        QMessageBox::critical(
+            this,
+            tr("Nothing to copy !"),
+            tr("Nothing is selected. Please select rows/columns in the password table to copy them "
+               "to the clibpboard!"));
         return;
+    }
+
     QString out;
     if (indexes.count() == 1) {
         out = indexes.at(0).data().toString();
@@ -469,10 +472,66 @@ void MainWindow::on_actionStart_Attack_triggered()
     if (!checkSettings())
         return;
 
+    QStringList parameters = getAttackParameters();
+
+    // Session for johnny
+    if (QFileInfo(m_session + ".rec").isReadable()) {
+        int button = QMessageBox::question(
+            this,
+            tr("Johnny"),
+            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
+            QMessageBox::Yes | QMessageBox::No);
+       if (button == QMessageBox::No)
+            return;
+        // Remove .rec file to avoid problem when john does not write it.
+        // TODO: Should not we say something if/when we could not remove file?
+        QFile(m_session + ".rec").remove();
+    }
+
+    // TODO: Saving so two instances of johnny overwrite description
+    //       but not .rec so they become not synchronized.
+    QFile description(m_session + ".johnny");
+    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Johnny could not open file to save session description!"));
+        return;
+    }
+    QTextStream descriptionStream(&description);
+    // TODO: john stores file name so itself. It could be changed
+    //       later though.
+    // TODO: ensure to convert file name into absolute path.
+    descriptionStream << m_hashesFileName << endl;
+    descriptionStream << m_format << endl;
+    description.close();
+
+    // TODO: Easier way is to cd to ~/.john/johnny but it needs
+    //       checks. In any case without that dir it will not work.
+    parameters << QString("--session=%1").arg(m_session);
+
+    // We check that we have file name.
+    if (m_hashesFileName != "") {
+        // If file name is not empty then we have file, pass it to
+        // John.
+        // We add file name onto parameters list.
+        parameters << m_hashesFileName;
+        startJohn(parameters);
+    } else {
+        // Else we do not have connected file name so we ask user to save
+        // file.
+        // TODO: Unreachable until we get fileless tables.
+        // TODO: Do something here.
+    }
+}
+
+/* This function doesn't return the parameters of the current john process,
+ * it returns the selected parameters in Johnny (UI-side) */
+QStringList MainWindow::getAttackParameters()
+{
     QStringList parameters;
     // We prepare parameters list from options section.
-    // TODO: Make it as separate method. It also will be needed to
-    //       preview command line that not done now.
+
     // General options
     // Format
     // TODO: If format is with checkbox then 'auto detect' does
@@ -591,56 +650,8 @@ void MainWindow::on_actionStart_Attack_triggered()
     {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
     }
-    // Session for johnny
-    if (QFileInfo(m_session + ".rec").isReadable()) {
-        int button = QMessageBox::question(
-            this,
-            tr("Johnny"),
-            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
-            QMessageBox::Yes | QMessageBox::No);
-       if (button == QMessageBox::No)
-            return;
-        // Remove .rec file to avoid problem when john does not write it.
-        // TODO: Should not we say something if/when we could not remove file?
-        QFile(m_session + ".rec").remove();
-    }
 
-    // TODO: Saving so two instances of johnny overwrite description
-    //       but not .rec so they become not synchronized.
-    QFile description(m_session + ".johnny");
-    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            // TODO: More informative message.
-            tr("Johnny could not open file to save session description!"));
-        return;
-    }
-    QTextStream descriptionStream(&description);
-    // TODO: john stores file name so itself. It could be changed
-    //       later though.
-    // TODO: ensure to convert file name into absolute path.
-    descriptionStream << m_hashesFileName << endl;
-    descriptionStream << m_format << endl;
-    description.close();
-
-    // TODO: Easier way is to cd to ~/.john/johnny but it needs
-    //       checks. In any case without that dir it will not work.
-    parameters << QString("--session=%1").arg(m_session);
-
-    // We check that we have file name.
-    if (m_hashesFileName != "") {
-        // If file name is not empty then we have file, pass it to
-        // John.
-        // We add file name onto parameters list.
-        parameters << m_hashesFileName;
-        startJohn(parameters);
-    } else {
-        // Else we do not have connected file name so we ask user to save
-        // file.
-        // TODO: Unreachable until we get fileless tables.
-        // TODO: Do something here.
-    }
+    return parameters;
 }
 
 void MainWindow::startJohn(QStringList params)

@@ -27,6 +27,11 @@ public slots:
 
 protected:
     virtual void setupChildProcess();
+
+private:
+#if defined Q_OS_WIN32
+    QProcess m_helper;
+#endif
 };
 
 #endif // JOHNPROCESS_H

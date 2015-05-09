@@ -157,17 +157,17 @@ MainWindow::MainWindow(QSettings &settings)
     // TODO: Are this checks are enough?
     // TODO: Claim on mkdir fails.
     // TODO: Do not do it on start up. Choose other good time.
-    if (!QDir(QDir::home().filePath(".john")).exists()) {
-        QDir::home().mkdir(".john");
+    if (!QDir(QDir::home().filePath("john")).exists()) {
+        QDir::home().mkdir("john");
     }
-    if (!QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).exists()) {
-        QDir(QDir::home().filePath(".john")).mkdir("johnny");
+    if (!QDir(QDir(QDir::home().filePath("john")).filePath("johnny")).exists()) {
+        QDir(QDir::home().filePath("john")).mkdir("johnny");
     }
 
     // Session for johnny
     m_session = QDir(
         QDir(QDir::home().filePath(
-                 ".john")).filePath(
+                 "john")).filePath(
                      "johnny")).filePath(
                          "default");
 

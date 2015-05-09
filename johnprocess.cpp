@@ -35,7 +35,8 @@ void JohnProcess::terminate()
         ::kill(-processId(), SIGTERM);
     }
 #elif defined Q_OS_WIN32
-    m_helper.start("helper.exe");
+    // Helper.exe will t
+    m_helper.start("helper.exe " + QString::number(processId()));
 #else
     QProcess::terminate();
 #endif

@@ -206,7 +206,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
 
     #if !OS_FORK
-    //As of now, fork is only supported on Linux platform
+    //As of now, fork is only supported on unix platforms
         m_ui->widget_Fork->hide();
     #endif
 }

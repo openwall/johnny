@@ -35,6 +35,8 @@ RESOURCES += \
 OTHER_FILES += \
 	README \
 	LICENSE
+
+DESTDIR = ../johnny_build/
 ## Default build is debug
 #CONFIG -= release
 #CONFIG += debug

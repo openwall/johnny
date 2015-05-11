@@ -34,6 +34,9 @@ void JohnProcess::terminate()
          * compatibility with those versions of John for now */
         ::kill(-processId(), SIGTERM);
     }
+#elif defined Q_OS_WIN32
+    // Helper.exe is necessary to terminate cleanly john on windows(start/pause attack)
+    m_helper.start("helper.exe " + QString::number(processId()));
 #else
     QProcess::terminate();
 #endif

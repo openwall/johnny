@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS = johnny helper
+SUBDIRS = johnny
+win32: SUBDIRS +=helper
 
 johnny.file = johnny.pro
 helper.file = helper/helper.pro

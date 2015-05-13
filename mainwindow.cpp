@@ -268,7 +268,7 @@ MainWindow::~MainWindow()
 {
     m_johnProcess.terminate();
     m_showJohnProcess.terminate();
-    // TODO: we wait 1 second.
+    // We wait 1 second.
     if (!m_johnProcess.waitForFinished(1000))
         m_johnProcess.kill();
     if (!m_showJohnProcess.waitForFinished(1000))
@@ -337,19 +337,6 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
             i);
     }
 }
-
-// void MainWindow::on_pushButton_clicked()
-// {
-//     replaceTableModel(new TableModel(this));
-//     // We reset file name because this model is generated and does not
-//     // have connected file.
-//     m_hashesFileName = "";
-
-//     for (int i = 0; i < TABLE_ROWS; i++) {
-//         m_hashesTable->setData(m_hashesTable->index(i, 0), QString("Rick%1").arg(i));
-//         m_hashesTable->setData(m_hashesTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
-//     }
-// }
 
 bool MainWindow::readPasswdFile(const QString &fileName)
 {

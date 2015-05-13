@@ -10,8 +10,16 @@
 #include <QCoreApplication>
 #include <QDir>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <wincon.h>
+#endif
+
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_WIN
+    SetConsoleCtrlHandler(NULL, TRUE);
+#endif
     // We set application info up.
     // It is needed to be able to store settings easily.
     // TODO: Could we use openwall.com/john as domain?

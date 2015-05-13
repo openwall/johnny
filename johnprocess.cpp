@@ -1,5 +1,10 @@
 #include "johnprocess.h"
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <wincon.h>
+#endif
+
 JohnProcess::JohnProcess()
 {
 
@@ -34,6 +39,11 @@ void JohnProcess::terminate()
          * compatibility with those versions of John for now */
         ::kill(-processId(), SIGTERM);
     }
+#elif defined Q_OS_WIN
+    FreeConsole();
+    AttachConsole(processId());
+    GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
+    FreeConsole();
 #else
     QProcess::terminate();
 #endif

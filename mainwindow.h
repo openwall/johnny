@@ -53,7 +53,7 @@ private slots:
     void on_pushButton_BrowsePathToJohn_clicked();
     void on_pushButton_ApplySettings_clicked();
     void on_pushButton_ApplySaveSettings_clicked();
-    void on_pushButton_ResetSettings_clicked();
+
     void on_comboBox_PathToJohn_editTextChanged();
     void on_spinBox_TimeIntervalPickCracked_valueChanged(int value);
     void on_checkBox_AutoApplySettings_stateChanged();
@@ -72,6 +72,7 @@ private slots:
     void readJohnShow();
 
     void fillSettingsWithDefaults();
+    void restoreLastSavedSettings();
     void warnAboutDefaultPathToJohn();
 
     void checkNToggleActionsLastSession();

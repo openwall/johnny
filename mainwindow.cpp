@@ -139,6 +139,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(group, SIGNAL(buttonClicked(int)),
             m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
+    connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),this,SLOT(restoreLastSavedSettings()));
+
 //    TableModel *passmodel = new TableModel();
 
 //    ui->tableView_Passwords->setModel(passmodel);
@@ -162,7 +164,8 @@ MainWindow::MainWindow(QSettings &settings)
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            tr("Johnny could not create directory in home. Settings and sessions won't be saved."));
+            tr("Johnny could not create directory in home. Johnny won't work."
+               "Check your permissions, disk space and restart Johnny."));
     }
 
 
@@ -191,8 +194,7 @@ MainWindow::MainWindow(QSettings &settings)
     fillSettingsWithDefaults();
 
     // We load old settings.
-    // TODO: bad name.
-    on_pushButton_ResetSettings_clicked();
+    restoreLastSavedSettings();
 
     // TODO: do this message on every invocation of john. Provide
     //       checkbox to not show this again.
@@ -1021,7 +1023,7 @@ void MainWindow::readJohnShow()
 //       fillSettingsWithDefaults,
 //       on_pushButton_ApplySettings_clicked,
 //       on_pushButton_ApplySaveSettings_clicked,
-//       on_pushButton_ResetSettings_clicked.
+//       restoreLastSavedSettings,
 //       And of course you should put elements on the form.
 //       And for each setting there should method for auto
 //       application.
@@ -1142,7 +1144,7 @@ void MainWindow::on_pushButton_ApplySaveSettings_clicked()
     m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
-void MainWindow::on_pushButton_ResetSettings_clicked()
+void MainWindow::restoreLastSavedSettings()
 {
     // We copy settings from stored settings object to our current
     // settings points.

@@ -144,6 +144,10 @@ MainWindow::MainWindow(QSettings &settings)
             this,SLOT(restoreLastSavedSettings()));
     connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
             this,SLOT(applyAndSaveSettings()));
+    // Settings changed by user
+    connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
+    connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
+    connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(settingsChangedByUser()));
 
 //    TableModel *passmodel = new TableModel();
 
@@ -309,8 +313,6 @@ void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
-    // TODO: Check argument.
-
     // Remove temporary file is exist
 
     if (m_temp) {
@@ -362,15 +364,7 @@ void MainWindow::on_actionOpen_Password_triggered()
     // file, parse it and present values in the table. Model and view
     // simplifies presentation. We just make and fill model and then
     // we set it to existing view.
-    // TODO: However there are variants: we could replace existing
-    //       model or append new values to existing model.
-    //       For now user could not choose what to do. We always
-    //       replace existing model.
 
-    // We pop a dialog to choose a file to open.
-    // TODO: What happens when John writes something while dialog
-    //       opened?
-    // TODO: Move dialog creation and setting up into window constructor.
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
     if (dialog.exec()) {
@@ -390,8 +384,7 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
         return;
     }
     QTextStream descriptionStream(&description);
-    // TODO: errors?
-    // TODO: end of line? Should not we "chomp" it? See other places too.
+
     QString fileName = descriptionStream.readLine();
     QString format = descriptionStream.readLine();
     description.close();
@@ -711,14 +704,6 @@ void MainWindow::on_actionResume_Attack_triggered()
 
 void MainWindow::updateJohnOutput()
 {
-    // TODO: There was a session string passed here. Hence the
-    //       question what is right: one window could have multiple sessions or at one
-    //       time there could be only one session opened?
-    // NOTE: If there could be only one session in/per window then it
-    //       is possible to have session name here through window's field.
-    // TODO: Session name should be displayed.
-    //ui->plainTextEdit_JohnOut->appendPlainText("Session file: " + session + "\n");
-
     //read output and error buffers
     appendLog(m_johnProcess.readAllStandardOutput()
               + m_johnProcess.readAllStandardError());
@@ -732,12 +717,6 @@ void MainWindow::updateJohnOutput()
 void MainWindow::on_actionPause_Attack_triggered()
 {
     // We ask John to exit.
-    // TODO: Is it ok to call it even if process is not running?
-    // TODO: Do not we need to call kill instead if John is too busy?
-    // TODO: Call kill on windows.
-    // NOTE: We could leave it for user: we count button presses and for
-    //       the first time we call terminate and for next times we
-    //       call kill.
     m_johnProcess.terminate();
 }
 
@@ -786,9 +765,6 @@ void MainWindow::showJohnStarted()
     // TODO: Are these signals called always in order
     //       started-finished? Or is it unpredictable?
     // When John starts we enable stop button.
-    // TODO: Is it ok if user clicks between his previous click and
-    //       button disables?
-    // TODO: Should we disable/enable status button?
     m_ui->actionPause_Attack->setEnabled(true);
     // When John starts we start capturing passwords.
     // TODO: Currently we set timer to 10 minutes. Make it
@@ -866,7 +842,7 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 
 void MainWindow::showJohnFinished()
 {
-    // TODO: Should we place a message about it into output buffer?
+    appendLog(tr("Session ended."));
     // When John finishes we enable start button and disable stop
     // button.
     m_ui->actionPause_Attack->setEnabled(false);
@@ -875,15 +851,15 @@ void MainWindow::showJohnFinished()
     checkNToggleActionsLastSession();
     // When John stops we need to stop timer and to look status last
     // time.
-    // TODO: currently if john crashed we do not call john.
+    // Currently if john crashed we do not call john.
     m_showTimer.stop();
     callJohnShow();
 }
 
 void MainWindow::callJohnShow()
 {
-    // TODO: if john returns immediately then we call it again before
-    //       it finishes. No good solution. Only workaround.
+    // If john returns immediately then we call it again before
+    // it finishes. No good solution. Only workaround.
     m_showJohnProcess.waitForFinished(1000);
     if (m_showJohnProcess.state() != QProcess::NotRunning)
         m_showJohnProcess.kill();
@@ -997,8 +973,8 @@ void MainWindow::readJohnShow()
 //       class, then you should add copying line to every method on
 //       the list:
 //       fillSettingsWithDefaults,
-//       on_pushButton_ApplySettings_clicked,
-//       on_pushButton_ApplySaveSettings_clicked,
+//       applySettings,
+//       applyAndSaveSettings,
 //       restoreLastSavedSettings,
 //       And of course you should put elements on the form.
 //       And for each setting there should method for auto
@@ -1109,8 +1085,6 @@ void MainWindow::applySettings()
 void MainWindow::applyAndSaveSettings()
 {
     // Apply settings first.
-    // TODO: It is not a good design that we call button's handler
-    //       that is really do something useful.
     applySettings();
     // We store settings.
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
@@ -1147,18 +1121,9 @@ void MainWindow::restoreLastSavedSettings()
 
 // Handlers for settings auto application
 
-void MainWindow::on_comboBox_PathToJohn_editTextChanged()
-{
-    // If auto application is turned on then we apply settings.
-    if (m_autoApplySettings)
-        applySettings();
-}
 
-void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged(int value)
+void MainWindow::settingsChangedByUser()
 {
-    Q_UNUSED(value);
-    // TODO: Copy-pasting is evil!
-    //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)
         applySettings();
 }
@@ -1182,12 +1147,6 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
         applySettings();
 }
 
-void MainWindow::on_comboBox_LanguageSelection_currentIndexChanged(int index)
-{
-    Q_UNUSED(index);
-    if (m_autoApplySettings)
-        applySettings();
-}
 
 // Statistics page code
 

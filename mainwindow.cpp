@@ -130,7 +130,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // To open respective tab on mode selection
     QButtonGroup *group = m_ui->radioButton_ExternalMode->group();
-    // TODO: Maybe cycle? Maybe put this into .ui?
+
     group->setId(m_ui->radioButton_DefaultBehaviour, 0);
     group->setId(m_ui->radioButton_SingleCrackMode, 1);
     group->setId(m_ui->radioButton_WordlistMode, 2);
@@ -470,7 +470,9 @@ void MainWindow::on_actionStart_Attack_triggered()
     QStringList parameters = getAttackParameters();
 
     // Session for johnny
-    if (QFileInfo(m_session + ".rec").isReadable()) {
+    QString nameOfFile = m_session + ".rec";
+    
+    if (QFileInfo(nameOfFile).isReadable()) {
         int button = QMessageBox::question(
             this,
             tr("Johnny"),
@@ -479,8 +481,13 @@ void MainWindow::on_actionStart_Attack_triggered()
        if (button == QMessageBox::No)
             return;
         // Remove .rec file to avoid problem when john does not write it.
-        // TODO: Should not we say something if/when we could not remove file?
-        QFile(m_session + ".rec").remove();
+        if(!QFile(nameOfFile).remove())
+        {
+            QMessageBox::warning(
+                this,
+                tr("Warning"),
+                tr("Unable to remove file ") + nameOfFile);
+        }
     }
 
     // TODO: Saving so two instances of johnny overwrite description
@@ -1052,8 +1059,10 @@ void MainWindow::fillSettingsWithDefaults()
         possiblePaths << QDir(dir).filePath(johnName);
     }
     // Predefined defaults
-    // TODO: we should not check paths default for linux on windows. On cygwin?
+#if !defined Q_OS_WIN
     possiblePaths << "/usr/sbin/john";
+#endif
+
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);

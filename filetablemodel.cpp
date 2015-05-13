@@ -17,14 +17,12 @@ FileTableModel::FileTableModel(QObject *parent)
 {
     // We make it as object field because we could not make class field.
     m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS");
-    // TODO: we leave object in inconsistent state.
 }
 
-// TODO: more codes? Other way to describe reason?
-// TODO: this should not be called twice. Either check that it was
-//       called or begin cleaning m_data.
 bool FileTableModel::readFile(const QString &fileName)
 {
+    m_data.clear();
+
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -139,8 +137,7 @@ QVariant FileTableModel::headerData(int section,
     // For horizontal header we return names from fields array.
     if (orientation == Qt::Horizontal)
         return m_columns[section];
-    // TODO: Could we rich this place? Should we do something special
-    //       here?
+
     return QVariant();
 }
 

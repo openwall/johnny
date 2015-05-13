@@ -51,8 +51,6 @@ private slots:
     void on_pushButton_WordlistFileBrowse_clicked();
     void on_pushButton_FillSettingsWithDefaults_clicked();
     void on_pushButton_BrowsePathToJohn_clicked();
-    void on_pushButton_ApplySettings_clicked();
-    void on_pushButton_ApplySaveSettings_clicked();
 
     void on_comboBox_PathToJohn_editTextChanged();
     void on_spinBox_TimeIntervalPickCracked_valueChanged(int value);
@@ -73,6 +71,8 @@ private slots:
 
     void fillSettingsWithDefaults();
     void restoreLastSavedSettings();
+    void applySettings();
+    void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
 
     void checkNToggleActionsLastSession();
@@ -99,8 +99,7 @@ private:
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
-    // TODO: Group settings into separate class with support for
-    //       saving and so on.
+
     // Path to John's binary
     QString m_pathToJohn;
     // Interval between loading of cracked passwords

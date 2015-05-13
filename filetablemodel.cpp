@@ -45,7 +45,6 @@ bool FileTableModel::readFile(const QString &fileName)
         // TODO: Parse gecos well.
         // TODO: Make customizable separator. It should be an option.
         QStringList fields = line.split(':');
-        // TODO: Is it safe to show untrusted input in gui?
         int column = 0;
         // NOTE: When we want we change lists we use [] as of .at()
         //       gives us only const.

@@ -139,8 +139,11 @@ MainWindow::MainWindow(QSettings &settings)
     connect(group, SIGNAL(buttonClicked(int)),
             m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
+    // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
             this,SLOT(restoreLastSavedSettings()));
+    connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
+            this,SLOT(applyAndSaveSettings()));
 
 //    TableModel *passmodel = new TableModel();
 
@@ -1004,8 +1007,6 @@ void MainWindow::readJohnShow()
 
 void MainWindow::warnAboutDefaultPathToJohn()
 {
-    // TODO: Handle empty path specifically.
-    // TODO: On startup this message is shown before main window. Bad?
     QMessageBox::warning(
         this,
         tr("Johnny: default path to john"),
@@ -1052,7 +1053,6 @@ void MainWindow::fillSettingsWithDefaults()
     }
 
     // We have hard coded default settings in here.
-    // TODO: Any better solution?
     // We just write all our values to elements on the form.
     m_ui->comboBox_PathToJohn->setEditText(john);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(10 * 60);
@@ -1088,7 +1088,7 @@ void MainWindow::on_pushButton_BrowsePathToJohn_clicked()
     }
 }
 
-void MainWindow::on_pushButton_ApplySettings_clicked()
+void MainWindow::applySettings()
 {
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1106,12 +1106,12 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     }
 }
 
-void MainWindow::on_pushButton_ApplySaveSettings_clicked()
+void MainWindow::applyAndSaveSettings()
 {
     // Apply settings first.
     // TODO: It is not a good design that we call button's handler
     //       that is really do something useful.
-    on_pushButton_ApplySettings_clicked();
+    applySettings();
     // We store settings.
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
@@ -1142,7 +1142,7 @@ void MainWindow::restoreLastSavedSettings()
     // We apply settings.
     // TODO: Again... Button's handler do useful work but named
     //       inappropriately because it is handler.
-    on_pushButton_ApplySettings_clicked();
+    applySettings();
 }
 
 // Handlers for settings auto application
@@ -1150,13 +1150,8 @@ void MainWindow::restoreLastSavedSettings()
 void MainWindow::on_comboBox_PathToJohn_editTextChanged()
 {
     // If auto application is turned on then we apply settings.
-    // TODO: Should we apply only one settings or all?
-    //       Currently we apply all settings (copy the same values).
-    //       Maybe it would be better to postpone settings application
-    //       to the moment when settings are really needed. Lazy
-    //       application.
     if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
 }
 
 void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged(int value)
@@ -1165,7 +1160,7 @@ void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged(int value)
     // TODO: Copy-pasting is evil!
     //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
 }
 
 void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
@@ -1176,7 +1171,7 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
     bool autoApply = m_ui->checkBox_AutoApplySettings->isChecked();
     m_ui->pushButton_ApplySettings->setEnabled(!autoApply);
     if (autoApply)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
     // Second goal is auto application for auto application setting itself.
     // NOTE: Deactivation of auto application will be auto applied.
     // NOTE: Auto application is a setting too. At least it would be
@@ -1184,14 +1179,14 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
     // TODO: Copy-pasting is evil!
     //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
 }
 
 void MainWindow::on_comboBox_LanguageSelection_currentIndexChanged(int index)
 {
     Q_UNUSED(index);
     if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
 }
 
 // Statistics page code

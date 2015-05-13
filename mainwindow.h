@@ -84,13 +84,7 @@ private slots:
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;
-    // TODO: Probably the right place for this field is in table model.
-    //       But this needs to have abstract interface that supports
-    //       connection with files. Someone could suppose to drop
-    //       generated tables out but if we want to have tables
-    //       joining, editing and so on tables that is not connected
-    //       with files yet are necessary.
-    //       However now this is here.
+
     QString m_hashesFileName;
     QString m_session;
     JohnProcess m_johnProcess;

@@ -139,7 +139,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(group, SIGNAL(buttonClicked(int)),
             m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
-    connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),this,SLOT(restoreLastSavedSettings()));
+    connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
+            this,SLOT(restoreLastSavedSettings()));
 
 //    TableModel *passmodel = new TableModel();
 
@@ -186,9 +187,6 @@ MainWindow::MainWindow(QSettings &settings)
     // strange: probably user would expect reset to be like default +
     // reset because storing of a part of settings is not normal
     // behaviour (only possible with upgrades).
-    // TODO: somewhat ugly.
-    // TODO: if there are no config or it is partial then claim. Do
-    //       not silently do something tricky.
     // TODO: do not search john if it is in stored settings. It is
     //       similar to other settings. It is at least start up speed up.
     fillSettingsWithDefaults();
@@ -291,12 +289,10 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
     // TODO: Move dialog creation and setting up into window constructor.
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
-    // TODO: Dialog could allow user to select multiple files. May it
-    //       be good to support this ability? To concatenate selected file?
+
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        // TODO: File name does not appear in history (drop down list).
         m_ui->comboBox_WordlistFile->setEditText(fileName);
     }
 }
@@ -374,9 +370,6 @@ void MainWindow::on_actionOpen_Password_triggered()
     // TODO: Move dialog creation and setting up into window constructor.
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
-    // TODO: Dialog could allow user to select multiple files. May it
-    //       be good to support this ability? There are variants: to
-    //       concatenate selected file or to unshadow them.
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         readPasswdFile(fileName);
@@ -501,15 +494,11 @@ void MainWindow::on_actionStart_Attack_triggered()
         return;
     }
     QTextStream descriptionStream(&description);
-    // TODO: john stores file name so itself. It could be changed
-    //       later though.
-    // TODO: ensure to convert file name into absolute path.
+
     descriptionStream << m_hashesFileName << endl;
     descriptionStream << m_format << endl;
     description.close();
 
-    // TODO: Easier way is to cd to ~/.john/johnny but it needs
-    //       checks. In any case without that dir it will not work.
     parameters << QString("--session=%1").arg(m_session);
 
     // We check that we have file name.
@@ -522,8 +511,7 @@ void MainWindow::on_actionStart_Attack_triggered()
     } else {
         // Else we do not have connected file name so we ask user to save
         // file.
-        // TODO: Unreachable until we get fileless tables.
-        // TODO: Do something here.
+        // Unreachable until we get fileless tables.
     }
 }
 
@@ -976,7 +964,6 @@ void MainWindow::readJohnShow()
     QRegExp crackedLeft("(\\d+)\\D+(\\d+)");
     int pos = crackedLeft.indexIn(lastLine);
     if (pos > -1) {
-        // TODO: check toInt success.
         int crackedCount = crackedLeft.cap(1).toInt();
         int leftCount = crackedLeft.cap(2).toInt();
         // We update progress bar.
@@ -988,16 +975,8 @@ void MainWindow::readJohnShow()
                 tr("No hashes loaded [%1], see output").arg(
                     m_format));
         } else {
-            // TODO: May it be better to show entire string from John?
-            //       Translation?
             m_ui->progressBar->setRange(0, crackedCount + leftCount);
             m_ui->progressBar->setValue(crackedCount);
-            // TODO: Is not such format too complex?
-            // TODO: May it be better to not change format during run?
-            // TODO: When attack starts progress bar goes left to
-            //       right and back before we set new format up.
-            // TODO: Format is shown as key. Enough good?
-            //       Brackets are shown always.
             m_ui->progressBar->setFormat(
                 tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(
                     crackedCount).arg(

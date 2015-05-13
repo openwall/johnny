@@ -150,15 +150,21 @@ MainWindow::MainWindow(QSettings &settings)
 
 
     // We create folder for us in home dir if it does not exist.
-    // TODO: Are this checks are enough?
-    // TODO: Claim on mkdir fails.
-    // TODO: Do not do it on start up. Choose other good time.
+    bool mkDirFailed = false;
     if (!QDir(QDir::home().filePath(".john")).exists()) {
-        QDir::home().mkdir(".john");
+        mkDirFailed |= QDir::home().mkdir(".john");
     }
     if (!QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).exists()) {
-        QDir(QDir::home().filePath(".john")).mkdir("johnny");
+        mkDirFailed |= QDir(QDir::home().filePath(".john")).mkdir("johnny");
     }
+    if (mkDirFailed)
+    {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Johnny could not create directory in home. Settings and sessions won't be saved."));
+    }
+
 
     // Session for johnny
     m_session = QDir(

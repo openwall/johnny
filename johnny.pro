@@ -18,13 +18,16 @@ SOURCES +=	main.cpp\
 			tablemodel.cpp \
 			filetablemodel.cpp \
                         translator.cpp \
-                        johnprocess.cpp
+                        johnprocess.cpp \
+                        hashtypechecker.cpp
+
 
 HEADERS  += mainwindow.h \
 			tablemodel.h \
 			filetablemodel.h \
                         translator.h \
-                        johnprocess.h
+                        johnprocess.h \
+                        hashtypechecker.h
 
 FORMS    += mainwindow.ui
 TRANSLATIONS    = translations/johnny_fr.ts

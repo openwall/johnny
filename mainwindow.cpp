@@ -328,10 +328,14 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 
     // We build hash table for fast access.
     m_tableMap = QMultiMap<QString, int>();
-    for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-        m_tableMap.insert(
-            m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
-            i);
+
+    // In case a newTableModel == NULL parameter is passed
+    if(m_hashesTable != NULL){
+        for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+            m_tableMap.insert(
+                m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
+                i);
+        }
     }
 }
 

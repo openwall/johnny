@@ -311,9 +311,9 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // Remove temporary file is exist
 
-    if (m_temp) {
+    if (m_temp != NULL) {
         delete m_temp;
-        m_temp = 0;
+        m_temp = NULL;
     }
 
     // We delete existing model if any.
@@ -1039,23 +1039,11 @@ void MainWindow::on_pushButton_FillSettingsWithDefaults_clicked()
 
 void MainWindow::on_pushButton_BrowsePathToJohn_clicked()
 {
-    // We pop a dialog to choose a file to open.
-    // TODO: Copy-pasting is evil! (on_pushButton_WordlistFileBrowse_clicked)
-    // TODO: What happens when John writes something while dialog
-    //       opened?
-    // TODO: Move dialog creation and setting up into window constructor.
-    // TODO: Should we save this dialog on form to make it remember
-    //       last path?
-    // TODO: Yet another "browse" button... Do not you want to make
-    //       without copying of code?
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
-    // TODO: Dialog could allow user to select multiple files. May it
-    //       be good to support this ability? To concatenate selected file?
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        // TODO: File name does not appear in history (drop down list).
         m_ui->comboBox_PathToJohn->setEditText(fileName);
     }
 }
@@ -1110,8 +1098,6 @@ void MainWindow::restoreLastSavedSettings()
         ? m_ui->checkBox_AutoApplySettings->isChecked()
         : m_settings.value("AutoApplySettings").toBool());
     // We apply settings.
-    // TODO: Again... Button's handler do useful work but named
-    //       inappropriately because it is handler.
     applySettings();
 }
 

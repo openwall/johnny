@@ -259,7 +259,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         int answer = QMessageBox::question(
             this,
             tr("Johnny"),
-            tr("John still runs! John will be stopped if you proceed. Do you really want to quit?"),
+            tr("John still runs! John will be terminated if you proceed. Do you really want to quit?"),
             QMessageBox::Yes | QMessageBox::No);
         if (answer == QMessageBox::No) {
             event->ignore();
@@ -273,7 +273,6 @@ MainWindow::~MainWindow()
 {
     m_johnProcess.terminate();
     m_showJohnProcess.terminate();
-    // We wait 1 second.
     if (!m_johnProcess.waitForFinished(1000))
         m_johnProcess.kill();
     if (!m_showJohnProcess.waitForFinished(1000))
@@ -842,7 +841,7 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 
 void MainWindow::showJohnFinished()
 {
-    appendLog(tr("Session ended."));
+    appendLog("--------------------------------------------------------------------------------\n");
     // When John finishes we enable start button and disable stop
     // button.
     m_ui->actionPause_Attack->setEnabled(false);
@@ -861,9 +860,12 @@ void MainWindow::callJohnShow()
     // If john returns immediately then we call it again before
     // it finishes. No good solution. Only workaround.
     m_showJohnProcess.waitForFinished(1000);
+    // Give a chance to terminate cleanly
+    if (m_showJohnProcess.state() != QProcess::NotRunning)
+        m_showJohnProcess.terminate();
+    m_showJohnProcess.waitForFinished(500);
     if (m_showJohnProcess.state() != QProcess::NotRunning)
         m_showJohnProcess.kill();
-    m_showJohnProcess.waitForFinished(1000);
 
     QStringList parameters;
     // We add current format key if it is not empty.

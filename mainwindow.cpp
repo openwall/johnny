@@ -289,13 +289,9 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
 {
     // We pop a dialog to choose a file to open.
-    // TODO: *.lst for file extension?
-    // TODO: Copy-pasting is evil! (open password file)
-    // TODO: What happens when John writes something while dialog
-    //       opened?
-    // TODO: Move dialog creation and setting up into window constructor.
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setNameFilter(tr("World list files (*.lst)"));
 
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];

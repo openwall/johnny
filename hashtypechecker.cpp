@@ -42,7 +42,7 @@ void HashTypeChecker::parseJohnAnswer()
     // Parse John's output which is in m_johnResult
     // when process finished it's work
     QList<Hash> hashTypes;
-   /* if(!m_johnOutput.isEmpty())
+    if(!m_johnOutput.isEmpty())
     {
         QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"),QString::SkipEmptyParts);
         for(int i=0; i < lines.size(); i++)
@@ -89,7 +89,7 @@ void HashTypeChecker::parseJohnAnswer()
 
             }
         }
-    }*/
+    }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
     emit updateHashTypes();

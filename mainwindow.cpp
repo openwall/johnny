@@ -388,6 +388,8 @@ void MainWindow::on_actionOpen_Password_triggered()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         readPasswdFile(fileName);
+        m_hashTypeChecker.start(m_pathToJohn, fileName);
+
     }
 }
 

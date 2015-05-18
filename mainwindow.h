@@ -7,6 +7,7 @@
 #define MAINWINDOW_H
 
 #include "johnprocess.h"
+#include "hashtypechecker.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -120,6 +121,10 @@ private:
     QMultiMap<QString, int> m_tableMap;
     // Holder for temporary file for `john --show`
     QTemporaryFile *m_temp;
+
+    HashTypeChecker m_hashTypeChecker;
+
+
 };
 
 #endif // MAINWINDOW_H

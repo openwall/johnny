@@ -5,30 +5,9 @@
 
 #include <QObject>
 #include <QTextStream>
+#include <QtConcurrent/QtConcurrent>
 
 #include <map>
-
-class HashTypeChecker : public QObject
-{
-    Q_OBJECT
-public:
-    HashTypeChecker();
-    ~HashTypeChecker();
-    void start(QString& pathToJohn, QString& pathToPwdFile);
-    void terminate();
-private slots:
-    void parseJohnAnswer();
-    void processOutput();
-private:
-    JohnProcess m_john;
-    QString m_johnOutput;
-
-    // Each row of the file will have
-    std::map<QString,QStringList> m_types;
-
-signals:
-    void updateHashTypes(QStringList typeOfHashInFile);
-};
 
 struct HashFormat
 {
@@ -52,5 +31,31 @@ struct Hash
     QString shell;
     std::vector<HashFormat> listFormats;
 };
+
+class HashTypeChecker : public QObject
+{
+    Q_OBJECT
+public:
+    HashTypeChecker();
+    ~HashTypeChecker();
+    void start(QString& pathToJohn, QString& pathToPwdFile);
+    void terminate();
+    std::vector<HashFormat>& getHashTypesList() const;
+
+private slots:
+    void startParsing();
+    void processOutput();
+
+private:
+    void parseJohnAnswer();
+    JohnProcess m_john;
+    QString m_johnOutput;
+    std::vector<HashFormat> m_listHashTypes;
+
+signals:
+    void updateHashTypes();
+};
+
+
 
 #endif // HASHTYPECHECKER_H

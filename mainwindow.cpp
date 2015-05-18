@@ -143,6 +143,9 @@ MainWindow::MainWindow(QSettings &settings)
     connect(group, SIGNAL(buttonClicked(int)),
             m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes()),this,
+            SLOT(updateHashTypes()));
+
 //    TableModel *passmodel = new TableModel();
 
 //    ui->tableView_Passwords->setModel(passmodel);
@@ -1259,4 +1262,9 @@ void MainWindow::appendLog(const QString& text)
     m_ui->plainTextEdit_JohnOut->moveCursor (QTextCursor::End);
     m_ui->plainTextEdit_JohnOut->insertPlainText (text);
     m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
+}
+
+void MainWindow::updateHashTypes()
+{
+    appendLog("Hash types has changed");
 }

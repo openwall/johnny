@@ -80,6 +80,8 @@ private slots:
 
     bool checkSettings();
 
+    void updateHashTypes();
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;

@@ -4,7 +4,7 @@
 
 HashTypeChecker::HashTypeChecker()
 {
-    connect(&m_john,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(parseJohnAnswer()));
+    connect(&m_john,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(startParsing()));
     connect (&m_john, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput())); // connect process signals with your code
 }
 
@@ -25,7 +25,11 @@ void HashTypeChecker::terminate()
         m_john.kill();
 
     // Process what have been done so far from JohnOutput ...
-    parseJohnAnswer();
+    startParsing();
+}
+void HashTypeChecker::startParsing()
+{
+    QtConcurrent::run(this,&HashTypeChecker::parseJohnAnswer);
 }
 
 void HashTypeChecker::processOutput()
@@ -38,7 +42,7 @@ void HashTypeChecker::parseJohnAnswer()
     // Parse John's output which is in m_johnResult
     // when process finished it's work
     QList<Hash> hashTypes;
-    if(!m_johnOutput.isEmpty())
+   /* if(!m_johnOutput.isEmpty())
     {
         QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"),QString::SkipEmptyParts);
         for(int i=0; i < lines.size(); i++)
@@ -81,9 +85,12 @@ void HashTypeChecker::parseJohnAnswer()
                     }
                 }
 
+                hashTypes.append(hash);
+
             }
         }
-    }
-    // We emit signal to view (MainWindow) that it must be updated
-    //emit updateHashTypes(hashTypes);
+    }*/
+    // We emit signal to view(s) that are listening that something changed
+    // (ex : MainWindow)
+    emit updateHashTypes();
 }

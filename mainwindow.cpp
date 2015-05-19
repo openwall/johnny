@@ -245,7 +245,7 @@ void MainWindow::checkNToggleActionsLastSession()
         while(!descriptionStream.atEnd())
         {
             QString content =  descriptionStream.readLine();
-            if(content.startsWith("FILE:"))
+            if(content.startsWith("FILE="))
             {
                 content.remove(0,5);
                 hashesFileNames.append(content);
@@ -399,12 +399,12 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     while(!descriptionStream.atEnd())
     {
         QString content =  descriptionStream.readLine();
-        if(content.startsWith("FILE:"))
+        if(content.startsWith("FILE="))
         {
             content.remove(0,5);
             fileNames.append(content);
         }
-        else if(content.startsWith("FORMAT:"))
+        else if(content.startsWith("FORMAT="))
         {
             content.remove(0,7);
             format = content;

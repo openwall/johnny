@@ -48,9 +48,11 @@ void HashTypeChecker::parseJohnAnswer()
         for(int i=0; i < lines.size(); i++)
         {
             QString currentLine = lines[i];
-            if(!currentLine.isEmpty())
+            // Each valid line from john is gonna have at least 7 fields
+            if(currentLine.length() >= 7)
             {
-                // Field_separator
+                // Field_separator can be set by john and the right way to find
+                // it is by looking at the last character of the line
                 QChar field_separator = currentLine[currentLine.length()-1];
                 currentLine.remove(currentLine.length()-4, 3);
 
@@ -65,8 +67,9 @@ void HashTypeChecker::parseJohnAnswer()
                 hash.home = fields[currentIndex++];
                 hash.shell = fields[currentIndex++];
 
-                // There is at least one valid format attached to this hash
                 int nbOfFieldsForValidFormats = 6;
+                // For each valid formats, which are separated by separator, empty string
+                // separator (ex: '::')
                 while(currentIndex + nbOfFieldsForValidFormats < fields.length()-1)
                 {
                     HashFormat format;
@@ -75,7 +78,7 @@ void HashTypeChecker::parseJohnAnswer()
                     format.isFormatDynamic = (fields[currentIndex++] == "0" ? false : true);
                     format.isUsingCypherTextAsIs = (fields[currentIndex++] == "0" ? false : true);
 
-                    // Between each formats we'll have empty string (::)
+                    // Canonical hash(es) fields
                     for(; currentIndex < fields.length() - 1; currentIndex++)
                     {
                         if(!fields[currentIndex].isEmpty())
@@ -86,8 +89,8 @@ void HashTypeChecker::parseJohnAnswer()
                 }
 
                 hashTypes.append(hash);
-
             }
+
         }
     }
     // We emit signal to view(s) that are listening that something changed

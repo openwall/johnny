@@ -22,6 +22,8 @@
 #include <QThread>
 #include <QTextCursor>
 
+#define PASSWORD_TAB 0
+
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
       m_ui(new Ui::MainWindow),
@@ -290,7 +292,7 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
     // We pop a dialog to choose a file to open.
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("World list files (*.lst)"));
+    dialog.setNameFilter(tr("World list files (*.lst) ;; Dict files (*.dict);; Any files (*)"));
 
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
@@ -302,8 +304,7 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
 void MainWindow::on_listWidgetTabs_itemSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
-    // We assume here that passwords tab is at 0.
-    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == 0);
+    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
 }
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
@@ -403,7 +404,7 @@ void MainWindow::on_actionCopyToClipboard_triggered()
             this,
             tr("Nothing to copy !"),
             tr("Nothing is selected. Please select rows/columns in the password table to copy them "
-               "to the clibpboard!"));
+               "to the clibpboard."));
         return;
     }
 

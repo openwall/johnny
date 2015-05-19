@@ -75,7 +75,7 @@ private slots:
 
     void checkNToggleActionsLastSession();
 
-    bool readPasswdFile(const QString &fileName);
+    bool readPasswdFiles(const QStringList &fileNames);
 
     bool checkSettings();
 
@@ -83,7 +83,7 @@ private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;
 
-    QString m_hashesFileName;
+    QStringList m_hashesFilesNames;
     QString m_session;
     JohnProcess m_johnProcess;
     // To catch cracked passwords we use timer and john --show.

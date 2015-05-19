@@ -23,7 +23,7 @@
 #include <QTextCursor>
 
 #define PASSWORD_TAB 0
-
+#define FILE_SEPARATOR "<-/-/ FS /-/->"
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
       m_ui(new Ui::MainWindow),
@@ -163,11 +163,11 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We create folder for us in home dir if it does not exist.
     bool mkDirFailed = false;
-    if (!QDir(QDir::home().filePath(".john")).exists()) {
-        mkDirFailed |= QDir::home().mkdir(".john");
+    if (!QDir(QDir::home().filePath("_john")).exists()) {
+        mkDirFailed |= !QDir::home().mkdir("_john");
     }
-    if (!QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).exists()) {
-        mkDirFailed |= QDir(QDir::home().filePath(".john")).mkdir("johnny");
+    if (!QDir(QDir(QDir::home().filePath("_john")).filePath("johnny")).exists()) {
+        mkDirFailed |= !QDir(QDir::home().filePath("_john")).mkdir("johnny");
     }
     if (mkDirFailed)
     {
@@ -182,7 +182,7 @@ MainWindow::MainWindow(QSettings &settings)
     // Session for johnny
     m_session = QDir(
         QDir(QDir::home().filePath(
-                 ".john")).filePath(
+                 "_john")).filePath(
                      "johnny")).filePath(
                          "default");
 
@@ -227,7 +227,7 @@ MainWindow::MainWindow(QSettings &settings)
 
 void MainWindow::checkNToggleActionsLastSession()
 {
-    m_ui->actionStart_Attack->setEnabled(m_hashesFileName != "");
+    m_ui->actionStart_Attack->setEnabled(! m_hashesFilesNames.isEmpty());
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
@@ -241,14 +241,23 @@ void MainWindow::checkNToggleActionsLastSession()
         }
         QTextStream descriptionStream(&description);
         // TODO: errors?
-        QString hashesFileName = descriptionStream.readLine();
+        QStringList hashesFileNames;
+        while(!descriptionStream.atEnd())
+        {
+            QString content =  descriptionStream.readLine();
+            if(content.startsWith("FILE:"))
+            {
+                content.remove(0,5);
+                hashesFileNames.append(content);
+            }
+        }
         description.close();
 
         m_ui->actionResume_Attack->setEnabled(
-            hashesFileName == m_hashesFileName
-            && hashesFileName != "");
+            hashesFileNames == m_hashesFilesNames
+            && !hashesFileNames.isEmpty());
         m_ui->actionOpen_Last_Session->setEnabled(
-            hashesFileName != m_hashesFileName);
+            hashesFileNames != m_hashesFilesNames);
     } else {
         m_ui->actionOpen_Last_Session->setEnabled(false);
         m_ui->actionResume_Attack->setEnabled(false);
@@ -339,14 +348,14 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     }
 }
 
-bool MainWindow::readPasswdFile(const QString &fileName)
+bool MainWindow::readPasswdFiles(const QStringList &fileNames)
 {
     FileTableModel *model = new FileTableModel(this);
-    if (model->readFile(fileName)) {
+    if (model->readFile(fileNames)) {
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
-        m_hashesFileName = fileName;
+        m_hashesFilesNames = fileNames;
         checkNToggleActionsLastSession();
         m_ui->actionCopyToClipboard->setEnabled(true);
         return true;
@@ -354,7 +363,7 @@ bool MainWindow::readPasswdFile(const QString &fileName)
     QMessageBox::warning(
             this,
             tr("Johnny"),
-            tr("Johnny could not read desired passwd file."));
+            tr("Johnny could not read desired passwd file(s)."));
     return false;
 }
 
@@ -366,10 +375,10 @@ void MainWindow::on_actionOpen_Password_triggered()
     // we set it to existing view.
 
     QFileDialog dialog;
-    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setFileMode(QFileDialog::ExistingFiles);
     if (dialog.exec()) {
-        QString fileName = dialog.selectedFiles()[0];
-        readPasswdFile(fileName);
+        QStringList fileNames = dialog.selectedFiles();
+        readPasswdFiles(fileNames);
     }
 }
 
@@ -384,11 +393,26 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
         return;
     }
     QTextStream descriptionStream(&description);
+    QString format;
+    QStringList fileNames;
+    // Parse johnny session file
+    while(!descriptionStream.atEnd())
+    {
+        QString content =  descriptionStream.readLine();
+        if(content.startsWith("FILE:"))
+        {
+            content.remove(0,5);
+            fileNames.append(content);
+        }
+        else if(content.startsWith("FORMAT:"))
+        {
+            content.remove(0,7);
+            format = content;
+        }
+    }
 
-    QString fileName = descriptionStream.readLine();
-    QString format = descriptionStream.readLine();
     description.close();
-    if (readPasswdFile(fileName)) {
+    if (readPasswdFiles(fileNames)) {
         m_format = format;
     }
 }
@@ -491,18 +515,21 @@ void MainWindow::on_actionStart_Attack_triggered()
     }
     QTextStream descriptionStream(&description);
 
-    descriptionStream << m_hashesFileName << endl;
-    descriptionStream << m_format << endl;
+    for(int i = 0; i < m_hashesFilesNames.size(); i++)
+    {
+        descriptionStream << "FILE=" << m_hashesFilesNames[i] <<endl;
+    }
+    descriptionStream << "FORMAT=" << m_format << endl;
     description.close();
 
     parameters << QString("--session=%1").arg(m_session);
 
     // We check that we have file name.
-    if (m_hashesFileName != "") {
+    if (!m_hashesFilesNames.isEmpty()) {
         // If file name is not empty then we have file, pass it to
         // John.
         // We add file name onto parameters list.
-        parameters << m_hashesFileName;
+        parameters << m_hashesFilesNames;
         startJohn(parameters);
     } else {
         // Else we do not have connected file name so we ask user to save

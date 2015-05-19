@@ -1266,5 +1266,8 @@ void MainWindow::appendLog(const QString& text)
 
 void MainWindow::updateHashTypes()
 {
-    appendLog("Hash types has changed");
+    // The types have changed because a new password file has been
+    // loaded,
+    //TODO : get the list from m_hashTypeChecker and
+    // modify the view
 }

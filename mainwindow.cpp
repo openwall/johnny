@@ -67,7 +67,7 @@ MainWindow::MainWindow(QSettings &settings)
     // We connect John process' signals with our slots.
     // John was ended.
     connect(&m_johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(showJohnFinished()));
+            this, SLOT(showJohnFinished(int, QProcess::ExitStatus)));
     // John was started.
     connect(&m_johnProcess, SIGNAL(started()),
             this, SLOT(showJohnStarted()));
@@ -839,8 +839,21 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
         message);
 }
 
-void MainWindow::showJohnFinished()
+void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    // If John crash, it'll be handled by showJohnError. However, if it does'nt
+    // the exit code might be interesting. Qt only guarantee that the value is
+    // valid if exitStatut == NormalExit
+    if(exitStatus == QProcess::NormalExit && exitCode != 0 && exitCode != 1)
+    {
+        appendLog("John exited with code " + QString::number(exitCode) + '\n');
+        QMessageBox::warning(
+                    this,
+                    tr("John exit"),
+                    tr("John the Ripper terminated unsuccessfully."
+                       " Check the Console Log for details."));
+    }
+
     appendLog("--------------------------------------------------------------------------------\n");
     // When John finishes we enable start button and disable stop
     // button.

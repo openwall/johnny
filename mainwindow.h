@@ -57,7 +57,7 @@ private slots:
     void settingsChangedByUser();
 
     void updateJohnOutput();
-    void showJohnFinished();
+    void showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);

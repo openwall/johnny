@@ -23,7 +23,6 @@
 #include <QTextCursor>
 
 #define PASSWORD_TAB 0
-#define FILE_SEPARATOR "<-/-/ FS /-/->"
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
       m_ui(new Ui::MainWindow),

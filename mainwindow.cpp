@@ -73,7 +73,6 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_johnProcess, SIGNAL(started()),
             this, SLOT(showJohnStarted()));
     // John got problem.
-    // TODO: catch problems from `john --show`?
     connect(&m_johnProcess, SIGNAL(error(QProcess::ProcessError)),
             this, SLOT(showJohnError(QProcess::ProcessError)));
     // John wrote something.
@@ -232,14 +231,13 @@ void MainWindow::checkNToggleActionsLastSession()
         && QFileInfo(m_session + ".johnny").isReadable()) {
         m_ui->actionOpen_Last_Session->setEnabled(true);
 
-        // TODO: very similar to open last session code.
         QFile description(m_session + ".johnny");
         if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
             m_ui->actionResume_Attack->setEnabled(false);
             return;
         }
         QTextStream descriptionStream(&description);
-        // TODO: errors?
+
         QStringList hashesFileNames;
         while(!descriptionStream.atEnd())
         {
@@ -502,8 +500,6 @@ void MainWindow::on_actionStart_Attack_triggered()
         }
     }
 
-    // TODO: Saving so two instances of johnny overwrite description
-    //       but not .rec so they become not synchronized.
     QFile description(m_session + ".johnny");
     if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(
@@ -546,10 +542,6 @@ QStringList MainWindow::getAttackParameters()
 
     // General options
     // Format
-    // TODO: If format is with checkbox then 'auto detect' does
-    //       not exist and format is handled as other options.
-    //       It could give an ability to unify all options and keep
-    //       them not as code.
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
         // We have one list for formats and subformats. Subformats
         // contain short description after it.
@@ -565,12 +557,8 @@ QStringList MainWindow::getAttackParameters()
         //       $ john -format:md5_gen(0)
         //       instead. See
         //       http://www.openwall.com/lists/john-users/2011/08/17/2
-        // TODO: What is better format to use for keys: -key: or
-        //       --key= or something else?
         // We remember format key to be used with '-show' to take
         // progress.
-        // TODO: Instead of remembering of keys we could lock options.
-        //       What is better?
         m_format = "--format=" + m_ui->comboBox_Format->currentText();
         // Now we have '--format=format' or '--format=format(N)description'.
         // So we truncate string to ')' if brace is in string.
@@ -771,25 +759,21 @@ void MainWindow::showJohnStarted()
     // with original hash during `john --show`.
     if (!m_temp) {
         m_temp = new QTemporaryFile();
-        // TODO: check return from new.
         if (m_temp->open()) {
             QTextStream temp(m_temp);
             for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-                // TODO: could it be done faster?
                 // TODO: is it ok to use "?" inserted for lonely hash as user name?
                 QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                 QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
-                // TODO: is it ok to use \n?
                 temp << user << ":" << hash << "::" << hash << '\n';
             }
             m_temp->close();
         } else {
-            // TODO: Error: could not open temp file.
+            // Error: could not open temp file.
         }
     }
 
-    // TODO: Are these signals called always in order
-    //       started-finished? Or is it unpredictable?
+
     // When John starts we enable stop button.
     m_ui->actionPause_Attack->setEnabled(true);
     // When John starts we start capturing passwords.
@@ -862,8 +846,7 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
     QMessageBox::critical(
         this,
         tr("Johnny"),
-        // TODO: show path to john in error messages.
-        message);
+        message + " " + m_pathToJohn);
 }
 
 void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -1019,9 +1002,8 @@ void MainWindow::readJohnShow()
 //       applyAndSaveSettings,
 //       restoreLastSavedSettings,
 //       And of course you should put elements on the form.
-//       And for each setting there should method for auto
-//       application.
-// TODO: It seems to be ugly. Refactoring is needed.
+//       And you must connect the signal eventChanged of the widget to the slot
+//       settingsChangedByUser() to take care of autoApply setting
 
 void MainWindow::warnAboutDefaultPathToJohn()
 {
@@ -1041,17 +1023,7 @@ void MainWindow::fillSettingsWithDefaults()
     // Find john on PATH
     QString john;
     QStringList possiblePaths;
-    // TODO: list of names for john.
-    // TODO: list of common names for john (i.e. john-gpu).
-    // TODO: hint for user that he could use just 'john' for the
-    //       setting but it has its specific pros and cons.
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    // TODO: Windows portability (semicolon instead of colon as delimiter).
-    // TODO: could there be escaped delimiter?
-    // TODO: Translated path to john? Any better solution for package
-    //       maintainers in distributions?
-    // TODO: it is bad implementation of search on PATH. Are not there
-    //       predefined better one?
     QString johnName = tr("john");
     foreach (QString dir, env.value("PATH").split(":")) {
         possiblePaths << QDir(dir).filePath(johnName);
@@ -1160,7 +1132,6 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
 {
     // First goal is to disable 'apply' button and to apply settings
     // when auto application is turned on.
-    // TODO: At program start we might need to do it too. Check!
     bool autoApply = m_ui->checkBox_AutoApplySettings->isChecked();
     m_ui->pushButton_ApplySettings->setEnabled(!autoApply);
     if (autoApply)
@@ -1169,8 +1140,6 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
     // NOTE: Deactivation of auto application will be auto applied.
     // NOTE: Auto application is a setting too. At least it would be
     //       good to remember its state between program runs.
-    // TODO: Copy-pasting is evil!
-    //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)
         applySettings();
 }
@@ -1201,8 +1170,7 @@ void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
         // We produce a string representing distance between time points.
         QString workingTime;
         QTextStream stream(&workingTime);
-        // TODO: Other format?
-        // TODO: String translation?
+
         stream << days << tr(":");
         // Hours, minutes and seconds have padding with zeroes to two
         // chars.

@@ -33,7 +33,6 @@ bool FileTableModel::readFile(const QStringList &fileNames)
     {
         // We read and parse the file.
         // We create and fill our internal model representation.
-        // TODO: Restore could call us with empty name. We crash.
         QFile file(fileNames[fileCount]);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             return false;
@@ -42,7 +41,6 @@ bool FileTableModel::readFile(const QStringList &fileNames)
             // TODO: right? Should not we keep \r in middle of line?
             line.remove(QRegExp("\\r?\\n"));
             // TODO: Parse gecos well.
-            // TODO: Make customizable separator. It should be an option.
             QStringList fields = line.split(':');
             int column = 0;
             // NOTE: When we want we change lists we use [] as of .at()
@@ -59,7 +57,6 @@ bool FileTableModel::readFile(const QStringList &fileNames)
                 data[column++].append("");
                 data[column++].append(fields.at(2));
                 // TODO: It is not good to pack it so. Parse gecos well.
-                // TODO: split and join back seem slower than optimal.
                 fields.removeAt(2);
                 fields.removeAt(0);
                 data[column++].append(fields.join(":"));

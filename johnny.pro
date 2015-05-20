@@ -9,13 +9,11 @@ TEMPLATE = app
 
 SOURCES +=	main.cpp\
             mainwindow.cpp \
-            tablemodel.cpp \
             filetablemodel.cpp \
             translator.cpp \
             johnprocess.cpp
 
 HEADERS  += mainwindow.h \
-            tablemodel.h \
             filetablemodel.h \
             translator.h \
             johnprocess.h

@@ -3,6 +3,7 @@
  */
 
 #include "filetablemodel.h"
+#include "hashtypechecker.h"
 
 #include <QFile>
 
@@ -16,7 +17,7 @@ FileTableModel::FileTableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
-    m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS");
+    m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS") << tr("Possible Hash Types");
     // TODO: we leave object in inconsistent state.
 }
 
@@ -87,6 +88,14 @@ bool FileTableModel::readFile(const QString &fileName)
     //       state?
 
     return true;
+}
+void FileTableModel::fillHashTypes(const QVector<QString>& listHashTypes)
+{
+    for(int i=0; i < listHashTypes.size(); i++)
+    {
+        // Possible hash types is column at 4
+        setData(index(i,4),listHashTypes[i]);
+    }
 }
 
 int FileTableModel::rowCount(const QModelIndex &/* parent */) const

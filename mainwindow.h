@@ -80,7 +80,7 @@ private slots:
 
     bool checkSettings();
 
-    void updateHashTypes();
+    void updateHashTypes(const QVector<QString>& typesLists);
 
 private:
     Ui::MainWindow *m_ui;

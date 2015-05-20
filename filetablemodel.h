@@ -5,6 +5,8 @@
 #ifndef FILETABLEMODEL_H
 #define FILETABLEMODEL_H
 
+#include "hashtypechecker.h"
+
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QVector>
@@ -30,6 +32,7 @@ public:
 
 
     bool readFile(const QString &fileName);
+    void fillHashTypes(const QVector<QString> &listHashTypes);
 
 private:
     QVector<QVector<QString> > m_data;

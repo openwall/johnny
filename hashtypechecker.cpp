@@ -41,7 +41,8 @@ void HashTypeChecker::parseJohnAnswer()
 {
     // Parse John's output which is in m_johnResult
     // when process finished it's work
-    QList<Hash> hashTypes;
+    QVector<QString> parsedTypes;
+    QList<Hash> hashesAllInfos;
     if(!m_johnOutput.isEmpty())
     {
         QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"),QString::SkipEmptyParts);
@@ -67,33 +68,44 @@ void HashTypeChecker::parseJohnAnswer()
                 hash.home = fields[currentIndex++];
                 hash.shell = fields[currentIndex++];
 
-                int nbOfFieldsForValidFormats = 6;
+                int nbOfFieldsForValidFormats = 4;
                 // For each valid formats, which are separated by separator, empty string
                 // separator (ex: '::')
-                while(currentIndex + nbOfFieldsForValidFormats < fields.length()-1)
+                QStringList typesOnly;
+                while(currentIndex + nbOfFieldsForValidFormats < fields.length())
                 {
                     HashFormat format;
                     format.label = fields[currentIndex++];
+                    typesOnly.append(format.label);
+
                     format.isFormatDisabled = (fields[currentIndex++] == "0" ? false : true);
                     format.isFormatDynamic = (fields[currentIndex++] == "0" ? false : true);
                     format.isUsingCypherTextAsIs = (fields[currentIndex++] == "0" ? false : true);
 
                     // Canonical hash(es) fields
-                    for(; currentIndex < fields.length() - 1; currentIndex++)
+                    for(; currentIndex < fields.length(); currentIndex++)
                     {
                         if(!fields[currentIndex].isEmpty())
+                        {
                             format.canonicalHashes.append(fields[currentIndex]);
+                        }
                         else
+                        {
+                            currentIndex++;
                             break;
+                        }
                     }
                 }
 
-                hashTypes.append(hash);
+                parsedTypes.append(typesOnly.join(","));
+
+                hashesAllInfos.append(hash);
+
             }
 
         }
     }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
-    emit updateHashTypes();
+    emit updateHashTypes(parsedTypes);
 }

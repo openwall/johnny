@@ -8,7 +8,6 @@
 #include "translator.h"
 
 // We include all table models we use.
-#include "tablemodel.h"
 #include "filetablemodel.h"
 
 #include <QToolButton>

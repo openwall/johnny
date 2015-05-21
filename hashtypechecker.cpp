@@ -14,10 +14,14 @@ HashTypeChecker::~HashTypeChecker()
 }
 void HashTypeChecker::start(QString& pathToJohn, QString& pathToPwdFile)
 {
+    // We make sure last process is terminated correctly before
+    // loading a new password file.
+    terminate();
     m_johnOutput.clear();
+    m_johnOutput.append(pathToPwdFile + "\n");
     m_john.start(pathToJohn + " --show=types " + pathToPwdFile);
 }
-void HashTypeChecker::terminate()
+void HashTypeChecker::terminate(bool shouldProcessWorkToDate)
 {
     if (m_john.state() != QProcess::NotRunning)
         m_john.terminate();
@@ -25,8 +29,11 @@ void HashTypeChecker::terminate()
     if (m_john.state() != QProcess::NotRunning)
         m_john.kill();
 
-    // Process what have been done so far from JohnOutput ...
-    startParsing();
+    // Process what have been done so far from JohnOutput ..
+    if(shouldProcessWorkToDate)
+    {
+        startParsing();
+    }
 }
 void HashTypeChecker::startParsing()
 {
@@ -42,12 +49,14 @@ void HashTypeChecker::parseJohnAnswer()
 {
     // Parse John's output which is in m_johnResult
     // when process finished it's work
-    QVector<QString> parsedTypes;
+    QStringList parsedTypes;
     QList<Hash> hashesAllInfos;
+    QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"),QString::SkipEmptyParts);
+    QString filePath;
     if(!m_johnOutput.isEmpty())
     {
-        QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"),QString::SkipEmptyParts);
-        for(int i=0; i < lines.size(); i++)
+        filePath = lines[0];
+        for(int i=1; i < lines.size(); i++)
         {
             QString currentLine = lines[i];
             // Each valid line from john is gonna have at least 7 fields
@@ -109,5 +118,5 @@ void HashTypeChecker::parseJohnAnswer()
     }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
-    emit updateHashTypes(parsedTypes);
+    emit updateHashTypes(parsedTypes,filePath);
 }

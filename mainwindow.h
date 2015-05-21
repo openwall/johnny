@@ -80,7 +80,7 @@ private slots:
 
     bool checkSettings();
 
-    void updateHashTypes(const QVector<QString>& typesLists);
+    void updateHashTypes(const QStringList &typesLists,const QString &pathToPwdFile);
 
 private:
     Ui::MainWindow *m_ui;

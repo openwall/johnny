@@ -142,9 +142,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(group, SIGNAL(buttonClicked(int)),
             m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
-    qRegisterMetaType<QVector<QString> >("QVector<QString>");
-    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(QVector<QString>)),this,
-            SLOT(updateHashTypes(QVector<QString>)),Qt::QueuedConnection);
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&,const QString&)),this,
+            SLOT(updateHashTypes(const QStringList&,const QString&)),Qt::QueuedConnection);
 
 //    TableModel *passmodel = new TableModel();
 
@@ -1264,15 +1263,16 @@ void MainWindow::appendLog(const QString& text)
     m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
 }
 
-void MainWindow::updateHashTypes(const QVector<QString>& typesLists)
+void MainWindow::updateHashTypes(const QStringList &typesLists, const QString &pathToPwdFile)
 {
     // The types have changed because a new password file has been
     // loaded,
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if(model != NULL)
+    if(model != NULL && pathToPwdFile == m_hashesFileName)
     {
+        // We know that the right file is still opened so the signal
+        // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(typesLists);
         m_ui->tableView_Hashes->setModel(model);
-
     }
 }

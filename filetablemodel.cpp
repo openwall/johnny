@@ -89,7 +89,7 @@ bool FileTableModel::readFile(const QString &fileName)
 
     return true;
 }
-void FileTableModel::fillHashTypes(const QVector<QString>& listHashTypes)
+void FileTableModel::fillHashTypes(const QStringList &listHashTypes)
 {
     for(int i=0; i < listHashTypes.size(); i++)
     {

@@ -39,7 +39,7 @@ public:
     HashTypeChecker();
     ~HashTypeChecker();
     void start(QString& pathToJohn, QString& pathToPwdFile);
-    void terminate();
+    void terminate(bool shouldProcessWorkToDate = false);
 
 private slots:
     void startParsing();
@@ -51,7 +51,7 @@ private:
     QString m_johnOutput;
 
 signals:
-    void updateHashTypes(const QVector<QString>& typesLists);
+    void updateHashTypes(const QStringList &typesLists, const QString &pathToPwdFile);
 };
 
 

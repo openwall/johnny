@@ -14,6 +14,7 @@ HashTypeChecker::~HashTypeChecker()
 }
 void HashTypeChecker::start(QString& pathToJohn, QString& pathToPwdFile)
 {
+    m_johnOutput.clear();
     m_john.start(pathToJohn + " --show=types " + pathToPwdFile);
 }
 void HashTypeChecker::terminate()
@@ -95,6 +96,7 @@ void HashTypeChecker::parseJohnAnswer()
                             break;
                         }
                     }
+                    hash.listFormats.push_back(format);
                 }
 
                 parsedTypes.append(typesOnly.join(","));

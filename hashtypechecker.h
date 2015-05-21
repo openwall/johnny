@@ -40,7 +40,6 @@ public:
     ~HashTypeChecker();
     void start(QString& pathToJohn, QString& pathToPwdFile);
     void terminate();
-    std::vector<HashFormat>& getHashTypesList() const;
 
 private slots:
     void startParsing();
@@ -48,10 +47,8 @@ private slots:
 
 private:
     void parseJohnAnswer();
-    void parseTypesOnly();
     JohnProcess m_john;
     QString m_johnOutput;
-    std::vector<HashFormat> m_listHashTypes;
 
 signals:
     void updateHashTypes(const QVector<QString>& typesLists);

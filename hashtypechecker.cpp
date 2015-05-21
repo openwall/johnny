@@ -10,7 +10,7 @@ HashTypeChecker::HashTypeChecker()
 
 HashTypeChecker::~HashTypeChecker()
 {
-
+    terminate();
 }
 void HashTypeChecker::start(QString& pathToJohn, QString& pathToPwdFile)
 {

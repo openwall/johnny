@@ -38,16 +38,13 @@ bool FileTableModel::readFile(const QStringList &fileNames)
             return false;
         while (!file.atEnd()) {
             QString line = file.readLine();
-            // TODO: right? Should not we keep \r in middle of line?
             line.remove(QRegExp("\\r?\\n"));
-            // TODO: Parse gecos well.
             QStringList fields = line.split(':');
             int column = 0;
             // NOTE: When we want we change lists we use [] as of .at()
             //       gives us only const.
             if (fields.size() == 1) {
                 // Lonely hash
-                // TODO: Special mark to show that ? is not from file. Color? How?
                 data[column++].append("?");
                 data[column++].append("");
                 data[column++].append(fields.at(0));
@@ -56,7 +53,6 @@ bool FileTableModel::readFile(const QStringList &fileNames)
                 data[column++].append(fields.at(0));
                 data[column++].append("");
                 data[column++].append(fields.at(2));
-                // TODO: It is not good to pack it so. Parse gecos well.
                 fields.removeAt(2);
                 fields.removeAt(0);
                 data[column++].append(fields.join(":"));
@@ -97,7 +93,8 @@ QVariant FileTableModel::data(const QModelIndex &index,
 {
     // We validate arguments.
     // TODO: Check bounds.
-    if (!index.isValid() || role != Qt::DisplayRole)
+    if (!index.isValid() || role != Qt::DisplayRole ||
+            index.column() >= columnCount() || index.row() >= rowCount())
         return QVariant();
     return m_data.at(index.column()).at(index.row());
 }
@@ -107,8 +104,8 @@ bool FileTableModel::setData(const QModelIndex &index,
                              int role)
 {
     // We validate arguments.
-    // TODO: Check bounds.
-    if (!index.isValid() || role != Qt::EditRole)
+    if (!index.isValid() || role != Qt::EditRole ||
+            index.column() >= columnCount() || index.row() >= rowCount())
         return false;
     // We replace data in our table.
     m_data[index.column()].replace(index.row(), value.toString());

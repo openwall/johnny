@@ -92,7 +92,6 @@ QVariant FileTableModel::data(const QModelIndex &index,
                               int role) const
 {
     // We validate arguments.
-    // TODO: Check bounds.
     if (!index.isValid() || role != Qt::DisplayRole ||
             index.column() >= columnCount() || index.row() >= rowCount())
         return QVariant();

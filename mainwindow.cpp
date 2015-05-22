@@ -193,8 +193,6 @@ MainWindow::MainWindow(QSettings &settings)
     // strange: probably user would expect reset to be like default +
     // reset because storing of a part of settings is not normal
     // behaviour (only possible with upgrades).
-    // TODO: do not search john if it is in stored settings. It is
-    //       similar to other settings. It is at least start up speed up.
     fillSettingsWithDefaults();
 
     // We load old settings.
@@ -452,8 +450,6 @@ void MainWindow::on_actionCopyToClipboard_triggered()
     }
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->clear();
-    // TODO: we copy in two modes. I guess only one should be used.
-    //       Selection mode on linux and clipboard on windows?
     if (clipboard->supportsSelection())
         clipboard->setText(out, QClipboard::Selection);
     clipboard->setText(out);
@@ -584,10 +580,6 @@ QStringList MainWindow::getAttackParameters()
         // "Single crack" mode
         parameters << "--single";
         // External mode, filter
-        // TODO: It is applicable for 3 formats. Copy-pasting is evil!
-        // TODO: Warn if checkbox is checked and there is not text in
-        //       combobox. For other empty fields it would great to
-        //       warn too.
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
     } else if (m_ui->radioButton_WordlistMode->isChecked()) {
@@ -761,7 +753,6 @@ void MainWindow::showJohnStarted()
         if (m_temp->open()) {
             QTextStream temp(m_temp);
             for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-                // TODO: is it ok to use "?" inserted for lonely hash as user name?
                 QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                 QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
                 temp << user << ":" << hash << "::" << hash << '\n';
@@ -776,16 +767,6 @@ void MainWindow::showJohnStarted()
     // When John starts we enable stop button.
     m_ui->actionPause_Attack->setEnabled(true);
     // When John starts we start capturing passwords.
-    // TODO: Currently we set timer to 10 minutes. Make it
-    //       customizable.
-    // TODO: What about adoptive time intervals? Something like 1, 1,
-    //       2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 10, 10, ...
-    // TODO: John updates pot in time listed in configuration file.
-    //       So it is needed to force John update file using sighup or
-    //       similar way or to change configuration file.
-    //       Also it is possible to implement terminal emulator to
-    //       take passwords from stdout without buffering.
-    //       It relates with picking status of John.
     // TODO: When user change respective setting time for current run
     //       is not changed. Probably user expects other.
     // TODO: Should we distinguish settings for current run and for
@@ -800,8 +781,6 @@ void MainWindow::showJohnStarted()
     //       to be comfortable for users.
     //       So current value corresponds to one day. However it is
     //       not suitable for platforms with int of two bytes.
-    // TODO: Do all platforms supported by Qt have 4 or bytes in int?
-    // TODO: Better maximum value for spin box? Conceptually other way?
     m_showTimer.start(m_timeIntervalPickCracked * 1000);
     // If we continue cracking than there could already be cracked
     // passwords so we check status.

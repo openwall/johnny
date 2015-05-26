@@ -33,7 +33,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QSettings& settings);
-    void closeEvent(QCloseEvent *event);
     ~MainWindow();
     void appendLog(const QString& text);
     QStringList getAttackParameters();
@@ -77,7 +76,14 @@ private slots:
 
     bool checkSettings();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+    // For the OS X QProgressBar issue
+    // https://github.com/shinnok/johnny/issues/11
+    bool eventFilter(QObject *watched, QEvent *event);
+
 private:
+    bool            m_terminate;
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;
 

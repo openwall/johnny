@@ -23,6 +23,7 @@
 
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
+      m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
       m_settings(settings),
@@ -246,7 +247,7 @@ void MainWindow::checkNToggleActionsLastSession()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (m_johnProcess.state() != QProcess::NotRunning) {
+    if (!m_terminate && (m_johnProcess.state() != QProcess::NotRunning)) {
         int answer = QMessageBox::question(
             this,
             tr("Johnny"),
@@ -258,6 +259,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
             return;
         }
     }
+    m_terminate = true;
     event->accept();
 }
 

@@ -31,6 +31,10 @@ MainWindow::MainWindow(QSettings &settings)
     // UI initializations
     m_ui->setupUi(this);
 
+    // For the OS X QProgressBar issue
+    // https://github.com/shinnok/johnny/issues/11
+    m_ui->progressBar->installEventFilter(this);
+
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
     // We select first item/tab on list.
     m_ui->listWidgetTabs->setCurrentRow(0);
@@ -461,6 +465,25 @@ bool MainWindow::checkSettings()
         return false;
     }
     return true;
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event)
+{
+    if (!event)
+        return false;
+    if (!watched || !watched->isWidgetType())
+        return false;
+    QWidget* widged = (QWidget*) watched;
+    switch (event->type())
+    {
+    case QEvent::StyleAnimationUpdate:
+        if (widged->inherits("QProgressBar"))
+            return true;
+        break;
+    default:
+        break;
+    }
+    return false;
 }
 
 void MainWindow::on_actionStart_Attack_triggered()

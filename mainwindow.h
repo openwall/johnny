@@ -79,6 +79,11 @@ private slots:
 
     bool checkSettings();
 
+protected:
+    // For the OS X QProgressBar issue
+    // https://github.com/shinnok/johnny/issues/11
+    bool eventFilter(QObject *watched, QEvent *event);
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;

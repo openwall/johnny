@@ -147,16 +147,21 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
     connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
     connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(settingsChangedByUser()));
+    connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
 
-//    TableModel *passmodel = new TableModel();
+    // Action buttons
+    connect(m_ui->actionOpen_Last_Session,SIGNAL(triggered()),this,SLOT(openLastSession()));
+    connect(m_ui->actionOpen_Password,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
+    connect(m_ui->actionPause_Attack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
+    connect(m_ui->actionResume_Attack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
+    connect(m_ui->actionStart_Attack,SIGNAL(triggered()),this,SLOT(startAttack()));
+    connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
+    connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
+    connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
+    connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
+    connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
 
-//    ui->tableView_Passwords->setModel(passmodel);
-
-//    for (int i = 0; i < TABLE_ROWS; i++) {
-//        passmodel->setData(passmodel->index(i, 0), QString("Rick%1").arg(i));
-//        passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
-//    }
-
+    connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
     // We create folder for us in home dir if it does not exist.
     bool mkDirFailed = false;
@@ -290,7 +295,7 @@ MainWindow::~MainWindow()
     m_temp = 0;
 }
 
-void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
+void MainWindow::buttonWordlistFileBrowseClicked()
 {
     // We pop a dialog to choose a file to open.
     QFileDialog dialog;
@@ -304,7 +309,7 @@ void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
     }
 }
 
-void MainWindow::on_listWidgetTabs_itemSelectionChanged()
+void MainWindow::listWidgetTabsSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
     m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
@@ -361,7 +366,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
     return false;
 }
 
-void MainWindow::on_actionOpen_Password_triggered()
+void MainWindow::openPasswordFile()
 {
     // When user asks to open password file we should read desired
     // file, parse it and present values in the table. Model and view
@@ -376,7 +381,7 @@ void MainWindow::on_actionOpen_Password_triggered()
     }
 }
 
-void MainWindow::on_actionOpen_Last_Session_triggered()
+void MainWindow::openLastSession()
 {
     QFile description(m_session + ".johnny");
     if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -411,7 +416,7 @@ void MainWindow::on_actionOpen_Last_Session_triggered()
     }
 }
 
-void MainWindow::on_actionCopyToClipboard_triggered()
+void MainWindow::actionCopyToClipboardTriggered()
 {
     if (!m_hashesTable)
         return;
@@ -467,7 +472,7 @@ bool MainWindow::checkSettings()
     return true;
 }
 
-void MainWindow::on_actionStart_Attack_triggered()
+void MainWindow::startAttack()
 {
     if (!checkSettings())
         return;
@@ -696,7 +701,7 @@ void MainWindow::startJohn(QStringList params)
 }
 
 
-void MainWindow::on_actionResume_Attack_triggered()
+void MainWindow::resumeAttack()
 {
     if (!checkSettings())
         return;
@@ -719,23 +724,11 @@ void MainWindow::updateJohnOutput()
     //       --show work for us.
 }
 
-void MainWindow::on_actionPause_Attack_triggered()
+void MainWindow::pauseAttack()
 {
     // We ask John to exit.
     m_johnProcess.terminate();
 }
-
-// void MainWindow::on_pushButton_JohnStatus_clicked()
-// {
-//     // When we want to get John status we send enter to John. Then
-//     // John write something to its stdout. We do not need to read its
-//     // output here because when output is ready to be read a signal is
-//     // fired and we read John output with status as any other John's
-//     // output.
-//     // TODO: However it does not work as of we do not have terminal.
-//     // TODO: Why do we write to John even when it is not running?
-//     m_johnProcess.write("a\r\n");
-// }
 
 void MainWindow::showJohnStarted()
 {
@@ -878,21 +871,12 @@ void MainWindow::callJohnShow()
 
 void MainWindow::readJohnShow()
 {
-    // TODO: Read John's output while it runs. Do not wait before it
-    //       finishes. For 0.5M of password this code should not work.
-    //       Even if it works it seems to be ineffective for big
-    //       files.
     // We read all output.
     QByteArray output = m_showJohnProcess.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
     // We read output line by line and take user name and password.
     // Then we find a row with such user and insert password there.
-    // TODO: This is ineffective implementation. May QVector::index()
-    //       be god for search in model internals?
-    // TODO: We could have more than 2 fields. It seems to be useful
-    //       to look on them too.
-    // TODO: What if there are 2 or more rows with 1 user name?
     QString line;
     line = outputStream.readLine();
     // If john did not yet cracked anything then john does not emit
@@ -901,27 +885,15 @@ void MainWindow::readJohnShow()
     firstLine = line;
     // We read to the end or before empty line.
     while (!line.isNull() && line != "") {
-        // TODO: could not it be done faster?
         line.remove(QRegExp("\\r?\\n"));
         // We split lines to fields.
-        // TODO: What if password contains semicolon?
-        // TODO: What if password contains new line?
         int left = line.indexOf(":");
         int right = line.lastIndexOf("::");
-        // TODO: check we found left and right and left is not right.
         QString password = line.mid(left + 1, right - left - 1);
         QString hash = line.mid(right + 2);
         // We handle password.
         // If we found user then we put password in table.
-        // TODO: What if there two rows with one user name?
-        // TODO: What if we did not have 2 fields? Could
-        //       John's output be wrong?
-        // TODO: What if we do not find row? Note user. Take into
-        //       account that we remove value after use.
-        // TODO: We overwrite values each time.
         foreach (int row, m_tableMap.values(hash)) {
-            // TODO: claim if overwrite with other value. Be aware of
-            //       lm with its ???????HALF2.
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
                 password);
@@ -934,15 +906,12 @@ void MainWindow::readJohnShow()
     QString lastLine;
     if (!line.isNull()) {
         // We are on the last line.
-        // TODO: Really? We are after empty line.
         // We take counts of cracked passwords and of left hashes.
         // We read count of cracked password hashes.
-        // TODO: Could we read after end?
         lastLine = outputStream.readLine();
     } else {
         lastLine = firstLine;
     }
-    // TODO: Is following regexp always right?
     QRegExp crackedLeft("(\\d+)\\D+(\\d+)");
     int pos = crackedLeft.indexIn(lastLine);
     if (pos > -1) {
@@ -1027,13 +996,13 @@ void MainWindow::fillSettingsWithDefaults()
     m_ui->checkBox_AutoApplySettings->setChecked(false);
 }
 
-void MainWindow::on_pushButton_FillSettingsWithDefaults_clicked()
+void MainWindow::buttonFillSettingsWithDefaultsClicked()
 {
     fillSettingsWithDefaults();
     warnAboutDefaultPathToJohn();
 }
 
-void MainWindow::on_pushButton_BrowsePathToJohn_clicked()
+void MainWindow::buttonBrowsePathToJohnClicked()
 {
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -1106,7 +1075,7 @@ void MainWindow::settingsChangedByUser()
         applySettings();
 }
 
-void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
+void MainWindow::checkBoxAutoApplySettingsStateChanged()
 {
     // First goal is to disable 'apply' button and to apply settings
     // when auto application is turned on.
@@ -1125,7 +1094,7 @@ void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
 
 // Statistics page code
 
-void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
+void MainWindow::updateStatistics()
 {
     // Working time
     // We could not just subtract one time from another. But we could

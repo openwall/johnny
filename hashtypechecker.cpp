@@ -1,18 +1,16 @@
 #include "hashtypechecker.h"
 
-#include <QtDebug>
-
 HashTypeChecker::HashTypeChecker()
 {
     connect(&m_john,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(startParsing()));
-    connect (&m_john, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput())); // connect process signals with your code
+    connect (&m_john, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()));
 }
 
 HashTypeChecker::~HashTypeChecker()
 {
     terminate();
 }
-void HashTypeChecker::start(QString& pathToJohn, QString& pathToPwdFile)
+void HashTypeChecker::start(QString &pathToJohn, QString &pathToPwdFile)
 {
     // We make sure last process is terminated correctly before
     // loading a new password file.
@@ -23,15 +21,15 @@ void HashTypeChecker::start(QString& pathToJohn, QString& pathToPwdFile)
 }
 void HashTypeChecker::terminate(bool shouldProcessWorkToDate)
 {
-    if (m_john.state() != QProcess::NotRunning)
+    if (m_john.state() != QProcess::NotRunning) {
         m_john.terminate();
-    m_john.waitForFinished(500);
+        m_john.waitForFinished(500);
+    }
     if (m_john.state() != QProcess::NotRunning)
         m_john.kill();
 
     // Process what have been done so far from JohnOutput ..
-    if(shouldProcessWorkToDate)
-    {
+    if (shouldProcessWorkToDate) {
         startParsing();
     }
 }
@@ -51,23 +49,20 @@ void HashTypeChecker::parseJohnAnswer()
     // when process finished it's work
     QStringList parsedTypes;
     QList<Hash> hashesAllInfos;
-    QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"),QString::SkipEmptyParts);
+    QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
     QString filePath;
-    if(!m_johnOutput.isEmpty())
-    {
+    if (!m_johnOutput.isEmpty()) {
         filePath = lines[0];
-        for(int i=1; i < lines.size(); i++)
-        {
+        for (int i = 1; i < lines.size(); i++) {
             QString currentLine = lines[i];
             // Each valid line from john is gonna have at least 7 fields
-            if(currentLine.length() >= 7)
-            {
+            if (currentLine.length() >= 7) {
                 // Field_separator can be set by john and the right way to find
                 // it is by looking at the last character of the line
                 QChar field_separator = currentLine[currentLine.length()-1];
                 currentLine.remove(currentLine.length()-4, 3);
 
-                QStringList fields = currentLine.split(field_separator,QString::KeepEmptyParts);
+                QStringList fields = currentLine.split(field_separator, QString::KeepEmptyParts);
                 Hash hash;
                 int currentIndex = 0;
                 hash.login = fields[currentIndex++];
@@ -82,8 +77,7 @@ void HashTypeChecker::parseJohnAnswer()
                 // For each valid formats, which are separated by separator, empty string
                 // separator (ex: '::')
                 QStringList typesOnly;
-                while(currentIndex + nbOfFieldsForValidFormats < fields.length())
-                {
+                while ((currentIndex + nbOfFieldsForValidFormats) < fields.length()) {
                     HashFormat format;
                     format.label = fields[currentIndex++];
                     typesOnly.append(format.label);
@@ -93,14 +87,11 @@ void HashTypeChecker::parseJohnAnswer()
                     format.isUsingCypherTextAsIs = (fields[currentIndex++] == "0" ? false : true);
 
                     // Canonical hash(es) fields
-                    for(; currentIndex < fields.length(); currentIndex++)
-                    {
-                        if(!fields[currentIndex].isEmpty())
-                        {
+                    for (; currentIndex < fields.length(); currentIndex++) {
+                        if (!fields[currentIndex].isEmpty()) {
                             format.canonicalHashes.append(fields[currentIndex]);
                         }
-                        else
-                        {
+                        else {
                             currentIndex++;
                             break;
                         }
@@ -111,12 +102,10 @@ void HashTypeChecker::parseJohnAnswer()
                 parsedTypes.append(typesOnly.join(","));
 
                 hashesAllInfos.append(hash);
-
             }
-
         }
     }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
-    emit updateHashTypes(parsedTypes,filePath);
+    emit updateHashTypes(parsedTypes, filePath);
 }

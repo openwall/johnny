@@ -37,13 +37,11 @@ int main(int argc, char *argv[])
     Translator& translator = Translator::getInstance();
 
     // If no language is saved : default behavior is to use system language
-    if(settingLanguage.isEmpty())
-    {
+    if (settingLanguage.isEmpty()) {
         QString systemLanguage =  QLocale::languageToString(QLocale().language());
         translator.translateApplication(&app, systemLanguage);
     }
-    else
-    {
+    else {
         //Use the language specified in the settings
         translator.translateApplication(&app, settingLanguage);
     }

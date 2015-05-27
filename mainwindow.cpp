@@ -591,8 +591,7 @@ void MainWindow::on_actionStart_Attack_triggered()
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
 
     // Advanced options
-    if(m_ui->checkBox_UseFork->isChecked())
-    {
+    if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
     }
     // Session for johnny
@@ -663,25 +662,20 @@ void MainWindow::startJohn(QStringList params)
     QProcessEnvironment env;
     // If default is chosen, we don't specify OMP_NUM_THREADS and john will choose the number of
     // threads based on the number of processors.
-    if(m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText())
-    {
+    if (m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText()) {
         env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
     }
 
     // User specified environment variables
-    if(m_ui->checkBox_EnvironmentVar->isChecked())
-    {
+    if (m_ui->checkBox_EnvironmentVar->isChecked()) {
         // Parse the input
         QStringList varList = m_ui->lineEdit_EnvironmentVar->text().split(",", QString::SkipEmptyParts);
-        for(int i=0; i < varList.size(); i++)
-        {
+        for (int i = 0; i < varList.size(); i++) {
             QStringList varPair = varList[i].split("=", QString::SkipEmptyParts);
-            if(varPair.size() == 2) // we assume value of variable doesn't have = inside
-            {
+            if (varPair.size() == 2) { // we assume value of variable doesn't have = inside
                 env.insert(varPair[0].trimmed(), varPair[1].trimmed());
             }
-            else
-            {
+            else {
                 QMessageBox::warning(
                         this,
                         tr("Environment variables"),
@@ -1109,8 +1103,7 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     //If the language changed, retranslate the UI
     Translator& translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
-    if(newLanguage != translator.getCurrentLanguage().toLower())
-    {
+    if (newLanguage != translator.getCurrentLanguage().toLower()) {
         translator.translateApplication(qApp,newLanguage);
         m_ui->retranslateUi(this);
     }
@@ -1268,8 +1261,7 @@ void MainWindow::updateHashTypes(const QStringList &typesLists, const QString &p
     // The types have changed because a new password file has been
     // loaded,
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if(model != NULL && pathToPwdFile == m_hashesFileName)
-    {
+    if ((model != NULL) && (pathToPwdFile == m_hashesFileName)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(typesLists);

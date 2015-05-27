@@ -23,10 +23,8 @@ Translator& Translator::getInstance()
 
 void Translator::translateApplication(QApplication* app, QString language)
 {
-    if(isTranslationAvailable(language))
-    {
-        if(m_currentQtTranslator != NULL && m_currentJohnnyTranslator != NULL)
-        {
+    if (isTranslationAvailable(language)) {
+        if ((m_currentQtTranslator != NULL) && (m_currentJohnnyTranslator != NULL)) {
             app->removeTranslator(m_currentQtTranslator);
             app->removeTranslator(m_currentJohnnyTranslator);
             delete m_currentJohnnyTranslator;
@@ -36,8 +34,7 @@ void Translator::translateApplication(QApplication* app, QString language)
         }
 
         // English is default language of Johnny, we don't need translator in that case
-        if(language.toLower() != "english")
-        {
+        if (language.toLower() != "english") {
             // Translator needed to translate Qt's own strings
             m_currentQtTranslator = new QTranslator();
             m_currentQtTranslator->load("qt_" + m_languagesAndCodes[language.toLower()],
@@ -54,8 +51,7 @@ void Translator::translateApplication(QApplication* app, QString language)
 }
 bool Translator::isTranslationAvailable(QString language)
 {
-    if(m_languagesAndCodes.find(language.toLower()) == m_languagesAndCodes.end())
-    {
+    if (m_languagesAndCodes.find(language.toLower()) == m_languagesAndCodes.end()) {
         return false;
     }
     return true;
@@ -68,8 +64,8 @@ QStringList Translator::getListOfAvailableLanguages()
 {
     QStringList lang;
     std::map<QString,QString>::iterator it = m_languagesAndCodes.begin();
-    while(it != m_languagesAndCodes.end())
-    {
+    std::map<QString,QString>::iterator end = m_languagesAndCodes.end();
+    while (it != end) {
         lang.append(it->first);
         it++;
     }

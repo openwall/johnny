@@ -17,7 +17,7 @@ FileTableModel::FileTableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
-    m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS") << tr("Possible Hash Types");
+    m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS") << tr("Hash Formats");
     // TODO: we leave object in inconsistent state.
 }
 
@@ -58,7 +58,7 @@ bool FileTableModel::readFile(const QString &fileName)
             data[column++].append("?");
             data[column++].append("");
             data[column++].append(fields.at(0));
-        } else if (fields.size() >= 3 && fields.at(2).indexOf(QRegExp("^[0-9a-fA-F]{32}$")) == 0) {
+        } else if ((fields.size() >= 3) && (fields.at(2).indexOf(QRegExp("^[0-9a-fA-F]{32}$")) == 0)) {
             // Pwdump format
             data[column++].append(fields.at(0));
             data[column++].append("");
@@ -91,10 +91,9 @@ bool FileTableModel::readFile(const QString &fileName)
 }
 void FileTableModel::fillHashTypes(const QStringList &listHashTypes)
 {
-    for(int i=0; i < listHashTypes.size() && i< rowCount() ; i++)
-    {
+    for (int i = 0; (i < listHashTypes.size()) && (i< rowCount()) ; i++) {
         // Possible hash types is column at 4
-        setData(index(i,4),listHashTypes[i]);
+        setData(index(i,4), listHashTypes[i]);
     }
 }
 

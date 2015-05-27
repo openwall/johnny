@@ -6,6 +6,8 @@
 
 #include <QFile>
 
+#define FIELD_SEPARATOR ':'
+
 // NOTE: Model could be resizable but it is easier to not
 //       implement it. Instead it is possible to load full
 //       file into memory and count rows. However it needs to
@@ -39,7 +41,7 @@ bool FileTableModel::readFile(const QStringList &fileNames)
         while (!file.atEnd()) {
             QString line = file.readLine();
             line.remove(QRegExp("\\r?\\n"));
-            QStringList fields = line.split(':');
+            QStringList fields = line.split(FIELD_SEPARATOR);
             int column = 0;
             // NOTE: When we want we change lists we use [] as of .at()
             //       gives us only const.
@@ -55,7 +57,7 @@ bool FileTableModel::readFile(const QStringList &fileNames)
                 data[column++].append(fields.at(2));
                 fields.removeAt(2);
                 fields.removeAt(0);
-                data[column++].append(fields.join(":"));
+                data[column++].append(fields.join(FIELD_SEPARATOR));
             } else {
                 // user:hash:other
                 data[column++].append(fields.at(0));
@@ -63,7 +65,7 @@ bool FileTableModel::readFile(const QStringList &fileNames)
                 data[column++].append(fields.at(1));
                 fields.removeAt(1);
                 fields.removeAt(0);
-                data[column++].append(fields.join(":"));
+                data[column++].append(fields.join(FIELD_SEPARATOR));
             }
             for (; column < columnCount(); column++)
                 data[column].append("");

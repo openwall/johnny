@@ -778,7 +778,10 @@ void MainWindow::showJohnStarted()
             }
             m_temp->close();
         } else {
-            // Error: could not open temp file.
+            QMessageBox::critical(
+                this,
+                tr("Johnny"),
+                tr("Johnny could not open temp file. Is disk full ?"));
         }
     }
 
@@ -851,14 +854,12 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     // If John crash, it'll be handled by showJohnError. However, if it does'nt
     // the exit code might be interesting. Qt only guarantee that the value is
     // valid if exitStatut == NormalExit
-    if(exitStatus == QProcess::NormalExit && exitCode != 0 && exitCode != 1)
+    if((exitStatus == QProcess::NormalExit) && (exitCode != 0))
     {
-        appendLog("John exited with code " + QString::number(exitCode) + '\n');
         QMessageBox::warning(
                     this,
                     tr("John exit"),
-                    tr("John the Ripper terminated unsuccessfully."
-                       " Check the Console Log for details."));
+                    tr("John the Ripper terminated unsuccessfully."));
     }
 
     appendLog("--------------------------------------------------------------------------------\n");

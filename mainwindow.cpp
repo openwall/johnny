@@ -325,7 +325,6 @@ void MainWindow::listWidgetTabsSelectionChanged()
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // Remove temporary file is exist
-
     if (m_temp != NULL) {
         delete m_temp;
         m_temp = NULL;
@@ -553,9 +552,10 @@ void MainWindow::startAttack()
         parameters << m_hashesFilesNames;
         startJohn(parameters);
     } else {
-        // Else we do not have connected file name so we ask user to save
-        // file.
-        // Unreachable until we get fileless tables.
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Johnny don't have access to this file. Did you forget to save it ?"));
     }
 }
 
@@ -992,17 +992,18 @@ void MainWindow::warnAboutDefaultPathToJohn()
 
 void MainWindow::fillSettingsWithDefaults()
 {
+    QStringList possiblePaths;
+    QString john;
     // Find john on system path, which is determined by PATH variable
     QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
     if(!johnSystemPath.isEmpty())
         possiblePaths << johnSystemPath;
 
     // Predefined defaults
-#if !defined Q_OS_WIN
-    possiblePaths << "/usr/sbin/john";
-#endif
     // John might be in in the same directory than johnny
-    possiblePaths << QDir::currentPath();
+    QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
+    if(!johnOtherPaths.isEmpty())
+        possiblePaths << johnOtherPaths;
 
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {

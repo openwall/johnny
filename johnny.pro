@@ -7,16 +7,18 @@ TARGET = johnny
 
 TEMPLATE = app
 
-SOURCES +=	main.cpp\
+SOURCES +=  main.cpp\
             mainwindow.cpp \
             filetablemodel.cpp \
             translator.cpp \
-            johnprocess.cpp
+            johnprocess.cpp \
+            textlabel.cpp
 
 HEADERS  += mainwindow.h \
             filetablemodel.h \
             translator.h \
-            johnprocess.h
+            johnprocess.h \
+            textlabel.h
 
 FORMS    += mainwindow.ui
 

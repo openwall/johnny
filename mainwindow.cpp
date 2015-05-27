@@ -20,6 +20,7 @@
 #include <QClipboard>
 #include <QThread>
 #include <QTextCursor>
+#include <QStandardPaths>
 
 #define PASSWORD_TAB 0
 MainWindow::MainWindow(QSettings &settings)
@@ -869,7 +870,6 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     checkNToggleActionsLastSession();
     // When John stops we need to stop timer and to look status last
     // time.
-    // Currently if john crashed we do not call john.
     m_showTimer.stop();
     callJohnShow();
 }
@@ -992,18 +992,17 @@ void MainWindow::warnAboutDefaultPathToJohn()
 
 void MainWindow::fillSettingsWithDefaults()
 {
-    // Find john on PATH
-    QString john;
-    QStringList possiblePaths;
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    QString johnName = tr("john");
-    foreach (QString dir, env.value("PATH").split(":")) {
-        possiblePaths << QDir(dir).filePath(johnName);
-    }
+    // Find john on system path, which is determined by PATH variable
+    QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
+    if(!johnSystemPath.isEmpty())
+        possiblePaths << johnSystemPath;
+
     // Predefined defaults
 #if !defined Q_OS_WIN
     possiblePaths << "/usr/sbin/john";
 #endif
+    // John might be in in the same directory than johnny
+    possiblePaths << QDir::currentPath();
 
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {

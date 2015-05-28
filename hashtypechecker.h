@@ -36,7 +36,7 @@ class HashTypeChecker : public QObject
 public:
     HashTypeChecker();
     ~HashTypeChecker();
-    void start(QString &pathToJohn, QString &pathToPwdFile);
+    void start(QString &pathToJohn, QStringList &pathsToPwdFiles);
     void terminate(bool shouldProcessAvailableOutput = false);
 
 private slots:

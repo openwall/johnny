@@ -10,14 +10,14 @@ HashTypeChecker::~HashTypeChecker()
 {
     terminate();
 }
-void HashTypeChecker::start(QString &pathToJohn, QString &pathToPwdFile)
+void HashTypeChecker::start(QString &pathToJohn, QStringList &pathsToPwdFiles)
 {
     // We make sure last process is terminated correctly before
     // loading a new password file.
     terminate();
     m_johnOutput.clear();
-    m_johnOutput.append(pathToPwdFile + "\n");
-    m_john.start(pathToJohn + " --show=types " + pathToPwdFile);
+    m_johnOutput.append(pathsToPwdFiles.join(" ") + "\n");
+    m_john.start(pathToJohn + " --show=types " + pathsToPwdFiles.join(" "));
 }
 void HashTypeChecker::terminate(bool shouldProcessAvailableOutput)
 {

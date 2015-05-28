@@ -9,7 +9,6 @@
 
 class Translator
 {
-
 public:
     static Translator& getInstance();
     void translateApplication(QApplication* app,QString language);

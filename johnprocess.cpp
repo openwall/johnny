@@ -7,13 +7,10 @@
 
 JohnProcess::JohnProcess()
 {
-
 }
 
 JohnProcess::~JohnProcess()
 {
-
-
 }
 
 void JohnProcess::setupChildProcess()

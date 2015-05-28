@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.
- * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * See LICENSE for details.
  */
 
 #ifndef MAINWINDOW_H
@@ -34,102 +35,98 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QSettings& settings);
-    void closeEvent(QCloseEvent *event);
     ~MainWindow();
-    void appendLog(const QString& text);
 
 private slots:
-    /* void on_pushButton_clicked(); */
-    void on_actionStart_Attack_triggered();
-    void on_actionResume_Attack_triggered();
-    void on_actionPause_Attack_triggered();
-    void on_actionCopyToClipboard_triggered();
-    void on_actionOpen_Password_triggered();
-    void on_actionOpen_Last_Session_triggered();
-    /* void on_pushButton_JohnStatus_clicked(); */
-    void on_listWidgetTabs_itemSelectionChanged();
-    void on_pushButton_WordlistFileBrowse_clicked();
-    void on_pushButton_FillSettingsWithDefaults_clicked();
-    void on_pushButton_BrowsePathToJohn_clicked();
-    void on_pushButton_ApplySettings_clicked();
-    void on_pushButton_ApplySaveSettings_clicked();
-    void on_pushButton_ResetSettings_clicked();
-    void on_comboBox_PathToJohn_editTextChanged();
-    void on_spinBox_TimeIntervalPickCracked_valueChanged(int value);
-    void on_checkBox_AutoApplySettings_stateChanged();
-    void on_pushButton_StatisticsUpdateStatus_clicked();
-    void on_comboBox_LanguageSelection_currentIndexChanged(int index);
+    // UI actions
+    void startAttack();
+    void resumeAttack();
+    void pauseAttack();
+    void actionCopyToClipboardTriggered();
+    void openPasswordFile();
+    void openLastSession();
+    void listWidgetTabsSelectionChanged();
+    void buttonWordlistFileBrowseClicked();
+    void buttonFillSettingsWithDefaultsClicked();
+    void buttonBrowsePathToJohnClicked();
+    void checkBoxAutoApplySettingsStateChanged();
+    void updateStatistics();
+    void settingsChangedByUser();
 
+    // JtR backend
     void updateJohnOutput();
-    void showJohnFinished();
+    void showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
-
     void startJohn(QStringList params);
-
     void callJohnShow();
     void readJohnShow();
-
-    void fillSettingsWithDefaults();
-    void warnAboutDefaultPathToJohn();
-
-    void checkNToggleActionsLastSession();
-
-    bool readPasswdFile(const QString &fileName);
-
-    bool checkSettings();
-
     void updateHashTypes(const QStringList &typesLists,const QString &pathToPwdFile);
-
     // TO DO : In 1.5.3, connect this slot to the signal of CoreHandler when parsing is done
     void setAvailabilityOfFeatures(bool isJumbo);
-
     // TO DO : In 1.5.3, get rid of this slot in MainWindow and make something similar in the
     // new design
     void verifyJohnVersion();
 
+    // Settings related
+    void fillSettingsWithDefaults();
+    void restoreLastSavedSettings();
+    void applySettings();
+    void applyAndSaveSettings();
+    void warnAboutDefaultPathToJohn();
+    void verifySessionState();
+    bool readPasswdFiles(const QStringList &fileNames);
+    bool checkSettings();
+
+    // Helpers
+    void appendLog(const QString& text);
+    QStringList getAttackParameters();
+
+protected:
+    void closeEvent(QCloseEvent *event);
+    // For the OS X QProgressBar issue
+    // https://github.com/shinnok/johnny/issues/11
+    bool eventFilter(QObject *watched, QEvent *event);
+
 private:
-    Ui::MainWindow *m_ui;
+    bool                 m_terminate;
+    Ui::MainWindow      *m_ui;
     QAbstractTableModel *m_hashesTable;
-    // TODO: Probably the right place for this field is in table model.
-    //       But this needs to have abstract interface that supports
-    //       connection with files. Someone could suppose to drop
-    //       generated tables out but if we want to have tables
-    //       joining, editing and so on tables that is not connected
-    //       with files yet are necessary.
-    //       However now this is here.
-    QString m_hashesFileName;
-    QString m_session;
-    JohnProcess m_johnProcess;
-    // To catch cracked passwords we use timer and john --show.
-    QTimer m_showTimer;
-    JohnProcess m_showJohnProcess;
+
+    QString              m_appDataPath;
+
+    QStringList     m_hashesFilesNames;
+    QString         m_session;
+    JohnProcess     m_johnProcess;
+    // Date and time of the start of the sttack
+    QDateTime m_startDateTime;
+
+    // To read cracked passwords we use this timer and john --show.
+    QTimer      m_showTimer;
+    QProcess    m_showJohnProcess;
+
     // Format key to use with --show.
     // With this key current John was started.
-    QString m_format;
+    QString     m_format;
+    // Holder for temporary file for `john --show`
+    QTemporaryFile *m_temp;
+    // Map (hash table) for fast access after `john --show`
+    QMultiMap<QString, int> m_tableMap;
+
     // Current application settings
     // Modified settings are stored on the form, this settings
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
-    // TODO: Group settings into separate class with support for
-    //       saving and so on.
-    // Path to John's binary
-    QString m_pathToJohn;
+    QSettings&  m_settings;
+    QString     m_pathToJohn;
     // Interval between loading of cracked passwords
-    int m_timeIntervalPickCracked;
+    int         m_timeIntervalPickCracked;
     // Should we use modified settings right after modification? Or
     // should we wait user to click 'apply' button.
-    bool m_autoApplySettings;
-    // Stored settings
-    QSettings& m_settings;
-    // Date and time of the start of the sttack
-    QDateTime m_startDateTime;
-    // Map (hash table) for fast access after `john --show`
-    QMultiMap<QString, int> m_tableMap;
-    // Holder for temporary file for `john --show`
-    QTemporaryFile *m_temp;
+    bool        m_autoApplySettings;
+
     HashTypeChecker m_hashTypeChecker;
     //TODO: To be moved 1.5.3
     JohnProcess m_johnVersionChecker;

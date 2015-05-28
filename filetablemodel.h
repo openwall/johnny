@@ -29,7 +29,7 @@ public:
                         int role = Qt::DisplayRole) const;
 
 
-    bool readFile(const QString &fileName);
+    bool readFile(const QStringList &fileNames);
 
 private:
     QVector<QVector<QString> > m_data;

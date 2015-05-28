@@ -22,8 +22,6 @@ int main(int argc, char *argv[])
 #endif
     // We set application info up.
     // It is needed to be able to store settings easily.
-    // TODO: Could we use openwall.com/john as domain?
-    // TODO: Is that the right place for this?
     QCoreApplication::setOrganizationName("Openwall");
     QCoreApplication::setOrganizationDomain("openwall.com");
     QCoreApplication::setApplicationName("Johnny");

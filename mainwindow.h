@@ -35,31 +35,26 @@ public:
     explicit MainWindow(QSettings& settings);
     ~MainWindow();
     void appendLog(const QString& text);
+    QStringList getAttackParameters();
 
 private slots:
-    /* void on_pushButton_clicked(); */
-    void on_actionStart_Attack_triggered();
-    void on_actionResume_Attack_triggered();
-    void on_actionPause_Attack_triggered();
-    void on_actionCopyToClipboard_triggered();
-    void on_actionOpen_Password_triggered();
-    void on_actionOpen_Last_Session_triggered();
-    /* void on_pushButton_JohnStatus_clicked(); */
-    void on_listWidgetTabs_itemSelectionChanged();
-    void on_pushButton_WordlistFileBrowse_clicked();
-    void on_pushButton_FillSettingsWithDefaults_clicked();
-    void on_pushButton_BrowsePathToJohn_clicked();
-    void on_pushButton_ApplySettings_clicked();
-    void on_pushButton_ApplySaveSettings_clicked();
-    void on_pushButton_ResetSettings_clicked();
-    void on_comboBox_PathToJohn_editTextChanged();
-    void on_spinBox_TimeIntervalPickCracked_valueChanged(int value);
-    void on_checkBox_AutoApplySettings_stateChanged();
-    void on_pushButton_StatisticsUpdateStatus_clicked();
-    void on_comboBox_LanguageSelection_currentIndexChanged(int index);
+    void startAttack();
+    void resumeAttack();
+    void pauseAttack();
+    void actionCopyToClipboardTriggered();//
+    void openPasswordFile();
+    void openLastSession();
+    void listWidgetTabsSelectionChanged();//
+    void buttonWordlistFileBrowseClicked();//
+    void buttonFillSettingsWithDefaultsClicked();//
+    void buttonBrowsePathToJohnClicked();//
+
+    void checkBoxAutoApplySettingsStateChanged();//
+    void updateStatistics();
+    void settingsChangedByUser();
 
     void updateJohnOutput();
-    void showJohnFinished();
+    void showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
@@ -70,11 +65,14 @@ private slots:
     void readJohnShow();
 
     void fillSettingsWithDefaults();
+    void restoreLastSavedSettings();
+    void applySettings();
+    void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
 
     void checkNToggleActionsLastSession();
 
-    bool readPasswdFile(const QString &fileName);
+    bool readPasswdFiles(const QStringList &fileNames);
 
     bool checkSettings();
 
@@ -88,14 +86,8 @@ private:
     bool            m_terminate;
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;
-    // TODO: Probably the right place for this field is in table model.
-    //       But this needs to have abstract interface that supports
-    //       connection with files. Someone could suppose to drop
-    //       generated tables out but if we want to have tables
-    //       joining, editing and so on tables that is not connected
-    //       with files yet are necessary.
-    //       However now this is here.
-    QString m_hashesFileName;
+
+    QStringList m_hashesFilesNames;
     QString m_session;
     JohnProcess m_johnProcess;
     // To catch cracked passwords we use timer and john --show.
@@ -109,8 +101,7 @@ private:
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
-    // TODO: Group settings into separate class with support for
-    //       saving and so on.
+
     // Path to John's binary
     QString m_pathToJohn;
     // Interval between loading of cracked passwords

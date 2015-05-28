@@ -20,7 +20,9 @@
 #include <QClipboard>
 #include <QThread>
 #include <QTextCursor>
+#include <QStandardPaths>
 
+#define PASSWORD_TAB 0
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
       m_terminate(false),
@@ -68,17 +70,14 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
     */
 
-    // TODO: Could we make connections easier?
     // We connect John process' signals with our slots.
     // John was ended.
-    // TODO: It will good to show exit status and exit code to user.
     connect(&m_johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(showJohnFinished()));
+            this, SLOT(showJohnFinished(int, QProcess::ExitStatus)));
     // John was started.
     connect(&m_johnProcess, SIGNAL(started()),
             this, SLOT(showJohnStarted()));
     // John got problem.
-    // TODO: catch problems from `john --show`?
     connect(&m_johnProcess, SIGNAL(error(QProcess::ProcessError)),
             this, SLOT(showJohnError(QProcess::ProcessError)));
     // John wrote something.
@@ -96,12 +95,10 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We connect all widgets for option with radio buttons to keep
     // enabled only widgets of selected mode.
-    // TODO: Easier way? Maybe make connections in designer?
     // "Single crack" mode
     connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
             m_ui->checkBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
-    // TODO: Should not we keep comboBox disabled until checkbox would
-    //       not be checked? (in other places too)
+
     connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
             m_ui->comboBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
     // Wordlist mode
@@ -138,7 +135,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // To open respective tab on mode selection
     QButtonGroup *group = m_ui->radioButton_ExternalMode->group();
-    // TODO: Maybe cycle? Maybe put this into .ui?
+
     group->setId(m_ui->radioButton_DefaultBehaviour, 0);
     group->setId(m_ui->radioButton_SingleCrackMode, 1);
     group->setId(m_ui->radioButton_WordlistMode, 2);
@@ -147,31 +144,53 @@ MainWindow::MainWindow(QSettings &settings)
     connect(group, SIGNAL(buttonClicked(int)),
             m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
-//    TableModel *passmodel = new TableModel();
+    // Handling of buttons regarding settings
+    connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
+            this,SLOT(restoreLastSavedSettings()));
+    connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
+            this,SLOT(applyAndSaveSettings()));
+    // Settings changed by user
+    connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
+    connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
+    connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(settingsChangedByUser()));
+    connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
 
-//    ui->tableView_Passwords->setModel(passmodel);
+    // Action buttons
+    connect(m_ui->actionOpen_Last_Session,SIGNAL(triggered()),this,SLOT(openLastSession()));
+    connect(m_ui->actionOpen_Password,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
+    connect(m_ui->actionPause_Attack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
+    connect(m_ui->actionResume_Attack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
+    connect(m_ui->actionStart_Attack,SIGNAL(triggered()),this,SLOT(startAttack()));
+    connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
+    connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
+    connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
+    connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
+    connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
 
-//    for (int i = 0; i < TABLE_ROWS; i++) {
-//        passmodel->setData(passmodel->index(i, 0), QString("Rick%1").arg(i));
-//        passmodel->setData(passmodel->index(i, 1), QString("Never gonna give you up!"));
-//    }
-
+    connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
     // We create folder for us in home dir if it does not exist.
-    // TODO: Are this checks are enough?
-    // TODO: Claim on mkdir fails.
-    // TODO: Do not do it on start up. Choose other good time.
-    if (!QDir(QDir::home().filePath(".john")).exists()) {
-        QDir::home().mkdir(".john");
+    bool mkDirFailed = false;
+    if (!QDir(QDir::home().filePath("_john")).exists()) {
+        mkDirFailed |= !QDir::home().mkdir("_john");
     }
-    if (!QDir(QDir(QDir::home().filePath(".john")).filePath("johnny")).exists()) {
-        QDir(QDir::home().filePath(".john")).mkdir("johnny");
+    if (!QDir(QDir(QDir::home().filePath("_john")).filePath("johnny")).exists()) {
+        mkDirFailed |= !QDir(QDir::home().filePath("_john")).mkdir("johnny");
     }
+    if (mkDirFailed)
+    {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Johnny could not create directory in home. Johnny won't work."
+               "Check your permissions, disk space and restart Johnny."));
+    }
+
 
     // Session for johnny
     m_session = QDir(
         QDir(QDir::home().filePath(
-                 ".john")).filePath(
+                 "_john")).filePath(
                      "johnny")).filePath(
                          "default");
 
@@ -185,16 +204,10 @@ MainWindow::MainWindow(QSettings &settings)
     // strange: probably user would expect reset to be like default +
     // reset because storing of a part of settings is not normal
     // behaviour (only possible with upgrades).
-    // TODO: somewhat ugly.
-    // TODO: if there are no config or it is partial then claim. Do
-    //       not silently do something tricky.
-    // TODO: do not search john if it is in stored settings. It is
-    //       similar to other settings. It is at least start up speed up.
     fillSettingsWithDefaults();
 
     // We load old settings.
-    // TODO: bad name.
-    on_pushButton_ResetSettings_clicked();
+    restoreLastSavedSettings();
 
     // TODO: do this message on every invocation of john. Provide
     //       checkbox to not show this again.
@@ -209,6 +222,9 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
 
+    // Disable copy button since there is no hash_tables (UI friendly)
+    m_ui->actionCopyToClipboard->setEnabled(false);
+
     #if !OS_FORK
     //As of now, fork is only supported on Linux platform
         m_ui->widget_Fork->hide();
@@ -217,28 +233,36 @@ MainWindow::MainWindow(QSettings &settings)
 
 void MainWindow::checkNToggleActionsLastSession()
 {
-    m_ui->actionStart_Attack->setEnabled(m_hashesFileName != "");
+    m_ui->actionStart_Attack->setEnabled(! m_hashesFilesNames.isEmpty());
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
         m_ui->actionOpen_Last_Session->setEnabled(true);
 
-        // TODO: very similar to open last session code.
         QFile description(m_session + ".johnny");
         if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
             m_ui->actionResume_Attack->setEnabled(false);
             return;
         }
         QTextStream descriptionStream(&description);
-        // TODO: errors?
-        QString hashesFileName = descriptionStream.readLine();
+
+        QStringList hashesFileNames;
+        while(!descriptionStream.atEnd())
+        {
+            QString content =  descriptionStream.readLine();
+            if(content.startsWith("FILE="))
+            {
+                content.remove(0,5);
+                hashesFileNames.append(content);
+            }
+        }
         description.close();
 
         m_ui->actionResume_Attack->setEnabled(
-            hashesFileName == m_hashesFileName
-            && hashesFileName != "");
+            hashesFileNames == m_hashesFilesNames
+            && !hashesFileNames.isEmpty());
         m_ui->actionOpen_Last_Session->setEnabled(
-            hashesFileName != m_hashesFileName);
+            hashesFileNames != m_hashesFilesNames);
     } else {
         m_ui->actionOpen_Last_Session->setEnabled(false);
         m_ui->actionResume_Attack->setEnabled(false);
@@ -251,8 +275,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         int answer = QMessageBox::question(
             this,
             tr("Johnny"),
-            // TODO: More informative message.
-            tr("John still runs! John will be stopped if you proceed. Do you really want to quit?"),
+            tr("John still runs! John will be terminated if you proceed. Do you really want to quit?"),
             QMessageBox::Yes | QMessageBox::No);
         if (answer == QMessageBox::No) {
             event->ignore();
@@ -267,7 +290,6 @@ MainWindow::~MainWindow()
 {
     m_johnProcess.terminate();
     m_showJohnProcess.terminate();
-    // TODO: we wait 1 second.
     if (!m_johnProcess.waitForFinished(1000))
         m_johnProcess.kill();
     if (!m_showJohnProcess.waitForFinished(1000))
@@ -280,43 +302,32 @@ MainWindow::~MainWindow()
     m_temp = 0;
 }
 
-void MainWindow::on_pushButton_WordlistFileBrowse_clicked()
+void MainWindow::buttonWordlistFileBrowseClicked()
 {
     // We pop a dialog to choose a file to open.
-    // TODO: *.lst for file extension?
-    // TODO: Copy-pasting is evil! (open password file)
-    // TODO: What happens when John writes something while dialog
-    //       opened?
-    // TODO: Move dialog creation and setting up into window constructor.
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
-    // TODO: Dialog could allow user to select multiple files. May it
-    //       be good to support this ability? To concatenate selected file?
+    dialog.setNameFilter(tr("World list files (*.lst) ;; Dict files (*.dict);; Any files (*)"));
+
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        // TODO: File name does not appear in history (drop down list).
         m_ui->comboBox_WordlistFile->setEditText(fileName);
     }
 }
 
-void MainWindow::on_listWidgetTabs_itemSelectionChanged()
+void MainWindow::listWidgetTabsSelectionChanged()
 {
     m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
-    // TODO: We assume here that passwords tab is at 0.
-    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == 0);
+    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
 }
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
-    // TODO: Check argument.
-
     // Remove temporary file is exist
-    // TODO: should not I check pointers like ptr != NULL instead of just ptr?
-    // TODO: should not I assign NULL instead of 0?
-    if (m_temp) {
+    if (m_temp != NULL) {
         delete m_temp;
-        m_temp = 0;
+        m_temp = NULL;
     }
 
     // We delete existing model if any.
@@ -331,101 +342,101 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 
     // We build hash table for fast access.
     m_tableMap = QMultiMap<QString, int>();
-    for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-        m_tableMap.insert(
-            m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
-            i);
+
+    // In case a newTableModel == NULL parameter is passed
+    if(m_hashesTable != NULL){
+        for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+            m_tableMap.insert(
+                m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
+                i);
+        }
     }
 }
 
-// void MainWindow::on_pushButton_clicked()
-// {
-//     replaceTableModel(new TableModel(this));
-//     // We reset file name because this model is generated and does not
-//     // have connected file.
-//     m_hashesFileName = "";
-
-//     for (int i = 0; i < TABLE_ROWS; i++) {
-//         m_hashesTable->setData(m_hashesTable->index(i, 0), QString("Rick%1").arg(i));
-//         m_hashesTable->setData(m_hashesTable->index(i, 1), QString("6817f89c171a439b3d0418a18a236001"));
-//     }
-// }
-
-bool MainWindow::readPasswdFile(const QString &fileName)
+bool MainWindow::readPasswdFiles(const QStringList &fileNames)
 {
     FileTableModel *model = new FileTableModel(this);
-    if (model->readFile(fileName)) {
+    if (model->readFile(fileNames)) {
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
-        m_hashesFileName = fileName;
+        m_hashesFilesNames = fileNames;
         checkNToggleActionsLastSession();
+        m_ui->actionCopyToClipboard->setEnabled(true);
         return true;
     }
     QMessageBox::warning(
             this,
             tr("Johnny"),
-            // TODO: More informative message.
-            tr("Johnny could not read desired passwd file."));
+            tr("Johnny could not read desired passwd file(s)."));
     return false;
 }
 
-void MainWindow::on_actionOpen_Password_triggered()
+void MainWindow::openPasswordFile()
 {
     // When user asks to open password file we should read desired
     // file, parse it and present values in the table. Model and view
     // simplifies presentation. We just make and fill model and then
     // we set it to existing view.
-    // TODO: However there are variants: we could replace existing
-    //       model or append new values to existing model.
-    //       For now user could not choose what to do. We always
-    //       replace existing model.
 
-    // We pop a dialog to choose a file to open.
-    // TODO: What happens when John writes something while dialog
-    //       opened?
-    // TODO: Move dialog creation and setting up into window constructor.
     QFileDialog dialog;
-    dialog.setFileMode(QFileDialog::ExistingFile);
-    // TODO: Dialog could allow user to select multiple files. May it
-    //       be good to support this ability? There are variants: to
-    //       concatenate selected file or to unshadow them.
+    dialog.setFileMode(QFileDialog::ExistingFiles);
     if (dialog.exec()) {
-        QString fileName = dialog.selectedFiles()[0];
-        readPasswdFile(fileName);
+        QStringList fileNames = dialog.selectedFiles();
+        readPasswdFiles(fileNames);
     }
 }
 
-void MainWindow::on_actionOpen_Last_Session_triggered()
+void MainWindow::openLastSession()
 {
     QFile description(m_session + ".johnny");
     if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            // TODO: More informative message.
             tr("Johnny could not open file to read session description!"));
         return;
     }
     QTextStream descriptionStream(&description);
-    // TODO: errors?
-    // TODO: end of line? Should not we "chomp" it? See other places too.
-    QString fileName = descriptionStream.readLine();
-    QString format = descriptionStream.readLine();
+    QString format;
+    QStringList fileNames;
+    // Parse johnny session file
+    while(!descriptionStream.atEnd())
+    {
+        QString content =  descriptionStream.readLine();
+        if(content.startsWith("FILE="))
+        {
+            content.remove(0,5);
+            fileNames.append(content);
+        }
+        else if(content.startsWith("FORMAT="))
+        {
+            content.remove(0,7);
+            format = content;
+        }
+    }
+
     description.close();
-    if (readPasswdFile(fileName)) {
+    if (readPasswdFiles(fileNames)) {
         m_format = format;
     }
 }
 
-void MainWindow::on_actionCopyToClipboard_triggered()
+void MainWindow::actionCopyToClipboardTriggered()
 {
     if (!m_hashesTable)
         return;
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
-    // TODO: maybe copy everything if nothing is selected?
     if (indexes.count() == 0)
+    {
+        QMessageBox::critical(
+            this,
+            tr("Nothing to copy !"),
+            tr("Nothing is selected. Please select rows/columns in the password table to copy them "
+               "to the clibpboard."));
         return;
+    }
+
     QString out;
     if (indexes.count() == 1) {
         out = indexes.at(0).data().toString();
@@ -450,8 +461,6 @@ void MainWindow::on_actionCopyToClipboard_triggered()
     }
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->clear();
-    // TODO: we copy in two modes. I guess only one should be used.
-    //       Selection mode on linux and clipboard on windows?
     if (clipboard->supportsSelection())
         clipboard->setText(out, QClipboard::Selection);
     clipboard->setText(out);
@@ -488,21 +497,77 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-void MainWindow::on_actionStart_Attack_triggered()
+void MainWindow::startAttack()
 {
     if (!checkSettings())
         return;
 
+    QStringList parameters = getAttackParameters();
+
+    // Session for johnny
+    QString nameOfFile = m_session + ".rec";
+    
+    if (QFileInfo(nameOfFile).isReadable()) {
+        int button = QMessageBox::question(
+            this,
+            tr("Johnny"),
+            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
+            QMessageBox::Yes | QMessageBox::No);
+       if (button == QMessageBox::No)
+            return;
+        // Remove .rec file to avoid problem when john does not write it.
+        if(!QFile(nameOfFile).remove())
+        {
+            QMessageBox::warning(
+                this,
+                tr("Warning"),
+                tr("Unable to remove file ") + nameOfFile);
+        }
+    }
+
+    QFile description(m_session + ".johnny");
+    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Johnny could not open file to save session description!"));
+        return;
+    }
+    QTextStream descriptionStream(&description);
+
+    for(int i = 0; i < m_hashesFilesNames.size(); i++)
+    {
+        descriptionStream << "FILE=" << m_hashesFilesNames[i] <<endl;
+    }
+    descriptionStream << "FORMAT=" << m_format << endl;
+    description.close();
+
+    parameters << QString("--session=%1").arg(m_session);
+
+    // We check that we have file name.
+    if (!m_hashesFilesNames.isEmpty()) {
+        // If file name is not empty then we have file, pass it to
+        // John.
+        // We add file name onto parameters list.
+        parameters << m_hashesFilesNames;
+        startJohn(parameters);
+    } else {
+        QMessageBox::critical(
+            this,
+            tr("Johnny"),
+            tr("Johnny don't have access to this file. Did you forget to save it ?"));
+    }
+}
+
+/* This function doesn't return the parameters of the current john process,
+ * it returns the selected parameters in Johnny (UI-side) */
+QStringList MainWindow::getAttackParameters()
+{
     QStringList parameters;
     // We prepare parameters list from options section.
-    // TODO: Make it as separate method. It also will be needed to
-    //       preview command line that not done now.
+
     // General options
     // Format
-    // TODO: If format is with checkbox then 'auto detect' does
-    //       not exist and format is handled as other options.
-    //       It could give an ability to unify all options and keep
-    //       them not as code.
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
         // We have one list for formats and subformats. Subformats
         // contain short description after it.
@@ -518,12 +583,8 @@ void MainWindow::on_actionStart_Attack_triggered()
         //       $ john -format:md5_gen(0)
         //       instead. See
         //       http://www.openwall.com/lists/john-users/2011/08/17/2
-        // TODO: What is better format to use for keys: -key: or
-        //       --key= or something else?
         // We remember format key to be used with '-show' to take
         // progress.
-        // TODO: Instead of remembering of keys we could lock options.
-        //       What is better?
         m_format = "--format=" + m_ui->comboBox_Format->currentText();
         // Now we have '--format=format' or '--format=format(N)description'.
         // So we truncate string to ')' if brace is in string.
@@ -550,10 +611,6 @@ void MainWindow::on_actionStart_Attack_triggered()
         // "Single crack" mode
         parameters << "--single";
         // External mode, filter
-        // TODO: It is applicable for 3 formats. Copy-pasting is evil!
-        // TODO: Warn if checkbox is checked and there is not text in
-        //       combobox. For other empty fields it would great to
-        //       warn too.
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
     } else if (m_ui->radioButton_WordlistMode->isChecked()) {
@@ -615,56 +672,8 @@ void MainWindow::on_actionStart_Attack_triggered()
     {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
     }
-    // Session for johnny
-    if (QFileInfo(m_session + ".rec").isReadable()) {
-        int button = QMessageBox::question(
-            this,
-            tr("Johnny"),
-            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
-            QMessageBox::Yes | QMessageBox::No);
-       if (button == QMessageBox::No)
-            return;
-        // Remove .rec file to avoid problem when john does not write it.
-        // TODO: Should not we say something if/when we could not remove file?
-        QFile(m_session + ".rec").remove();
-    }
 
-    // TODO: Saving so two instances of johnny overwrite description
-    //       but not .rec so they become not synchronized.
-    QFile description(m_session + ".johnny");
-    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            // TODO: More informative message.
-            tr("Johnny could not open file to save session description!"));
-        return;
-    }
-    QTextStream descriptionStream(&description);
-    // TODO: john stores file name so itself. It could be changed
-    //       later though.
-    // TODO: ensure to convert file name into absolute path.
-    descriptionStream << m_hashesFileName << endl;
-    descriptionStream << m_format << endl;
-    description.close();
-
-    // TODO: Easier way is to cd to ~/.john/johnny but it needs
-    //       checks. In any case without that dir it will not work.
-    parameters << QString("--session=%1").arg(m_session);
-
-    // We check that we have file name.
-    if (m_hashesFileName != "") {
-        // If file name is not empty then we have file, pass it to
-        // John.
-        // We add file name onto parameters list.
-        parameters << m_hashesFileName;
-        startJohn(parameters);
-    } else {
-        // Else we do not have connected file name so we ask user to save
-        // file.
-        // TODO: Unreachable until we get fileless tables.
-        // TODO: Do something here.
-    }
+    return parameters;
 }
 
 void MainWindow::startJohn(QStringList params)
@@ -718,7 +727,7 @@ void MainWindow::startJohn(QStringList params)
 }
 
 
-void MainWindow::on_actionResume_Attack_triggered()
+void MainWindow::resumeAttack()
 {
     if (!checkSettings())
         return;
@@ -731,14 +740,6 @@ void MainWindow::on_actionResume_Attack_triggered()
 
 void MainWindow::updateJohnOutput()
 {
-    // TODO: There was a session string passed here. Hence the
-    //       question what is right: one window could have multiple sessions or at one
-    //       time there could be only one session opened?
-    // NOTE: If there could be only one session in/per window then it
-    //       is possible to have session name here through window's field.
-    // TODO: Session name should be displayed.
-    //ui->plainTextEdit_JohnOut->appendPlainText("Session file: " + session + "\n");
-
     //read output and error buffers
     appendLog(m_johnProcess.readAllStandardOutput()
               + m_johnProcess.readAllStandardError());
@@ -749,29 +750,11 @@ void MainWindow::updateJohnOutput()
     //       --show work for us.
 }
 
-void MainWindow::on_actionPause_Attack_triggered()
+void MainWindow::pauseAttack()
 {
     // We ask John to exit.
-    // TODO: Is it ok to call it even if process is not running?
-    // TODO: Do not we need to call kill instead if John is too busy?
-    // TODO: Call kill on windows.
-    // NOTE: We could leave it for user: we count button presses and for
-    //       the first time we call terminate and for next times we
-    //       call kill.
     m_johnProcess.terminate();
 }
-
-// void MainWindow::on_pushButton_JohnStatus_clicked()
-// {
-//     // When we want to get John status we send enter to John. Then
-//     // John write something to its stdout. We do not need to read its
-//     // output here because when output is ready to be read a signal is
-//     // fired and we read John output with status as any other John's
-//     // output.
-//     // TODO: However it does not work as of we do not have terminal.
-//     // TODO: Why do we write to John even when it is not running?
-//     m_johnProcess.write("a\r\n");
-// }
 
 void MainWindow::showJohnStarted()
 {
@@ -786,41 +769,26 @@ void MainWindow::showJohnStarted()
     // with original hash during `john --show`.
     if (!m_temp) {
         m_temp = new QTemporaryFile();
-        // TODO: check return from new.
         if (m_temp->open()) {
             QTextStream temp(m_temp);
             for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-                // TODO: could it be done faster?
-                // TODO: is it ok to use "?" inserted for lonely hash as user name?
                 QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                 QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
-                // TODO: is it ok to use \n?
                 temp << user << ":" << hash << "::" << hash << '\n';
             }
             m_temp->close();
         } else {
-            // TODO: Error: could not open temp file.
+            QMessageBox::critical(
+                this,
+                tr("Johnny"),
+                tr("Johnny could not open temp file. Is disk full ?"));
         }
     }
 
-    // TODO: Are these signals called always in order
-    //       started-finished? Or is it unpredictable?
+
     // When John starts we enable stop button.
-    // TODO: Is it ok if user clicks between his previous click and
-    //       button disables?
-    // TODO: Should we disable/enable status button?
     m_ui->actionPause_Attack->setEnabled(true);
     // When John starts we start capturing passwords.
-    // TODO: Currently we set timer to 10 minutes. Make it
-    //       customizable.
-    // TODO: What about adoptive time intervals? Something like 1, 1,
-    //       2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 10, 10, 10, ...
-    // TODO: John updates pot in time listed in configuration file.
-    //       So it is needed to force John update file using sighup or
-    //       similar way or to change configuration file.
-    //       Also it is possible to implement terminal emulator to
-    //       take passwords from stdout without buffering.
-    //       It relates with picking status of John.
     // TODO: When user change respective setting time for current run
     //       is not changed. Probably user expects other.
     // TODO: Should we distinguish settings for current run and for
@@ -835,8 +803,6 @@ void MainWindow::showJohnStarted()
     //       to be comfortable for users.
     //       So current value corresponds to one day. However it is
     //       not suitable for platforms with int of two bytes.
-    // TODO: Do all platforms supported by Qt have 4 or bytes in int?
-    // TODO: Better maximum value for spin box? Conceptually other way?
     m_showTimer.start(m_timeIntervalPickCracked * 1000);
     // If we continue cracking than there could already be cracked
     // passwords so we check status.
@@ -880,13 +846,23 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
     QMessageBox::critical(
         this,
         tr("Johnny"),
-        // TODO: show path to john in error messages.
-        message);
+        message + " " + m_pathToJohn);
 }
 
-void MainWindow::showJohnFinished()
+void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    // TODO: Should we place a message about it into output buffer?
+    // If John crash, it'll be handled by showJohnError. However, if it does'nt
+    // the exit code might be interesting. Qt only guarantee that the value is
+    // valid if exitStatut == NormalExit
+    if((exitStatus == QProcess::NormalExit) && (exitCode != 0))
+    {
+        QMessageBox::warning(
+                    this,
+                    tr("John exit"),
+                    tr("John the Ripper terminated unsuccessfully."));
+    }
+
+    appendLog("--------------------------------------------------------------------------------\n");
     // When John finishes we enable start button and disable stop
     // button.
     m_ui->actionPause_Attack->setEnabled(false);
@@ -895,19 +871,21 @@ void MainWindow::showJohnFinished()
     checkNToggleActionsLastSession();
     // When John stops we need to stop timer and to look status last
     // time.
-    // TODO: currently if john crashed we do not call john.
     m_showTimer.stop();
     callJohnShow();
 }
 
 void MainWindow::callJohnShow()
 {
-    // TODO: if john returns immediately then we call it again before
-    //       it finishes. No good solution. Only workaround.
+    // If john returns immediately then we call it again before
+    // it finishes. No good solution. Only workaround.
     m_showJohnProcess.waitForFinished(1000);
+    // Give a chance to terminate cleanly
+    if (m_showJohnProcess.state() != QProcess::NotRunning)
+        m_showJohnProcess.terminate();
+    m_showJohnProcess.waitForFinished(500);
     if (m_showJohnProcess.state() != QProcess::NotRunning)
         m_showJohnProcess.kill();
-    m_showJohnProcess.waitForFinished(1000);
 
     QStringList parameters;
     // We add current format key if it is not empty.
@@ -919,21 +897,12 @@ void MainWindow::callJohnShow()
 
 void MainWindow::readJohnShow()
 {
-    // TODO: Read John's output while it runs. Do not wait before it
-    //       finishes. For 0.5M of password this code should not work.
-    //       Even if it works it seems to be ineffective for big
-    //       files.
     // We read all output.
     QByteArray output = m_showJohnProcess.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
     // We read output line by line and take user name and password.
     // Then we find a row with such user and insert password there.
-    // TODO: This is ineffective implementation. May QVector::index()
-    //       be god for search in model internals?
-    // TODO: We could have more than 2 fields. It seems to be useful
-    //       to look on them too.
-    // TODO: What if there are 2 or more rows with 1 user name?
     QString line;
     line = outputStream.readLine();
     // If john did not yet cracked anything then john does not emit
@@ -942,27 +911,15 @@ void MainWindow::readJohnShow()
     firstLine = line;
     // We read to the end or before empty line.
     while (!line.isNull() && line != "") {
-        // TODO: could not it be done faster?
         line.remove(QRegExp("\\r?\\n"));
         // We split lines to fields.
-        // TODO: What if password contains semicolon?
-        // TODO: What if password contains new line?
         int left = line.indexOf(":");
         int right = line.lastIndexOf("::");
-        // TODO: check we found left and right and left is not right.
         QString password = line.mid(left + 1, right - left - 1);
         QString hash = line.mid(right + 2);
         // We handle password.
         // If we found user then we put password in table.
-        // TODO: What if there two rows with one user name?
-        // TODO: What if we did not have 2 fields? Could
-        //       John's output be wrong?
-        // TODO: What if we do not find row? Note user. Take into
-        //       account that we remove value after use.
-        // TODO: We overwrite values each time.
         foreach (int row, m_tableMap.values(hash)) {
-            // TODO: claim if overwrite with other value. Be aware of
-            //       lm with its ???????HALF2.
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
                 password);
@@ -975,19 +932,15 @@ void MainWindow::readJohnShow()
     QString lastLine;
     if (!line.isNull()) {
         // We are on the last line.
-        // TODO: Really? We are after empty line.
         // We take counts of cracked passwords and of left hashes.
         // We read count of cracked password hashes.
-        // TODO: Could we read after end?
         lastLine = outputStream.readLine();
     } else {
         lastLine = firstLine;
     }
-    // TODO: Is following regexp always right?
     QRegExp crackedLeft("(\\d+)\\D+(\\d+)");
     int pos = crackedLeft.indexIn(lastLine);
     if (pos > -1) {
-        // TODO: check toInt success.
         int crackedCount = crackedLeft.cap(1).toInt();
         int leftCount = crackedLeft.cap(2).toInt();
         // We update progress bar.
@@ -999,16 +952,8 @@ void MainWindow::readJohnShow()
                 tr("No hashes loaded [%1], see output").arg(
                     m_format));
         } else {
-            // TODO: May it be better to show entire string from John?
-            //       Translation?
             m_ui->progressBar->setRange(0, crackedCount + leftCount);
             m_ui->progressBar->setValue(crackedCount);
-            // TODO: Is not such format too complex?
-            // TODO: May it be better to not change format during run?
-            // TODO: When attack starts progress bar goes left to
-            //       right and back before we set new format up.
-            // TODO: Format is shown as key. Enough good?
-            //       Brackets are shown always.
             m_ui->progressBar->setFormat(
                 tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(
                     crackedCount).arg(
@@ -1026,18 +971,15 @@ void MainWindow::readJohnShow()
 //       class, then you should add copying line to every method on
 //       the list:
 //       fillSettingsWithDefaults,
-//       on_pushButton_ApplySettings_clicked,
-//       on_pushButton_ApplySaveSettings_clicked,
-//       on_pushButton_ResetSettings_clicked.
+//       applySettings,
+//       applyAndSaveSettings,
+//       restoreLastSavedSettings,
 //       And of course you should put elements on the form.
-//       And for each setting there should method for auto
-//       application.
-// TODO: It seems to be ugly. Refactoring is needed.
+//       And you must connect the signal eventChanged of the widget to the slot
+//       settingsChangedByUser() to take care of autoApply setting
 
 void MainWindow::warnAboutDefaultPathToJohn()
 {
-    // TODO: Handle empty path specifically.
-    // TODO: On startup this message is shown before main window. Bad?
     QMessageBox::warning(
         this,
         tr("Johnny: default path to john"),
@@ -1051,27 +993,19 @@ void MainWindow::warnAboutDefaultPathToJohn()
 
 void MainWindow::fillSettingsWithDefaults()
 {
-    // Find john on PATH
-    QString john;
     QStringList possiblePaths;
-    // TODO: list of names for john.
-    // TODO: list of common names for john (i.e. john-gpu).
-    // TODO: hint for user that he could use just 'john' for the
-    //       setting but it has its specific pros and cons.
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    // TODO: Windows portability (semicolon instead of colon as delimiter).
-    // TODO: could there be escaped delimiter?
-    // TODO: Translated path to john? Any better solution for package
-    //       maintainers in distributions?
-    // TODO: it is bad implementation of search on PATH. Are not there
-    //       predefined better one?
-    QString johnName = tr("john");
-    foreach (QString dir, env.value("PATH").split(":")) {
-        possiblePaths << QDir(dir).filePath(johnName);
-    }
+    QString john;
+    // Find john on system path, which is determined by PATH variable
+    QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
+    if(!johnSystemPath.isEmpty())
+        possiblePaths << johnSystemPath;
+
     // Predefined defaults
-    // TODO: we should not check paths default for linux on windows. On cygwin?
-    possiblePaths << "/usr/sbin/john";
+    // John might be in in the same directory than johnny
+    QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
+    if(!johnOtherPaths.isEmpty())
+        possiblePaths << johnOtherPaths;
+
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);
@@ -1082,43 +1016,30 @@ void MainWindow::fillSettingsWithDefaults()
     }
 
     // We have hard coded default settings in here.
-    // TODO: Any better solution?
     // We just write all our values to elements on the form.
     m_ui->comboBox_PathToJohn->setEditText(john);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(10 * 60);
     m_ui->checkBox_AutoApplySettings->setChecked(false);
 }
 
-void MainWindow::on_pushButton_FillSettingsWithDefaults_clicked()
+void MainWindow::buttonFillSettingsWithDefaultsClicked()
 {
     fillSettingsWithDefaults();
     warnAboutDefaultPathToJohn();
 }
 
-void MainWindow::on_pushButton_BrowsePathToJohn_clicked()
+void MainWindow::buttonBrowsePathToJohnClicked()
 {
-    // We pop a dialog to choose a file to open.
-    // TODO: Copy-pasting is evil! (on_pushButton_WordlistFileBrowse_clicked)
-    // TODO: What happens when John writes something while dialog
-    //       opened?
-    // TODO: Move dialog creation and setting up into window constructor.
-    // TODO: Should we save this dialog on form to make it remember
-    //       last path?
-    // TODO: Yet another "browse" button... Do not you want to make
-    //       without copying of code?
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
-    // TODO: Dialog could allow user to select multiple files. May it
-    //       be good to support this ability? To concatenate selected file?
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        // TODO: File name does not appear in history (drop down list).
         m_ui->comboBox_PathToJohn->setEditText(fileName);
     }
 }
 
-void MainWindow::on_pushButton_ApplySettings_clicked()
+void MainWindow::applySettings()
 {
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1136,12 +1057,10 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
     }
 }
 
-void MainWindow::on_pushButton_ApplySaveSettings_clicked()
+void MainWindow::applyAndSaveSettings()
 {
     // Apply settings first.
-    // TODO: It is not a good design that we call button's handler
-    //       that is really do something useful.
-    on_pushButton_ApplySettings_clicked();
+    applySettings();
     // We store settings.
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
@@ -1149,7 +1068,7 @@ void MainWindow::on_pushButton_ApplySaveSettings_clicked()
     m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
-void MainWindow::on_pushButton_ResetSettings_clicked()
+void MainWindow::restoreLastSavedSettings()
 {
     // We copy settings from stored settings object to our current
     // settings points.
@@ -1170,63 +1089,38 @@ void MainWindow::on_pushButton_ResetSettings_clicked()
         ? m_ui->checkBox_AutoApplySettings->isChecked()
         : m_settings.value("AutoApplySettings").toBool());
     // We apply settings.
-    // TODO: Again... Button's handler do useful work but named
-    //       inappropriately because it is handler.
-    on_pushButton_ApplySettings_clicked();
+    applySettings();
 }
 
 // Handlers for settings auto application
 
-void MainWindow::on_comboBox_PathToJohn_editTextChanged()
+
+void MainWindow::settingsChangedByUser()
 {
-    // If auto application is turned on then we apply settings.
-    // TODO: Should we apply only one settings or all?
-    //       Currently we apply all settings (copy the same values).
-    //       Maybe it would be better to postpone settings application
-    //       to the moment when settings are really needed. Lazy
-    //       application.
     if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
 }
 
-void MainWindow::on_spinBox_TimeIntervalPickCracked_valueChanged(int value)
-{
-    Q_UNUSED(value);
-    // TODO: Copy-pasting is evil!
-    //       (on_comboBox_PathToJohn_valueChanged)
-    if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
-}
-
-void MainWindow::on_checkBox_AutoApplySettings_stateChanged()
+void MainWindow::checkBoxAutoApplySettingsStateChanged()
 {
     // First goal is to disable 'apply' button and to apply settings
     // when auto application is turned on.
-    // TODO: At program start we might need to do it too. Check!
     bool autoApply = m_ui->checkBox_AutoApplySettings->isChecked();
     m_ui->pushButton_ApplySettings->setEnabled(!autoApply);
     if (autoApply)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
     // Second goal is auto application for auto application setting itself.
     // NOTE: Deactivation of auto application will be auto applied.
     // NOTE: Auto application is a setting too. At least it would be
     //       good to remember its state between program runs.
-    // TODO: Copy-pasting is evil!
-    //       (on_comboBox_PathToJohn_valueChanged)
     if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
+        applySettings();
 }
 
-void MainWindow::on_comboBox_LanguageSelection_currentIndexChanged(int index)
-{
-    Q_UNUSED(index);
-    if (m_autoApplySettings)
-        on_pushButton_ApplySettings_clicked();
-}
 
 // Statistics page code
 
-void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
+void MainWindow::updateStatistics()
 {
     // Working time
     // We could not just subtract one time from another. But we could
@@ -1249,8 +1143,7 @@ void MainWindow::on_pushButton_StatisticsUpdateStatus_clicked()
         // We produce a string representing distance between time points.
         QString workingTime;
         QTextStream stream(&workingTime);
-        // TODO: Other format?
-        // TODO: String translation?
+
         stream << days << tr(":");
         // Hours, minutes and seconds have padding with zeroes to two
         // chars.

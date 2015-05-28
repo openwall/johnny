@@ -35,6 +35,7 @@ public:
     void fillHashTypes(const QStringList &listHashTypes);
 
 private:
+    enum Columns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
     QVector<QVector<QString> > m_data;
 
     QVector<QString> m_columns;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1013</width>
-    <height>1337</height>
+    <width>674</width>
+    <height>507</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -245,8 +245,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>887</width>
-             <height>1198</height>
+             <width>577</width>
+             <height>950</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1164,8 +1164,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>534</width>
-             <height>329</height>
+             <width>599</width>
+             <height>352</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1368,8 +1368,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1013</width>
-     <height>26</height>
+     <width>674</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

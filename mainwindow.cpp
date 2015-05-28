@@ -391,7 +391,6 @@ void MainWindow::on_actionOpen_Password_triggered()
         QString fileName = dialog.selectedFiles()[0];
         readPasswdFile(fileName);
         m_hashTypeChecker.start(m_pathToJohn, fileName);
-
     }
 }
 
@@ -674,12 +673,12 @@ void MainWindow::startJohn(QStringList params)
             QStringList varPair = varList[i].split("=", QString::SkipEmptyParts);
             if (varPair.size() == 2) { // we assume value of variable doesn't have = inside
                 env.insert(varPair[0].trimmed(), varPair[1].trimmed());
-            }
-            else {
+            } else {
                 QMessageBox::warning(
                         this,
                         tr("Environment variables"),
-                        tr("The format to set environment variable must be in the format : varName1=value, varName2=value etc.. "));
+                        tr("The format to set environment variable must be in the format : varName1="
+                           "value, varName2=value etc.. "));
             }
         }
     }

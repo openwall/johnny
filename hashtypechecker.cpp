@@ -19,7 +19,7 @@ void HashTypeChecker::start(QString &pathToJohn, QString &pathToPwdFile)
     m_johnOutput.append(pathToPwdFile + "\n");
     m_john.start(pathToJohn + " --show=types " + pathToPwdFile);
 }
-void HashTypeChecker::terminate(bool shouldProcessWorkToDate)
+void HashTypeChecker::terminate(bool shouldProcessAvailableOutput)
 {
     if (m_john.state() != QProcess::NotRunning) {
         m_john.terminate();
@@ -29,7 +29,7 @@ void HashTypeChecker::terminate(bool shouldProcessWorkToDate)
         m_john.kill();
 
     // Process what have been done so far from JohnOutput ..
-    if (shouldProcessWorkToDate) {
+    if (!m_johnOutput.isEmpty() && shouldProcessAvailableOutput) {
         startParsing();
     }
 }
@@ -90,8 +90,7 @@ void HashTypeChecker::parseJohnAnswer()
                     for (; currentIndex < fields.length(); currentIndex++) {
                         if (!fields[currentIndex].isEmpty()) {
                             format.canonicalHashes.append(fields[currentIndex]);
-                        }
-                        else {
+                        } else {
                             currentIndex++;
                             break;
                         }
@@ -107,5 +106,6 @@ void HashTypeChecker::parseJohnAnswer()
     }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
+    m_johnOutput.clear();
     emit updateHashTypes(parsedTypes, filePath);
 }

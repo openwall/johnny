@@ -40,8 +40,7 @@ int main(int argc, char *argv[])
     if (settingLanguage.isEmpty()) {
         QString systemLanguage =  QLocale::languageToString(QLocale().language());
         translator.translateApplication(&app, systemLanguage);
-    }
-    else {
+    } else {
         //Use the language specified in the settings
         translator.translateApplication(&app, settingLanguage);
     }

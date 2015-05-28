@@ -91,7 +91,7 @@ bool FileTableModel::readFile(const QString &fileName)
 }
 void FileTableModel::fillHashTypes(const QStringList &listHashTypes)
 {
-    for (int i = 0; (i < listHashTypes.size()) && (i< rowCount()) ; i++) {
+    for (int i = 0; (i < listHashTypes.size()) && (i< rowCount()); i++) {
         // Possible hash types is column at 4
         setData(index(i,4), listHashTypes[i]);
     }

@@ -39,7 +39,7 @@ public:
     HashTypeChecker();
     ~HashTypeChecker();
     void start(QString &pathToJohn, QString &pathToPwdFile);
-    void terminate(bool shouldProcessWorkToDate = false);
+    void terminate(bool shouldProcessAvailableOutput = false);
 
 private slots:
     void startParsing();

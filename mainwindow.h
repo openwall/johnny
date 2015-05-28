@@ -41,15 +41,15 @@ private slots:
     void startAttack();
     void resumeAttack();
     void pauseAttack();
-    void actionCopyToClipboardTriggered();//
+    void actionCopyToClipboardTriggered();
     void openPasswordFile();
     void openLastSession();
-    void listWidgetTabsSelectionChanged();//
-    void buttonWordlistFileBrowseClicked();//
-    void buttonFillSettingsWithDefaultsClicked();//
-    void buttonBrowsePathToJohnClicked();//
+    void listWidgetTabsSelectionChanged();
+    void buttonWordlistFileBrowseClicked();
+    void buttonFillSettingsWithDefaultsClicked();
+    void buttonBrowsePathToJohnClicked();
 
-    void checkBoxAutoApplySettingsStateChanged();//
+    void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
     void settingsChangedByUser();
 
@@ -69,11 +69,8 @@ private slots:
     void applySettings();
     void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
-
-    void checkNToggleActionsLastSession();
-
+    void verifySessionState();
     bool readPasswdFiles(const QStringList &fileNames);
-
     bool checkSettings();
 
 protected:
@@ -83,8 +80,8 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    bool            m_terminate;
-    Ui::MainWindow *m_ui;
+    bool                 m_terminate;
+    Ui::MainWindow      *m_ui;
     QAbstractTableModel *m_hashesTable;
 
     QStringList m_hashesFilesNames;

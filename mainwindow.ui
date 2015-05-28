@@ -211,7 +211,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1165,7 +1165,7 @@
              <x>0</x>
              <y>0</y>
              <width>599</width>
-             <height>352</height>
+             <height>382</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">

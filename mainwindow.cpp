@@ -24,6 +24,8 @@
 #include <QDebug>
 
 #define PASSWORD_TAB 0
+#define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
+
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
       m_terminate(false),
@@ -195,7 +197,7 @@ MainWindow::MainWindow(QSettings &settings)
                      "johnny")).filePath(
                          "default");
 
-    checkNToggleActionsLastSession();
+    verifySessionState();
 
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
@@ -232,7 +234,7 @@ MainWindow::MainWindow(QSettings &settings)
     #endif
 }
 
-void MainWindow::checkNToggleActionsLastSession()
+void MainWindow::verifySessionState()
 {
     m_ui->actionStart_Attack->setEnabled(! m_hashesFilesNames.isEmpty());
 
@@ -362,7 +364,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         replaceTableModel(model);
         // After new model remembered we remember its file name.
         m_hashesFilesNames = fileNames;
-        checkNToggleActionsLastSession();
+        verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
         return true;
     }
@@ -507,7 +509,7 @@ void MainWindow::startAttack()
 
     // Session for johnny
     QString nameOfFile = m_session + ".rec";
-    
+
     if (QFileInfo(nameOfFile).isReadable()) {
         int button = QMessageBox::question(
             this,
@@ -684,7 +686,7 @@ void MainWindow::startJohn(QStringList params)
     // start it.
 
     // to visually separate sessions in the console output (make it clearer for the user)
-    QString cmd = "--------------------------------------------------------------------------------\n" +
+    QString cmd = CONSOLE_LOG_SEPARATOR +
             QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + '\n';
 
     appendLog(cmd);
@@ -816,12 +818,12 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
     switch (error) {
     case QProcess::FailedToStart:
         message = tr("John failed to start."
-                     "Check your Path to John setting."
-                     "Check permissions on respective file.");
+                     "Check your path to John."
+                     "Check permissions on the executable.");
         break;
 
     case QProcess::Crashed:
-        message = tr("John crashed.");
+        message = tr("John crashed. Verify Console Log for details.");
         break;
 
     case QProcess::Timedout:
@@ -837,17 +839,11 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
         break;
 
     case QProcess::UnknownError:
-        message = tr("An unknown problem happened to John.");
+        message = tr("An unknown problem happened to John. Verify Console Log for any details.");
         break;
-
-    default:
-        message = tr("There is a problem. Johnny could not handle it.");
     }
 
-    QMessageBox::critical(
-        this,
-        tr("Johnny"),
-        message + " " + m_pathToJohn);
+    QMessageBox::critical(this, tr("Johnny"), message + "(" + m_pathToJohn + ")");
 }
 
 void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -860,13 +856,13 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
         return;
     }
 
-    appendLog("--------------------------------------------------------------------------------\n");
+    appendLog(CONSOLE_LOG_SEPARATOR);
     // When John finishes we enable start button and disable stop
     // button.
     m_ui->actionPause_Attack->setEnabled(false);
     m_ui->actionStart_Attack->setEnabled(true);
     m_ui->actionOpen_Password->setEnabled(true);
-    checkNToggleActionsLastSession();
+    verifySessionState();
     // When John stops we need to stop timer and to look status last
     // time.
     m_showTimer.stop();

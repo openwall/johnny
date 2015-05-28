@@ -10,7 +10,7 @@ HashTypeChecker::~HashTypeChecker()
 {
     terminate();
 }
-void HashTypeChecker::start(QString &pathToJohn, QStringList &pathsToPwdFiles)
+void HashTypeChecker::start(const QString &pathToJohn, const QStringList &pathsToPwdFiles)
 {
     // We make sure last process is terminated correctly before
     // loading a new password file.

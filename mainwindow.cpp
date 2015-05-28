@@ -318,6 +318,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_hashesFilesNames = fileNames;
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
+        m_hashTypeChecker.start(m_pathToJohn, fileNames);
         return true;
     }
     QMessageBox::warning(
@@ -339,7 +340,6 @@ void MainWindow::openPasswordFile()
     if (dialog.exec()) {
         QStringList fileNames = dialog.selectedFiles();
         readPasswdFiles(fileNames);
-        m_hashTypeChecker.start(m_pathToJohn, fileNames);
     }
 }
 

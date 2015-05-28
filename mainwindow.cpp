@@ -21,6 +21,7 @@
 #include <QThread>
 #include <QTextCursor>
 #include <QStandardPaths>
+#include <QDebug>
 
 #define PASSWORD_TAB 0
 MainWindow::MainWindow(QSettings &settings)
@@ -851,15 +852,12 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 
 void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    // If John crash, it'll be handled by showJohnError. However, if it does'nt
-    // the exit code might be interesting. Qt only guarantee that the value is
-    // valid if exitStatut == NormalExit
-    if((exitStatus == QProcess::NormalExit) && (exitCode != 0))
+    Q_UNUSED(exitCode);
+
+    if(exitStatus == QProcess::CrashExit)
     {
-        QMessageBox::warning(
-                    this,
-                    tr("John exit"),
-                    tr("John the Ripper terminated unsuccessfully."));
+        qDebug() << "JtR seems to have crashed.";
+        return;
     }
 
     appendLog("--------------------------------------------------------------------------------\n");

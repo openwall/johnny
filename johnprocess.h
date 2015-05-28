@@ -5,9 +5,9 @@
 #include <QProcess>
 
 #if defined Q_OS_UNIX
-#define OS_FORK				1
+#define OS_FORK 1
 #else
-#define OS_FORK				0
+#define OS_FORK 0
 #endif
 
 #if OS_FORK

@@ -31,8 +31,8 @@ MainWindow::MainWindow(QSettings &settings)
       m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
-      m_settings(settings),
-      m_temp(NULL)
+      m_temp(NULL),
+      m_settings(settings)
 {
     // UI initializations
     m_ui->setupUi(this);
@@ -42,8 +42,9 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->progressBar->installEventFilter(this);
 
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
-    // We select first item/tab on list.
-    m_ui->listWidgetTabs->setCurrentRow(0);
+
+    // We select the PASSWORDS tab
+    m_ui->listWidgetTabs->setCurrentRow(PASSWORD_TAB);
     foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("*", Qt::MatchWildcard))
         item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
 
@@ -172,30 +173,17 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
-    // We create folder for us in home dir if it does not exist.
-    bool mkDirFailed = false;
-    if (!QDir(QDir::home().filePath("_john")).exists()) {
-        mkDirFailed |= !QDir::home().mkdir("_john");
-    }
-    if (!QDir(QDir(QDir::home().filePath("_john")).filePath("johnny")).exists()) {
-        mkDirFailed |= !QDir(QDir::home().filePath("_john")).mkdir("johnny");
-    }
-    if (mkDirFailed)
+    // We create the app data directory for us in $HOME if it does not exist.
+    m_appDataPath = QDir::home().filePath(QLatin1String("_john") + QDir::separator() + "johnny" + QDir::separator());
+    if (!QDir::home().mkpath(m_appDataPath))
     {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            tr("Johnny could not create directory in home. Johnny won't work."
-               "Check your permissions, disk space and restart Johnny."));
+        QMessageBox::critical( this, tr("Johnny"),
+            tr("Could not create settings directory(%1). Check your permissions, disk space and restart Johnny.").arg(m_appDataPath));
+        qApp->quit();
     }
-
 
     // Session for johnny
-    m_session = QDir(
-        QDir(QDir::home().filePath(
-                 "_john")).filePath(
-                     "johnny")).filePath(
-                         "default");
+    m_session = QDir(m_appDataPath).filePath("default");
 
     verifySessionState();
 
@@ -371,7 +359,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
     QMessageBox::warning(
             this,
             tr("Johnny"),
-            tr("Johnny could not read desired passwd file(s)."));
+            tr("Could not read desired password file(s)."));
     return false;
 }
 
@@ -434,9 +422,9 @@ void MainWindow::actionCopyToClipboardTriggered()
     {
         QMessageBox::critical(
             this,
-            tr("Nothing to copy !"),
+            tr("Johnny"),
             tr("Nothing is selected. Please select rows/columns in the password table to copy them "
-               "to the clibpboard."));
+               "to the clipboard."));
         return;
     }
 
@@ -533,7 +521,7 @@ void MainWindow::startAttack()
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            tr("Johnny could not open file to save session description!"));
+            tr("Johnny could not open file to save session description."));
         return;
     }
     QTextStream descriptionStream(&description);
@@ -549,16 +537,14 @@ void MainWindow::startAttack()
 
     // We check that we have file name.
     if (!m_hashesFilesNames.isEmpty()) {
-        // If file name is not empty then we have file, pass it to
-        // John.
-        // We add file name onto parameters list.
+        // If file name is not empty then we have file, pass it to John.
         parameters << m_hashesFilesNames;
         startJohn(parameters);
     } else {
-        QMessageBox::critical(
+        QMessageBox::warning(
             this,
             tr("Johnny"),
-            tr("Johnny don't have access to this file. Did you forget to save it ?"));
+            tr("No password files specified."));
     }
 }
 
@@ -784,7 +770,7 @@ void MainWindow::showJohnStarted()
             QMessageBox::critical(
                 this,
                 tr("Johnny"),
-                tr("Johnny could not open temp file. Is disk full ?"));
+                tr("Can't open a temporary file. Your disk might be full."));
         }
     }
 

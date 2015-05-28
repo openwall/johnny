@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.
- * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * See LICENSE for details.
  */
 
 #ifndef MAINWINDOW_H
@@ -34,10 +35,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QSettings& settings);
     ~MainWindow();
-    void appendLog(const QString& text);
-    QStringList getAttackParameters();
 
 private slots:
+    // UI actions
     void startAttack();
     void resumeAttack();
     void pauseAttack();
@@ -48,22 +48,21 @@ private slots:
     void buttonWordlistFileBrowseClicked();
     void buttonFillSettingsWithDefaultsClicked();
     void buttonBrowsePathToJohnClicked();
-
     void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
     void settingsChangedByUser();
 
+    // JtR backend
     void updateJohnOutput();
     void showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
-
     void startJohn(QStringList params);
-
     void callJohnShow();
     void readJohnShow();
 
+    // Settings related
     void fillSettingsWithDefaults();
     void restoreLastSavedSettings();
     void applySettings();
@@ -72,6 +71,10 @@ private slots:
     void verifySessionState();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
+
+    // Helpers
+    void appendLog(const QString& text);
+    QStringList getAttackParameters();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -83,37 +86,38 @@ private:
     bool                 m_terminate;
     Ui::MainWindow      *m_ui;
     QAbstractTableModel *m_hashesTable;
+    QString              m_appDataPath;
 
-    QStringList m_hashesFilesNames;
-    QString m_session;
-    JohnProcess m_johnProcess;
-    // To catch cracked passwords we use timer and john --show.
-    QTimer m_showTimer;
-    QProcess m_showJohnProcess;
+    QStringList     m_hashesFilesNames;
+    QString         m_session;
+    JohnProcess     m_johnProcess;
+    // Date and time of the start of the sttack
+    QDateTime m_startDateTime;
+
+    // To read cracked passwords we use this timer and john --show.
+    QTimer      m_showTimer;
+    QProcess    m_showJohnProcess;
     // Format key to use with --show.
     // With this key current John was started.
-    QString m_format;
+    QString     m_format;
+    // Holder for temporary file for `john --show`
+    QTemporaryFile *m_temp;
+    // Map (hash table) for fast access after `john --show`
+    QMultiMap<QString, int> m_tableMap;
+
     // Current application settings
     // Modified settings are stored on the form, this settings
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
 
-    // Path to John's binary
-    QString m_pathToJohn;
+    QSettings&  m_settings;
+    QString     m_pathToJohn;
     // Interval between loading of cracked passwords
-    int m_timeIntervalPickCracked;
+    int         m_timeIntervalPickCracked;
     // Should we use modified settings right after modification? Or
     // should we wait user to click 'apply' button.
-    bool m_autoApplySettings;
-    // Stored settings
-    QSettings& m_settings;
-    // Date and time of the start of the sttack
-    QDateTime m_startDateTime;
-    // Map (hash table) for fast access after `john --show`
-    QMultiMap<QString, int> m_tableMap;
-    // Holder for temporary file for `john --show`
-    QTemporaryFile *m_temp;
+    bool        m_autoApplySettings;
 };
 
 #endif // MAINWINDOW_H

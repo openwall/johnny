@@ -1,13 +1,12 @@
 /*
- * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.
- * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
+ * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * See LICENSE for details.
  */
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "translator.h"
-
-// We include all table models we use.
 #include "filetablemodel.h"
 
 #include <QToolButton>
@@ -44,9 +43,12 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // We select the PASSWORDS tab
+    m_ui->contentStackedWidget->setCurrentIndex(PASSWORD_TAB);
     m_ui->listWidgetTabs->setCurrentRow(PASSWORD_TAB);
     foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("*", Qt::MatchWildcard))
         item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
+
+    m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
 
     /*
     // We add a button to the toolbar but this button is not simple. It has
@@ -96,57 +98,6 @@ MainWindow::MainWindow(QSettings &settings)
     // We connect 'john --show' process with our object.
     connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
-
-    // We connect all widgets for option with radio buttons to keep
-    // enabled only widgets of selected mode.
-    // "Single crack" mode
-    connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
-            m_ui->checkBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
-
-    connect(m_ui->radioButton_SingleCrackMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_SingleCrackModeExternalName, SLOT(setEnabled(bool)));
-    // Wordlist mode
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->label_WordlistFile, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_WordlistFile, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->pushButton_WordlistFileBrowse, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->checkBox_WordlistModeRules, SLOT(setEnabled(bool)));
-    // connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-    //         m_ui->checkBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
-    // connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-    //         m_ui->comboBox_WordlistModeRulesName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->checkBox_WordlistModeExternalName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_WordlistMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_WordlistModeExternalName, SLOT(setEnabled(bool)));
-    // Incremental mode
-    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
-            m_ui->checkBox_IncrementalModeName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_IncrementalModeName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
-            m_ui->checkBox_IncrementalModeExternalName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_IncrementalMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_IncrementalModeExternalName, SLOT(setEnabled(bool)));
-    // External mode
-    connect(m_ui->radioButton_ExternalMode, SIGNAL(toggled(bool)),
-            m_ui->label_ExternalModeName, SLOT(setEnabled(bool)));
-    connect(m_ui->radioButton_ExternalMode, SIGNAL(toggled(bool)),
-            m_ui->comboBox_ExternalModeName, SLOT(setEnabled(bool)));
-
-    // To open respective tab on mode selection
-    QButtonGroup *group = m_ui->radioButton_ExternalMode->group();
-
-    group->setId(m_ui->radioButton_DefaultBehaviour, 0);
-    group->setId(m_ui->radioButton_SingleCrackMode, 1);
-    group->setId(m_ui->radioButton_WordlistMode, 2);
-    group->setId(m_ui->radioButton_IncrementalMode, 3);
-    group->setId(m_ui->radioButton_ExternalMode, 4);
-    connect(group, SIGNAL(buttonClicked(int)),
-            m_ui->tabWidget, SLOT(setCurrentIndex(int)));
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
@@ -309,7 +260,7 @@ void MainWindow::buttonWordlistFileBrowseClicked()
 
 void MainWindow::listWidgetTabsSelectionChanged()
 {
-    m_ui->stackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
+    m_ui->contentStackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
     m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
 }
 
@@ -420,11 +371,10 @@ void MainWindow::actionCopyToClipboardTriggered()
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     if (indexes.count() == 0)
     {
-        QMessageBox::critical(
+        QMessageBox::warning(
             this,
             tr("Johnny"),
-            tr("Nothing is selected. Please select rows/columns in the password table to copy them "
-               "to the clipboard."));
+            tr("Nothing selected. Select rows/columns in the Passwords table to copy."));
         return;
     }
 
@@ -593,16 +543,16 @@ QStringList MainWindow::getAttackParameters()
         m_format = "";
     }
     // Modes
-    if (m_ui->radioButton_DefaultBehaviour->isChecked()) {
+    if (m_ui->defaultModeTab->isVisible()) {
         // Default behaviour - no modes
         // There are no options here.
-    } else if (m_ui->radioButton_SingleCrackMode->isChecked()) {
+    } else if (m_ui->singleModeTab->isVisible()) {
         // "Single crack" mode
         parameters << "--single";
         // External mode, filter
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
-    } else if (m_ui->radioButton_WordlistMode->isChecked()) {
+    } else if (m_ui->wordlistModeTab->isVisible()) {
         // Wordlist mode
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
         // Rules
@@ -628,7 +578,7 @@ QStringList MainWindow::getAttackParameters()
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
-    } else if (m_ui->radioButton_IncrementalMode->isChecked()) {
+    } else if (m_ui->incrementalModeTab->isVisible()) {
         // "Incremental" mode
         // It could be with or without name.
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
@@ -639,9 +589,9 @@ QStringList MainWindow::getAttackParameters()
             parameters << "--incremental";
         }
         // External mode, filter
-        if (m_ui->checkBox_IncrementalModeExternalName->isChecked())
+        if (m_ui->incrementalModeTab->isVisible())
             parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
-    } else if (m_ui->radioButton_ExternalMode->isChecked()) {
+    } else if (m_ui->externalModeTab->isVisible()) {
         // External mode
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
     }

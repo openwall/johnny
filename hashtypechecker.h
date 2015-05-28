@@ -7,8 +7,6 @@
 #include <QTextStream>
 #include <QtConcurrent/QtConcurrent>
 
-#include <map>
-
 struct HashFormat
 {
     // For each valid hash
@@ -53,7 +51,5 @@ private:
 signals:
     void updateHashTypes(const QStringList &typesLists, const QString &pathToPwdFile);
 };
-
-
 
 #endif // HASHTYPECHECKER_H

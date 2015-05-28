@@ -30,6 +30,10 @@ MainWindow::MainWindow(QSettings &settings)
 {
     // UI initializations
     m_ui->setupUi(this);
+    // Until we get a result from john, we disable jumbo features
+    m_isJohnJumbo = false;
+    setAvailabilityOfFeatures(false);
+    connect(&m_johnVersionChecker,SIGNAL(finished(int)),this,SLOT(verifyJohnVersion()));
 
     m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
     // We select first item/tab on list.
@@ -211,6 +215,7 @@ MainWindow::MainWindow(QSettings &settings)
     //As of now, fork is only supported on Linux platform
         m_ui->widget_Fork->hide();
     #endif
+
 }
 
 void MainWindow::checkNToggleActionsLastSession()
@@ -264,11 +269,14 @@ MainWindow::~MainWindow()
 {
     m_johnProcess.terminate();
     m_showJohnProcess.terminate();
+    m_johnVersionChecker.terminate();
     // TODO: we wait 1 second.
     if (!m_johnProcess.waitForFinished(1000))
         m_johnProcess.kill();
     if (!m_showJohnProcess.waitForFinished(1000))
         m_showJohnProcess.kill();
+    if (!m_johnVersionChecker.waitForFinished(1000))
+        m_johnVersionChecker.kill();
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;
@@ -325,6 +333,8 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     m_hashesTable = newTableModel;
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
+    // Hide formats column if not jumbo
+    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJohnJumbo);
 
     // We build hash table for fast access.
     m_tableMap = QMultiMap<QString, int>();
@@ -1095,7 +1105,11 @@ void MainWindow::on_pushButton_ApplySettings_clicked()
 {
     // We copy settings from elements on the form to the settings
     // object with current settings.
-    m_pathToJohn = m_ui->comboBox_PathToJohn->currentText();
+    QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
+    if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
+        m_johnVersionChecker.start(newJohnPath);
+    }
+    m_pathToJohn = newJohnPath;
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
@@ -1266,4 +1280,23 @@ void MainWindow::updateHashTypes(const QStringList &typesLists, const QString &p
         model->fillHashTypes(typesLists);
         m_ui->tableView_Hashes->setModel(model);
     }
+}
+
+// Enable/Disable all features that are jumbo related in this method
+void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
+{
+    if ((m_isJohnJumbo == false) && (isJumbo == true) && !m_hashesFileName.isEmpty()) {
+        m_hashTypeChecker.start(m_pathToJohn,m_hashesFileName);
+    }
+    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
+    m_isJohnJumbo = isJumbo;
+}
+
+void MainWindow::verifyJohnVersion()
+{
+    // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
+    // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
+    QString output = m_johnVersionChecker.readAllStandardOutput();
+    bool isJumbo = output.contains("jumbo",Qt::CaseInsensitive);
+    setAvailabilityOfFeatures(isJumbo);
 }

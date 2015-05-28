@@ -34,8 +34,9 @@ public:
     bool readFile(const QString &fileName);
     void fillHashTypes(const QStringList &listHashTypes);
 
+    enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
+
 private:
-    enum Columns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
     QVector<QVector<QString> > m_data;
 
     QVector<QString> m_columns;

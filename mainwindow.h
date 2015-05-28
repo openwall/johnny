@@ -82,6 +82,13 @@ private slots:
 
     void updateHashTypes(const QStringList &typesLists,const QString &pathToPwdFile);
 
+    // TO DO : In 1.5.3, connect this slot to the signal of CoreHandler when parsing is done
+    void setAvailabilityOfFeatures(bool isJumbo);
+
+    // TO DO : In 1.5.3, get rid of this slot in MainWindow and make something similar in the
+    // new design
+    void verifyJohnVersion();
+
 private:
     Ui::MainWindow *m_ui;
     QAbstractTableModel *m_hashesTable;
@@ -123,10 +130,10 @@ private:
     QMultiMap<QString, int> m_tableMap;
     // Holder for temporary file for `john --show`
     QTemporaryFile *m_temp;
-
     HashTypeChecker m_hashTypeChecker;
-
-
+    //TODO: To be moved 1.5.3
+    JohnProcess m_johnVersionChecker;
+    bool m_isJohnJumbo;
 };
 
 #endif // MAINWINDOW_H

@@ -128,8 +128,7 @@ private:
     bool        m_autoApplySettings;
 
     HashTypeChecker m_hashTypeChecker;
-    //TODO: To be moved 1.5.3
-    JohnProcess m_johnVersionChecker;
+    JohnProcess m_johnVersionChecker; //TODO: To be moved 1.5.3
     bool m_isJohnJumbo;
 };
 

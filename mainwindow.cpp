@@ -1114,13 +1114,13 @@ void MainWindow::appendLog(const QString& text)
     QTextCursor prev_cursor = m_ui->plainTextEdit_JohnOut->textCursor();
     m_ui->plainTextEdit_JohnOut->moveCursor(QTextCursor::End);
     m_ui->plainTextEdit_JohnOut->insertPlainText(text);
-    m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
+    m_ui->plainTextEdit_JohnOut->setTextCursor(prev_cursor);
 }
 
 void MainWindow::updateHashTypes(const QStringList &typesLists, const QString &pathToPwdFile)
 {
-    // The types have changed because a new password file has been
-    // loaded,
+    // This slots was triggered because the types have changed. This is probably because a new
+    // password file has been loaded
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
     if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames.join(" "))) {
         // We know that the right file is still opened so the signal

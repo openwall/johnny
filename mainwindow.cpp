@@ -1112,8 +1112,8 @@ void MainWindow::appendLog(const QString& text)
 {
     // Preserving cursor preserves selection by user
     QTextCursor prev_cursor = m_ui->plainTextEdit_JohnOut->textCursor();
-    m_ui->plainTextEdit_JohnOut->moveCursor (QTextCursor::End);
-    m_ui->plainTextEdit_JohnOut->insertPlainText (text);
+    m_ui->plainTextEdit_JohnOut->moveCursor(QTextCursor::End);
+    m_ui->plainTextEdit_JohnOut->insertPlainText(text);
     m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
 }
 
@@ -1133,8 +1133,8 @@ void MainWindow::updateHashTypes(const QStringList &typesLists, const QString &p
 // Enable/Disable all features that are jumbo related in this method
 void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
-    if ((m_isJohnJumbo == false) && (isJumbo == true) && !m_hashesFilesNames.isEmpty()) {
-        m_hashTypeChecker.start(m_pathToJohn,m_hashesFilesNames);
+    if ((m_isJohnJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
+        m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
     m_isJohnJumbo = isJumbo;
@@ -1145,6 +1145,6 @@ void MainWindow::verifyJohnVersion()
     // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
     // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
     QString output = m_johnVersionChecker.readAllStandardOutput();
-    bool isJumbo = output.contains("jumbo",Qt::CaseInsensitive);
+    bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
 }

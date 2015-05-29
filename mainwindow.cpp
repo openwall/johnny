@@ -103,8 +103,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
-    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&,const QString&)),this,
-            SLOT(updateHashTypes(const QStringList&,const QString&)),Qt::QueuedConnection);
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
@@ -318,7 +317,9 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_hashesFilesNames = fileNames;
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
-        m_hashTypeChecker.start(m_pathToJohn, fileNames);
+        if (m_isJohnJumbo) {
+            m_hashTypeChecker.start(m_pathToJohn, fileNames);
+        }
         return true;
     }
     QMessageBox::warning(
@@ -979,17 +980,18 @@ void MainWindow::buttonBrowsePathToJohnClicked()
 
 void MainWindow::applySettings()
 {
-    // We copy settings from elements on the form to the settings
-    // object with current settings.
+    // We verify john version
     QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
         m_johnVersionChecker.start(newJohnPath);
     }
+    // We copy settings from elements on the form to the settings
+    // object with current settings.
     m_pathToJohn = newJohnPath;
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
-    //If the language changed, retranslate the UI
+    // If the language changed, retranslate the UI
     Translator& translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
     if (newLanguage != translator.getCurrentLanguage().toLower()) {
@@ -1117,27 +1119,42 @@ void MainWindow::appendLog(const QString& text)
     m_ui->plainTextEdit_JohnOut->setTextCursor(prev_cursor);
 }
 
-void MainWindow::updateHashTypes(const QStringList &typesLists, const QString &pathToPwdFile)
+/* This slot is triggered when the types changed. This is probably because :
+ * 1) a new password file has been loaded OR 2) old file with a new jumbo john was used
+ */
+void MainWindow::updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+                                 const QStringList &detailedTypesPerRow)
 {
-    // This slots was triggered because the types have changed. This is probably because a new
-    // password file has been loaded
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
     if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames.join(" "))) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
-        model->fillHashTypes(typesLists);
+        model->fillHashTypes(detailedTypesPerRow);
         m_ui->tableView_Hashes->setModel(model);
+        // For jumbo, we list only available formats in file in attack option
+        m_ui->comboBox_Format->clear();
+        m_ui->comboBox_Format->addItem(tr("Auto detect"));
+        m_ui->comboBox_Format->addItems(listOfTypesInFile);
     }
 }
 
 // Enable/Disable all features that are jumbo related in this method
 void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
-    if ((m_isJohnJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
+    bool wasLastVersionJumbo = m_isJohnJumbo;
+    m_isJohnJumbo = isJumbo;
+    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
         m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
-    m_isJohnJumbo = isJumbo;
+    if (!isJumbo) {
+        // Add default format list supported by core john
+        QStringList defaultFormats;
+        defaultFormats << tr("Auto detect") << "descrypt" << "bsdicrypt" << "md5crypt"
+                       << "bcrypt" << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
+        m_ui->comboBox_Format->clear();
+        m_ui->comboBox_Format->addItems(defaultFormats);
+    }
 }
 
 void MainWindow::verifyJohnVersion()

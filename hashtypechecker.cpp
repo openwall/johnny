@@ -50,7 +50,8 @@ void HashTypeChecker::parseJohnAnswer()
 {
     // Parse John's output which is in m_johnResult
     // when process finished it's work
-    QStringList parsedTypes;
+    QStringList uniqueTypesInFile;
+    QStringList detailedTypesPerRow;
     QList<Hash> hashesAllInfos;
     QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
     QString filePath;
@@ -84,6 +85,10 @@ void HashTypeChecker::parseJohnAnswer()
                     HashFormat format;
                     format.label = fields[currentIndex++];
                     typesOnly.append(format.label);
+                    // Keep track of non-duplicate formats's label in the file
+                    if (!uniqueTypesInFile.contains(format.label)) {
+                        uniqueTypesInFile.append(format.label);
+                    }
 
                     format.isFormatDisabled = (fields[currentIndex++] == "0" ? false : true);
                     format.isFormatDynamic = (fields[currentIndex++] == "0" ? false : true);
@@ -101,7 +106,7 @@ void HashTypeChecker::parseJohnAnswer()
                     hash.listFormats.push_back(format);
                 }
 
-                parsedTypes.append(typesOnly.join(","));
+                detailedTypesPerRow.append(typesOnly.join(","));
 
                 hashesAllInfos.append(hash);
             }
@@ -110,5 +115,5 @@ void HashTypeChecker::parseJohnAnswer()
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
     m_johnOutput.clear();
-    emit updateHashTypes(parsedTypes, filePath);
+    emit updateHashTypes(filePath,uniqueTypesInFile,detailedTypesPerRow);
 }

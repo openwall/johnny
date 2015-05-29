@@ -49,7 +49,8 @@ private:
     QString m_johnOutput;
 
 signals:
-    void updateHashTypes(const QStringList &typesLists, const QString &pathToPwdFile);
+    void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+                         const QStringList &detailedTypesPerRow);
 };
 
 #endif // HASHTYPECHECKER_H

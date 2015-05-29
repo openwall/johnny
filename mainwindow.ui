@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>729</width>
-    <height>565</height>
+    <width>884</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -211,7 +211,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -245,8 +245,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>629</width>
-             <height>899</height>
+             <width>741</width>
+             <height>884</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -279,56 +279,6 @@
                   <property name="editable">
                    <bool>true</bool>
                   </property>
-                  <item>
-                   <property name="text">
-                    <string>Auto detect</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>des</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>bsdi</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>md5</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>bf</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>afs</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>lm</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>crypt</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>trip</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>dummy</string>
-                   </property>
-                  </item>
                  </widget>
                 </item>
                </layout>
@@ -1004,8 +954,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>352</height>
+             <width>616</width>
+             <height>333</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1208,8 +1158,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>729</width>
-     <height>22</height>
+     <width>884</width>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

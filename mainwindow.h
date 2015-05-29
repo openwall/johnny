@@ -62,7 +62,8 @@ private slots:
     void startJohn(QStringList params);
     void callJohnShow();
     void readJohnShow();
-    void updateHashTypes(const QStringList &typesLists,const QString &pathToPwdFile);
+    void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+                         const QStringList &detailedTypesPerRow);
     // TO DO : In 1.5.3, connect this slot to the signal of CoreHandler when parsing is done
     void setAvailabilityOfFeatures(bool isJumbo);
     // TO DO : In 1.5.3, get rid of this slot in MainWindow and make something similar in the

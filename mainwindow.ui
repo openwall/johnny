@@ -1121,6 +1121,9 @@
    </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
      <horstretch>0</horstretch>
@@ -1149,8 +1152,9 @@
    <addaction name="actionResume_Attack"/>
    <addaction name="actionPause_Attack"/>
    <addaction name="separator"/>
-   <addaction name="actionCopyToClipboard"/>
+   <addaction name="actionGuess_Password"/>
    <addaction name="separator"/>
+   <addaction name="actionCopyToClipboard"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -1340,6 +1344,24 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionGuess_Password">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resources/resources.qrc">
+     <normaloff>:/icons/tab_log.png</normaloff>:/icons/tab_log.png</iconset>
+   </property>
+   <property name="text">
+    <string>Guess!</string>
+   </property>
+   <property name="toolTip">
+    <string>I'm feeling lucky!</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::ApplicationSpecificRole</enum>
    </property>
   </action>
  </widget>

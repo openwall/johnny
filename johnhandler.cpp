@@ -21,6 +21,7 @@ JohnHandler::~JohnHandler()
 {
     terminate();
     m_thread.quit();
+    m_thread.wait();
 }
 
 void JohnHandler::exec()

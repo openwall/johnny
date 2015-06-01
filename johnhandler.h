@@ -13,14 +13,9 @@ class JohnHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit JohnHandler();
-    ~JohnHandler();
+    JohnHandler();
+    virtual ~JohnHandler();
 
-    virtual void start() = 0; // call exec when done
-    virtual void stop() = 0; // call terminate when done
-
-    void exec();
-    bool terminate(bool kill = true);
     QProcess::ProcessState state() const;
 
     QByteArray readAllStandardOutput();
@@ -44,6 +39,12 @@ signals:
     void stateChanged(QProcess::ProcessState newState);
 
 public slots:
+    virtual void start() = 0; // call exec when done
+    virtual void stop() = 0; // call terminate when done
+
+protected:
+    void exec();
+    bool terminate(bool kill = true);
 
 private:
     JohnProcess             m_john;

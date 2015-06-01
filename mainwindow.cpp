@@ -231,7 +231,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 MainWindow::~MainWindow()
 {
-    m_johnAttack.terminate();
+    m_johnAttack.stop();
     m_showJohnProcess.terminate();
     m_johnVersionChecker.terminate();
     m_hashTypeChecker.terminate();
@@ -695,8 +695,7 @@ void MainWindow::updateJohnOutput()
 
 void MainWindow::pauseAttack()
 {
-    // We ask John to exit.
-    m_johnAttack.terminate();
+    m_johnAttack.stop();
 }
 
 void MainWindow::showJohnStarted()

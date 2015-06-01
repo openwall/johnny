@@ -12,11 +12,11 @@ JohnAttack::~JohnAttack()
 
 void JohnAttack::start()
 {
-    JohnHandler::exec();
+    JohnHandler::start();
 }
 
 void JohnAttack::stop()
 {
-    JohnHandler::terminate();
+    JohnHandler::stop();
 }
 

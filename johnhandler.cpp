@@ -92,6 +92,16 @@ void JohnHandler::setJohnProgram(const QString &johnProgram)
     m_johnProgram = johnProgram;
 }
 
+void JohnHandler::start()
+{
+    JohnHandler::exec();
+}
+
+void JohnHandler::stop()
+{
+    JohnHandler::terminate();
+}
+
 
 
 

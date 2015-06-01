@@ -39,8 +39,8 @@ signals:
     void stateChanged(QProcess::ProcessState newState);
 
 public slots:
-    virtual void start() = 0; // call exec when done
-    virtual void stop() = 0; // call terminate when done
+    virtual void start();
+    virtual void stop();
 
 protected:
     void exec();

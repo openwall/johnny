@@ -36,9 +36,9 @@ MainWindow::MainWindow(QSettings &settings)
     // UI initializations
     m_ui->setupUi(this);
     // Until we get a result from john, we disable jumbo features
-    m_isJohnJumbo = false;
+    m_isJumbo = false;
     setAvailabilityOfFeatures(false);
-    connect(&m_johnVersionChecker,SIGNAL(finished(int)),this,SLOT(verifyJohnVersion()));
+    connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
 
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
@@ -95,7 +95,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_showTimer, SIGNAL(timeout()),
             this, SLOT(callJohnShow()));
     // We connect 'john --show' process with our object.
-    connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+    connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
     connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
@@ -232,14 +232,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     m_johnAttack.stop();
-    m_showJohnProcess.terminate();
-    m_johnVersionChecker.terminate();
+    m_johnShow.stop();
+    m_johnVersionCheck.stop();
     m_hashTypeChecker.terminate();
 
-    if (!m_showJohnProcess.waitForFinished(1000))
-        m_showJohnProcess.kill();
-    if (!m_johnVersionChecker.waitForFinished(1000))
-        m_johnVersionChecker.kill();
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;
@@ -286,15 +282,15 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
     // Hide formats column if not jumbo
-    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJohnJumbo);
+    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJumbo);
 
     // We build hash table for fast access.
-    m_tableMap = QMultiMap<QString, int>();
+    m_showTableMap = QMultiMap<QString, int>();
 
     // In case a newTableModel == NULL parameter is passed
     if(m_hashesTable != NULL){
         for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-            m_tableMap.insert(
+            m_showTableMap.insert(
                 m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
                 i);
         }
@@ -311,7 +307,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_hashesFilesNames = fileNames;
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
-        if (m_isJohnJumbo) {
+        if (m_isJumbo) {
             m_hashTypeChecker.start(m_pathToJohn, fileNames);
         }
         return true;
@@ -810,28 +806,24 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 void MainWindow::callJohnShow()
 {
-    // If john returns immediately then we call it again before
-    // it finishes. No good solution. Only workaround.
-    m_showJohnProcess.waitForFinished(1000);
     // Give a chance to terminate cleanly
-    if (m_showJohnProcess.state() != QProcess::NotRunning)
-        m_showJohnProcess.terminate();
-    m_showJohnProcess.waitForFinished(500);
-    if (m_showJohnProcess.state() != QProcess::NotRunning)
-        m_showJohnProcess.kill();
+    if (m_johnShow.state() != QProcess::NotRunning)
+        m_johnShow.stop();
 
-    QStringList parameters;
+    QStringList args;
     // We add current format key if it is not empty.
     if (m_format != "")
-        parameters << m_format;
-    parameters << "--show" << m_temp->fileName();
-    m_showJohnProcess.start(m_pathToJohn, parameters);
+        args << m_format;
+    args << "--show" << m_temp->fileName();
+    m_johnShow.setJohnProgram(m_pathToJohn);
+    m_johnShow.setArgs(args);
+    m_johnShow.start();
 }
 
 void MainWindow::readJohnShow()
 {
     // We read all output.
-    QByteArray output = m_showJohnProcess.readAllStandardOutput();
+    QByteArray output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
     // We read output line by line and take user name and password.
@@ -852,13 +844,13 @@ void MainWindow::readJohnShow()
         QString hash = line.mid(right + 2);
         // We handle password.
         // If we found user then we put password in table.
-        foreach (int row, m_tableMap.values(hash)) {
+        foreach (int row, m_showTableMap.values(hash)) {
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
                 password);
         }
         // We remove value to speed up.
-        m_tableMap.remove(hash);
+        m_showTableMap.remove(hash);
         // We continue reading with next line.
         line = outputStream.readLine();
     }
@@ -977,7 +969,8 @@ void MainWindow::applySettings()
     // We verify john version
     QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
-        m_johnVersionChecker.start(newJohnPath);
+        m_johnVersionCheck.setJohnProgram(newJohnPath);
+        m_johnVersionCheck.start();
     }
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1135,8 +1128,8 @@ void MainWindow::updateHashTypes(const QString &pathToPwdFile, const QStringList
 // Enable/Disable all features that are jumbo related in this method
 void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
-    bool wasLastVersionJumbo = m_isJohnJumbo;
-    m_isJohnJumbo = isJumbo;
+    bool wasLastVersionJumbo = m_isJumbo;
+    m_isJumbo = isJumbo;
     if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
         m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
     }
@@ -1155,7 +1148,7 @@ void MainWindow::verifyJohnVersion()
 {
     // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
     // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
-    QString output = m_johnVersionChecker.readAllStandardOutput();
+    QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
 }

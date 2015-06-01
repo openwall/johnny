@@ -5,6 +5,8 @@
 #ifndef FILETABLEMODEL_H
 #define FILETABLEMODEL_H
 
+#include "hashtypechecker.h"
+
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QVector>
@@ -28,8 +30,10 @@ public:
                         Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const;
 
-
     bool readFile(const QStringList &fileNames);
+    void fillHashTypes(const QStringList &listHashTypes);
+
+    enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
 
 private:
     QVector<QVector<QString> > m_data;

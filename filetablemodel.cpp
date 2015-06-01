@@ -3,6 +3,7 @@
  */
 
 #include "filetablemodel.h"
+#include "hashtypechecker.h"
 
 #include <QFile>
 
@@ -18,7 +19,8 @@ FileTableModel::FileTableModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
-    m_columns << tr("User") << tr("Password") << tr("Hash") << tr("GECOS");
+    // When changing order of this, the enum FileTableModel::Columns should be changed accordingly
+    m_columns << tr("User") << tr("Password") << tr("Hash") <<  tr("Formats") << tr("GECOS");
 }
 
 bool FileTableModel::readFile(const QStringList &fileNames)
@@ -73,9 +75,19 @@ bool FileTableModel::readFile(const QStringList &fileNames)
     }
     // We convert our lists into vectors to store data.
     for (int column = 0; column < columnCount(); column++) {
+        if (column == FORMATS_COL) {
+            m_data << QVector<QString>(rowCount());
+        }
         m_data << data.at(column).toVector();
     }
     return true;
+}
+
+void FileTableModel::fillHashTypes(const QStringList &listHashTypes)
+{
+    for (int i = 0; (i < listHashTypes.size()) && (i< rowCount()); i++) {
+        setData(index(i,FORMATS_COL), listHashTypes[i]);
+    }
 }
 
 int FileTableModel::rowCount(const QModelIndex &/* parent */) const
@@ -131,4 +143,3 @@ QVariant FileTableModel::headerData(int section,
 
     return QVariant();
 }
-

@@ -12,12 +12,14 @@ SOURCES +=  main.cpp\
             filetablemodel.cpp \
             translator.cpp \
             johnprocess.cpp \
+            hashtypechecker.cpp \
             textlabel.cpp
 
 HEADERS  += mainwindow.h \
             filetablemodel.h \
             translator.h \
             johnprocess.h \
+            hashtypechecker.h \
             textlabel.h
 
 FORMS    += mainwindow.ui

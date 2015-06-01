@@ -8,6 +8,7 @@
 #define MAINWINDOW_H
 
 #include "johnprocess.h"
+#include "hashtypechecker.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -61,6 +62,13 @@ private slots:
     void startJohn(QStringList params);
     void callJohnShow();
     void readJohnShow();
+    void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+                         const QStringList &detailedTypesPerRow);
+    // TO DO : In 1.5.3, connect this slot to the signal of CoreHandler when parsing is done
+    void setAvailabilityOfFeatures(bool isJumbo);
+    // TO DO : In 1.5.3, get rid of this slot in MainWindow and make something similar in the
+    // new design
+    void verifyJohnVersion();
 
     // Settings related
     void fillSettingsWithDefaults();
@@ -86,6 +94,7 @@ private:
     bool                 m_terminate;
     Ui::MainWindow      *m_ui;
     QAbstractTableModel *m_hashesTable;
+
     QString              m_appDataPath;
 
     QStringList     m_hashesFilesNames;
@@ -97,6 +106,7 @@ private:
     // To read cracked passwords we use this timer and john --show.
     QTimer      m_showTimer;
     QProcess    m_showJohnProcess;
+
     // Format key to use with --show.
     // With this key current John was started.
     QString     m_format;
@@ -110,7 +120,6 @@ private:
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
-
     QSettings&  m_settings;
     QString     m_pathToJohn;
     // Interval between loading of cracked passwords
@@ -118,6 +127,10 @@ private:
     // Should we use modified settings right after modification? Or
     // should we wait user to click 'apply' button.
     bool        m_autoApplySettings;
+
+    HashTypeChecker m_hashTypeChecker;
+    JohnProcess m_johnVersionChecker; //TODO: To be moved 1.5.3
+    bool m_isJohnJumbo;
 };
 
 #endif // MAINWINDOW_H

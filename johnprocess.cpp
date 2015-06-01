@@ -27,8 +27,7 @@ void JohnProcess::setupChildProcess()
 void JohnProcess::terminate()
 {
 #if OS_FORK
-    if(processId() != 0)
-    {
+    if (processId() != 0) {
         /* Send sigterm to all processes of the group
          * created previously with setsid()
          * This is done in Johnny because of a bug in john <= 1.8.0

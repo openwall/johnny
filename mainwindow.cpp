@@ -35,6 +35,10 @@ MainWindow::MainWindow(QSettings &settings)
 {
     // UI initializations
     m_ui->setupUi(this);
+    // Until we get a result from john, we disable jumbo features
+    m_isJohnJumbo = false;
+    setAvailabilityOfFeatures(false);
+    connect(&m_johnVersionChecker,SIGNAL(finished(int)),this,SLOT(verifyJohnVersion()));
 
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
@@ -99,6 +103,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
+
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
             this,SLOT(restoreLastSavedSettings()));
@@ -126,8 +132,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We create the app data directory for us in $HOME if it does not exist.
     m_appDataPath = QDir::home().filePath(QLatin1String("_john") + QDir::separator() + "johnny" + QDir::separator());
-    if (!QDir::home().mkpath(m_appDataPath))
-    {
+    if (!QDir::home().mkpath(m_appDataPath)) {
         QMessageBox::critical( this, tr("Johnny"),
             tr("Could not create settings directory(%1). Check your permissions, disk space and restart Johnny.").arg(m_appDataPath));
         qApp->quit();
@@ -171,6 +176,7 @@ MainWindow::MainWindow(QSettings &settings)
     //As of now, fork is only supported on Linux platform
         m_ui->widget_Fork->hide();
     #endif
+
 }
 
 void MainWindow::verifySessionState()
@@ -232,10 +238,14 @@ MainWindow::~MainWindow()
 {
     m_johnProcess.terminate();
     m_showJohnProcess.terminate();
+    m_johnVersionChecker.terminate();
+
     if (!m_johnProcess.waitForFinished(1000))
         m_johnProcess.kill();
     if (!m_showJohnProcess.waitForFinished(1000))
         m_showJohnProcess.kill();
+    if (!m_johnVersionChecker.waitForFinished(1000))
+        m_johnVersionChecker.kill();
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;
@@ -281,6 +291,8 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     m_hashesTable = newTableModel;
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
+    // Hide formats column if not jumbo
+    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJohnJumbo);
 
     // We build hash table for fast access.
     m_tableMap = QMultiMap<QString, int>();
@@ -305,6 +317,9 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_hashesFilesNames = fileNames;
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
+        if (m_isJohnJumbo) {
+            m_hashTypeChecker.start(m_pathToJohn, fileNames);
+        }
         return true;
     }
     QMessageBox::warning(
@@ -607,8 +622,7 @@ QStringList MainWindow::getAttackParameters()
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
 
     // Advanced options
-    if(m_ui->checkBox_UseFork->isChecked())
-    {
+    if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
     }
 
@@ -631,29 +645,24 @@ void MainWindow::startJohn(QStringList params)
     QProcessEnvironment env;
     // If default is chosen, we don't specify OMP_NUM_THREADS and john will choose the number of
     // threads based on the number of processors.
-    if(m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText())
-    {
+    if (m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText()) {
         env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
     }
 
     // User specified environment variables
-    if(m_ui->checkBox_EnvironmentVar->isChecked())
-    {
+    if (m_ui->checkBox_EnvironmentVar->isChecked()) {
         // Parse the input
         QStringList varList = m_ui->lineEdit_EnvironmentVar->text().split(",", QString::SkipEmptyParts);
-        for(int i=0; i < varList.size(); i++)
-        {
+        for (int i = 0; i < varList.size(); i++) {
             QStringList varPair = varList[i].split("=", QString::SkipEmptyParts);
-            if(varPair.size() == 2) // we assume value of variable doesn't have = inside
-            {
+            if (varPair.size() == 2) { // we assume value of variable doesn't have = inside
                 env.insert(varPair[0].trimmed(), varPair[1].trimmed());
-            }
-            else
-            {
+            } else {
                 QMessageBox::warning(
                         this,
                         tr("Environment variables"),
-                        tr("The format to set environment variable must be in the format : varName1=value, varName2=value etc.. "));
+                        tr("The format to set environment variable must be in the format : varName1="
+                           "value, varName2=value etc.. "));
             }
         }
     }
@@ -971,17 +980,21 @@ void MainWindow::buttonBrowsePathToJohnClicked()
 
 void MainWindow::applySettings()
 {
+    // We verify john version
+    QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
+    if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
+        m_johnVersionChecker.start(newJohnPath);
+    }
     // We copy settings from elements on the form to the settings
     // object with current settings.
-    m_pathToJohn = m_ui->comboBox_PathToJohn->currentText();
+    m_pathToJohn = newJohnPath;
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
-    //If the language changed, retranslate the UI
+    // If the language changed, retranslate the UI
     Translator& translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
-    if(newLanguage != translator.getCurrentLanguage().toLower())
-    {
+    if (newLanguage != translator.getCurrentLanguage().toLower()) {
         translator.translateApplication(qApp,newLanguage);
         m_ui->retranslateUi(this);
     }
@@ -1101,7 +1114,54 @@ void MainWindow::appendLog(const QString& text)
 {
     // Preserving cursor preserves selection by user
     QTextCursor prev_cursor = m_ui->plainTextEdit_JohnOut->textCursor();
-    m_ui->plainTextEdit_JohnOut->moveCursor (QTextCursor::End);
-    m_ui->plainTextEdit_JohnOut->insertPlainText (text);
-    m_ui->plainTextEdit_JohnOut->setTextCursor (prev_cursor);
+    m_ui->plainTextEdit_JohnOut->moveCursor(QTextCursor::End);
+    m_ui->plainTextEdit_JohnOut->insertPlainText(text);
+    m_ui->plainTextEdit_JohnOut->setTextCursor(prev_cursor);
+}
+
+/* This slot is triggered when the types changed. This is probably because :
+ * 1) a new password file has been loaded OR 2) old file with a new jumbo john was used
+ */
+void MainWindow::updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+                                 const QStringList &detailedTypesPerRow)
+{
+    FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
+    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames.join(" "))) {
+        // We know that the right file is still opened so the signal
+        // isn't too late, otherwise we don't replace the model
+        model->fillHashTypes(detailedTypesPerRow);
+        m_ui->tableView_Hashes->setModel(model);
+        // For jumbo, we list only available formats in file in attack option
+        m_ui->comboBox_Format->clear();
+        m_ui->comboBox_Format->addItem(tr("Auto detect"));
+        m_ui->comboBox_Format->addItems(listOfTypesInFile);
+    }
+}
+
+// Enable/Disable all features that are jumbo related in this method
+void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
+{
+    bool wasLastVersionJumbo = m_isJohnJumbo;
+    m_isJohnJumbo = isJumbo;
+    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
+        m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
+    }
+    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
+    if (!isJumbo) {
+        // Add default format list supported by core john
+        QStringList defaultFormats;
+        defaultFormats << tr("Auto detect") << "descrypt" << "bsdicrypt" << "md5crypt"
+                       << "bcrypt" << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
+        m_ui->comboBox_Format->clear();
+        m_ui->comboBox_Format->addItems(defaultFormats);
+    }
+}
+
+void MainWindow::verifyJohnVersion()
+{
+    // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
+    // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
+    QString output = m_johnVersionChecker.readAllStandardOutput();
+    bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
+    setAvailabilityOfFeatures(isJumbo);
 }

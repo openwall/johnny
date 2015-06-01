@@ -8,6 +8,7 @@
 #define MAINWINDOW_H
 
 #include "johnprocess.h"
+#include "johnattack.h"
 #include "hashtypechecker.h"
 
 #include <QMainWindow>
@@ -59,7 +60,7 @@ private slots:
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
-    void startJohn(QStringList params);
+    void startJohn(QStringList args);
     void callJohnShow();
     void readJohnShow();
     void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
@@ -99,7 +100,7 @@ private:
 
     QStringList     m_hashesFilesNames;
     QString         m_session;
-    JohnProcess     m_johnProcess;
+    JohnAttack      m_johnAttack; // main JtR attack handler
     // Date and time of the start of the sttack
     QDateTime m_startDateTime;
 

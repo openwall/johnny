@@ -80,21 +80,16 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
     */
 
-    // We connect John process' signals with our slots.
-    // John was ended.
-    connect(&m_johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(showJohnFinished(int, QProcess::ExitStatus)));
-    // John was started.
-    connect(&m_johnProcess, SIGNAL(started()),
-            this, SLOT(showJohnStarted()));
-    // John got problem.
-    connect(&m_johnProcess, SIGNAL(error(QProcess::ProcessError)),
-            this, SLOT(showJohnError(QProcess::ProcessError)));
-    // John wrote something.
-    connect(&m_johnProcess, SIGNAL(readyReadStandardOutput()),
-            this, SLOT(updateJohnOutput()));
-    connect(&m_johnProcess, SIGNAL(readyReadStandardError()),
-            this, SLOT(updateJohnOutput()));
+    connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(started()), this,
+            SLOT(showJohnStarted()), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(error(QProcess::ProcessError)), this,
+            SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(readyReadStandardOutput()), this,
+            SLOT(updateJohnOutput()), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(readyReadStandardError()), this,
+            SLOT(updateJohnOutput()), Qt::QueuedConnection);
 
     // We connect timer with calling for john to show us status.
     connect(&m_showTimer, SIGNAL(timeout()),
@@ -219,11 +214,11 @@ void MainWindow::verifySessionState()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (!m_terminate && (m_johnProcess.state() != QProcess::NotRunning)) {
+    if (!m_terminate && (m_johnAttack.state() != QProcess::NotRunning)) {
         int answer = QMessageBox::question(
             this,
             tr("Johnny"),
-            tr("John still runs! John will be terminated if you proceed. Do you really want to quit?"),
+            tr("An attack session is running, it will be terminated if you proceed. Do you really want to quit?"),
             QMessageBox::Yes | QMessageBox::No);
         if (answer == QMessageBox::No) {
             event->ignore();
@@ -236,12 +231,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 MainWindow::~MainWindow()
 {
-    m_johnProcess.terminate();
+    m_johnAttack.terminate();
     m_showJohnProcess.terminate();
     m_johnVersionChecker.terminate();
+    m_hashTypeChecker.terminate();
 
-    if (!m_johnProcess.waitForFinished(1000))
-        m_johnProcess.kill();
     if (!m_showJohnProcess.waitForFinished(1000))
         m_showJohnProcess.kill();
     if (!m_johnVersionChecker.waitForFinished(1000))
@@ -629,7 +623,7 @@ QStringList MainWindow::getAttackParameters()
     return parameters;
 }
 
-void MainWindow::startJohn(QStringList params)
+void MainWindow::startJohn(QStringList args)
 {
     // To start John we have predefined process object. That object's
     // signals are already connected with our slots. So we need only
@@ -637,7 +631,7 @@ void MainWindow::startJohn(QStringList params)
 
     // to visually separate sessions in the console output (make it clearer for the user)
     QString cmd = CONSOLE_LOG_SEPARATOR +
-            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + '\n';
+            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + args.join(" ") + '\n';
 
     appendLog(cmd);
 
@@ -666,10 +660,11 @@ void MainWindow::startJohn(QStringList params)
             }
         }
     }
-    m_johnProcess.setProcessEnvironment(env);
+    m_johnAttack.setEnv(env);
+    m_johnAttack.setArgs(args);
+    m_johnAttack.setJohnProgram(m_pathToJohn);
+    m_johnAttack.start();
 
-    // We start John.
-    m_johnProcess.start(m_pathToJohn, params);
     // We remember date and time of the start.
     m_startDateTime = QDateTime::currentDateTime();
 }
@@ -689,8 +684,8 @@ void MainWindow::resumeAttack()
 void MainWindow::updateJohnOutput()
 {
     //read output and error buffers
-    appendLog(m_johnProcess.readAllStandardOutput()
-              + m_johnProcess.readAllStandardError());
+    appendLog(m_johnAttack.readAllStandardOutput()
+              + m_johnAttack.readAllStandardError());
 
     // NOTE: Probably here we want to parse John's output, catch newly
     //       cracked passwords and so on. However John's output is buffered.
@@ -701,7 +696,7 @@ void MainWindow::updateJohnOutput()
 void MainWindow::pauseAttack()
 {
     // We ask John to exit.
-    m_johnProcess.terminate();
+    m_johnAttack.terminate();
 }
 
 void MainWindow::showJohnStarted()
@@ -1070,7 +1065,7 @@ void MainWindow::updateStatistics()
     // know days and seconds between two time points.
     //
     // We check whether John is running.
-    if (m_johnProcess.state() == QProcess::Running) {
+    if (m_johnAttack.state() == QProcess::Running) {
         // If John is running then we put time of its work on the
         // form.
         // We remember current time.

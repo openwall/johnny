@@ -8,6 +8,7 @@
 #define MAINWINDOW_H
 
 #include "johnprocess.h"
+#include "johnattack.h"
 #include "hashtypechecker.h"
 
 #include <QMainWindow>
@@ -59,7 +60,7 @@ private slots:
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
-    void startJohn(QStringList params);
+    void startJohn(QStringList args);
     void callJohnShow();
     void readJohnShow();
     void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
@@ -72,7 +73,7 @@ private slots:
 
     // Settings related
     void fillSettingsWithDefaults();
-    void restoreLastSavedSettings();
+    void restoreSavedSettings();
     void applySettings();
     void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
@@ -97,40 +98,38 @@ private:
 
     QString              m_appDataPath;
 
-    QStringList     m_hashesFilesNames;
-    QString         m_session;
-    JohnProcess     m_johnProcess;
-    // Date and time of the start of the sttack
-    QDateTime m_startDateTime;
+    QStringList         m_hashesFilesNames;
+    QString             m_session;
+    JohnAttack          m_johnAttack; // main JtR attack handler
+    QDateTime           m_startDateTime; // Date and time of the start of the sttack
 
     // To read cracked passwords we use this timer and john --show.
-    QTimer      m_showTimer;
-    QProcess    m_showJohnProcess;
-
+    QTimer              m_showTimer;
+    JohnHandler         m_johnShow;
     // Format key to use with --show.
     // With this key current John was started.
-    QString     m_format;
+    QString             m_format;
     // Holder for temporary file for `john --show`
-    QTemporaryFile *m_temp;
+    QTemporaryFile      *m_temp;
     // Map (hash table) for fast access after `john --show`
-    QMultiMap<QString, int> m_tableMap;
+    QMultiMap<QString, int> m_showTableMap;
 
     // Current application settings
     // Modified settings are stored on the form, this settings
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
-    QSettings&  m_settings;
-    QString     m_pathToJohn;
+    QSettings&      m_settings;
+    QString         m_pathToJohn;
     // Interval between loading of cracked passwords
-    int         m_timeIntervalPickCracked;
-    // Should we use modified settings right after modification? Or
-    // should we wait user to click 'apply' button.
-    bool        m_autoApplySettings;
+    int             m_timeIntervalPickCracked;
+
+    bool            m_autoApplySettings;
+
+    JohnHandler     m_johnVersionCheck; //TODO: To be moved 1.5.3
+    bool            m_isJumbo;
 
     HashTypeChecker m_hashTypeChecker;
-    JohnProcess m_johnVersionChecker; //TODO: To be moved 1.5.3
-    bool m_isJohnJumbo;
 };
 
 #endif // MAINWINDOW_H

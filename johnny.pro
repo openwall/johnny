@@ -13,14 +13,18 @@ SOURCES +=  main.cpp\
             translator.cpp \
             johnprocess.cpp \
             hashtypechecker.cpp \
-            textlabel.cpp
+            textlabel.cpp \
+            johnhandler.cpp \
+            johnattack.cpp
 
 HEADERS  += mainwindow.h \
             filetablemodel.h \
             translator.h \
             johnprocess.h \
             hashtypechecker.h \
-            textlabel.h
+            textlabel.h \
+            johnhandler.h \
+            johnattack.h
 
 FORMS    += mainwindow.ui
 

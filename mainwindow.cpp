@@ -22,6 +22,7 @@
 #include <QStandardPaths>
 #include <QDebug>
 
+#define INTERVAL_PICK_CRACKED 600
 #define PASSWORD_TAB 0
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
@@ -36,9 +37,9 @@ MainWindow::MainWindow(QSettings &settings)
     // UI initializations
     m_ui->setupUi(this);
     // Until we get a result from john, we disable jumbo features
-    m_isJohnJumbo = false;
+    m_isJumbo = false;
     setAvailabilityOfFeatures(false);
-    connect(&m_johnVersionChecker,SIGNAL(finished(int)),this,SLOT(verifyJohnVersion()));
+    connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
 
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
@@ -80,34 +81,29 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
     */
 
-    // We connect John process' signals with our slots.
-    // John was ended.
-    connect(&m_johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(showJohnFinished(int, QProcess::ExitStatus)));
-    // John was started.
-    connect(&m_johnProcess, SIGNAL(started()),
-            this, SLOT(showJohnStarted()));
-    // John got problem.
-    connect(&m_johnProcess, SIGNAL(error(QProcess::ProcessError)),
-            this, SLOT(showJohnError(QProcess::ProcessError)));
-    // John wrote something.
-    connect(&m_johnProcess, SIGNAL(readyReadStandardOutput()),
-            this, SLOT(updateJohnOutput()));
-    connect(&m_johnProcess, SIGNAL(readyReadStandardError()),
-            this, SLOT(updateJohnOutput()));
+    connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(started()), this,
+            SLOT(showJohnStarted()), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(error(QProcess::ProcessError)), this,
+            SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(readyReadStandardOutput()), this,
+            SLOT(updateJohnOutput()), Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(readyReadStandardError()), this,
+            SLOT(updateJohnOutput()), Qt::QueuedConnection);
 
     // We connect timer with calling for john to show us status.
     connect(&m_showTimer, SIGNAL(timeout()),
             this, SLOT(callJohnShow()));
     // We connect 'john --show' process with our object.
-    connect(&m_showJohnProcess, SIGNAL(finished(int, QProcess::ExitStatus)),
+    connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
     connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
-            this,SLOT(restoreLastSavedSettings()));
+            this,SLOT(restoreSavedSettings()));
     connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
             this,SLOT(applyAndSaveSettings()));
     // Settings changed by user
@@ -154,7 +150,7 @@ MainWindow::MainWindow(QSettings &settings)
     fillSettingsWithDefaults();
 
     // We load old settings.
-    restoreLastSavedSettings();
+    restoreSavedSettings();
 
     // TODO: do this message on every invocation of john. Provide
     //       checkbox to not show this again.
@@ -219,11 +215,11 @@ void MainWindow::verifySessionState()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (!m_terminate && (m_johnProcess.state() != QProcess::NotRunning)) {
+    if (!m_terminate && (m_johnAttack.state() != QProcess::NotRunning)) {
         int answer = QMessageBox::question(
             this,
             tr("Johnny"),
-            tr("John still runs! John will be terminated if you proceed. Do you really want to quit?"),
+            tr("An attack session is running, it will be terminated if you proceed. Do you really want to quit?"),
             QMessageBox::Yes | QMessageBox::No);
         if (answer == QMessageBox::No) {
             event->ignore();
@@ -236,16 +232,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 MainWindow::~MainWindow()
 {
-    m_johnProcess.terminate();
-    m_showJohnProcess.terminate();
-    m_johnVersionChecker.terminate();
+    m_johnAttack.stop();
+    m_johnShow.stop();
+    m_johnVersionCheck.stop();
+    m_hashTypeChecker.terminate();
 
-    if (!m_johnProcess.waitForFinished(1000))
-        m_johnProcess.kill();
-    if (!m_showJohnProcess.waitForFinished(1000))
-        m_showJohnProcess.kill();
-    if (!m_johnVersionChecker.waitForFinished(1000))
-        m_johnVersionChecker.kill();
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;
@@ -292,15 +283,15 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     // We connect table view with new model.
     m_ui->tableView_Hashes->setModel(newTableModel);
     // Hide formats column if not jumbo
-    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJohnJumbo);
+    m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJumbo);
 
     // We build hash table for fast access.
-    m_tableMap = QMultiMap<QString, int>();
+    m_showTableMap = QMultiMap<QString, int>();
 
     // In case a newTableModel == NULL parameter is passed
     if(m_hashesTable != NULL){
         for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-            m_tableMap.insert(
+            m_showTableMap.insert(
                 m_hashesTable->data(m_hashesTable->index(i, 2)).toString(),
                 i);
         }
@@ -317,7 +308,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_hashesFilesNames = fileNames;
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
-        if (m_isJohnJumbo) {
+        if (m_isJumbo) {
             m_hashTypeChecker.start(m_pathToJohn, fileNames);
         }
         return true;
@@ -424,11 +415,11 @@ void MainWindow::actionCopyToClipboardTriggered()
 
 bool MainWindow::checkSettings()
 {
-    if (m_pathToJohn == "") {
+    if (m_pathToJohn.isEmpty()) {
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            tr("Please specify path to John the Ripper binary in settings!"));
+            tr("Please specify the path to JohntheRipper in settings."));
         return false;
     }
     return true;
@@ -629,7 +620,7 @@ QStringList MainWindow::getAttackParameters()
     return parameters;
 }
 
-void MainWindow::startJohn(QStringList params)
+void MainWindow::startJohn(QStringList args)
 {
     // To start John we have predefined process object. That object's
     // signals are already connected with our slots. So we need only
@@ -637,7 +628,7 @@ void MainWindow::startJohn(QStringList params)
 
     // to visually separate sessions in the console output (make it clearer for the user)
     QString cmd = CONSOLE_LOG_SEPARATOR +
-            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + params.join(" ") + '\n';
+            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + args.join(" ") + '\n';
 
     appendLog(cmd);
 
@@ -666,10 +657,11 @@ void MainWindow::startJohn(QStringList params)
             }
         }
     }
-    m_johnProcess.setProcessEnvironment(env);
+    m_johnAttack.setEnv(env);
+    m_johnAttack.setArgs(args);
+    m_johnAttack.setJohnProgram(m_pathToJohn);
+    m_johnAttack.start();
 
-    // We start John.
-    m_johnProcess.start(m_pathToJohn, params);
     // We remember date and time of the start.
     m_startDateTime = QDateTime::currentDateTime();
 }
@@ -689,8 +681,8 @@ void MainWindow::resumeAttack()
 void MainWindow::updateJohnOutput()
 {
     //read output and error buffers
-    appendLog(m_johnProcess.readAllStandardOutput()
-              + m_johnProcess.readAllStandardError());
+    appendLog(m_johnAttack.readAllStandardOutput()
+              + m_johnAttack.readAllStandardError());
 
     // NOTE: Probably here we want to parse John's output, catch newly
     //       cracked passwords and so on. However John's output is buffered.
@@ -700,8 +692,7 @@ void MainWindow::updateJohnOutput()
 
 void MainWindow::pauseAttack()
 {
-    // We ask John to exit.
-    m_johnProcess.terminate();
+    m_johnAttack.stop();
 }
 
 void MainWindow::showJohnStarted()
@@ -816,28 +807,24 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 void MainWindow::callJohnShow()
 {
-    // If john returns immediately then we call it again before
-    // it finishes. No good solution. Only workaround.
-    m_showJohnProcess.waitForFinished(1000);
     // Give a chance to terminate cleanly
-    if (m_showJohnProcess.state() != QProcess::NotRunning)
-        m_showJohnProcess.terminate();
-    m_showJohnProcess.waitForFinished(500);
-    if (m_showJohnProcess.state() != QProcess::NotRunning)
-        m_showJohnProcess.kill();
+    if (m_johnShow.state() != QProcess::NotRunning)
+        m_johnShow.stop();
 
-    QStringList parameters;
+    QStringList args;
     // We add current format key if it is not empty.
     if (m_format != "")
-        parameters << m_format;
-    parameters << "--show" << m_temp->fileName();
-    m_showJohnProcess.start(m_pathToJohn, parameters);
+        args << m_format;
+    args << "--show" << m_temp->fileName();
+    m_johnShow.setJohnProgram(m_pathToJohn);
+    m_johnShow.setArgs(args);
+    m_johnShow.start();
 }
 
 void MainWindow::readJohnShow()
 {
     // We read all output.
-    QByteArray output = m_showJohnProcess.readAllStandardOutput();
+    QByteArray output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
     // We read output line by line and take user name and password.
@@ -858,13 +845,13 @@ void MainWindow::readJohnShow()
         QString hash = line.mid(right + 2);
         // We handle password.
         // If we found user then we put password in table.
-        foreach (int row, m_tableMap.values(hash)) {
+        foreach (int row, m_showTableMap.values(hash)) {
             m_hashesTable->setData(
                 m_hashesTable->index(row, 1),
                 password);
         }
         // We remove value to speed up.
-        m_tableMap.remove(hash);
+        m_showTableMap.remove(hash);
         // We continue reading with next line.
         line = outputStream.readLine();
     }
@@ -954,10 +941,8 @@ void MainWindow::fillSettingsWithDefaults()
         }
     }
 
-    // We have hard coded default settings in here.
-    // We just write all our values to elements on the form.
     m_ui->comboBox_PathToJohn->setEditText(john);
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(10 * 60);
+    m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
     m_ui->checkBox_AutoApplySettings->setChecked(false);
 }
 
@@ -983,7 +968,8 @@ void MainWindow::applySettings()
     // We verify john version
     QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
-        m_johnVersionChecker.start(newJohnPath);
+        m_johnVersionCheck.setJohnProgram(newJohnPath);
+        m_johnVersionCheck.start();
     }
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1002,22 +988,17 @@ void MainWindow::applySettings()
 
 void MainWindow::applyAndSaveSettings()
 {
-    // Apply settings first.
     applySettings();
-    // We store settings.
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
     m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
     m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
-void MainWindow::restoreLastSavedSettings()
+void MainWindow::restoreSavedSettings()
 {
-    // We copy settings from stored settings object to our current
-    // settings points.
-    // Really we copy stored settings to the form and then apply
-    // settings.
-    // TODO: claim on empty fields. Probably on all together.
+    // We copy stored settings to the form and then invoke applySettings()
+    // TODO: Add sensible defaults to all values
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
     m_ui->comboBox_PathToJohn->setEditText(
         settingsPathToJohn == ""
@@ -1031,12 +1012,10 @@ void MainWindow::restoreLastSavedSettings()
         m_settings.value("AutoApplySettings").toString() == ""
         ? m_ui->checkBox_AutoApplySettings->isChecked()
         : m_settings.value("AutoApplySettings").toBool());
-    // We apply settings.
     applySettings();
 }
 
 // Handlers for settings auto application
-
 
 void MainWindow::settingsChangedByUser()
 {
@@ -1070,7 +1049,7 @@ void MainWindow::updateStatistics()
     // know days and seconds between two time points.
     //
     // We check whether John is running.
-    if (m_johnProcess.state() == QProcess::Running) {
+    if (m_johnAttack.state() == QProcess::Running) {
         // If John is running then we put time of its work on the
         // form.
         // We remember current time.
@@ -1141,8 +1120,8 @@ void MainWindow::updateHashTypes(const QString &pathToPwdFile, const QStringList
 // Enable/Disable all features that are jumbo related in this method
 void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
-    bool wasLastVersionJumbo = m_isJohnJumbo;
-    m_isJohnJumbo = isJumbo;
+    bool wasLastVersionJumbo = m_isJumbo;
+    m_isJumbo = isJumbo;
     if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
         m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
     }
@@ -1161,7 +1140,7 @@ void MainWindow::verifyJohnVersion()
 {
     // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
     // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
-    QString output = m_johnVersionChecker.readAllStandardOutput();
+    QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
 }

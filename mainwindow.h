@@ -73,7 +73,7 @@ private slots:
 
     // Settings related
     void fillSettingsWithDefaults();
-    void restoreLastSavedSettings();
+    void restoreSavedSettings();
     void applySettings();
     void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();

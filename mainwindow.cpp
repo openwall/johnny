@@ -22,6 +22,7 @@
 #include <QStandardPaths>
 #include <QDebug>
 
+#define INTERVAL_PICK_CRACKED 600
 #define PASSWORD_TAB 0
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
@@ -102,7 +103,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
-            this,SLOT(restoreLastSavedSettings()));
+            this,SLOT(restoreSavedSettings()));
     connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
             this,SLOT(applyAndSaveSettings()));
     // Settings changed by user
@@ -149,7 +150,7 @@ MainWindow::MainWindow(QSettings &settings)
     fillSettingsWithDefaults();
 
     // We load old settings.
-    restoreLastSavedSettings();
+    restoreSavedSettings();
 
     // TODO: do this message on every invocation of john. Provide
     //       checkbox to not show this again.
@@ -414,11 +415,11 @@ void MainWindow::actionCopyToClipboardTriggered()
 
 bool MainWindow::checkSettings()
 {
-    if (m_pathToJohn == "") {
+    if (m_pathToJohn.isEmpty()) {
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            tr("Please specify path to John the Ripper binary in settings!"));
+            tr("Please specify the path to JohntheRipper in settings."));
         return false;
     }
     return true;
@@ -940,10 +941,8 @@ void MainWindow::fillSettingsWithDefaults()
         }
     }
 
-    // We have hard coded default settings in here.
-    // We just write all our values to elements on the form.
     m_ui->comboBox_PathToJohn->setEditText(john);
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(10 * 60);
+    m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
     m_ui->checkBox_AutoApplySettings->setChecked(false);
 }
 
@@ -989,22 +988,17 @@ void MainWindow::applySettings()
 
 void MainWindow::applyAndSaveSettings()
 {
-    // Apply settings first.
     applySettings();
-    // We store settings.
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
     m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
     m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
-void MainWindow::restoreLastSavedSettings()
+void MainWindow::restoreSavedSettings()
 {
-    // We copy settings from stored settings object to our current
-    // settings points.
-    // Really we copy stored settings to the form and then apply
-    // settings.
-    // TODO: claim on empty fields. Probably on all together.
+    // We copy stored settings to the form and then invoke applySettings()
+    // TODO: Add sensible defaults to all values
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
     m_ui->comboBox_PathToJohn->setEditText(
         settingsPathToJohn == ""
@@ -1018,12 +1012,10 @@ void MainWindow::restoreLastSavedSettings()
         m_settings.value("AutoApplySettings").toString() == ""
         ? m_ui->checkBox_AutoApplySettings->isChecked()
         : m_settings.value("AutoApplySettings").toBool());
-    // We apply settings.
     applySettings();
 }
 
 // Handlers for settings auto application
-
 
 void MainWindow::settingsChangedByUser()
 {

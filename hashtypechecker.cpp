@@ -2,48 +2,25 @@
 
 HashTypeChecker::HashTypeChecker()
 {
-    connect(&m_john,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(startParsing()));
-    connect (&m_john, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()));
-}
-
-HashTypeChecker::~HashTypeChecker()
-{
-    terminate();
+    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(parseJohnAnswer()));
+    connect(this, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()));
 }
 
 void HashTypeChecker::start(const QString &pathToJohn, const QStringList &pathsToPwdFiles)
 {
-    QString joinedFilesPaths = pathsToPwdFiles.join(" ");
     // We make sure last process is terminated correctly before
     // loading a new password file.
-    terminate();
+    terminate(true);
     m_johnOutput.clear();
-    m_johnOutput.append(joinedFilesPaths + "\n");
-    m_john.start(pathToJohn + " --show=types " + joinedFilesPaths);
-}
-
-void HashTypeChecker::terminate(bool shouldProcessAvailableOutput)
-{
-    if (m_john.state() != QProcess::NotRunning) {
-        m_john.terminate();
-        m_john.waitForFinished(500);
-    }
-    if (m_john.state() != QProcess::NotRunning)
-        m_john.kill();
-
-    // Process what have been done so far from JohnOutput ..
-    if (!m_johnOutput.isEmpty() && shouldProcessAvailableOutput)
-        startParsing();
-}
-
-void HashTypeChecker::startParsing()
-{
-    QtConcurrent::run(this, &HashTypeChecker::parseJohnAnswer);
+    m_johnOutput.append(pathsToPwdFiles.join(" ") + "\n");
+    setArgs(QStringList() << "--show=types" << pathsToPwdFiles);
+    setJohnProgram(pathToJohn);
+    JohnHandler::start();
 }
 
 void HashTypeChecker::processOutput()
 {
-  m_johnOutput.append(m_john.readAllStandardOutput());
+  m_johnOutput.append(readAllStandardOutput());
 }
 
 void HashTypeChecker::parseJohnAnswer()

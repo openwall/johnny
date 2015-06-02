@@ -235,7 +235,7 @@ MainWindow::~MainWindow()
     m_johnAttack.stop();
     m_johnShow.stop();
     m_johnVersionCheck.stop();
-    m_hashTypeChecker.terminate();
+    m_hashTypeChecker.stop();
 
     delete m_ui;
     m_ui = 0;

@@ -1138,8 +1138,6 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 
 void MainWindow::verifyJohnVersion()
 {
-    // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
-    // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
     QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);

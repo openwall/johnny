@@ -99,14 +99,13 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
-    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)),
-            this,SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
-    connect(&m_passwordGuessing,SIGNAL(finished(int,QProcess::ExitStatus)),this,SLOT(callJohnShow()), Qt::QueuedConnection);
-    connect(&m_passwordGuessing,SIGNAL(finished(int,QProcess::ExitStatus)),this,
+    connect(&m_hashTypeChecker, SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)),
+            this, SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)), Qt::QueuedConnection);
+    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
+    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this,
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
     connect(&m_passwordGuessing, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
-
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
@@ -244,6 +243,7 @@ MainWindow::~MainWindow()
     m_johnShow.stop();
     m_johnVersionCheck.stop();
     m_hashTypeChecker.terminate();
+    m_passwordGuessing.stop();
 
     delete m_ui;
     m_ui = 0;
@@ -796,8 +796,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
 
-    if(exitStatus == QProcess::CrashExit)
-    {
+    if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
         return;
     }
@@ -1175,8 +1174,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 {
     Q_UNUSED(exitCode);
 
-    if(exitStatus == QProcess::CrashExit)
-    {
+    if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
         return;
     }

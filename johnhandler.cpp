@@ -102,7 +102,7 @@ void JohnHandler::stop()
     JohnHandler::terminate();
 }
 
-void JohnHandler::write(QString text)
+void JohnHandler::write(const QString &text)
 {
     m_john.write(text.toUtf8());
 }

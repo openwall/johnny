@@ -30,7 +30,7 @@ public:
     QString johnProgram() const;
     void setJohnProgram(const QString &johnProgram);
 
-    void write(QString text);
+    void write(const QString &text);
     void closeWriteChannel();
 
 signals:

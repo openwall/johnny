@@ -1355,7 +1355,7 @@
      <normaloff>:/icons/tab_log.png</normaloff>:/icons/tab_log.png</iconset>
    </property>
    <property name="text">
-    <string>Guess!</string>
+    <string>Guess</string>
    </property>
    <property name="toolTip">
     <string>I'm feeling lucky!</string>

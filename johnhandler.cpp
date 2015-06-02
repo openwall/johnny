@@ -102,6 +102,15 @@ void JohnHandler::stop()
     JohnHandler::terminate();
 }
 
+void JohnHandler::write(QString text)
+{
+    m_john.write(text.toUtf8());
+}
+
+void JohnHandler::closeWriteChannel()
+{
+    m_john.closeWriteChannel();
+}
 
 
 

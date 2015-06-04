@@ -56,20 +56,20 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
 
     // Multiple sessions management menu
-    QMenu *sessionMenu = new QMenu(this);
+    m_sessionMenu = new QMenu(this);
     //sessionMenu->addAction("Session 1");
     // We create a button.
     QToolButton *sessionMenuButton = new QToolButton(this);
     // We set default action and menu for the button.
     sessionMenuButton->setDefaultAction(m_ui->actionOpen_Last_Session);
-    sessionMenuButton->setMenu(sessionMenu);
+    sessionMenuButton->setMenu(m_sessionMenu);
     // We set button up to have desired look and behaviour.
     sessionMenuButton->setPopupMode(QToolButton::InstantPopup);
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     // We put the button onto the toolbar.
     m_ui->mainToolBar->insertWidget(m_ui->actionStart_Attack, sessionMenuButton);
     m_ui->mainToolBar->insertSeparator(m_ui->actionStart_Attack);
-    connect(sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
+    connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
@@ -103,7 +103,6 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
 
     // Action buttons
-    connect(m_ui->actionOpen_Last_Session,SIGNAL(triggered()),this,SLOT(openLastSession()));
     connect(m_ui->actionOpen_Password,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
     connect(m_ui->actionPause_Attack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
     connect(m_ui->actionResume_Attack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
@@ -126,18 +125,20 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Session for Johnny
     QDir sessionDir(m_appDataPath,"*.johnny", QDir::Time, QDir::Files);
+    bool isSessionListEmpty = true;
     QStringList fileNames = sessionDir.entryList();
     for (int i = 0; i < fileNames.size(); i++) {
         QString fileName = fileNames[i].remove(".johnny");
         QString completePath = QDir(m_appDataPath).filePath(fileName);
         if (QFileInfo(completePath + ".rec").isReadable()
                 && QFileInfo(completePath + ".johnny").isReadable()) {
-                QAction* fileAction = sessionMenu->addAction(fileName);
+                QAction* fileAction = m_sessionMenu->addAction(fileName);
                 fileAction->setData(fileName);
+                isSessionListEmpty = false;
             }
         }
 
-    sessionMenu->addAction(m_ui->actionClearSessionHistory);
+    m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
     //verifySessionState();
     m_session.clear(); // No session currently choosen by user
@@ -165,6 +166,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
+    m_ui->actionStart_Attack->setEnabled(false);
 
     #if !OS_FORK
     //As of now, fork is only supported on unix platforms
@@ -179,7 +181,7 @@ void MainWindow::verifySessionState()
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
-        m_ui->actionOpen_Last_Session->setEnabled(true);
+        //m_ui->actionOpen_Last_Session->setEnabled(true);
 
         QFile description(m_session + ".johnny");
         if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -203,10 +205,10 @@ void MainWindow::verifySessionState()
         m_ui->actionResume_Attack->setEnabled(
             hashesFileNames == m_hashesFilesNames
             && !hashesFileNames.isEmpty());
-        m_ui->actionOpen_Last_Session->setEnabled(
-            hashesFileNames != m_hashesFilesNames);
+        /*m_ui->actionOpen_Last_Session->setEnabled(
+            hashesFileNames != m_hashesFilesNames);*/
     } else {
-        m_ui->actionOpen_Last_Session->setEnabled(false);
+        //m_ui->actionOpen_Last_Session->setEnabled(false);
         m_ui->actionResume_Attack->setEnabled(false);
     }
 }
@@ -335,9 +337,6 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    if (QObject::sender() == m_ui->actionOpen_Last_Session) {
-        m_session = QDir(m_appDataPath).filePath(m_ui->actionOpen_Last_Session->data().toString());
-    }
     QFile description(m_session + ".johnny");
     if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(
@@ -796,12 +795,21 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     }
 
     appendLog(CONSOLE_LOG_SEPARATOR);
+
+    QList<QAction*> actions = m_sessionMenu->actions();
+    for(int i=0;i < actions.size(); i++) {
+        QString session = QDir(m_appDataPath).filePath(actions[i]->data().toString());
+        if (session != m_session) {
+            qDebug() << actions[i]->data().toString();
+        }
+    }
     // When John finishes we enable start button and disable stop
     // button.
+    verifySessionState();
     m_ui->actionPause_Attack->setEnabled(false);
     m_ui->actionStart_Attack->setEnabled(true);
     m_ui->actionOpen_Password->setEnabled(true);
-    verifySessionState();
+    m_ui->actionOpen_Last_Session->setEnabled(true);
     // When John stops we need to stop timer and to look status last
     // time.
     m_showTimer.stop();
@@ -816,8 +824,8 @@ void MainWindow::callJohnShow()
 
     QStringList args;
     // We add current format key if it is not empty.
-    if (m_format != "")
-        args << m_format;
+   /* if (m_format != "")
+        args << m_format;*/
     args << "--show" << m_temp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
@@ -1157,6 +1165,7 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {
             dir.remove(dirFile);
+
         }
         m_ui->actionOpen_Last_Session->setEnabled(false);
     } else {

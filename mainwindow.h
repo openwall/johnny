@@ -95,13 +95,13 @@ protected:
 private:
     bool                 m_terminate;
     Ui::MainWindow      *m_ui;
+    QMenu               *m_sessionMenu;
     QAbstractTableModel *m_hashesTable;
 
     QString              m_appDataPath;
 
     QStringList         m_hashesFilesNames;
     QString             m_session;
-    //QStringList         m_
     JohnAttack          m_johnAttack; // main JtR attack handler
     QDateTime           m_startDateTime; // Date and time of the start of the sttack
 

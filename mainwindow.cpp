@@ -128,15 +128,24 @@ MainWindow::MainWindow(QSettings &settings)
     QDir sessionDir(m_appDataPath,"*.johnny", QDir::Time, QDir::Files);
     QStringList fileNames = sessionDir.entryList();
     QString lastSession;
-    if (!fileNames.isEmpty()) {
-        lastSession = fileNames[0].remove(".johnny");
+    bool foundLastSession = false;
+    for (int i = 0; i < fileNames.size(); i++) {
+        QString fileName = fileNames[i].remove(".johnny");
+        QString completePath = QDir(m_appDataPath).filePath(fileName);
+
+        if (QFileInfo(completePath + ".rec").isReadable()
+                && QFileInfo(completePath + ".johnny").isReadable()) {
+            if (!foundLastSession) { // We find most recent readable session
+                foundLastSession = true;
+                lastSession = fileName;
+            } else {
+                QAction* fileAction = sessionMenu->addAction(fileName);
+                fileAction->setData(fileName);
+            }
+        }
     }
     m_ui->actionOpen_Last_Session->setData(lastSession);
-    for (int i = 1; i < fileNames.size(); i++) {
-        QString fileName = fileNames[i].remove(".johnny");
-        QAction* fileAction = sessionMenu->addAction(fileName);
-        fileAction->setData(fileName);
-    }
+    sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
     m_session = QDir(m_appDataPath).filePath(lastSession);
     verifySessionState();
@@ -155,11 +164,6 @@ MainWindow::MainWindow(QSettings &settings)
     // We load old settings.
     restoreSavedSettings();
 
-    // TODO: do this message on every invocation of john. Provide
-    //       checkbox to not show this again.
-    // TODO: default values for other settings are accepted silently.
-    // if (m_settings.value("PathToJohn").toString() == "")
-    //     warnAboutDefaultPathToJohn();
     Translator& translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
@@ -172,7 +176,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->actionCopyToClipboard->setEnabled(false);
 
     #if !OS_FORK
-    //As of now, fork is only supported on Linux platform
+    //As of now, fork is only supported on unix platforms
         m_ui->widget_Fork->hide();
     #endif
 
@@ -458,6 +462,8 @@ void MainWindow::startAttack()
     QStringList parameters = getAttackParameters();
 
     // Session for johnny
+    QString date = QDateTime::currentDateTime().toString("MM-dd-yy_hh:mm:ss");
+    m_session = QDir(m_appDataPath).filePath(date);
     QString nameOfFile = m_session + ".rec";
 
     if (QFileInfo(nameOfFile).isReadable()) {
@@ -1153,9 +1159,11 @@ void MainWindow::verifyJohnVersion()
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
-    QString fileName = action->data().toString();
-    if (!fileName.isEmpty()) {
-        m_session = QDir(m_appDataPath).filePath(fileName);
-        openLastSession();
+    if (action != m_ui->actionClearSessionHistory) {
+        QString fileName = action->data().toString();
+        if (!fileName.isEmpty()) {
+            m_session = QDir(m_appDataPath).filePath(fileName);
+            openLastSession();
+        }
     }
 }

@@ -309,7 +309,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
         if (m_isJumbo) {
-            m_hashTypeChecker.start(m_pathToJohn, fileNames);
+            m_hashTypeChecker.setJohnProgram(m_pathToJohn);
+            m_hashTypeChecker.start(fileNames);
         }
         return true;
     }
@@ -1123,7 +1124,8 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
     if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
-        m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
+        m_hashTypeChecker.setJohnProgram(m_pathToJohn);
+        m_hashTypeChecker.start(m_hashesFilesNames);
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
     if (!isJumbo) {

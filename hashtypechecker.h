@@ -35,7 +35,7 @@ class HashTypeChecker : public JohnHandler
     Q_OBJECT
 public:
     HashTypeChecker();
-    void start(const QString &pathToJohn, const QStringList &pathsToPwdFiles);
+    void start(const QStringList &passwordFiles);
 
 private slots:
     void parseJohnAnswer();

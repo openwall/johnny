@@ -1211,7 +1211,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Open Last Session</string>
+    <string>Open Previous Session</string>
    </property>
    <property name="toolTip">
     <string>Open Last Session</string>

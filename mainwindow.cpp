@@ -64,7 +64,7 @@ MainWindow::MainWindow(QSettings &settings)
     sessionMenuButton->setDefaultAction(m_ui->actionOpen_Last_Session);
     sessionMenuButton->setMenu(sessionMenu);
     // We set button up to have desired look and behaviour.
-    sessionMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
+    sessionMenuButton->setPopupMode(QToolButton::InstantPopup);
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     // We put the button onto the toolbar.
     m_ui->mainToolBar->insertWidget(m_ui->actionStart_Attack, sessionMenuButton);
@@ -127,28 +127,19 @@ MainWindow::MainWindow(QSettings &settings)
     // Session for Johnny
     QDir sessionDir(m_appDataPath,"*.johnny", QDir::Time, QDir::Files);
     QStringList fileNames = sessionDir.entryList();
-    QString lastSession;
-    bool foundLastSession = false;
     for (int i = 0; i < fileNames.size(); i++) {
         QString fileName = fileNames[i].remove(".johnny");
         QString completePath = QDir(m_appDataPath).filePath(fileName);
-
         if (QFileInfo(completePath + ".rec").isReadable()
                 && QFileInfo(completePath + ".johnny").isReadable()) {
-            if (!foundLastSession) { // We find most recent readable session
-                foundLastSession = true;
-                lastSession = fileName;
-            } else {
                 QAction* fileAction = sessionMenu->addAction(fileName);
                 fileAction->setData(fileName);
             }
         }
-    }
-    m_ui->actionOpen_Last_Session->setData(lastSession);
+
     sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
-    m_session = QDir(m_appDataPath).filePath(lastSession);
-    verifySessionState();
+    //verifySessionState();
     m_session.clear(); // No session currently choosen by user
 
     // We fill form with default values. Then we load settings. When
@@ -1159,7 +1150,16 @@ void MainWindow::verifyJohnVersion()
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
-    if (action != m_ui->actionClearSessionHistory) {
+    if (action == m_ui->actionClearSessionHistory) {
+        QString path = m_appDataPath;
+        QDir dir(path);
+        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec");
+        dir.setFilter(QDir::Files);
+        foreach (QString dirFile, dir.entryList()) {
+            dir.remove(dirFile);
+        }
+        m_ui->actionOpen_Last_Session->setEnabled(false);
+    } else {
         QString fileName = action->data().toString();
         if (!fileName.isEmpty()) {
             m_session = QDir(m_appDataPath).filePath(fileName);

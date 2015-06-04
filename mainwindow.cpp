@@ -55,31 +55,21 @@ MainWindow::MainWindow(QSettings &settings)
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
 
-    /*
-    // We add a button to the toolbar but this button is not simple. It has
-    // menu. And that menu drops like from menu button. Just QAction could not
-    // do it. Just QPushButton looses it's main action for popping
-    // menu. Solution with the best looking is QToolButton. QtCreator could not
-    // put such element on tool bar. It is possible to put it by hands through
-    // .ui file but it does not seem to be reliable. So we make it here in
-    // code.
-    //
-    // We create a desired menu.
+    // Multiple sessions management menu
     QMenu *sessionMenu = new QMenu(this);
-    sessionMenu->addAction(m_ui->actionNew_Session);
-    sessionMenu->addAction(m_ui->actionSave_Session);
+    //sessionMenu->addAction("Session 1");
     // We create a button.
     QToolButton *sessionMenuButton = new QToolButton(this);
     // We set default action and menu for the button.
-    sessionMenuButton->setDefaultAction(m_ui->actionOpen_Session);
+    sessionMenuButton->setDefaultAction(m_ui->actionOpen_Last_Session);
     sessionMenuButton->setMenu(sessionMenu);
     // We set button up to have desired look and behaviour.
     sessionMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
-    // TODO: May it be better to derive this setting from the toolbar?
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     // We put the button onto the toolbar.
-    m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
-    */
+    m_ui->mainToolBar->insertWidget(m_ui->actionStart_Attack, sessionMenuButton);
+    m_ui->mainToolBar->insertSeparator(m_ui->actionStart_Attack);
+    connect(sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
@@ -134,10 +124,23 @@ MainWindow::MainWindow(QSettings &settings)
         qApp->quit();
     }
 
-    // Session for johnny
-    m_session = QDir(m_appDataPath).filePath("default");
+    // Session for Johnny
+    QDir sessionDir(m_appDataPath,"*.johnny", QDir::Time, QDir::Files);
+    QStringList fileNames = sessionDir.entryList();
+    QString lastSession;
+    if (!fileNames.isEmpty()) {
+        lastSession = fileNames[0].remove(".johnny");
+    }
+    m_ui->actionOpen_Last_Session->setData(lastSession);
+    for (int i = 1; i < fileNames.size(); i++) {
+        QString fileName = fileNames[i].remove(".johnny");
+        QAction* fileAction = sessionMenu->addAction(fileName);
+        fileAction->setData(fileName);
+    }
 
+    m_session = QDir(m_appDataPath).filePath(lastSession);
     verifySessionState();
+    m_session.clear(); // No session currently choosen by user
 
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
@@ -337,6 +340,9 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
+    if (QObject::sender() == m_ui->actionOpen_Last_Session) {
+        m_session = QDir(m_appDataPath).filePath(m_ui->actionOpen_Last_Session->data().toString());
+    }
     QFile description(m_session + ".johnny");
     if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(
@@ -1143,4 +1149,13 @@ void MainWindow::verifyJohnVersion()
     QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
+}
+
+void MainWindow::actionOpenSessionTriggered(QAction* action)
+{
+    QString fileName = action->data().toString();
+    if (!fileName.isEmpty()) {
+        m_session = QDir(m_appDataPath).filePath(fileName);
+        openLastSession();
+    }
 }

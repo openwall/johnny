@@ -44,6 +44,7 @@ private slots:
     void resumeAttack();
     void pauseAttack();
     void actionCopyToClipboardTriggered();
+    void actionOpenSessionTriggered(QAction* action);
     void openPasswordFile();
     void openLastSession();
     void listWidgetTabsSelectionChanged();
@@ -100,6 +101,7 @@ private:
 
     QStringList         m_hashesFilesNames;
     QString             m_session;
+    //QStringList         m_
     JohnAttack          m_johnAttack; // main JtR attack handler
     QDateTime           m_startDateTime; // Date and time of the start of the sttack
 

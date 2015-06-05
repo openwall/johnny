@@ -57,16 +57,11 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Multiple sessions management menu
     m_sessionMenu = new QMenu(this);
-    //sessionMenu->addAction("Session 1");
-    // We create a button.
     QToolButton *sessionMenuButton = new QToolButton(this);
-    // We set default action and menu for the button.
     sessionMenuButton->setDefaultAction(m_ui->actionOpen_Last_Session);
     sessionMenuButton->setMenu(m_sessionMenu);
-    // We set button up to have desired look and behaviour.
     sessionMenuButton->setPopupMode(QToolButton::InstantPopup);
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    // We put the button onto the toolbar.
     m_ui->mainToolBar->insertWidget(m_ui->actionStart_Attack, sessionMenuButton);
     m_ui->mainToolBar->insertSeparator(m_ui->actionStart_Attack);
     connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
@@ -124,7 +119,7 @@ MainWindow::MainWindow(QSettings &settings)
     }
 
     // Session for Johnny
-    QDir sessionDir(m_appDataPath,"*.johnny", QDir::Time, QDir::Files);
+    QDir sessionDir(m_appDataPath, "*.johnny", QDir::Time, QDir::Files);
     QStringList fileNames = sessionDir.entryList();
     for (int i = 0; i < fileNames.size(); i++) {
         QString fileName = fileNames[i].remove(".johnny");
@@ -1173,6 +1168,7 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
                     m_sessionMenu->removeAction(actions);
             }
         }
+        m_session.clear();
         m_ui->actionResume_Attack->setEnabled(false);
     } else {
         QString fileName = action->data().toString();

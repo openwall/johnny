@@ -119,11 +119,11 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
 
     // Action buttons
-    connect(m_ui->actionOpen_Last_Session,SIGNAL(triggered()),this,SLOT(openLastSession()));
-    connect(m_ui->actionOpen_Password,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
-    connect(m_ui->actionPause_Attack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
-    connect(m_ui->actionResume_Attack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
-    connect(m_ui->actionStart_Attack,SIGNAL(triggered()),this,SLOT(startAttack()));
+    connect(m_ui->actionOpenLastSession,SIGNAL(triggered()),this,SLOT(openLastSession()));
+    connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
+    connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
+    connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
+    connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
     connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
     connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
@@ -184,15 +184,15 @@ MainWindow::MainWindow(QSettings &settings)
 
 void MainWindow::verifySessionState()
 {
-    m_ui->actionStart_Attack->setEnabled(! m_hashesFilesNames.isEmpty());
+    m_ui->actionStartAttack->setEnabled(! m_hashesFilesNames.isEmpty());
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
-        m_ui->actionOpen_Last_Session->setEnabled(true);
+        m_ui->actionOpenLastSession->setEnabled(true);
 
         QFile description(m_session + ".johnny");
         if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_ui->actionResume_Attack->setEnabled(false);
+            m_ui->actionResumeAttack->setEnabled(false);
             return;
         }
         QTextStream descriptionStream(&description);
@@ -209,14 +209,14 @@ void MainWindow::verifySessionState()
         }
         description.close();
 
-        m_ui->actionResume_Attack->setEnabled(
+        m_ui->actionResumeAttack->setEnabled(
             hashesFileNames == m_hashesFilesNames
             && !hashesFileNames.isEmpty());
-        m_ui->actionOpen_Last_Session->setEnabled(
+        m_ui->actionOpenLastSession->setEnabled(
             hashesFileNames != m_hashesFilesNames);
     } else {
-        m_ui->actionOpen_Last_Session->setEnabled(false);
-        m_ui->actionResume_Attack->setEnabled(false);
+        m_ui->actionOpenLastSession->setEnabled(false);
+        m_ui->actionResumeAttack->setEnabled(false);
     }
 }
 
@@ -726,14 +726,14 @@ void MainWindow::pauseAttack()
 void MainWindow::showJohnStarted()
 {
     // We disable all buttons.
-    m_ui->actionPause_Attack->setEnabled(false);
-    m_ui->actionStart_Attack->setEnabled(false);
-    m_ui->actionResume_Attack->setEnabled(false);
-    m_ui->actionOpen_Password->setEnabled(false);
-    m_ui->actionOpen_Last_Session->setEnabled(false);
+    m_ui->actionPauseAttack->setEnabled(false);
+    m_ui->actionStartAttack->setEnabled(false);
+    m_ui->actionResumeAttack->setEnabled(false);
+    m_ui->actionOpenPassword->setEnabled(false);
+    m_ui->actionOpenLastSession->setEnabled(false);
 
     // When John starts we enable stop button.
-    m_ui->actionPause_Attack->setEnabled(true);
+    m_ui->actionPauseAttack->setEnabled(true);
     // When John starts we start capturing passwords.
     // TODO: When user change respective setting time for current run
     //       is not changed. Probably user expects other.
@@ -800,9 +800,9 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     appendLog(CONSOLE_LOG_SEPARATOR);
     // When John finishes we enable start button and disable stop
     // button.
-    m_ui->actionPause_Attack->setEnabled(false);
-    m_ui->actionStart_Attack->setEnabled(true);
-    m_ui->actionOpen_Password->setEnabled(true);
+    m_ui->actionPauseAttack->setEnabled(false);
+    m_ui->actionStartAttack->setEnabled(true);
+    m_ui->actionOpenPassword->setEnabled(true);
     verifySessionState();
 
     if (exitStatus == QProcess::CrashExit) {

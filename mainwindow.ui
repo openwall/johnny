@@ -1145,12 +1145,12 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpen_Password"/>
-   <addaction name="actionOpen_Last_Session"/>
+   <addaction name="actionOpenPassword"/>
+   <addaction name="actionOpenLastSession"/>
    <addaction name="separator"/>
-   <addaction name="actionStart_Attack"/>
-   <addaction name="actionResume_Attack"/>
-   <addaction name="actionPause_Attack"/>
+   <addaction name="actionStartAttack"/>
+   <addaction name="actionResumeAttack"/>
+   <addaction name="actionPauseAttack"/>
    <addaction name="separator"/>
    <addaction name="actionGuessPassword"/>
    <addaction name="separator"/>
@@ -1170,16 +1170,16 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen_Password"/>
-    <addaction name="actionOpen_Last_Session"/>
+    <addaction name="actionOpenPassword"/>
+    <addaction name="actionOpenLastSession"/>
    </widget>
    <widget class="QMenu" name="menuAttack">
     <property name="title">
      <string>Attack</string>
     </property>
-    <addaction name="actionStart_Attack"/>
-    <addaction name="actionResume_Attack"/>
-    <addaction name="actionPause_Attack"/>
+    <addaction name="actionStartAttack"/>
+    <addaction name="actionResumeAttack"/>
+    <addaction name="actionPauseAttack"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1226,7 +1226,7 @@
     <string>Preferences</string>
    </property>
   </action>
-  <action name="actionOpen_Password">
+  <action name="actionOpenPassword">
    <property name="icon">
     <iconset>
      <normalon>:/icons/fileopen.png</normalon>
@@ -1245,7 +1245,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionOpen_Last_Session">
+  <action name="actionOpenLastSession">
    <property name="icon">
     <iconset>
      <normalon>:/icons/fileopen.png</normalon>
@@ -1283,7 +1283,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionStart_Attack">
+  <action name="actionStartAttack">
    <property name="icon">
     <iconset>
      <normalon>:/icons/start-attack.png</normalon>
@@ -1302,7 +1302,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionResume_Attack">
+  <action name="actionResumeAttack">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -1324,7 +1324,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionPause_Attack">
+  <action name="actionPauseAttack">
    <property name="enabled">
     <bool>false</bool>
    </property>

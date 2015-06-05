@@ -1152,7 +1152,7 @@
    <addaction name="actionResume_Attack"/>
    <addaction name="actionPause_Attack"/>
    <addaction name="separator"/>
-   <addaction name="actionGuess_Password"/>
+   <addaction name="actionGuessPassword"/>
    <addaction name="separator"/>
    <addaction name="actionCopyToClipboard"/>
   </widget>
@@ -1346,7 +1346,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionGuess_Password">
+  <action name="actionGuessPassword">
    <property name="enabled">
     <bool>false</bool>
    </property>

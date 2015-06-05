@@ -129,7 +129,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
     connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
-    connect(m_ui->actionGuess_Password,SIGNAL(triggered()), this, SLOT(guessPassword()));
+    connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
     connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
@@ -335,7 +335,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         }
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
-        m_ui->actionGuess_Password->setEnabled(true);
+        m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.start(m_pathToJohn, fileNames);
         }
@@ -788,19 +788,15 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 
     QMessageBox::critical(this, tr("Johnny"), message + "(" + m_pathToJohn + ")");
 
-    if(QObject::sender() == &m_passwordGuessing)
-        m_ui->actionGuess_Password->setEnabled(true);
+    if (QObject::sender() == &m_passwordGuessing) {
+        m_ui->actionGuessPassword->setEnabled(true);
+    }
+
 }
 
 void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
-
-    if (exitStatus == QProcess::CrashExit) {
-        qDebug() << "JtR seems to have crashed.";
-        return;
-    }
-
     appendLog(CONSOLE_LOG_SEPARATOR);
     // When John finishes we enable start button and disable stop
     // button.
@@ -808,6 +804,11 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     m_ui->actionStart_Attack->setEnabled(true);
     m_ui->actionOpen_Password->setEnabled(true);
     verifySessionState();
+
+    if (exitStatus == QProcess::CrashExit) {
+        qDebug() << "JtR seems to have crashed.";
+        return;
+    }
     // When John stops we need to stop timer and to look status last
     // time.
     m_showTimer.stop();
@@ -1158,10 +1159,10 @@ void MainWindow::guessPassword()
 {
     bool isOk;
     QString guess = QInputDialog::getText(this, tr("Password Guessing"),
-                                         tr("Enter a word:"), QLineEdit::Normal,
+                                         tr("Your passphrase guess:"), QLineEdit::Normal,
                                          "", &isOk);
     if (isOk && !guess.isEmpty()) {
-        m_ui->actionGuess_Password->setEnabled(false);
+        m_ui->actionGuessPassword->setEnabled(false);
         m_passwordGuessing.setJohnProgram(m_pathToJohn);
         m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_hashesFilesNames);
         m_passwordGuessing.start();
@@ -1173,10 +1174,9 @@ void MainWindow::guessPassword()
 void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
-
+    m_ui->actionGuessPassword->setEnabled(true);
     if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
         return;
     }
-    m_ui->actionGuess_Password->setEnabled(true);
 }

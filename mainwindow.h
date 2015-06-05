@@ -102,6 +102,7 @@ private:
 
     QStringList         m_hashesFilesNames;
     QString             m_session;
+    QStringList         m_sessionHistory;
     JohnAttack          m_johnAttack; // main JtR attack handler
     QDateTime           m_startDateTime; // Date and time of the start of the sttack
 

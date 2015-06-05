@@ -125,7 +125,6 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Session for Johnny
     QDir sessionDir(m_appDataPath,"*.johnny", QDir::Time, QDir::Files);
-    bool isSessionListEmpty = true;
     QStringList fileNames = sessionDir.entryList();
     for (int i = 0; i < fileNames.size(); i++) {
         QString fileName = fileNames[i].remove(".johnny");
@@ -134,7 +133,7 @@ MainWindow::MainWindow(QSettings &settings)
                 && QFileInfo(completePath + ".johnny").isReadable()) {
                 QAction* fileAction = m_sessionMenu->addAction(fileName);
                 fileAction->setData(fileName);
-                isSessionListEmpty = false;
+                m_sessionHistory.append(fileName);
             }
         }
 
@@ -796,13 +795,16 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     appendLog(CONSOLE_LOG_SEPARATOR);
 
-    QList<QAction*> actions = m_sessionMenu->actions();
-    for(int i=0;i < actions.size(); i++) {
-        QString session = QDir(m_appDataPath).filePath(actions[i]->data().toString());
-        if (session != m_session) {
-            qDebug() << actions[i]->data().toString();
-        }
+    QString sessionName = m_session;
+    sessionName.remove(m_appDataPath);
+    if (!m_sessionHistory.contains(sessionName) && (QFileInfo(m_session + ".rec").isReadable())
+            && (QFileInfo(m_session + ".johnny").isReadable())) {
+        QAction* action = new QAction(sessionName,this);
+        m_sessionMenu->insertAction(m_sessionMenu->actions()[0],action);
+        action->setData(sessionName);
+        m_sessionHistory.append(sessionName);
     }
+
     // When John finishes we enable start button and disable stop
     // button.
     verifySessionState();
@@ -1158,16 +1160,20 @@ void MainWindow::verifyJohnVersion()
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
-    if (action == m_ui->actionClearSessionHistory) {
+    if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
         QString path = m_appDataPath;
         QDir dir(path);
         dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec");
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {
             dir.remove(dirFile);
-
         }
-        m_ui->actionOpen_Last_Session->setEnabled(false);
+        foreach(QAction* actions, m_sessionMenu->actions()) {
+            if (m_sessionHistory.removeOne(actions->data().toString())) {
+                    m_sessionMenu->removeAction(actions);
+            }
+        }
+        m_ui->actionResume_Attack->setEnabled(false);
     } else {
         QString fileName = action->data().toString();
         if (!fileName.isEmpty()) {

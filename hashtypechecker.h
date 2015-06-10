@@ -1,7 +1,7 @@
 #ifndef HASHTYPECHECKER_H
 #define HASHTYPECHECKER_H
 
-#include "johnprocess.h"
+#include "johnhandler.h"
 
 #include <QObject>
 #include <QTextStream>
@@ -30,26 +30,22 @@ struct Hash
     std::vector<HashFormat> listFormats;
 };
 
-class HashTypeChecker : public QObject
+class HashTypeChecker : public JohnHandler
 {
     Q_OBJECT
 public:
     HashTypeChecker();
-    ~HashTypeChecker();
-    void start(const QString &pathToJohn, const QStringList &pathsToPwdFiles);
-    void terminate(bool shouldProcessAvailableOutput = false);
+    void start(const QStringList &passwordFiles);
 
 private slots:
-    void startParsing();
+    void parseJohnAnswer();
     void processOutput();
 
 private:
-    void parseJohnAnswer();
-    JohnProcess m_john;
     QString m_johnOutput;
-
+    QStringList m_passwordFiles;
 signals:
-    void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+    void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);
 };
 

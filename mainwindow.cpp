@@ -99,8 +99,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
-    connect(&m_hashTypeChecker, SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)),
-            this, SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)), Qt::QueuedConnection);
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
+            SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
     connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
     connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this,
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
@@ -242,7 +242,7 @@ MainWindow::~MainWindow()
     m_johnAttack.stop();
     m_johnShow.stop();
     m_johnVersionCheck.stop();
-    m_hashTypeChecker.terminate();
+    m_hashTypeChecker.stop();
     m_passwordGuessing.stop();
 
     delete m_ui;
@@ -337,7 +337,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_ui->actionCopyToClipboard->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
-            m_hashTypeChecker.start(m_pathToJohn, fileNames);
+            m_hashTypeChecker.setJohnProgram(m_pathToJohn);
+            m_hashTypeChecker.start(fileNames);
         }
         return true;
     }
@@ -1111,11 +1112,11 @@ void MainWindow::appendLog(const QString& text)
 /* This slot is triggered when the types changed. This is probably because :
  * 1) a new password file has been loaded OR 2) old file with a new jumbo john was used
  */
-void MainWindow::updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                                  const QStringList &detailedTypesPerRow)
 {
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames.join(" "))) {
+    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
@@ -1133,7 +1134,8 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
     if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
-        m_hashTypeChecker.start(m_pathToJohn, m_hashesFilesNames);
+        m_hashTypeChecker.setJohnProgram(m_pathToJohn);
+        m_hashTypeChecker.start(m_hashesFilesNames);
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
     if (!isJumbo) {
@@ -1148,8 +1150,6 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 
 void MainWindow::verifyJohnVersion()
 {
-    // TODO : In 1.5.3, this method will be in another class and it'll emit a signal like
-    // johnChanged(bool isJumbo) which will trigger MainWindow::setAvailabilityOfFeatures(isJumbo)
     QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);

@@ -2,48 +2,25 @@
 
 HashTypeChecker::HashTypeChecker()
 {
-    connect(&m_john,SIGNAL(finished(int, QProcess::ExitStatus)),this,SLOT(startParsing()));
-    connect (&m_john, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()));
+    qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
+    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(parseJohnAnswer()), Qt::QueuedConnection);
+    connect(this, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()), Qt::QueuedConnection);
 }
 
-HashTypeChecker::~HashTypeChecker()
+void HashTypeChecker::start(const QStringList &passwordFiles)
 {
-    terminate();
-}
-
-void HashTypeChecker::start(const QString &pathToJohn, const QStringList &pathsToPwdFiles)
-{
-    QString joinedFilesPaths = pathsToPwdFiles.join(" ");
     // We make sure last process is terminated correctly before
     // loading a new password file.
     terminate();
     m_johnOutput.clear();
-    m_johnOutput.append(joinedFilesPaths + "\n");
-    m_john.start(pathToJohn + " --show=types " + joinedFilesPaths);
-}
-
-void HashTypeChecker::terminate(bool shouldProcessAvailableOutput)
-{
-    if (m_john.state() != QProcess::NotRunning) {
-        m_john.terminate();
-        m_john.waitForFinished(500);
-    }
-    if (m_john.state() != QProcess::NotRunning)
-        m_john.kill();
-
-    // Process what have been done so far from JohnOutput ..
-    if (!m_johnOutput.isEmpty() && shouldProcessAvailableOutput)
-        startParsing();
-}
-
-void HashTypeChecker::startParsing()
-{
-    QtConcurrent::run(this, &HashTypeChecker::parseJohnAnswer);
+    m_passwordFiles = passwordFiles;
+    setArgs(QStringList() << "--show=types" << passwordFiles);
+    JohnHandler::start();
 }
 
 void HashTypeChecker::processOutput()
 {
-  m_johnOutput.append(m_john.readAllStandardOutput());
+  m_johnOutput.append(readAllStandardOutput());
 }
 
 void HashTypeChecker::parseJohnAnswer()
@@ -54,10 +31,8 @@ void HashTypeChecker::parseJohnAnswer()
     QStringList detailedTypesPerRow;
     QList<Hash> hashesAllInfos;
     QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
-    QString filePath;
     if (!m_johnOutput.isEmpty()) {
-        filePath = lines[0];
-        for (int i = 1; i < lines.size(); i++) {
+        for (int i = 0; i < lines.size(); i++) {
             QString currentLine = lines[i];
             // Each valid line from john is gonna have at least 7 fields
             if (currentLine.length() >= 7) {
@@ -115,5 +90,6 @@ void HashTypeChecker::parseJohnAnswer()
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
     m_johnOutput.clear();
-    emit updateHashTypes(filePath,uniqueTypesInFile,detailedTypesPerRow);
+    emit updateHashTypes(m_passwordFiles,uniqueTypesInFile,detailedTypesPerRow);
+    m_passwordFiles.clear();
 }

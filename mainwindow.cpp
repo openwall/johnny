@@ -333,6 +333,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
+        callJohnShow();
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);

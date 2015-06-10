@@ -65,6 +65,8 @@ private slots:
     void readJohnShow();
     void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);
+    void guessPassword();
+    void guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus);
     // TO DO : In 1.5.3, connect this slot to the signal of CoreHandler when parsing is done
     void setAvailabilityOfFeatures(bool isJumbo);
     // TO DO : In 1.5.3, get rid of this slot in MainWindow and make something similar in the
@@ -130,6 +132,7 @@ private:
     bool            m_isJumbo;
 
     HashTypeChecker m_hashTypeChecker;
+    JohnHandler     m_passwordGuessing;
 };
 
 #endif // MAINWINDOW_H

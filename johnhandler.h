@@ -30,6 +30,9 @@ public:
     QString johnProgram() const;
     void setJohnProgram(const QString &johnProgram);
 
+    void write(const QString &text);
+    void closeWriteChannel();
+
 signals:
     void started();
     void finished(int exitCode, QProcess::ExitStatus exitStatus);

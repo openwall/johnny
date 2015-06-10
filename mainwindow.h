@@ -65,6 +65,9 @@ private slots:
     void readJohnShow();
     void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);
+
+    void guessPassword();
+    void guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void setAvailabilityOfFeatures(bool isJumbo);
     void verifyJohnVersion();
 
@@ -127,6 +130,7 @@ private:
     bool            m_isJumbo;
 
     HashTypeChecker m_hashTypeChecker;
+    JohnHandler     m_passwordGuessing;
 };
 
 #endif // MAINWINDOW_H

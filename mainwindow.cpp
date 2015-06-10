@@ -20,7 +20,7 @@
 #include <QThread>
 #include <QTextCursor>
 #include <QStandardPaths>
-#include <QDebug>
+#include <QInputDialog>
 
 #define INTERVAL_PICK_CRACKED 600
 #define PASSWORD_TAB 0
@@ -99,7 +99,13 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
-    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
+            SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
+    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
+    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this,
+            SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
+    connect(&m_passwordGuessing, SIGNAL(error(QProcess::ProcessError)), this,
+            SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
@@ -113,16 +119,17 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
 
     // Action buttons
-    connect(m_ui->actionOpen_Last_Session,SIGNAL(triggered()),this,SLOT(openLastSession()));
-    connect(m_ui->actionOpen_Password,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
-    connect(m_ui->actionPause_Attack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
-    connect(m_ui->actionResume_Attack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
-    connect(m_ui->actionStart_Attack,SIGNAL(triggered()),this,SLOT(startAttack()));
+    connect(m_ui->actionOpenLastSession,SIGNAL(triggered()),this,SLOT(openLastSession()));
+    connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
+    connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
+    connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
+    connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
     connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
     connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
     connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
+    connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
     connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
@@ -177,15 +184,15 @@ MainWindow::MainWindow(QSettings &settings)
 
 void MainWindow::verifySessionState()
 {
-    m_ui->actionStart_Attack->setEnabled(! m_hashesFilesNames.isEmpty());
+    m_ui->actionStartAttack->setEnabled(! m_hashesFilesNames.isEmpty());
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
-        m_ui->actionOpen_Last_Session->setEnabled(true);
+        m_ui->actionOpenLastSession->setEnabled(true);
 
         QFile description(m_session + ".johnny");
         if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_ui->actionResume_Attack->setEnabled(false);
+            m_ui->actionResumeAttack->setEnabled(false);
             return;
         }
         QTextStream descriptionStream(&description);
@@ -202,14 +209,14 @@ void MainWindow::verifySessionState()
         }
         description.close();
 
-        m_ui->actionResume_Attack->setEnabled(
+        m_ui->actionResumeAttack->setEnabled(
             hashesFileNames == m_hashesFilesNames
             && !hashesFileNames.isEmpty());
-        m_ui->actionOpen_Last_Session->setEnabled(
+        m_ui->actionOpenLastSession->setEnabled(
             hashesFileNames != m_hashesFilesNames);
     } else {
-        m_ui->actionOpen_Last_Session->setEnabled(false);
-        m_ui->actionResume_Attack->setEnabled(false);
+        m_ui->actionOpenLastSession->setEnabled(false);
+        m_ui->actionResumeAttack->setEnabled(false);
     }
 }
 
@@ -236,6 +243,7 @@ MainWindow::~MainWindow()
     m_johnShow.stop();
     m_johnVersionCheck.stop();
     m_hashTypeChecker.stop();
+    m_passwordGuessing.stop();
 
     delete m_ui;
     m_ui = 0;
@@ -306,8 +314,28 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         replaceTableModel(model);
         // After new model remembered we remember its file name.
         m_hashesFilesNames = fileNames;
+        // We make a file with original hash in gecos to connect password
+        // with original hash during `john --show`.
+        if (!m_temp) {
+            m_temp = new QTemporaryFile();
+            if (m_temp->open()) {
+                QTextStream temp(m_temp);
+                for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+                    QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
+                    QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
+                    temp << user << ":" << hash << "::" << hash << '\n';
+                }
+                m_temp->close();
+            } else {
+                QMessageBox::critical(
+                    this,
+                    tr("Johnny"),
+                    tr("Can't open a temporary file. Your disk might be full."));
+            }
+        }
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
+        m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
             m_hashTypeChecker.start(fileNames);
@@ -699,35 +727,14 @@ void MainWindow::pauseAttack()
 void MainWindow::showJohnStarted()
 {
     // We disable all buttons.
-    m_ui->actionPause_Attack->setEnabled(false);
-    m_ui->actionStart_Attack->setEnabled(false);
-    m_ui->actionResume_Attack->setEnabled(false);
-    m_ui->actionOpen_Password->setEnabled(false);
-    m_ui->actionOpen_Last_Session->setEnabled(false);
-
-    // We make a file with original hash in gecos to connect password
-    // with original hash during `john --show`.
-    if (!m_temp) {
-        m_temp = new QTemporaryFile();
-        if (m_temp->open()) {
-            QTextStream temp(m_temp);
-            for (int i = 0; i < m_hashesTable->rowCount(); i++) {
-                QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
-                QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
-                temp << user << ":" << hash << "::" << hash << '\n';
-            }
-            m_temp->close();
-        } else {
-            QMessageBox::critical(
-                this,
-                tr("Johnny"),
-                tr("Can't open a temporary file. Your disk might be full."));
-        }
-    }
-
+    m_ui->actionPauseAttack->setEnabled(false);
+    m_ui->actionStartAttack->setEnabled(false);
+    m_ui->actionResumeAttack->setEnabled(false);
+    m_ui->actionOpenPassword->setEnabled(false);
+    m_ui->actionOpenLastSession->setEnabled(false);
 
     // When John starts we enable stop button.
-    m_ui->actionPause_Attack->setEnabled(true);
+    m_ui->actionPauseAttack->setEnabled(true);
     // When John starts we start capturing passwords.
     // TODO: When user change respective setting time for current run
     //       is not changed. Probably user expects other.
@@ -781,25 +788,28 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
     }
 
     QMessageBox::critical(this, tr("Johnny"), message + "(" + m_pathToJohn + ")");
+
+    if (QObject::sender() == &m_passwordGuessing) {
+        m_ui->actionGuessPassword->setEnabled(true);
+    }
+
 }
 
 void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
-
-    if(exitStatus == QProcess::CrashExit)
-    {
-        qDebug() << "JtR seems to have crashed.";
-        return;
-    }
-
     appendLog(CONSOLE_LOG_SEPARATOR);
     // When John finishes we enable start button and disable stop
     // button.
-    m_ui->actionPause_Attack->setEnabled(false);
-    m_ui->actionStart_Attack->setEnabled(true);
-    m_ui->actionOpen_Password->setEnabled(true);
+    m_ui->actionPauseAttack->setEnabled(false);
+    m_ui->actionStartAttack->setEnabled(true);
+    m_ui->actionOpenPassword->setEnabled(true);
     verifySessionState();
+
+    if (exitStatus == QProcess::CrashExit) {
+        qDebug() << "JtR seems to have crashed.";
+        return;
+    }
     // When John stops we need to stop timer and to look status last
     // time.
     m_showTimer.stop();
@@ -1143,4 +1153,30 @@ void MainWindow::verifyJohnVersion()
     QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
+}
+
+void MainWindow::guessPassword()
+{
+    bool isOk;
+    QString guess = QInputDialog::getText(this, tr("Password Guessing"),
+                                         tr("Your passphrase guess:"), QLineEdit::Normal,
+                                         "", &isOk);
+    if (isOk && !guess.isEmpty()) {
+        m_ui->actionGuessPassword->setEnabled(false);
+        m_passwordGuessing.setJohnProgram(m_pathToJohn);
+        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_hashesFilesNames);
+        m_passwordGuessing.start();
+        m_passwordGuessing.write(guess);
+        m_passwordGuessing.closeWriteChannel();
+    }
+}
+
+void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitCode);
+    m_ui->actionGuessPassword->setEnabled(true);
+    if (exitStatus == QProcess::CrashExit) {
+        qDebug() << "JtR seems to have crashed.";
+        return;
+    }
 }

@@ -45,7 +45,7 @@ private:
     QString m_johnOutput;
     QStringList m_passwordFiles;
 signals:
-    void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+    void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);
 };
 

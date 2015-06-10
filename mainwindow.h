@@ -63,7 +63,7 @@ private slots:
     void startJohn(QStringList args);
     void callJohnShow();
     void readJohnShow();
-    void updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+    void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);
     void setAvailabilityOfFeatures(bool isJumbo);
     void verifyJohnVersion();

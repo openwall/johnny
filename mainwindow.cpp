@@ -99,7 +99,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
             this, SLOT(readJohnShow()));
 
-    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QString&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QString&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
+    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
@@ -1102,11 +1102,11 @@ void MainWindow::appendLog(const QString& text)
 /* This slot is triggered when the types changed. This is probably because :
  * 1) a new password file has been loaded OR 2) old file with a new jumbo john was used
  */
-void MainWindow::updateHashTypes(const QString &pathToPwdFile, const QStringList &listOfTypesInFile,
+void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                                  const QStringList &detailedTypesPerRow)
 {
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames.join(" "))) {
+    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);

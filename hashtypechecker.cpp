@@ -30,7 +30,6 @@ void HashTypeChecker::parseJohnAnswer()
     QStringList uniqueTypesInFile;
     QStringList detailedTypesPerRow;
     QList<Hash> hashesAllInfos;
-    QString filePath = m_passwordFiles.join(" ");
     QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
     if (!m_johnOutput.isEmpty()) {
         for (int i = 0; i < lines.size(); i++) {
@@ -91,6 +90,6 @@ void HashTypeChecker::parseJohnAnswer()
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
     m_johnOutput.clear();
+    emit updateHashTypes(m_passwordFiles,uniqueTypesInFile,detailedTypesPerRow);
     m_passwordFiles.clear();
-    emit updateHashTypes(filePath,uniqueTypesInFile,detailedTypesPerRow);
 }

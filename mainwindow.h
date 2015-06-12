@@ -81,6 +81,10 @@ private slots:
     void verifySessionState();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
+    
+    // Session related
+    void restoreSessionUI(const QString& sessionName);
+    void saveNewSession(const QString& sessionName);
 
     // Helpers
     void appendLog(const QString& text);

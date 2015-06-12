@@ -1253,7 +1253,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Start Attack</string>
+    <string>Start New Attack</string>
    </property>
    <property name="toolTip">
     <string>Start cracking passwords</string>

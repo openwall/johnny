@@ -141,7 +141,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
-    //verifySessionState();
+    verifySessionState();
     m_session.clear(); // No session currently choosen by user
 
     // We fill form with default values. Then we load settings. When
@@ -182,7 +182,7 @@ void MainWindow::verifySessionState()
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
-        //m_ui->actionOpen_Last_Session->setEnabled(true);
+        m_ui->actionOpenLastSession->setEnabled(true);
 
         QFile description(m_session + ".johnny");
         if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -534,6 +534,7 @@ void MainWindow::startAttack()
  * it returns the selected parameters in Johnny (UI-side) */
 QStringList MainWindow::getAttackParameters()
 {
+    m_settings.beginGroup("sessions/" + m_session);
     QStringList parameters;
     // We prepare parameters list from options section.
 
@@ -574,38 +575,32 @@ QStringList MainWindow::getAttackParameters()
         // key.
         m_format = "";
     }
+    m_settings.setValue("format", m_ui->comboBox_Format->currentText());
+    
     // Modes
     if (m_ui->defaultModeTab->isVisible()) {
         // Default behaviour - no modes
         // There are no options here.
+        m_settings.setValue("mode", "default");
     } else if (m_ui->singleModeTab->isVisible()) {
         // "Single crack" mode
         parameters << "--single";
+        m_settings.setValue("mode", "single");
         // External mode, filter
-        if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
+        if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
+            m_settings.setValue("external", m_ui->comboBox_SingleCrackModeExternalName->currentText());
+        }
     } else if (m_ui->wordlistModeTab->isVisible()) {
         // Wordlist mode
+        m_settings.setValue("mode", "wordlist");
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
+        m_settings.setValue("wordlistFile", m_ui->comboBox_WordlistFile->currentText());
+        
         // Rules
-        // They could appear with or without name.
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
-            // If rules are selected then we distinguish either name
-            // is needed two.
-            // if (m_ui->checkBox_WordlistModeRulesName->isChecked()) {
-            //     // If name for rules is selected to be then we take it.
-            //     // NOTE: Not all versions support this.
-            //     // TODO: It would be great to notice user about this.
-            //     // TODO: It would be great to notice user on any
-            //     //       fails, not only here.
-            //     // TODO: Calls to John makes interface to stick a bit.
-            //     //       It is actual with often -show calls.
-            //     parameters << ("--rules=" + m_ui->comboBox_WordlistModeRulesName->currentText());
-            // } else {
-                // If no name is needed then we use just rules,
-                // without name.
                 parameters << "--rules";
-            // }
+                
         }
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked())
@@ -629,9 +624,13 @@ QStringList MainWindow::getAttackParameters()
     }
 
     // Selectors
-    if (m_ui->checkBox_LimitUsers->isChecked())
+    if (m_ui->checkBox_LimitUsers->isChecked()) {
         parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
+        
+        
+    }
     if (m_ui->checkBox_LimitGroups->isChecked())
+        
         parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
     if (m_ui->checkBox_LimitShells->isChecked())
         parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
@@ -832,8 +831,8 @@ void MainWindow::callJohnShow()
 
     QStringList args;
     // We add current format key if it is not empty.
-   /* if (m_format != "")
-        args << m_format;*/
+    if (m_format != "")
+        args << m_format;
     args << "--show" << m_temp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
@@ -1213,4 +1212,23 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
         qDebug() << "JtR seems to have crashed.";
         return;
     }
+}
+
+void MainWindow::restoreSessionUI(const QString& sessionName)
+{
+    
+}
+
+void MainWindow::saveNewSession(const QString& sessionName)
+{
+    /*m_settings.beginGroup("sessions/" + sessionName);
+#if OS_FORK
+    m_settings.setValue("format", m_ui->comboBox_Format->currentText());
+
+#endif
+    m_settings.setValue("isUsingFork", m_ui->);
+    m_settings.setValue("fullScreen", win->isFullScreen());
+    m_settings.endGroup();*/
+ 
+    
 }

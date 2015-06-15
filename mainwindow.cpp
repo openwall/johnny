@@ -578,11 +578,12 @@ QStringList MainWindow::getAttackParameters()
     m_settings.setValue("format", m_ui->comboBox_Format->currentText());
     
     // Modes
-    if (m_ui->defaultModeTab->isVisible()) {
+    QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
+    if (selectedMode == m_ui->defaultModeTab) {
         // Default behaviour - no modes
         // There are no options here.
         m_settings.setValue("mode", "default");
-    } else if (m_ui->singleModeTab->isVisible()) {
+    } else if (selectedMode == m_ui->singleModeTab) {
         // "Single crack" mode
         parameters << "--single";
         m_settings.setValue("mode", "single");
@@ -591,7 +592,7 @@ QStringList MainWindow::getAttackParameters()
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
             m_settings.setValue("external", m_ui->comboBox_SingleCrackModeExternalName->currentText());
         }
-    } else if (m_ui->wordlistModeTab->isVisible()) {
+    } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
         m_settings.setValue("mode", "wordlist");
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
@@ -605,7 +606,7 @@ QStringList MainWindow::getAttackParameters()
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
-    } else if (m_ui->incrementalModeTab->isVisible()) {
+    } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
@@ -616,9 +617,9 @@ QStringList MainWindow::getAttackParameters()
             parameters << "--incremental";
         }
         // External mode, filter
-        if (m_ui->incrementalModeTab->isVisible())
+        if (m_ui->checkBox_IncrementalModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
-    } else if (m_ui->externalModeTab->isVisible()) {
+    } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
     }
@@ -626,8 +627,6 @@ QStringList MainWindow::getAttackParameters()
     // Selectors
     if (m_ui->checkBox_LimitUsers->isChecked()) {
         parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
-        
-        
     }
     if (m_ui->checkBox_LimitGroups->isChecked())
         

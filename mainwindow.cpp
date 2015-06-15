@@ -361,34 +361,11 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    QFile description(m_session + ".johnny");
-    if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            tr("Johnny could not open file to read session description!"));
-        return;
-    }
-    QTextStream descriptionStream(&description);
-    QString format;
-    QStringList fileNames;
-    // Parse johnny session file
-    while(!descriptionStream.atEnd())
-    {
-        QString content =  descriptionStream.readLine();
-        if(content.startsWith("FILE="))
-        {
-            content.remove(0,5);
-            fileNames.append(content);
-        }
-        else if(content.startsWith("FORMAT="))
-        {
-            content.remove(0,7);
-            format = content;
-        }
-    }
+    m_settings.beginGroup("sessions/" + m_session);
+    QString format = m_settings.value("formatJohn").toString();
+    QStringList fileNames = m_settings.value("fileNames").toStringList();
+    m_settings.endGroup();
 
-    description.close();
     if (readPasswdFiles(fileNames)) {
         m_format = format;
     }
@@ -472,9 +449,7 @@ void MainWindow::startAttack()
 {
     if (!checkSettings())
         return;
-
-    QStringList parameters = getAttackParameters();
-
+    
     // Session for johnny
     QString date = QDateTime::currentDateTime().toString("MM-dd-yy_hh:mm:ss");
     m_session = QDir(m_appDataPath).filePath(date);
@@ -498,22 +473,7 @@ void MainWindow::startAttack()
         }
     }
 
-    QFile description(m_session + ".johnny");
-    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            tr("Johnny could not open file to save session description."));
-        return;
-    }
-    QTextStream descriptionStream(&description);
-
-    for(int i = 0; i < m_hashesFilesNames.size(); i++)
-    {
-        descriptionStream << "FILE=" << m_hashesFilesNames[i] <<endl;
-    }
-    descriptionStream << "FORMAT=" << m_format << endl;
-    description.close();
+    QStringList parameters = saveAttackParameters();
 
     parameters << QString("--session=%1").arg(m_session);
 
@@ -532,12 +492,14 @@ void MainWindow::startAttack()
 
 /* This function doesn't return the parameters of the current john process,
  * it returns the selected parameters in Johnny (UI-side) */
-QStringList MainWindow::getAttackParameters()
+QStringList MainWindow::saveAttackParameters()
 {
     m_settings.beginGroup("sessions/" + m_session);
+    m_settings.remove(""); // make sure the group is empty before saving params
+    m_settings.setValue("fileNames", m_hashesFilesNames);
+    
     QStringList parameters;
     // We prepare parameters list from options section.
-
     // General options
     // Format
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
@@ -575,7 +537,8 @@ QStringList MainWindow::getAttackParameters()
         // key.
         m_format = "";
     }
-    m_settings.setValue("format", m_ui->comboBox_Format->currentText());
+    m_settings.setValue("formatJohn", m_format);
+    m_settings.setValue("formatUI", m_ui->comboBox_Format->currentText());
     
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
@@ -592,6 +555,7 @@ QStringList MainWindow::getAttackParameters()
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
             m_settings.setValue("external", m_ui->comboBox_SingleCrackModeExternalName->currentText());
         }
+        m_settings.setValue("isSingleCrackModeExternalChecked", m_ui->checkBox_SingleCrackModeExternalName->isChecked());
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
         m_settings.setValue("mode", "wordlist");
@@ -601,11 +565,12 @@ QStringList MainWindow::getAttackParameters()
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
                 parameters << "--rules";
-                
         }
+        m_settings.setValue("isUsingWordlistRules", m_ui->checkBox_WordlistModeRules->isChecked());
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked())
             parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
+        m_settings.setValue("isWordListModeExternalChecked", m_ui->checkBox_WordlistModeExternalName->isChecked());
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
@@ -628,8 +593,7 @@ QStringList MainWindow::getAttackParameters()
     if (m_ui->checkBox_LimitUsers->isChecked()) {
         parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
     }
-    if (m_ui->checkBox_LimitGroups->isChecked())
-        
+    if (m_ui->checkBox_LimitGroups->isChecked()) 
         parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
     if (m_ui->checkBox_LimitShells->isChecked())
         parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
@@ -640,6 +604,8 @@ QStringList MainWindow::getAttackParameters()
     if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
     }
+    
+    m_settings.endGroup();
 
     return parameters;
 }
@@ -1215,19 +1181,21 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void MainWindow::restoreSessionUI(const QString& sessionName)
 {
-    
-}
-
-void MainWindow::saveNewSession(const QString& sessionName)
-{
-    /*m_settings.beginGroup("sessions/" + sessionName);
-#if OS_FORK
-    m_settings.setValue("format", m_ui->comboBox_Format->currentText());
-
-#endif
-    m_settings.setValue("isUsingFork", m_ui->);
-    m_settings.setValue("fullScreen", win->isFullScreen());
-    m_settings.endGroup();*/
- 
+    m_settings.beginGroup("sessions/" + sessionName);
+    m_format = m_settings.value("formatJohn").toString();
+    m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
+    QString mode = m_settings.value("mode").toString();
+    if (mode == "single") {
+        m_ui->attackModeTabWidget->setCurrentIndex(1);
+    } else if (mode == "wordlist") {
+        m_ui->attackModeTabWidget->setCurrentIndex(2);        
+    } else if (mode == "incremental") {
+        m_ui->attackModeTabWidget->setCurrentIndex(3);        
+    } else if (mode == "external") {
+        m_ui->attackModeTabWidget->setCurrentIndex(4);        
+    } else {
+        m_ui->attackModeTabWidget->setCurrentIndex(0);
+    }
+    m_settings.endGroup();
     
 }

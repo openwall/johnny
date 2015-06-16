@@ -126,19 +126,21 @@ MainWindow::MainWindow(QSettings &settings)
     }
 
     // Session for Johnny
-    QDir sessionDir(m_appDataPath, "*.johnny", QDir::Time, QDir::Files);
-    QStringList fileNames = sessionDir.entryList();
-    for (int i = 0; i < fileNames.size(); i++) {
-        QString fileName = fileNames[i].remove(".johnny");
-        QString completePath = QDir(m_appDataPath).filePath(fileName);
-        if (QFileInfo(completePath + ".rec").isReadable()
-                && QFileInfo(completePath + ".johnny").isReadable()) {
-                QAction* fileAction = m_sessionMenu->addAction(fileName);
-                fileAction->setData(fileName);
-                m_sessionHistory.append(fileName);
+    m_settings.beginGroup("johnSessions");
+    QStringList sessionsList = m_settings.childGroups();
+    for (int i = 0; i < sessionsList.size(); i++) {
+        QString sessionName = sessionsList[i];
+        QString completePath = QDir(m_appDataPath).filePath(sessionName);
+        if (QFileInfo(completePath + ".rec").isReadable()) {
+                QAction* fileAction = m_sessionMenu->addAction(sessionName);
+                fileAction->setData(sessionName);
+                m_sessionHistory.append(sessionName);
+                QString fileNames = m_settings.value(sessionName + "/fileNames").toStringList().join(" ");
+                fileAction->setToolTip(fileNames);
             }
         }
-
+    m_settings.endGroup();
+    m_sessionMenu->setToolTipsVisible(true);
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
     verifySessionState();
@@ -361,13 +363,14 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    m_settings.beginGroup("sessions/" + m_session);
+    m_settings.beginGroup("johnSessions/" + QString(m_session).remove(m_appDataPath));
     QString format = m_settings.value("formatJohn").toString();
     QStringList fileNames = m_settings.value("fileNames").toStringList();
     m_settings.endGroup();
 
     if (readPasswdFiles(fileNames)) {
         m_format = format;
+        restoreSessionUI(m_session);
     }
 }
 
@@ -494,8 +497,7 @@ void MainWindow::startAttack()
  * it returns the selected parameters in Johnny (UI-side) */
 QStringList MainWindow::saveAttackParameters()
 {
-    m_settings.beginGroup("sessions/" + m_session);
-    m_settings.remove(""); // make sure the group is empty before saving params
+    m_settings.beginGroup("johnSessions/" + QString(m_session).remove(m_appDataPath));
     m_settings.setValue("fileNames", m_hashesFilesNames);
     
     QStringList parameters;
@@ -574,6 +576,7 @@ QStringList MainWindow::saveAttackParameters()
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
+        m_settings.setValue("mode", "incremental");
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
             // With name
             parameters << ("--incremental=" + m_ui->comboBox_IncrementalModeName->currentText());
@@ -586,6 +589,7 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
+        m_settings.setValue("mode", "external");       
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
     }
 
@@ -607,6 +611,8 @@ QStringList MainWindow::saveAttackParameters()
     
     m_settings.endGroup();
 
+    m_settings.beginGroup("johnSessions");
+    QStringList sessionsList = m_settings.childGroups();
     return parameters;
 }
 

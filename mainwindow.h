@@ -98,7 +98,7 @@ private:
 
     QString              m_appDataPath;
 
-    QStringList         m_hashesFilesNames;
+    QStringList         m_passwordFiles;
     QString             m_session;
     JohnAttack          m_johnAttack; // main JtR attack handler
     QDateTime           m_startDateTime; // Date and time of the start of the sttack

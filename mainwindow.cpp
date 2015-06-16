@@ -184,7 +184,7 @@ MainWindow::MainWindow(QSettings &settings)
 
 void MainWindow::verifySessionState()
 {
-    m_ui->actionStartAttack->setEnabled(! m_hashesFilesNames.isEmpty());
+    m_ui->actionStartAttack->setEnabled(! m_passwordFiles.isEmpty());
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
@@ -210,10 +210,10 @@ void MainWindow::verifySessionState()
         description.close();
 
         m_ui->actionResumeAttack->setEnabled(
-            hashesFileNames == m_hashesFilesNames
+            hashesFileNames == m_passwordFiles
             && !hashesFileNames.isEmpty());
         m_ui->actionOpenLastSession->setEnabled(
-            hashesFileNames != m_hashesFilesNames);
+            hashesFileNames != m_passwordFiles);
     } else {
         m_ui->actionOpenLastSession->setEnabled(false);
         m_ui->actionResumeAttack->setEnabled(false);
@@ -313,7 +313,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
-        m_hashesFilesNames = fileNames;
+        m_passwordFiles = fileNames;
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
         if (!m_temp) {
@@ -339,7 +339,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
-            m_hashTypeChecker.start(fileNames);
+            m_hashTypeChecker.setPasswordFiles(fileNames);
+            m_hashTypeChecker.start();
         }
         return true;
     }
@@ -512,9 +513,9 @@ void MainWindow::startAttack()
     }
     QTextStream descriptionStream(&description);
 
-    for(int i = 0; i < m_hashesFilesNames.size(); i++)
+    for(int i = 0; i < m_passwordFiles.size(); i++)
     {
-        descriptionStream << "FILE=" << m_hashesFilesNames[i] <<endl;
+        descriptionStream << "FILE=" << m_passwordFiles[i] <<endl;
     }
     descriptionStream << "FORMAT=" << m_format << endl;
     description.close();
@@ -522,9 +523,9 @@ void MainWindow::startAttack()
     parameters << QString("--session=%1").arg(m_session);
 
     // We check that we have file name.
-    if (!m_hashesFilesNames.isEmpty()) {
+    if (!m_passwordFiles.isEmpty()) {
         // If file name is not empty then we have file, pass it to John.
-        parameters << m_hashesFilesNames;
+        parameters << m_passwordFiles;
         startJohn(parameters);
     } else {
         QMessageBox::warning(
@@ -1118,7 +1119,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
                                  const QStringList &detailedTypesPerRow)
 {
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames)) {
+    if ((model != NULL) && (pathToPwdFile == m_passwordFiles)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
@@ -1135,9 +1136,10 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
-    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
+    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_passwordFiles.isEmpty())) {
         m_hashTypeChecker.setJohnProgram(m_pathToJohn);
-        m_hashTypeChecker.start(m_hashesFilesNames);
+        m_hashTypeChecker.setPasswordFiles(m_passwordFiles);
+        m_hashTypeChecker.start();
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
     if (!isJumbo) {
@@ -1166,7 +1168,7 @@ void MainWindow::guessPassword()
     if (isOk && !guess.isEmpty()) {
         m_ui->actionGuessPassword->setEnabled(false);
         m_passwordGuessing.setJohnProgram(m_pathToJohn);
-        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_hashesFilesNames);
+        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_passwordFiles);
         m_passwordGuessing.start();
         m_passwordGuessing.write(guess);
         m_passwordGuessing.closeWriteChannel();

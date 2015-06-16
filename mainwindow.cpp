@@ -613,12 +613,8 @@ QStringList MainWindow::saveAttackParameters()
     if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
     }
+    m_settings.endGroup();
     
-    m_settings.endGroup();
-
-    m_settings.beginGroup("johnSessions");
-    QStringList sessionsList = m_settings.childGroups();
-    m_settings.endGroup();
     return parameters;
 }
 
@@ -775,12 +771,26 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     QString sessionName = m_session;
     sessionName.remove(m_appDataPath);
-    if (!m_sessionHistory.contains(sessionName) && (QFileInfo(m_session + ".rec").isReadable())) {
+   
+    bool isNewSession = !m_sessionHistory.contains(sessionName);
+    bool isRecReadable = QFileInfo(m_session + ".rec").isReadable();
+    if ((isNewSession == true) && (isRecReadable == true)) {
+        // New session saved by john, add it to the list
         QAction* action = new QAction(sessionName,this);
         m_sessionMenu->insertAction(m_sessionMenu->actions()[0],action);
         action->setData(sessionName);
         m_sessionHistory.append(sessionName);
         action->setToolTip(m_hashesFilesNames.join(" "));
+    } else if ((isNewSession == false) && (isRecReadable == false)) {
+        // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
+        // so we remove it from the session history list to have an error-prone UI
+        m_sessionHistory.removeOne(sessionName);
+        m_settings.remove("johnSessions/" + sessionName);
+        foreach(QAction* actions, m_sessionMenu->actions()) {
+            if (actions->data().toString() == sessionName) {
+                    m_sessionMenu->removeAction(actions);
+            }
+        }
     }
 
     // When John finishes we enable start button and disable stop

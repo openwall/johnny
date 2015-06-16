@@ -19,8 +19,9 @@
 #include <QClipboard>
 #include <QThread>
 #include <QTextCursor>
-#include <QStandardPaths>
+#include <QDesktopServices>
 #include <QInputDialog>
+#include <QtDebug>
 
 #define INTERVAL_PICK_CRACKED 600
 #define PASSWORD_TAB 0
@@ -166,7 +167,7 @@ MainWindow::MainWindow(QSettings &settings)
     //     warnAboutDefaultPathToJohn();
     Translator& translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
-    m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
+    //TODO:m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
 
     //We set the default and maximum of fork thread to the idealThreadCount.
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
@@ -465,7 +466,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     QWidget* widged = (QWidget*) watched;
     switch (event->type())
     {
-    case QEvent::StyleAnimationUpdate:
+    case 1://QEvent::StyleAnimationUpdate:
         if (widged->inherits("QProgressBar"))
             return true;
         break;
@@ -936,7 +937,7 @@ void MainWindow::fillSettingsWithDefaults()
     QStringList possiblePaths;
     QString john;
     // Find john on system path, which is determined by PATH variable
-    QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
+    /*QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
     if(!johnSystemPath.isEmpty())
         possiblePaths << johnSystemPath;
 
@@ -944,7 +945,7 @@ void MainWindow::fillSettingsWithDefaults()
     // John might be in in the same directory than johnny
     QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
     if(!johnOtherPaths.isEmpty())
-        possiblePaths << johnOtherPaths;
+        possiblePaths << johnOtherPaths;*/
 
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {

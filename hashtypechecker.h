@@ -5,7 +5,8 @@
 
 #include <QObject>
 #include <QTextStream>
-#include <QtConcurrent/QtConcurrent>
+
+#include <vector>
 
 struct HashFormat
 {

@@ -128,7 +128,7 @@ MainWindow::MainWindow(QSettings &settings)
     // Session for Johnny
     m_settings.beginGroup("johnSessions");
     QStringList sessionsList = m_settings.childGroups();
-    for (int i = 0; i < sessionsList.size(); i++) {
+    for (int i = sessionsList.size()-1; i >= 0 ; i--) {
         QString sessionName = sessionsList[i];
         QString completePath = QDir(m_appDataPath).filePath(sessionName);
         if (QFileInfo(completePath + ".rec").isReadable()) {
@@ -137,7 +137,10 @@ MainWindow::MainWindow(QSettings &settings)
                 m_sessionHistory.append(sessionName);
                 QString fileNames = m_settings.value(sessionName + "/fileNames").toStringList().join(" ");
                 fileAction->setToolTip(fileNames);
-            }
+            } else {
+            // The .rec may have been deleted manually by user, let's clean our settings
+            m_settings.remove(sessionName);
+        }
         }
     m_settings.endGroup();
     m_sessionMenu->setToolTipsVisible(true);
@@ -363,14 +366,15 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    m_settings.beginGroup("johnSessions/" + QString(m_session).remove(m_appDataPath));
+    QString sessionName = QString(m_session).remove(m_appDataPath);
+    m_settings.beginGroup("johnSessions/" + sessionName);
     QString format = m_settings.value("formatJohn").toString();
     QStringList fileNames = m_settings.value("fileNames").toStringList();
     m_settings.endGroup();
 
     if (readPasswdFiles(fileNames)) {
         m_format = format;
-        restoreSessionUI(m_session);
+        restoreSessionUI(sessionName);
     }
 }
 
@@ -497,7 +501,8 @@ void MainWindow::startAttack()
  * it returns the selected parameters in Johnny (UI-side) */
 QStringList MainWindow::saveAttackParameters()
 {
-    m_settings.beginGroup("johnSessions/" + QString(m_session).remove(m_appDataPath));
+    QString sessionName = QString(m_session).remove(m_appDataPath);
+    m_settings.beginGroup("johnSessions/" + sessionName);
     m_settings.setValue("fileNames", m_hashesFilesNames);
     
     QStringList parameters;
@@ -613,6 +618,7 @@ QStringList MainWindow::saveAttackParameters()
 
     m_settings.beginGroup("johnSessions");
     QStringList sessionsList = m_settings.childGroups();
+    m_settings.endGroup();
     return parameters;
 }
 
@@ -769,12 +775,12 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     QString sessionName = m_session;
     sessionName.remove(m_appDataPath);
-    if (!m_sessionHistory.contains(sessionName) && (QFileInfo(m_session + ".rec").isReadable())
-            && (QFileInfo(m_session + ".johnny").isReadable())) {
+    if (!m_sessionHistory.contains(sessionName) && (QFileInfo(m_session + ".rec").isReadable())) {
         QAction* action = new QAction(sessionName,this);
         m_sessionMenu->insertAction(m_sessionMenu->actions()[0],action);
         action->setData(sessionName);
         m_sessionHistory.append(sessionName);
+        action->setToolTip(m_hashesFilesNames.join(" "));
     }
 
     // When John finishes we enable start button and disable stop
@@ -782,7 +788,8 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     m_ui->actionPauseAttack->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(true);
     m_ui->actionOpenPassword->setEnabled(true);
-    verifySessionState();
+    //verifySessionState();
+    m_ui->actionOpenLastSession->setEnabled(true);
 
     if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
@@ -1149,6 +1156,7 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
             }
         }
         m_session.clear();
+        m_settings.remove("johnSessions");
         m_ui->actionResumeAttack->setEnabled(false);
     } else {
         QString fileName = action->data().toString();
@@ -1187,7 +1195,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void MainWindow::restoreSessionUI(const QString& sessionName)
 {
-    m_settings.beginGroup("sessions/" + sessionName);
+    m_settings.beginGroup("johnSessions/" + sessionName);
     m_format = m_settings.value("formatJohn").toString();
     m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
     QString mode = m_settings.value("mode").toString();

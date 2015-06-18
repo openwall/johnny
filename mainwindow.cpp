@@ -54,6 +54,7 @@ MainWindow::MainWindow(QSettings &settings)
         item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
+    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
 
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
@@ -404,13 +405,18 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         return false;
     if (!watched || !watched->isWidgetType())
         return false;
-    QWidget* widged = (QWidget*) watched;
+    QWidget* widget = (QWidget*) watched;
     switch (event->type())
     {
     case QEvent::StyleAnimationUpdate:
-        if (widged->inherits("QProgressBar"))
+        if (widget->inherits("QProgressBar"))
             return true;
         break;
+    case QEvent::Wheel:
+        if (widget->inherits("QTabBar")) {
+            event->ignore();
+            return true;
+        }
     default:
         break;
     }
@@ -1203,7 +1209,8 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void MainWindow::restoreSessionUI(const QString& sessionName)
 {
-    // Clear/or default optional previous session UI options that may not specified in the settings depending on the mode
+    // Clear/or default optional previous session UI options that may 
+    // not be specified in the settings depending on the mode
     foreach(QCheckBox *widget, m_ui->optionsPage->findChildren<QCheckBox*>()) {
         widget->setChecked(false);
     }

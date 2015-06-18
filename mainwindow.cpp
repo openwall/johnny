@@ -170,6 +170,7 @@ MainWindow::MainWindow(QSettings &settings)
     //We set the default and maximum of fork thread to the idealThreadCount.
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
+    m_ui->spinBox_nbOfProcess->setMinimum(2); // fork = 1 gives john error, let's prevent it
 
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
@@ -543,7 +544,7 @@ QStringList MainWindow::saveAttackParameters()
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
                 parameters << "--rules";
         }
-        m_settings.setValue("isUsingWordlistRules", m_ui->checkBox_WordlistModeRules->isChecked());
+        m_settings.setValue("isUsingWordListRules", m_ui->checkBox_WordlistModeRules->isChecked());
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());

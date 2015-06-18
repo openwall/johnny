@@ -1144,7 +1144,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
         if (indexSavedFormat != -1) {
             m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
-        } else {
+        } else if(savedFormat.isEmpty()){
             m_ui->comboBox_Format->setEditText(savedFormat);
         }
     }
@@ -1172,7 +1172,7 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
         if (indexSavedFormat != -1) {
             m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
-        } else {
+        } else if (!savedFormat.isEmpty()){
             m_ui->comboBox_Format->setEditText(savedFormat);
         }
     }

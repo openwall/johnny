@@ -79,7 +79,6 @@ private slots:
     void applySettings();
     void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
-    void verifySessionState();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
 

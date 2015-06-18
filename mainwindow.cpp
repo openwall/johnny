@@ -147,8 +147,6 @@ MainWindow::MainWindow(QSettings &settings)
     m_sessionMenu->setToolTipsVisible(true);
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
-
-    verifySessionState();
     m_session.clear(); // No session currently choosen by user
 
     // We fill form with default values. Then we load settings. When
@@ -181,45 +179,6 @@ MainWindow::MainWindow(QSettings &settings)
         m_ui->widget_Fork->hide();
     #endif
 
-}
-
-void MainWindow::verifySessionState()
-{
-    m_ui->actionStartAttack->setEnabled(! m_passwordFiles.isEmpty());
-
-    if (QFileInfo(m_session + ".rec").isReadable()
-        && QFileInfo(m_session + ".johnny").isReadable()) {
-        m_ui->actionOpenLastSession->setEnabled(true);
-
-        QFile description(m_session + ".johnny");
-        if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_ui->actionResumeAttack->setEnabled(false);
-            return;
-        }
-        QTextStream descriptionStream(&description);
-
-        QStringList hashesFileNames;
-        while(!descriptionStream.atEnd())
-        {
-            QString content =  descriptionStream.readLine();
-            if(content.startsWith("FILE="))
-            {
-                content.remove(0,5);
-                hashesFileNames.append(content);
-            }
-        }
-        description.close();
-
-        m_ui->actionResumeAttack->setEnabled(
-            hashesFileNames == m_passwordFiles
-            && !hashesFileNames.isEmpty());
-        /*m_ui->actionOpen_Last_Session->setEnabled(
-            hashesFileNames != m_passwordFiles;*/
-    } else {
-        //m_ui->actionOpen_Last_Session->setEnabled(false);
-        m_ui->actionResumeAttack->setEnabled(false);
-
-    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -336,7 +295,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             }
         }
         callJohnShow();
-        verifySessionState();
+        m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
@@ -365,6 +324,7 @@ void MainWindow::openPasswordFile()
     if (dialog.exec()) {
         QStringList fileNames = dialog.selectedFiles();
         readPasswdFiles(fileNames);
+        m_ui->actionResumeAttack->setEnabled(false);
     }
 }
 
@@ -819,7 +779,6 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     m_ui->actionPauseAttack->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(true);
     m_ui->actionOpenPassword->setEnabled(true);
-    //verifySessionState();
     m_ui->actionOpenLastSession->setEnabled(true);
     m_ui->actionResumeAttack->setEnabled(m_sessionHistory.contains(sessionName) && isRecReadable);
 
@@ -1244,7 +1203,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void MainWindow::restoreSessionUI(const QString& sessionName)
 {
-    // Clear/or default optional previous session UI options
+    // Clear/or default optional previous session UI options that may not specified in the settings depending on the mode
     foreach(QCheckBox *widget, m_ui->optionsPage->findChildren<QCheckBox*>()) {
         widget->setChecked(false);
     }

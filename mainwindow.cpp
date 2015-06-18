@@ -1244,10 +1244,18 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void MainWindow::restoreSessionUI(const QString& sessionName)
 {
-    /*foreach(QLineEdit *widget, this->findChildren<QLineEdit*>()) {
-        widget->clear();*/
+    // Clear/or default optional previous session UI options
+    foreach(QCheckBox *widget, m_ui->optionsPage->findChildren<QCheckBox*>()) {
+        widget->setChecked(false);
+    }
+    foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox*>()) {
+        widget->setCurrentText("");
+    }
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
+    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
+    m_ui->spinBox_LimitSalts->setValue(0);
     
+    // Start restoring required UI fields
     m_settings.beginGroup("johnSessions/" + sessionName);
     m_format = m_settings.value("formatJohn").toString();
     m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
@@ -1327,5 +1335,4 @@ void MainWindow::restoreSessionUI(const QString& sessionName)
         m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
     }
     m_settings.endGroup();
-    
 }

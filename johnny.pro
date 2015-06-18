@@ -16,7 +16,7 @@ SOURCES +=  main.cpp\
             textlabel.cpp \
             johnhandler.cpp \
             johnattack.cpp \
-    menu.cpp
+            menu.cpp
 
 HEADERS  += mainwindow.h \
             filetablemodel.h \
@@ -26,7 +26,7 @@ HEADERS  += mainwindow.h \
             textlabel.h \
             johnhandler.h \
             johnattack.h \
-    menu.h
+            menu.h
 
 FORMS    += mainwindow.ui
 

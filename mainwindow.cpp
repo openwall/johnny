@@ -1246,6 +1246,8 @@ void MainWindow::restoreSessionUI(const QString& sessionName)
 {
     /*foreach(QLineEdit *widget, this->findChildren<QLineEdit*>()) {
         widget->clear();*/
+    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
+    
     m_settings.beginGroup("johnSessions/" + sessionName);
     m_format = m_settings.value("formatJohn").toString();
     m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
@@ -1308,11 +1310,17 @@ void MainWindow::restoreSessionUI(const QString& sessionName)
     }
 
     // Advanced options
-   /* if (m_ui->checkBox_UseFork->isChecked()) {
-        parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
-        m_settings.setValue("nbForkProcess", m_ui->spinBox_nbOfProcess->value());
+    if (m_settings.contains("nbForkProcess")) {
+        m_ui->checkBox_UseFork->setChecked(true);
+        int nbOfProcess = m_settings.value("nbForkProcess").toInt();
+        // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
+        // we have to restore the right previous session value.
+        if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
+            m_ui->spinBox_nbOfProcess->setMaximum(nbOfProcess);
+        }
+        m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
-    m_settings.value("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->value());*/
+    m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings.value("OMP_NUM_THREADS").toInt());
     
     if (m_settings.contains("environmentVariables")) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);

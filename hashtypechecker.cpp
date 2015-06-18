@@ -7,20 +7,28 @@ HashTypeChecker::HashTypeChecker()
     connect(this, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()), Qt::QueuedConnection);
 }
 
-void HashTypeChecker::start(const QStringList &passwordFiles)
+void HashTypeChecker::start()
 {
     // We make sure last process is terminated correctly before
     // loading a new password file.
     terminate();
     m_johnOutput.clear();
-    m_passwordFiles = passwordFiles;
-    setArgs(QStringList() << "--show=types" << passwordFiles);
+    setArgs(QStringList() << "--show=types" << m_passwordFiles);
     JohnHandler::start();
 }
 
 void HashTypeChecker::processOutput()
 {
   m_johnOutput.append(readAllStandardOutput());
+}
+QStringList HashTypeChecker::passwordFiles() const
+{
+    return m_passwordFiles;
+}
+
+void HashTypeChecker::setPasswordFiles(const QStringList &passwordFiles)
+{
+    m_passwordFiles = passwordFiles;
 }
 
 void HashTypeChecker::parseJohnAnswer()

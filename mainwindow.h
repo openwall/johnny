@@ -101,7 +101,7 @@ private:
 
     QString              m_appDataPath;
 
-    QStringList         m_hashesFilesNames;
+    QStringList         m_passwordFiles;
     QString             m_session;
     QStringList         m_sessionHistory;
     JohnAttack          m_johnAttack; // main JtR attack handler

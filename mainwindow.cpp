@@ -183,7 +183,7 @@ MainWindow::MainWindow(QSettings &settings)
 
 void MainWindow::verifySessionState()
 {
-    m_ui->actionStartAttack->setEnabled(! m_hashesFilesNames.isEmpty());
+    m_ui->actionStartAttack->setEnabled(! m_passwordFiles.isEmpty());
 
     if (QFileInfo(m_session + ".rec").isReadable()
         && QFileInfo(m_session + ".johnny").isReadable()) {
@@ -209,10 +209,10 @@ void MainWindow::verifySessionState()
         description.close();
 
         m_ui->actionResumeAttack->setEnabled(
-            hashesFileNames == m_hashesFilesNames
+            hashesFileNames == m_passwordFiles
             && !hashesFileNames.isEmpty());
         /*m_ui->actionOpen_Last_Session->setEnabled(
-            hashesFileNames != m_hashesFilesNames);*/
+            hashesFileNames != m_passwordFiles;*/
     } else {
         //m_ui->actionOpen_Last_Session->setEnabled(false);
         m_ui->actionResumeAttack->setEnabled(false);
@@ -313,7 +313,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
-        m_hashesFilesNames = fileNames;
+        m_passwordFiles = fileNames;
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
         if (!m_temp) {
@@ -333,12 +333,14 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
+        callJohnShow();
         verifySessionState();
         m_ui->actionCopyToClipboard->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
-            m_hashTypeChecker.start(fileNames);
+            m_hashTypeChecker.setPasswordFiles(fileNames);
+            m_hashTypeChecker.start();
         }
         return true;
     }
@@ -482,13 +484,12 @@ void MainWindow::startAttack()
     }
 
     QStringList parameters = saveAttackParameters();
-
     parameters << QString("--session=%1").arg(m_session);
 
     // We check that we have file name.
-    if (!m_hashesFilesNames.isEmpty()) {
+    if (!m_passwordFiles.isEmpty()) {
         // If file name is not empty then we have file, pass it to John.
-        parameters << m_hashesFilesNames;
+        parameters << m_passwordFiles;
         startJohn(parameters);
     } else {
         QMessageBox::warning(
@@ -504,7 +505,7 @@ QStringList MainWindow::saveAttackParameters()
 {
     QString sessionName = QString(m_session).remove(m_appDataPath);
     m_settings.beginGroup("johnSessions/" + sessionName);
-    m_settings.setValue("fileNames", m_hashesFilesNames);
+    m_settings.setValue("fileNames", m_passwordFiles);
     
     QStringList parameters;
     // We prepare parameters list from options section.
@@ -798,7 +799,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
         m_sessionMenu->insertAction(m_sessionMenu->actions()[0],action);
         action->setData(sessionName);
         m_sessionHistory.append(sessionName);
-        action->setToolTip(m_hashesFilesNames.join(" "));
+        action->setToolTip(m_passwordFiles.join(" "));
     } else if ((isNewSession == false) && (isRecReadable == false)) {
         // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
         // so we remove it from the session history list to have an error-prone UI
@@ -1130,7 +1131,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
                                  const QStringList &detailedTypesPerRow)
 {
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if ((model != NULL) && (pathToPwdFile == m_hashesFilesNames)) {
+    if ((model != NULL) && (pathToPwdFile == m_passwordFiles)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
@@ -1155,9 +1156,10 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
-    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_hashesFilesNames.isEmpty())) {
+    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_passwordFiles.isEmpty())) {
         m_hashTypeChecker.setJohnProgram(m_pathToJohn);
-        m_hashTypeChecker.start(m_hashesFilesNames);
+        m_hashTypeChecker.setPasswordFiles(m_passwordFiles);
+        m_hashTypeChecker.start();
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
     if (!isJumbo) {
@@ -1221,7 +1223,7 @@ void MainWindow::guessPassword()
     if (isOk && !guess.isEmpty()) {
         m_ui->actionGuessPassword->setEnabled(false);
         m_passwordGuessing.setJohnProgram(m_pathToJohn);
-        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_hashesFilesNames);
+        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_passwordFiles);
         m_passwordGuessing.start();
         m_passwordGuessing.write(guess);
         m_passwordGuessing.closeWriteChannel();

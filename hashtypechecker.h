@@ -33,20 +33,26 @@ struct Hash
 class HashTypeChecker : public JohnHandler
 {
     Q_OBJECT
+
 public:
     HashTypeChecker();
-    void start(const QStringList &passwordFiles);
+    void start();
+
+    QStringList passwordFiles() const;
+    void setPasswordFiles(const QStringList &passwordFiles);
+
+signals:
+    void updateHashTypes(const QStringList &pathToPwdFile,
+                         const QStringList &listOfTypesInFile,
+                         const QStringList &detailedTypesPerRow);
 
 private slots:
     void parseJohnAnswer();
     void processOutput();
 
 private:
-    QString m_johnOutput;
+    QString     m_johnOutput;
     QStringList m_passwordFiles;
-signals:
-    void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
-                         const QStringList &detailedTypesPerRow);
 };
 
 #endif // HASHTYPECHECKER_H

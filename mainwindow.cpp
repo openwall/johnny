@@ -1135,11 +1135,18 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
         m_ui->tableView_Hashes->setModel(model);
+        QString savedFormat = m_ui->comboBox_Format->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->comboBox_Format->clear();
         m_ui->comboBox_Format->addItem(tr("Auto detect"));
         m_ui->comboBox_Format->addItems(listOfTypesInFile);
-        m_ui->comboBox_Format->setEditText(m_format);
+        // Restore user's selection
+        int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
+        if (indexSavedFormat != -1) {
+            m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
+        } else {
+            m_ui->comboBox_Format->setEditText(savedFormat);
+        }
     }
 }
 
@@ -1158,8 +1165,16 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         QStringList defaultFormats;
         defaultFormats << tr("Auto detect") << "descrypt" << "bsdicrypt" << "md5crypt"
                        << "bcrypt" << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
+        QString savedFormat = m_ui->comboBox_Format->currentText();
         m_ui->comboBox_Format->clear();
         m_ui->comboBox_Format->addItems(defaultFormats);
+        // Restore user's selection
+        int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
+        if (indexSavedFormat != -1) {
+            m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
+        } else {
+            m_ui->comboBox_Format->setEditText(savedFormat);
+        }
     }
 }
 

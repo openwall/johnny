@@ -10,6 +10,7 @@
 #include "johnprocess.h"
 #include "johnattack.h"
 #include "hashtypechecker.h"
+#include "menu.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -24,7 +25,6 @@
 #include <QMultiMap>
 #include <QTemporaryFile>
 #include <QPlainTextEdit>
-
 
 namespace Ui {
     class MainWindow;
@@ -96,7 +96,7 @@ protected:
 private:
     bool                 m_terminate;
     Ui::MainWindow      *m_ui;
-    QMenu               *m_sessionMenu;
+    Menu                *m_sessionMenu;
     QAbstractTableModel *m_hashesTable;
 
     QString              m_appDataPath;

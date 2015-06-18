@@ -15,7 +15,8 @@ SOURCES +=  main.cpp\
             hashtypechecker.cpp \
             textlabel.cpp \
             johnhandler.cpp \
-            johnattack.cpp
+            johnattack.cpp \
+    menu.cpp
 
 HEADERS  += mainwindow.h \
             filetablemodel.h \
@@ -24,7 +25,8 @@ HEADERS  += mainwindow.h \
             hashtypechecker.h \
             textlabel.h \
             johnhandler.h \
-            johnattack.h
+            johnattack.h \
+    menu.h
 
 FORMS    += mainwindow.ui
 

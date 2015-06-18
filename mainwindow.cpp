@@ -56,7 +56,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
 
     // Multiple sessions management menu
-    m_sessionMenu = new QMenu(this);
+    m_sessionMenu = new Menu(this);
     QToolButton *sessionMenuButton = new QToolButton(this);
     sessionMenuButton->setDefaultAction(m_ui->actionOpenLastSession);
     sessionMenuButton->setMenu(m_sessionMenu);
@@ -143,7 +143,9 @@ MainWindow::MainWindow(QSettings &settings)
         }
         }
     m_settings.endGroup();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
     m_sessionMenu->setToolTipsVisible(true);
+#endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
     verifySessionState();

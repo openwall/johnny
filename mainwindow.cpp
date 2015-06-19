@@ -24,7 +24,11 @@
 #include <QtDebug>
 
 #define INTERVAL_PICK_CRACKED 600
-#define PASSWORD_TAB 0
+#define PASSWORD_TAB    0
+#define OPTIONS_TAB     1
+#define STATISTICS_TAB  2
+#define SETTINGS_TAB    3
+#define CONSOLE_LOG_TAB 4
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -46,13 +50,14 @@ MainWindow::MainWindow(QSettings &settings)
     // https://github.com/shinnok/johnny/issues/11
     m_ui->progressBar->installEventFilter(this);
 
-    m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
-
     // We select the PASSWORDS tab
     m_ui->contentStackedWidget->setCurrentIndex(PASSWORD_TAB);
-    m_ui->listWidgetTabs->setCurrentRow(PASSWORD_TAB);
-    foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("*", Qt::MatchWildcard))
-        item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
+    QActionGroup *tabSelectionGroup = new QActionGroup(this);
+    tabSelectionGroup->setExclusive(true);
+    foreach(QAction* actions, m_ui->tabSelectionToolBar->actions()) {
+        tabSelectionGroup->addAction(actions);
+    }
+    m_ui->actionPasswordsTabClicked->setChecked(true);
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
 
@@ -132,7 +137,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
-    connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
+    connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // We create the app data directory for us in $HOME if it does not exist.
     m_appDataPath = QDir::home().filePath(QLatin1String("_john") + QDir::separator() + "johnny" + QDir::separator());
@@ -165,7 +170,7 @@ MainWindow::MainWindow(QSettings &settings)
     // TODO: default values for other settings are accepted silently.
     // if (m_settings.value("PathToJohn").toString() == "")
     //     warnAboutDefaultPathToJohn();
-    Translator& translator = Translator::getInstance();
+    Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     //TODO:m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
 
@@ -268,10 +273,22 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     }
 }
 
-void MainWindow::listWidgetTabsSelectionChanged()
+void MainWindow::tabsSelectionChanged(QAction* action)
 {
-    m_ui->contentStackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
-    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
+    int index = 0;
+    if (action == m_ui->actionPasswordsTabClicked) {
+        index = PASSWORD_TAB;
+    } else if (action == m_ui->actionOptionsTabClicked) {
+        index = OPTIONS_TAB;
+    } else if (action == m_ui->actionStatisticsTabClicked) {
+        index = STATISTICS_TAB;
+    } else if (action == m_ui->actionSettingsTabClicked) {
+        index = SETTINGS_TAB;
+    } else if (action ==  m_ui->actionConsoleLogTabClicked) {
+        index = CONSOLE_LOG_TAB;
+    }
+    m_ui->actionCopyToClipboard->setEnabled(index == PASSWORD_TAB);
+    m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)

@@ -6,8 +6,6 @@
 #include <QObject>
 #include <QTextStream>
 
-#include <vector>
-
 struct HashFormat
 {
     // For each valid hash
@@ -28,7 +26,7 @@ struct Hash
     QString gecos;
     QString home;
     QString shell;
-    std::vector<HashFormat> listFormats;
+    QList<HashFormat> listFormats;
 };
 
 class HashTypeChecker : public JohnHandler

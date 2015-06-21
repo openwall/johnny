@@ -172,7 +172,10 @@ MainWindow::MainWindow(QSettings &settings)
     //     warnAboutDefaultPathToJohn();
     Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
-    //TODO:m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
+    int languageIndex = m_ui->comboBox_LanguageSelection->findText(translator.getCurrentLanguage());
+    if (languageIndex != -1) {
+        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
+    }
 
     //We set the default and maximum of fork thread to the idealThreadCount.
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
@@ -483,10 +486,12 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     QWidget* widged = (QWidget*) watched;
     switch (event->type())
     {
-    case 1://QEvent::StyleAnimationUpdate:
+#if defined Q_OS_OSX
+    case QEvent::StyleAnimationUpdate:
         if (widged->inherits("QProgressBar"))
             return true;
         break;
+#endif
     default:
         break;
     }
@@ -954,7 +959,20 @@ void MainWindow::fillSettingsWithDefaults()
     QStringList possiblePaths;
     QString john;
     // Find john on system path, which is determined by PATH variable
-    /*QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    foreach (QString dir, env.value("PATH").split(":")) {
+        possiblePaths << QDir(dir).filePath("john");
+    }
+    possiblePaths << QDir::currentPath().filePath("john"); // in the same directory than johnny
+#if defined Q_OS_WIN
+    foreach(QString dir, possiblePaths) {
+        possiblePaths.append(".exe");
+    }
+#endif
+
+#else
+    QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
     if(!johnSystemPath.isEmpty())
         possiblePaths << johnSystemPath;
 
@@ -962,8 +980,9 @@ void MainWindow::fillSettingsWithDefaults()
     // John might be in in the same directory than johnny
     QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
     if(!johnOtherPaths.isEmpty())
-        possiblePaths << johnOtherPaths;*/
-
+        possiblePaths << johnOtherPaths;
+#endif
+    
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);

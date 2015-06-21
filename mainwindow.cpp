@@ -964,7 +964,7 @@ void MainWindow::fillSettingsWithDefaults()
     foreach (QString dir, env.value("PATH").split(":")) {
         possiblePaths << QDir(dir).filePath("john");
     }
-    possiblePaths << QDir::currentPath().filePath("john"); // in the same directory than johnny
+    possiblePaths << QDir::current().filePath("john"); // in the same directory than johnny
 #if defined Q_OS_WIN
     foreach(QString dir, possiblePaths) {
         possiblePaths.append(".exe");

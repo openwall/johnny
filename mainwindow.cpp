@@ -22,7 +22,7 @@
 #include <QStandardPaths>
 #include <QInputDialog>
 
-#define INTERVAL_PICK_CRACKED 600
+#define INTERVAL_PICK_CRACKED 15
 #define PASSWORD_TAB 0
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 

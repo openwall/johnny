@@ -54,7 +54,8 @@ private slots:
     void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
     void settingsChangedByUser();
-    void restoreSessionUI(const QString& sessionName);
+    void restoreSessionOptions();
+    void restoreDefaultAttackOptions(bool shouldClearFields = true);
 
     // JtR backend
     void updateJohnOutput();

@@ -22,13 +22,16 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QtDebug>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QStandardPaths>
+#endif
 
-#define INTERVAL_PICK_CRACKED 600
-#define PASSWORD_TAB    0
-#define OPTIONS_TAB     1
-#define STATISTICS_TAB  2
-#define SETTINGS_TAB    3
-#define CONSOLE_LOG_TAB 4
+#define INTERVAL_PICK_CRACKED 15
+#define TAB_PASSWORDS   0
+#define TAB_OPTIONS     1
+#define TAB_STATISTICS  2
+#define TAB_SETTINGS    3
+#define TAB_CONSOLE_LOG 4
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -51,7 +54,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->progressBar->installEventFilter(this);
 
     // We select the PASSWORDS tab
-    m_ui->contentStackedWidget->setCurrentIndex(PASSWORD_TAB);
+    m_ui->contentStackedWidget->setCurrentIndex(TAB_PASSWORDS);
     QActionGroup *tabSelectionGroup = new QActionGroup(this);
     tabSelectionGroup->setExclusive(true);
     foreach(QAction* actions, m_ui->tabSelectionToolBar->actions()) {
@@ -140,7 +143,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // We create the app data directory for us in $HOME if it does not exist.
-    m_appDataPath = QDir::home().filePath(QLatin1String("_john") + QDir::separator() + "johnny" + QDir::separator());
+    m_appDataPath = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "johnny" + QDir::separator());
     if (!QDir::home().mkpath(m_appDataPath)) {
         QMessageBox::critical( this, tr("Johnny"),
             tr("Could not create settings directory(%1). Check your permissions, disk space and restart Johnny.").arg(m_appDataPath));
@@ -280,17 +283,17 @@ void MainWindow::tabsSelectionChanged(QAction* action)
 {
     int index = 0;
     if (action == m_ui->actionPasswordsTabClicked) {
-        index = PASSWORD_TAB;
+        index = TAB_PASSWORDS;
     } else if (action == m_ui->actionOptionsTabClicked) {
-        index = OPTIONS_TAB;
+        index = TAB_OPTIONS;
     } else if (action == m_ui->actionStatisticsTabClicked) {
-        index = STATISTICS_TAB;
+        index = TAB_STATISTICS;
     } else if (action == m_ui->actionSettingsTabClicked) {
-        index = SETTINGS_TAB;
+        index = TAB_SETTINGS;
     } else if (action ==  m_ui->actionConsoleLogTabClicked) {
-        index = CONSOLE_LOG_TAB;
+        index = TAB_CONSOLE_LOG;
     }
-    m_ui->actionCopyToClipboard->setEnabled(index == PASSWORD_TAB);
+    m_ui->actionCopyToClipboard->setEnabled(index == TAB_PASSWORDS);
     m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 

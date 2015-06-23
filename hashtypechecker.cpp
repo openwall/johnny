@@ -1,5 +1,8 @@
 #include "hashtypechecker.h"
 
+#include <QtDebug>
+#include <QMetaType>
+
 HashTypeChecker::HashTypeChecker()
 {
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");

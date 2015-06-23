@@ -1,5 +1,7 @@
 #include "johnhandler.h"
 
+#include <QMetaType>
+
 JohnHandler::JohnHandler(): m_env(QProcessEnvironment::systemEnvironment())
 {
     qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");

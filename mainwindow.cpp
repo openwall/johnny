@@ -19,11 +19,19 @@
 #include <QClipboard>
 #include <QThread>
 #include <QTextCursor>
-#include <QStandardPaths>
+#include <QDesktopServices>
 #include <QInputDialog>
+#include <QtDebug>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QStandardPaths>
+#endif
 
 #define INTERVAL_PICK_CRACKED 15
-#define PASSWORD_TAB 0
+#define TAB_PASSWORDS   0
+#define TAB_OPTIONS     1
+#define TAB_STATISTICS  2
+#define TAB_SETTINGS    3
+#define TAB_CONSOLE_LOG 4
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -45,19 +53,20 @@ MainWindow::MainWindow(QSettings &settings)
     // https://github.com/shinnok/johnny/issues/11
     m_ui->progressBar->installEventFilter(this);
 
-    m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
-
     // We select the PASSWORDS tab
-    m_ui->contentStackedWidget->setCurrentIndex(PASSWORD_TAB);
-    m_ui->listWidgetTabs->setCurrentRow(PASSWORD_TAB);
+    m_ui->contentStackedWidget->setCurrentIndex(TAB_PASSWORDS);
+    QActionGroup *tabSelectionGroup = new QActionGroup(this);
+    tabSelectionGroup->setExclusive(true);
+    foreach(QAction* actions, m_ui->tabSelectionToolBar->actions()) {
+        tabSelectionGroup->addAction(actions);
+    }
+    m_ui->actionPasswordsTabClicked->setChecked(true);
+
+    m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab); 
+    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
-    foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("*", Qt::MatchWildcard))
-        item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
-
-    m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
-    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
 
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
@@ -119,7 +128,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
-    connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
+    connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // We create the app data directory for us in $HOME if it does not exist.
     m_appDataPath = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "johnny" + QDir::separator());
@@ -174,9 +183,12 @@ MainWindow::MainWindow(QSettings &settings)
     // We load old settings.
     restoreSavedSettings();
 
-    Translator& translator = Translator::getInstance();
+    Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
-    m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
+    int languageIndex = m_ui->comboBox_LanguageSelection->findText(translator.getCurrentLanguage());
+    if (languageIndex != -1) {
+        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
+    }
 
     #if !OS_FORK
     //As of now, fork is only supported on unix platforms
@@ -232,10 +244,22 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     }
 }
 
-void MainWindow::listWidgetTabsSelectionChanged()
+void MainWindow::tabsSelectionChanged(QAction* action)
 {
-    m_ui->contentStackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
-    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
+    int index = 0;
+    if (action == m_ui->actionPasswordsTabClicked) {
+        index = TAB_PASSWORDS;
+    } else if (action == m_ui->actionOptionsTabClicked) {
+        index = TAB_OPTIONS;
+    } else if (action == m_ui->actionStatisticsTabClicked) {
+        index = TAB_STATISTICS;
+    } else if (action == m_ui->actionSettingsTabClicked) {
+        index = TAB_SETTINGS;
+    } else if (action ==  m_ui->actionConsoleLogTabClicked) {
+        index = TAB_CONSOLE_LOG;
+    }
+    m_ui->actionCopyToClipboard->setEnabled(index == TAB_PASSWORDS);
+    m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
@@ -299,7 +323,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             }
         }
         callJohnShow();
-        m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == PASSWORD_TAB);
+        m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
@@ -412,15 +436,18 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     QWidget* widget = (QWidget*) watched;
     switch (event->type())
     {
+#if defined Q_OS_OSX
     case QEvent::StyleAnimationUpdate:
         if (widget->inherits("QProgressBar"))
             return true;
         break;
+#endif
     case QEvent::Wheel:
         if (widget->inherits("QTabBar")) {
             event->ignore();
             return true;
         }
+        break;
     default:
         break;
     }
@@ -920,6 +947,19 @@ void MainWindow::fillSettingsWithDefaults()
     QStringList possiblePaths;
     QString john;
     // Find john on system path, which is determined by PATH variable
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    foreach (QString dir, env.value("PATH").split(":")) {
+        possiblePaths << QDir(dir).filePath("john");
+    }
+    possiblePaths << QDir::current().filePath("john"); // in the same directory than johnny
+#if defined Q_OS_WIN
+    foreach(QString dir, possiblePaths) {
+        possiblePaths.append(".exe");
+    }
+#endif
+
+#else
     QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
     if(!johnSystemPath.isEmpty())
         possiblePaths << johnSystemPath;
@@ -929,7 +969,8 @@ void MainWindow::fillSettingsWithDefaults()
     QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
     if(!johnOtherPaths.isEmpty())
         possiblePaths << johnOtherPaths;
-
+#endif
+    
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);

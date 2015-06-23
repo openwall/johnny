@@ -18,5 +18,6 @@
         <file>icons/tab_log.png</file>
         <file>icons/tab_output.png</file>
         <file>../translations/johnny_fr.qm</file>
+        <file>icons/trash.png</file>
     </qresource>
 </RCC>

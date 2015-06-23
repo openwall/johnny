@@ -99,7 +99,6 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
             SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
     connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this,
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
     connect(&m_passwordGuessing, SIGNAL(error(QProcess::ProcessError)), this,
@@ -322,7 +321,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
-        callJohnShow();
+        callJohnShow(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
@@ -830,7 +829,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     callJohnShow();
 }
 
-void MainWindow::callJohnShow()
+void MainWindow::callJohnShow(bool showAllFormats)
 {
     // Give a chance to terminate cleanly
     if (m_johnShow.state() != QProcess::NotRunning)
@@ -838,7 +837,7 @@ void MainWindow::callJohnShow()
 
     QStringList args;
     // We add current format key if it is not empty.
-    if (!m_format.isEmpty())
+    if (!m_format.isEmpty() && !showAllFormats)
         args << m_format;
     args << "--show" << m_temp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
@@ -1246,6 +1245,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 {
     Q_UNUSED(exitCode);
     m_ui->actionGuessPassword->setEnabled(true);
+    callJohnShow(true);
     if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
         return;

@@ -161,15 +161,6 @@ MainWindow::MainWindow(QSettings &settings)
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
     
-    // Automatically open last session by default
-    if (!m_sessionHistory.isEmpty()) {
-        m_session = QDir(m_appDataPath).filePath(m_sessionHistory[0]);
-        openLastSession();
-    } else {
-        m_session.clear(); // No session
-        restoreDefaultAttackOptions(false);
-    }
-
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
     // configuration file then we get default values. Also it means
@@ -182,6 +173,15 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We load old settings.
     restoreSavedSettings();
+    
+    // Automatically open last session by default
+    if (!m_sessionHistory.isEmpty()) {
+        m_session = QDir(m_appDataPath).filePath(m_sessionHistory[0]);
+        openLastSession();
+    } else {
+        m_session.clear(); // No session
+        restoreDefaultAttackOptions(false);
+    }
 
     Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());

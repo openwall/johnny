@@ -22,7 +22,7 @@
 #include <QStandardPaths>
 #include <QInputDialog>
 
-#define INTERVAL_PICK_CRACKED 600
+#define INTERVAL_PICK_CRACKED 15
 #define PASSWORD_TAB 0
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
@@ -122,7 +122,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
     // We create the app data directory for us in $HOME if it does not exist.
-    m_appDataPath = QDir::home().filePath(QLatin1String("_john") + QDir::separator() + "johnny" + QDir::separator());
+    m_appDataPath = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "johnny" + QDir::separator());
     if (!QDir::home().mkpath(m_appDataPath)) {
         QMessageBox::critical( this, tr("Johnny"),
             tr("Could not create settings directory(%1). Check your permissions, disk space and restart Johnny.").arg(m_appDataPath));

@@ -161,15 +161,6 @@ MainWindow::MainWindow(QSettings &settings)
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
-    // Automatically open last session by default
-    if (!m_sessionHistory.isEmpty()) {
-        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
-        openLastSession();
-    } else {
-        m_sessionCurrent.clear(); // No session
-        restoreDefaultAttackOptions(false);
-    }
-
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
     // configuration file then we get default values. Also it means
@@ -182,6 +173,15 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We load old settings.
     restoreSavedSettings();
+
+    // Automatically open last session by default
+    if (!m_sessionHistory.isEmpty()) {
+        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
+        openLastSession();
+    } else {
+        m_sessionCurrent.clear(); // No session
+        restoreDefaultAttackOptions(false);
+    }
 
     Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
@@ -436,7 +436,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     switch (event->type())
     {
 #if defined Q_OS_OSX
-    case QEvent::StyleAnimationUpdate:    
+    case QEvent::StyleAnimationUpdate:
         QWidget* widget = (QWidget*) watched;
         if (widget->inherits("QProgressBar"))
             return true;
@@ -964,7 +964,7 @@ void MainWindow::fillSettingsWithDefaults()
     if(!johnOtherPaths.isEmpty())
         possiblePaths << johnOtherPaths;
 #endif
-    
+
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);

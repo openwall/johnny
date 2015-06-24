@@ -2,12 +2,10 @@
 
 JohnAttack::JohnAttack()
 {
-
 }
 
 JohnAttack::~JohnAttack()
 {
-
 }
 
 void JohnAttack::start()

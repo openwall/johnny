@@ -12,7 +12,6 @@ HashTypeChecker::HashTypeChecker()
 
 HashTypeChecker::~HashTypeChecker()
 {
-    
 }
 
 void HashTypeChecker::start()

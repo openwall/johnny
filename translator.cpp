@@ -50,6 +50,7 @@ void Translator::translateApplication(QApplication* app, QString language)
         m_currentLanguage = language;
     }
 }
+
 bool Translator::isTranslationAvailable(QString language)
 {
     if (m_languagesAndCodes.find(language.toLower()) == m_languagesAndCodes.end()) {
@@ -57,10 +58,12 @@ bool Translator::isTranslationAvailable(QString language)
     }
     return true;
 }
+
 QString Translator::getCurrentLanguage()
 {
     return m_currentLanguage;
 }
+
 QStringList Translator::getListOfAvailableLanguages()
 {
     QStringList lang;

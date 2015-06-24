@@ -113,8 +113,3 @@ void JohnHandler::closeWriteChannel()
 {
     m_john.closeWriteChannel();
 }
-
-
-
-
-

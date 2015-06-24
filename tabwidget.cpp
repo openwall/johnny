@@ -12,7 +12,6 @@ TabWidget::TabWidget(QWidget *parent)
 
 TabWidget::~TabWidget()
 {
-    
 }
 
 bool TabWidget::eventFilter(QObject *watched, QEvent *event)

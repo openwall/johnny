@@ -19,4 +19,3 @@ void JohnAttack::stop()
 {
     JohnHandler::stop();
 }
-

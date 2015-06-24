@@ -4,13 +4,12 @@ TextLabel::TextLabel(QWidget *parent):
     QLabel(parent),
     _elide(Qt::ElideNone)
 {
-
 }
 
 TextLabel::~TextLabel()
 {
-
 }
+
 Qt::TextElideMode TextLabel::elide() const
 {
     return _elide;
@@ -53,5 +52,3 @@ QString TextLabel::elideText(const QString &text)
     QFontMetrics metrics(this->font());
     return metrics.elidedText(text, _elide, this->width());
 }
-
-

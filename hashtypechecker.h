@@ -35,6 +35,7 @@ class HashTypeChecker : public JohnHandler
 
 public:
     HashTypeChecker();
+    ~HashTypeChecker();
     void start();
 
     QStringList passwordFiles() const;

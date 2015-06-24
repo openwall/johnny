@@ -10,6 +10,11 @@ Menu::Menu(QWidget *parent)
     
 }
 
+Menu::~Menu()
+{
+    
+}
+
 bool Menu::event (QEvent *event)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)

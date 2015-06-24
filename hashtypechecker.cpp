@@ -10,6 +10,11 @@ HashTypeChecker::HashTypeChecker()
     connect(this, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()), Qt::QueuedConnection);
 }
 
+HashTypeChecker::~HashTypeChecker()
+{
+    
+}
+
 void HashTypeChecker::start()
 {
     // We make sure last process is terminated correctly before

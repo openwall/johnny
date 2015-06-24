@@ -161,9 +161,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QTabWidget" name="attackModeTabWidget">
+             <widget class="TabWidget" name="attackModeTabWidget">
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="defaultModeTab">
                <attribute name="title">
@@ -1302,6 +1302,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>TabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>tabwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources/resources.qrc"/>
  </resources>

@@ -63,7 +63,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->actionPasswordsTabClicked->setChecked(true);
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
-    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
+    m_ui->attackModeTabWidget->installEventFilter(this);
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
@@ -433,21 +433,15 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         return false;
     if (!watched || !watched->isWidgetType())
         return false;
-    QWidget* widget = (QWidget*) watched;
     switch (event->type())
     {
 #if defined Q_OS_OSX
-    case QEvent::StyleAnimationUpdate:
+    case QEvent::StyleAnimationUpdate:    
+        QWidget* widget = (QWidget*) watched;
         if (widget->inherits("QProgressBar"))
             return true;
         break;
 #endif
-    case QEvent::Wheel:
-        if (widget->inherits("QTabBar")) {
-            event->ignore();
-            return true;
-        }
-        break;
     default:
         break;
     }
@@ -1349,7 +1343,7 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
             widget->setChecked(false);
         }
         foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox*>()) {
-            widget->setCurrentText("");
+            widget->setEditText("");
         }
     }
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());

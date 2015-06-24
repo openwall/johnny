@@ -1239,11 +1239,11 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
 {
     Q_UNUSED(exitCode);
     m_ui->actionGuessPassword->setEnabled(true);
-    callJohnShow(true);
     if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
         return;
     }
+    callJohnShow(true);
 }
 
 void MainWindow::restoreSessionOptions()

@@ -2,6 +2,7 @@
 
 #include <QTranslator>
 #include <QLibraryInfo>
+#include <QStringList>
 
 Translator::Translator()
 {

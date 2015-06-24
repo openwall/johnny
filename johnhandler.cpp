@@ -1,5 +1,7 @@
 #include "johnhandler.h"
 
+#include <QMetaType>
+
 JohnHandler::JohnHandler(): m_env(QProcessEnvironment::systemEnvironment())
 {
     qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");
@@ -32,7 +34,7 @@ void JohnHandler::exec()
 bool JohnHandler::terminate(bool kill)
 {
     bool success = false;
-    if(m_john.state() == QProcess::Running)
+    if((m_john.state() == QProcess::Running) || (m_john.state() == QProcess::Starting))
     {
         m_john.terminate();
         if(m_john.waitForFinished(1000))

@@ -47,7 +47,7 @@ private slots:
     void actionOpenSessionTriggered(QAction* action);
     void openPasswordFile();
     void openLastSession();
-    void listWidgetTabsSelectionChanged();
+    void tabsSelectionChanged(QAction *action);
     void buttonWordlistFileBrowseClicked();
     void buttonFillSettingsWithDefaultsClicked();
     void buttonBrowsePathToJohnClicked();
@@ -64,7 +64,7 @@ private slots:
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
     void startJohn(QStringList args);
-    void callJohnShow();
+    void callJohnShow(bool showAllFormats = false);
     void readJohnShow();
     void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);

@@ -10,6 +10,7 @@
 #include "johnprocess.h"
 #include "johnattack.h"
 #include "hashtypechecker.h"
+#include "menu.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -24,7 +25,6 @@
 #include <QMultiMap>
 #include <QTemporaryFile>
 #include <QPlainTextEdit>
-
 
 namespace Ui {
     class MainWindow;
@@ -44,6 +44,7 @@ private slots:
     void resumeAttack();
     void pauseAttack();
     void actionCopyToClipboardTriggered();
+    void actionOpenSessionTriggered(QAction* action);
     void openPasswordFile();
     void openLastSession();
     void tabsSelectionChanged(QAction *action);
@@ -53,6 +54,8 @@ private slots:
     void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
     void settingsChangedByUser();
+    void restoreSessionOptions();
+    void restoreDefaultAttackOptions(bool shouldClearFields = true);
 
     // JtR backend
     void updateJohnOutput();
@@ -77,13 +80,12 @@ private slots:
     void applySettings();
     void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
-    void verifySessionState();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
 
     // Helpers
     void appendLog(const QString& text);
-    QStringList getAttackParameters();
+    QStringList saveAttackParameters();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -94,25 +96,26 @@ protected:
 private:
     bool                 m_terminate;
     Ui::MainWindow      *m_ui;
+    Menu                *m_sessionMenu;
     QAbstractTableModel *m_hashesTable;
 
-    QString              m_appDataPath;
-
-    QStringList         m_passwordFiles;
-    QString             m_session;
-    JohnAttack          m_johnAttack; // main JtR attack handler
-    QDateTime           m_startDateTime; // Date and time of the start of the sttack
+    QString             m_sessionDataDir;
+    QString             m_sessionCurrent;
+    QStringList         m_sessionHistory;
+    QStringList         m_sessionPasswordFiles;
+    JohnAttack          m_johnAttack;       // main JtR attack handler
+    QDateTime           m_startDateTime;    // Date and time of the start of the sttack
 
     // To read cracked passwords we use this timer and john --show.
-    QTimer              m_showTimer;
-    JohnHandler         m_johnShow;
+    QTimer                   m_showTimer;
+    JohnHandler              m_johnShow;
+    // Temporary file for `john --show` output
+    QTemporaryFile          *m_johnShowTemp;
     // Format key to use with --show.
     // With this key current John was started.
-    QString             m_format;
-    // Holder for temporary file for `john --show`
-    QTemporaryFile      *m_temp;
+    QString                  m_format;
     // Map (hash table) for fast access after `john --show`
-    QMultiMap<QString, int> m_showTableMap;
+    QMultiMap<QString, int>  m_showTableMap;
 
     // Current application settings
     // Modified settings are stored on the form, this settings
@@ -123,14 +126,13 @@ private:
     QString         m_pathToJohn;
     // Interval between loading of cracked passwords
     int             m_timeIntervalPickCracked;
-
     bool            m_autoApplySettings;
 
     JohnHandler     m_johnVersionCheck;
     bool            m_isJumbo;
 
     HashTypeChecker m_hashTypeChecker;
-    JohnHandler     m_passwordGuessing;
+    JohnHandler     m_johnGuess;
 };
 
 #endif // MAINWINDOW_H

@@ -39,7 +39,7 @@ MainWindow::MainWindow(QSettings &settings)
       m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
-      m_temp(NULL),
+      m_johnShowTemp(NULL),
       m_settings(settings)
 {
     // UI initializations
@@ -63,32 +63,21 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->actionPasswordsTabClicked->setChecked(true);
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
+    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
+    // Disable copy button since there is no hash_tables (UI friendly)
+    m_ui->actionCopyToClipboard->setEnabled(false);
+    m_ui->actionStartAttack->setEnabled(false);
 
-    /*
-    // We add a button to the toolbar but this button is not simple. It has
-    // menu. And that menu drops like from menu button. Just QAction could not
-    // do it. Just QPushButton looses it's main action for popping
-    // menu. Solution with the best looking is QToolButton. QtCreator could not
-    // put such element on tool bar. It is possible to put it by hands through
-    // .ui file but it does not seem to be reliable. So we make it here in
-    // code.
-    //
-    // We create a desired menu.
-    QMenu *sessionMenu = new QMenu(this);
-    sessionMenu->addAction(m_ui->actionNew_Session);
-    sessionMenu->addAction(m_ui->actionSave_Session);
-    // We create a button.
+    // Multiple sessions management menu
+    m_sessionMenu = new Menu(this);
     QToolButton *sessionMenuButton = new QToolButton(this);
-    // We set default action and menu for the button.
-    sessionMenuButton->setDefaultAction(m_ui->actionOpen_Session);
-    sessionMenuButton->setMenu(sessionMenu);
-    // We set button up to have desired look and behaviour.
-    sessionMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
-    // TODO: May it be better to derive this setting from the toolbar?
+    sessionMenuButton->setDefaultAction(m_ui->actionOpenLastSession);
+    sessionMenuButton->setMenu(m_sessionMenu);
+    sessionMenuButton->setPopupMode(QToolButton::InstantPopup);
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-    // We put the button onto the toolbar.
-    m_ui->mainToolBar->insertWidget(m_ui->actionOpen_Password, sessionMenuButton);
-    */
+    m_ui->mainToolBar->insertWidget(m_ui->actionStartAttack, sessionMenuButton);
+    m_ui->mainToolBar->insertSeparator(m_ui->actionStartAttack);
+    connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
@@ -110,10 +99,10 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
             SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this,
+    connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
+    connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this,
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(error(QProcess::ProcessError)), this,
+    connect(&m_johnGuess, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
 
     // Handling of buttons regarding settings
@@ -128,7 +117,6 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
 
     // Action buttons
-    connect(m_ui->actionOpenLastSession,SIGNAL(triggered()),this,SLOT(openLastSession()));
     connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
     connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
     connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
@@ -142,18 +130,45 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
-    // We create the app data directory for us in $HOME if it does not exist.
-    m_appDataPath = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "johnny" + QDir::separator());
-    if (!QDir::home().mkpath(m_appDataPath)) {
-        QMessageBox::critical( this, tr("Johnny"),
-            tr("Could not create settings directory(%1). Check your permissions, disk space and restart Johnny.").arg(m_appDataPath));
+    // We create the app sessions data directory in $HOME if it does not exist
+    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "sessions" + QDir::separator());
+    if (!QDir::home().mkpath(m_sessionDataDir)) {
+        QMessageBox::critical(this, tr("Johnny"),
+            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
         qApp->quit();
     }
 
-    // Session for johnny
-    m_session = QDir(m_appDataPath).filePath("default");
+    // Load sessions
+    m_settings.beginGroup("Sessions");
+    QStringList sessionsList = m_settings.childGroups();
+    for (int i = sessionsList.size()-1; i >= 0; i--) {
+        QString sessionName = sessionsList[i];
+        QString completePath = QDir(m_sessionDataDir).filePath(sessionName);
+        if (QFileInfo(completePath + ".rec").isReadable()) {
+            QAction *fileAction = m_sessionMenu->addAction(sessionName);
+            fileAction->setData(sessionName);
+            m_sessionHistory.append(sessionName);
+            QString fileNames = m_settings.value(sessionName + "/passwordFiles").toStringList().join(" ");
+            fileAction->setToolTip(fileNames);
+        } else {
+            // The .rec may have been deleted manually by user, let's clean our settings
+            m_settings.remove(sessionName);
+        }
+    }
+    m_settings.endGroup();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+    m_sessionMenu->setToolTipsVisible(true);
+#endif
+    m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
-    verifySessionState();
+    // Automatically open last session by default
+    if (!m_sessionHistory.isEmpty()) {
+        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
+        openLastSession();
+    } else {
+        m_sessionCurrent.clear(); // No session
+        restoreDefaultAttackOptions(false);
+    }
 
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
@@ -168,11 +183,6 @@ MainWindow::MainWindow(QSettings &settings)
     // We load old settings.
     restoreSavedSettings();
 
-    // TODO: do this message on every invocation of john. Provide
-    //       checkbox to not show this again.
-    // TODO: default values for other settings are accepted silently.
-    // if (m_settings.value("PathToJohn").toString() == "")
-    //     warnAboutDefaultPathToJohn();
     Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     int languageIndex = m_ui->comboBox_LanguageSelection->findText(translator.getCurrentLanguage());
@@ -180,56 +190,11 @@ MainWindow::MainWindow(QSettings &settings)
         m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
     }
 
-    //We set the default and maximum of fork thread to the idealThreadCount.
-    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
-    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
-
-    // Disable copy button since there is no hash_tables (UI friendly)
-    m_ui->actionCopyToClipboard->setEnabled(false);
-
     #if !OS_FORK
-    //As of now, fork is only supported on Linux platform
-        m_ui->widget_Fork->hide();
+    //As of now, fork is only supported on unix platforms
+        m_ui->widgetFork->hide();
     #endif
 
-}
-
-void MainWindow::verifySessionState()
-{
-    m_ui->actionStartAttack->setEnabled(! m_passwordFiles.isEmpty());
-
-    if (QFileInfo(m_session + ".rec").isReadable()
-        && QFileInfo(m_session + ".johnny").isReadable()) {
-        m_ui->actionOpenLastSession->setEnabled(true);
-
-        QFile description(m_session + ".johnny");
-        if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_ui->actionResumeAttack->setEnabled(false);
-            return;
-        }
-        QTextStream descriptionStream(&description);
-
-        QStringList hashesFileNames;
-        while(!descriptionStream.atEnd())
-        {
-            QString content =  descriptionStream.readLine();
-            if(content.startsWith("FILE="))
-            {
-                content.remove(0,5);
-                hashesFileNames.append(content);
-            }
-        }
-        description.close();
-
-        m_ui->actionResumeAttack->setEnabled(
-            hashesFileNames == m_passwordFiles
-            && !hashesFileNames.isEmpty());
-        m_ui->actionOpenLastSession->setEnabled(
-            hashesFileNames != m_passwordFiles);
-    } else {
-        m_ui->actionOpenLastSession->setEnabled(false);
-        m_ui->actionResumeAttack->setEnabled(false);
-    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -255,14 +220,14 @@ MainWindow::~MainWindow()
     m_johnShow.stop();
     m_johnVersionCheck.stop();
     m_hashTypeChecker.stop();
-    m_passwordGuessing.stop();
+    m_johnGuess.stop();
 
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;
     m_hashesTable = 0;
-    delete m_temp;
-    m_temp = 0;
+    delete m_johnShowTemp;
+    m_johnShowTemp = 0;
 }
 
 void MainWindow::buttonWordlistFileBrowseClicked()
@@ -300,9 +265,9 @@ void MainWindow::tabsSelectionChanged(QAction* action)
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // Remove temporary file is exist
-    if (m_temp != NULL) {
-        delete m_temp;
-        m_temp = NULL;
+    if (m_johnShowTemp != NULL) {
+        delete m_johnShowTemp;
+        m_johnShowTemp = NULL;
     }
 
     // We delete existing model if any.
@@ -337,19 +302,19 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
-        m_passwordFiles = fileNames;
+        m_sessionPasswordFiles = fileNames;
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
-        if (!m_temp) {
-            m_temp = new QTemporaryFile();
-            if (m_temp->open()) {
-                QTextStream temp(m_temp);
+        if (!m_johnShowTemp) {
+            m_johnShowTemp = new QTemporaryFile();
+            if (m_johnShowTemp->open()) {
+                QTextStream temp(m_johnShowTemp);
                 for (int i = 0; i < m_hashesTable->rowCount(); i++) {
                     QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                     QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
                     temp << user << ":" << hash << "::" << hash << '\n';
                 }
-                m_temp->close();
+                m_johnShowTemp->close();
             } else {
                 QMessageBox::critical(
                     this,
@@ -358,8 +323,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             }
         }
         callJohnShow();
-        verifySessionState();
-        m_ui->actionCopyToClipboard->setEnabled(true);
+        m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
+        m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
@@ -387,41 +352,23 @@ void MainWindow::openPasswordFile()
     if (dialog.exec()) {
         QStringList fileNames = dialog.selectedFiles();
         readPasswdFiles(fileNames);
+        m_ui->actionResumeAttack->setEnabled(false);
     }
 }
 
 void MainWindow::openLastSession()
 {
-    QFile description(m_session + ".johnny");
-    if (!description.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            tr("Johnny could not open file to read session description!"));
-        return;
-    }
-    QTextStream descriptionStream(&description);
-    QString format;
-    QStringList fileNames;
-    // Parse johnny session file
-    while(!descriptionStream.atEnd())
-    {
-        QString content =  descriptionStream.readLine();
-        if(content.startsWith("FILE="))
-        {
-            content.remove(0,5);
-            fileNames.append(content);
-        }
-        else if(content.startsWith("FORMAT="))
-        {
-            content.remove(0,7);
-            format = content;
-        }
-    }
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+    m_settings.beginGroup("Sessions/" + sessionName);
+    QString format = m_settings.value("formatJohn").toString();
+    QStringList fileNames = m_settings.value("passwordFiles").toStringList();
+    m_settings.endGroup();
 
-    description.close();
     if (readPasswdFiles(fileNames)) {
         m_format = format;
+        restoreSessionOptions();
+        m_ui->actionResumeAttack->setEnabled(true);
     }
 }
 
@@ -486,15 +433,21 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         return false;
     if (!watched || !watched->isWidgetType())
         return false;
-    QWidget* widged = (QWidget*) watched;
+    QWidget* widget = (QWidget*) watched;
     switch (event->type())
     {
 #if defined Q_OS_OSX
     case QEvent::StyleAnimationUpdate:
-        if (widged->inherits("QProgressBar"))
+        if (widget->inherits("QProgressBar"))
             return true;
         break;
 #endif
+    case QEvent::Wheel:
+        if (widget->inherits("QTabBar")) {
+            event->ignore();
+            return true;
+        }
+        break;
     default:
         break;
     }
@@ -506,52 +459,36 @@ void MainWindow::startAttack()
     if (!checkSettings())
         return;
 
-    QStringList parameters = getAttackParameters();
-
     // Session for johnny
-    QString nameOfFile = m_session + ".rec";
+    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh:mm:ss");
+    m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
+    QString sessionFile = m_sessionCurrent + ".rec";
 
-    if (QFileInfo(nameOfFile).isReadable()) {
-        int button = QMessageBox::question(
-            this,
-            tr("Johnny"),
-            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
-            QMessageBox::Yes | QMessageBox::No);
-       if (button == QMessageBox::No)
-            return;
-        // Remove .rec file to avoid problem when john does not write it.
-        if(!QFile(nameOfFile).remove())
+    if (QFileInfo(sessionFile).isReadable())
+    {
+        QMessageBox::StandardButton button =
+                QMessageBox::question(this,
+                tr("Johnny"),
+                tr("A session file already exists with this name (%1). Do you want to overwrite?").arg(sessionFile),
+                QMessageBox::Yes | QMessageBox::No);
+        if (button == QMessageBox::Yes)
         {
-            QMessageBox::warning(
-                this,
-                tr("Warning"),
-                tr("Unable to remove file ") + nameOfFile);
+            // Remove existing session .rec file to avoid issues with JtR
+            if(!QFile(sessionFile).remove())
+            {
+                QMessageBox::warning(this, tr("Warning"),
+                                     tr("Unable to remove file session file %1").arg(sessionFile));
+            }
         }
     }
 
-    QFile description(m_session + ".johnny");
-    if (!description.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(
-            this,
-            tr("Johnny"),
-            tr("Johnny could not open file to save session description."));
-        return;
-    }
-    QTextStream descriptionStream(&description);
-
-    for(int i = 0; i < m_passwordFiles.size(); i++)
-    {
-        descriptionStream << "FILE=" << m_passwordFiles[i] <<endl;
-    }
-    descriptionStream << "FORMAT=" << m_format << endl;
-    description.close();
-
-    parameters << QString("--session=%1").arg(m_session);
+    QStringList parameters = saveAttackParameters();
+    parameters << QString("--session=%1").arg(m_sessionCurrent);
 
     // We check that we have file name.
-    if (!m_passwordFiles.isEmpty()) {
+    if (!m_sessionPasswordFiles.isEmpty()) {
         // If file name is not empty then we have file, pass it to John.
-        parameters << m_passwordFiles;
+        parameters << m_sessionPasswordFiles;
         startJohn(parameters);
     } else {
         QMessageBox::warning(
@@ -563,11 +500,15 @@ void MainWindow::startAttack()
 
 /* This function doesn't return the parameters of the current john process,
  * it returns the selected parameters in Johnny (UI-side) */
-QStringList MainWindow::getAttackParameters()
+QStringList MainWindow::saveAttackParameters()
 {
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+    m_settings.beginGroup("Sessions/" + sessionName);
+    m_settings.setValue("passwordFiles", m_sessionPasswordFiles);
+
     QStringList parameters;
     // We prepare parameters list from options section.
-
     // General options
     // Format
     if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
@@ -603,77 +544,95 @@ QStringList MainWindow::getAttackParameters()
     } else {
         // In case we do not have explicit format we erase remembered
         // key.
-        m_format = "";
+        m_format.clear();
     }
+    m_settings.setValue("formatJohn", m_format);
+    m_settings.setValue("formatUI", m_ui->comboBox_Format->currentText());
+
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
     if (selectedMode == m_ui->defaultModeTab) {
         // Default behaviour - no modes
         // There are no options here.
+        m_settings.setValue("mode", "default");
     } else if (selectedMode == m_ui->singleModeTab) {
         // "Single crack" mode
         parameters << "--single";
+        m_settings.setValue("mode", "single");
         // External mode, filter
-        if (m_ui->checkBox_SingleCrackModeExternalName->isChecked())
+        if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
+            m_settings.setValue("singleCrackExternalName", m_ui->comboBox_SingleCrackModeExternalName->currentText());
+        }
+
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
+        m_settings.setValue("mode", "wordlist");
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
+        m_settings.setValue("wordlistFile", m_ui->comboBox_WordlistFile->currentText());
+
         // Rules
-        // They could appear with or without name.
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
-            // If rules are selected then we distinguish either name
-            // is needed two.
-            // if (m_ui->checkBox_WordlistModeRulesName->isChecked()) {
-            //     // If name for rules is selected to be then we take it.
-            //     // NOTE: Not all versions support this.
-            //     // TODO: It would be great to notice user about this.
-            //     // TODO: It would be great to notice user on any
-            //     //       fails, not only here.
-            //     // TODO: Calls to John makes interface to stick a bit.
-            //     //       It is actual with often -show calls.
-            //     parameters << ("--rules=" + m_ui->comboBox_WordlistModeRulesName->currentText());
-            // } else {
-                // If no name is needed then we use just rules,
-                // without name.
                 parameters << "--rules";
-            // }
         }
+        m_settings.setValue("isUsingWordListRules", m_ui->checkBox_WordlistModeRules->isChecked());
         // External mode, filter
-        if (m_ui->checkBox_WordlistModeExternalName->isChecked())
+        if (m_ui->checkBox_WordlistModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
+            m_settings.setValue("worldListExternalName", m_ui->comboBox_WordlistModeExternalName->currentText());
+        }
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
+        m_settings.setValue("mode", "incremental");
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
             // With name
             parameters << ("--incremental=" + m_ui->comboBox_IncrementalModeName->currentText());
+            m_settings.setValue("incrementalModeName", m_ui->comboBox_IncrementalModeName->currentText());
         } else {
             // Without name
             parameters << "--incremental";
         }
         // External mode, filter
-        if (m_ui->checkBox_IncrementalModeExternalName->isChecked())
+        if (m_ui->checkBox_IncrementalModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
+            m_settings.setValue("incrementalExternalName", m_ui->comboBox_IncrementalModeExternalName->currentText());
+        }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
+        m_settings.setValue("mode", "external");
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
+        m_settings.setValue("externalModeName", m_ui->comboBox_ExternalModeName->currentText());
     }
 
     // Selectors
-    if (m_ui->checkBox_LimitUsers->isChecked())
+    if (m_ui->checkBox_LimitUsers->isChecked()) {
         parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
-    if (m_ui->checkBox_LimitGroups->isChecked())
+        m_settings.setValue("limitUsers", m_ui->comboBox_LimitUsers->currentText());
+    }
+    if (m_ui->checkBox_LimitGroups->isChecked()) {
         parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
-    if (m_ui->checkBox_LimitShells->isChecked())
+        m_settings.setValue("limitGroups", m_ui->comboBox_LimitGroups->currentText());
+    }
+    if (m_ui->checkBox_LimitShells->isChecked()) {
         parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
-    if (m_ui->checkBox_LimitSalts->isChecked())
+        m_settings.setValue("limitShells", m_ui->comboBox_LimitShells->currentText());
+    }
+    if (m_ui->checkBox_LimitSalts->isChecked()) {
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
+        m_settings.setValue("limitSalts", m_ui->spinBox_LimitSalts->value());
+    }
 
     // Advanced options
     if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
+        m_settings.setValue("nbForkProcess", m_ui->spinBox_nbOfProcess->value());
     }
+    m_settings.setValue("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->value());
+    if (m_ui->checkBox_EnvironmentVar->isChecked()) {
+        m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
+    }
+    m_settings.endGroup();
 
     return parameters;
 }
@@ -731,7 +690,7 @@ void MainWindow::resumeAttack()
         return;
 
     QStringList parameters;
-    parameters << QString("--restore=%1").arg(m_session);
+    parameters << QString("--restore=%1").arg(m_sessionCurrent);
 
     startJohn(parameters);
 }
@@ -818,7 +777,7 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 
     QMessageBox::critical(this, tr("Johnny"), message + "(" + m_pathToJohn + ")");
 
-    if (QObject::sender() == &m_passwordGuessing) {
+    if (QObject::sender() == &m_johnGuess) {
         m_ui->actionGuessPassword->setEnabled(true);
     }
 
@@ -828,12 +787,38 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
     appendLog(CONSOLE_LOG_SEPARATOR);
+
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+
+    bool isNewSession = !m_sessionHistory.contains(sessionName);
+    bool isRecReadable = QFileInfo(m_sessionCurrent + ".rec").isReadable();
+    if ((isNewSession == true) && (isRecReadable == true)) {
+        // New session saved by john, add it to the list
+        QAction* action = new QAction(sessionName, this);
+        m_sessionMenu->insertAction(m_sessionMenu->actions()[0], action);
+        action->setData(sessionName);
+        m_sessionHistory.append(sessionName);
+        action->setToolTip(m_sessionPasswordFiles.join(" "));
+    } else if ((isNewSession == false) && (isRecReadable == false)) {
+        // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
+        // so we remove it from the session history list to have an error-prone UI
+        m_sessionHistory.removeOne(sessionName);
+        m_settings.remove("Sessions/" + sessionName);
+        foreach(QAction* actions, m_sessionMenu->actions()) {
+            if (actions->data().toString() == sessionName) {
+                    m_sessionMenu->removeAction(actions);
+            }
+        }
+    }
+
     // When John finishes we enable start button and disable stop
     // button.
     m_ui->actionPauseAttack->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(true);
     m_ui->actionOpenPassword->setEnabled(true);
-    verifySessionState();
+    m_ui->actionOpenLastSession->setEnabled(true);
+    m_ui->actionResumeAttack->setEnabled(m_sessionHistory.contains(sessionName) && isRecReadable);
 
     if (exitStatus == QProcess::CrashExit) {
         qDebug() << "JtR seems to have crashed.";
@@ -853,9 +838,9 @@ void MainWindow::callJohnShow()
 
     QStringList args;
     // We add current format key if it is not empty.
-    if (m_format != "")
+    if (!m_format.isEmpty())
         args << m_format;
-    args << "--show" << m_temp->fileName();
+    args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
     m_johnShow.start();
@@ -1159,15 +1144,23 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
                                  const QStringList &detailedTypesPerRow)
 {
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if ((model != NULL) && (pathToPwdFile == m_passwordFiles)) {
+    if ((model != NULL) && (pathToPwdFile == m_sessionPasswordFiles)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
         m_ui->tableView_Hashes->setModel(model);
+        QString savedFormat = m_ui->comboBox_Format->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->comboBox_Format->clear();
         m_ui->comboBox_Format->addItem(tr("Auto detect"));
         m_ui->comboBox_Format->addItems(listOfTypesInFile);
+        // Restore user's selection
+        int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
+        if (indexSavedFormat != -1) {
+            m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
+        } else if(savedFormat.isEmpty()){
+            m_ui->comboBox_Format->setEditText(savedFormat);
+        }
     }
 }
 
@@ -1176,9 +1169,9 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
-    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_passwordFiles.isEmpty())) {
+    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_sessionPasswordFiles.isEmpty())) {
         m_hashTypeChecker.setJohnProgram(m_pathToJohn);
-        m_hashTypeChecker.setPasswordFiles(m_passwordFiles);
+        m_hashTypeChecker.setPasswordFiles(m_sessionPasswordFiles);
         m_hashTypeChecker.start();
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
@@ -1187,8 +1180,16 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         QStringList defaultFormats;
         defaultFormats << tr("Auto detect") << "descrypt" << "bsdicrypt" << "md5crypt"
                        << "bcrypt" << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
+        QString savedFormat = m_ui->comboBox_Format->currentText();
         m_ui->comboBox_Format->clear();
         m_ui->comboBox_Format->addItems(defaultFormats);
+        // Restore user's selection
+        int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
+        if (indexSavedFormat != -1) {
+            m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
+        } else if (!savedFormat.isEmpty()){
+            m_ui->comboBox_Format->setEditText(savedFormat);
+        }
     }
 }
 
@@ -1199,6 +1200,32 @@ void MainWindow::verifyJohnVersion()
     setAvailabilityOfFeatures(isJumbo);
 }
 
+void MainWindow::actionOpenSessionTriggered(QAction* action)
+{
+    if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
+        QDir dir(m_sessionDataDir);
+        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec");
+        dir.setFilter(QDir::Files);
+        foreach (QString dirFile, dir.entryList()) {
+            dir.remove(dirFile);
+        }
+        foreach(QAction* actions, m_sessionMenu->actions()) {
+            if (m_sessionHistory.removeOne(actions->data().toString())) {
+                    m_sessionMenu->removeAction(actions);
+            }
+        }
+        m_sessionCurrent.clear();
+        m_settings.remove("Sessions");
+        m_ui->actionResumeAttack->setEnabled(false);
+    } else {
+        QString fileName = action->data().toString();
+        if (!fileName.isEmpty()) {
+            m_sessionCurrent = QDir(m_sessionDataDir).filePath(fileName);
+            openLastSession();
+        }
+    }
+}
+
 void MainWindow::guessPassword()
 {
     bool isOk;
@@ -1207,11 +1234,11 @@ void MainWindow::guessPassword()
                                          "", &isOk);
     if (isOk && !guess.isEmpty()) {
         m_ui->actionGuessPassword->setEnabled(false);
-        m_passwordGuessing.setJohnProgram(m_pathToJohn);
-        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_passwordFiles);
-        m_passwordGuessing.start();
-        m_passwordGuessing.write(guess);
-        m_passwordGuessing.closeWriteChannel();
+        m_johnGuess.setJohnProgram(m_pathToJohn);
+        m_johnGuess.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_sessionPasswordFiles);
+        m_johnGuess.start();
+        m_johnGuess.write(guess);
+        m_johnGuess.closeWriteChannel();
     }
 }
 
@@ -1223,4 +1250,112 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
         qDebug() << "JtR seems to have crashed.";
         return;
     }
+}
+
+void MainWindow::restoreSessionOptions()
+{
+    restoreDefaultAttackOptions();
+    // Start restoring required UI fields
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+    m_settings.beginGroup("Sessions/" + sessionName);
+    m_format = m_settings.value("formatJohn").toString();
+    m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
+    QString mode = m_settings.value("mode").toString();
+    if (mode == "single") {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->singleModeTab);
+        // External mode, filter
+        if(m_settings.contains("singleCrackExternalName")) {
+            m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
+            m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_settings.value("singleCrackExternalName").toString());
+        }
+    } else if (mode == "wordlist") {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
+        m_ui->comboBox_WordlistFile->setEditText(m_settings.value("wordlistFile").toString());
+        //Rules
+        if (m_settings.value("isUsingWordListRules").toBool() == true) {
+            m_ui->checkBox_WordlistModeRules->setChecked(true);
+        }
+        // External mode, filter
+        if (m_settings.contains("worldListExternalName")) {
+            m_ui->checkBox_WordlistModeExternalName->setChecked(true);
+            m_ui->comboBox_WordlistModeExternalName->setEditText(m_settings.value("worldListExternalName").toString());
+        }
+    } else if (mode == "incremental") {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);
+        // "Incremental" mode
+        // It could be with or without name.
+        if (m_settings.contains("incrementalModeName")) {
+            m_ui->checkBox_IncrementalModeName->setChecked(true);
+            m_ui->comboBox_IncrementalModeName->setEditText(m_settings.value("incrementalModeName").toString());
+        }
+        // External mode, filter
+        if (m_settings.contains("incrementalExternalName")) {
+            m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
+            m_ui->comboBox_IncrementalModeExternalName->setEditText(m_settings.value("incrementalExternalName").toString());
+        }
+    } else if (mode == "external") {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
+        m_ui->comboBox_ExternalModeName->setEditText(m_settings.value("externalModeName").toString());
+    } else {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
+    }
+
+    // Selectors
+    if (m_settings.contains("limitUsers")) {
+        m_ui->checkBox_LimitUsers->setChecked(true);
+        m_ui->comboBox_LimitUsers->setEditText(m_settings.value("limitUsers").toString());
+    }
+    if (m_settings.contains("limitGroups")) {
+        m_ui->checkBox_LimitGroups->setChecked(true);
+        m_ui->comboBox_LimitGroups->setEditText(m_settings.value("limitGroups").toString());
+    }
+    if (m_settings.contains("limitShells")) {
+        m_ui->checkBox_LimitShells->setChecked(true);
+        m_ui->comboBox_LimitShells->setEditText(m_settings.value("limitShells").toString());
+    }
+    if (m_settings.contains("limitSalts")) {
+        m_ui->checkBox_LimitSalts->setChecked(true);
+        m_ui->spinBox_LimitSalts->setValue(m_settings.value("limitSalts").toInt());
+    }
+
+    // Advanced options
+    if (m_settings.contains("nbForkProcess")) {
+        m_ui->checkBox_UseFork->setChecked(true);
+        int nbOfProcess = m_settings.value("nbForkProcess").toInt();
+        // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
+        // we have to restore the right previous session value.
+        if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
+            m_ui->spinBox_nbOfProcess->setMaximum(nbOfProcess);
+        }
+        m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
+    }
+    m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings.value("OMP_NUM_THREADS").toInt());
+
+    if (m_settings.contains("environmentVariables")) {
+        m_ui->checkBox_EnvironmentVar->setChecked(true);
+        m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
+    }
+    m_settings.endGroup();
+}
+
+/* Clear/or default optional previous session UI options that may
+   not be specified in the settings depending on the mode
+*/
+void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
+{
+    if (shouldClearFields) {
+        foreach(QCheckBox *widget, m_ui->optionsPage->findChildren<QCheckBox*>()) {
+            widget->setChecked(false);
+        }
+        foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox*>()) {
+            widget->setCurrentText("");
+        }
+    }
+    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
+    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
+    m_ui->spinBox_nbOfProcess->setMinimum(2); // john --fork will error if < 2, let's prevent it
+    m_ui->spinBox_LimitSalts->setValue(0);
+    m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
+    m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
 }

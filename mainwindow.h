@@ -10,6 +10,7 @@
 #include "johnprocess.h"
 #include "johnattack.h"
 #include "hashtypechecker.h"
+#include "menu.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -24,7 +25,6 @@
 #include <QMultiMap>
 #include <QTemporaryFile>
 #include <QPlainTextEdit>
-
 
 namespace Ui {
     class MainWindow;
@@ -44,6 +44,7 @@ private slots:
     void resumeAttack();
     void pauseAttack();
     void actionCopyToClipboardTriggered();
+    void actionOpenSessionTriggered(QAction* action);
     void openPasswordFile();
     void openLastSession();
     void listWidgetTabsSelectionChanged();
@@ -53,6 +54,8 @@ private slots:
     void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
     void settingsChangedByUser();
+    void restoreSessionOptions();
+    void restoreDefaultAttackOptions(bool shouldClearFields = true);
 
     // JtR backend
     void updateJohnOutput();
@@ -77,13 +80,12 @@ private slots:
     void applySettings();
     void applyAndSaveSettings();
     void warnAboutDefaultPathToJohn();
-    void verifySessionState();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
 
     // Helpers
     void appendLog(const QString& text);
-    QStringList getAttackParameters();
+    QStringList saveAttackParameters();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -94,12 +96,14 @@ protected:
 private:
     bool                 m_terminate;
     Ui::MainWindow      *m_ui;
+    Menu                *m_sessionMenu;
     QAbstractTableModel *m_hashesTable;
 
     QString              m_appDataPath;
 
     QStringList         m_passwordFiles;
     QString             m_session;
+    QStringList         m_sessionHistory;
     JohnAttack          m_johnAttack; // main JtR attack handler
     QDateTime           m_startDateTime; // Date and time of the start of the sttack
 

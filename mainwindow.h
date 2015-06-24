@@ -47,7 +47,7 @@ private slots:
     void actionOpenSessionTriggered(QAction* action);
     void openPasswordFile();
     void openLastSession();
-    void tabsSelectionChanged(QAction *action);
+    void listWidgetTabsSelectionChanged();
     void buttonWordlistFileBrowseClicked();
     void buttonFillSettingsWithDefaultsClicked();
     void buttonBrowsePathToJohnClicked();

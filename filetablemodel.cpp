@@ -59,7 +59,7 @@ bool FileTableModel::readFile(const QStringList &fileNames)
                 data[column++].append(fields.at(2));
                 fields.removeAt(2);
                 fields.removeAt(0);
-                data[column++].append(fields.join(QString(FIELD_SEPARATOR)));
+                data[column++].append(fields.join(FIELD_SEPARATOR));
             } else {
                 // user:hash:other
                 data[column++].append(fields.at(0));
@@ -67,7 +67,7 @@ bool FileTableModel::readFile(const QStringList &fileNames)
                 data[column++].append(fields.at(1));
                 fields.removeAt(1);
                 fields.removeAt(0);
-                data[column++].append(fields.join(QString(FIELD_SEPARATOR)));
+                data[column++].append(fields.join(FIELD_SEPARATOR));
             }
             for (; column < columnCount(); column++)
                 data[column].append("");

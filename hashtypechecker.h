@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QTextStream>
+#include <QtConcurrent/QtConcurrent>
 
 struct HashFormat
 {
@@ -26,7 +27,7 @@ struct Hash
     QString gecos;
     QString home;
     QString shell;
-    QList<HashFormat> listFormats;
+    std::vector<HashFormat> listFormats;
 };
 
 class HashTypeChecker : public JohnHandler

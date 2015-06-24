@@ -19,19 +19,11 @@
 #include <QClipboard>
 #include <QThread>
 #include <QTextCursor>
-#include <QDesktopServices>
-#include <QInputDialog>
-#include <QtDebug>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QStandardPaths>
-#endif
+#include <QInputDialog>
 
 #define INTERVAL_PICK_CRACKED 15
-#define TAB_PASSWORDS   0
-#define TAB_OPTIONS     1
-#define TAB_STATISTICS  2
-#define TAB_SETTINGS    3
-#define TAB_CONSOLE_LOG 4
+#define PASSWORD_TAB 0
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -53,20 +45,19 @@ MainWindow::MainWindow(QSettings &settings)
     // https://github.com/shinnok/johnny/issues/11
     m_ui->progressBar->installEventFilter(this);
 
-    // We select the PASSWORDS tab
-    m_ui->contentStackedWidget->setCurrentIndex(TAB_PASSWORDS);
-    QActionGroup *tabSelectionGroup = new QActionGroup(this);
-    tabSelectionGroup->setExclusive(true);
-    foreach(QAction* actions, m_ui->tabSelectionToolBar->actions()) {
-        tabSelectionGroup->addAction(actions);
-    }
-    m_ui->actionPasswordsTabClicked->setChecked(true);
+    m_ui->listWidgetTabs->setAttribute(Qt::WA_MacShowFocusRect, false);
 
-    m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab); 
-    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
+    // We select the PASSWORDS tab
+    m_ui->contentStackedWidget->setCurrentIndex(PASSWORD_TAB);
+    m_ui->listWidgetTabs->setCurrentRow(PASSWORD_TAB);
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
+    foreach (QListWidgetItem *item, m_ui->listWidgetTabs->findItems("*", Qt::MatchWildcard))
+        item->setSizeHint(QSize(m_ui->listWidgetTabs->width(), m_ui->listWidgetTabs->sizeHintForRow(0)));
+
+    m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
+    m_ui->attackModeTabWidget->tabBar()->installEventFilter(this);
 
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
@@ -127,7 +118,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
-    connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
+    connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
     // We create the app data directory for us in $HOME if it does not exist.
     m_appDataPath = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "johnny" + QDir::separator());
@@ -159,7 +150,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_sessionMenu->setToolTipsVisible(true);
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
-    
+
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
     // configuration file then we get default values. Also it means
@@ -172,7 +163,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We load old settings.
     restoreSavedSettings();
-    
+
     // Automatically open last session by default
     if (!m_sessionHistory.isEmpty()) {
         m_session = QDir(m_appDataPath).filePath(m_sessionHistory[0]);
@@ -182,12 +173,9 @@ MainWindow::MainWindow(QSettings &settings)
         restoreDefaultAttackOptions(false);
     }
 
-    Translator &translator = Translator::getInstance();
+    Translator& translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
-    int languageIndex = m_ui->comboBox_LanguageSelection->findText(translator.getCurrentLanguage());
-    if (languageIndex != -1) {
-        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
-    }
+    m_ui->comboBox_LanguageSelection->setCurrentText(translator.getCurrentLanguage());
 
     #if !OS_FORK
     //As of now, fork is only supported on unix platforms
@@ -243,22 +231,10 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     }
 }
 
-void MainWindow::tabsSelectionChanged(QAction* action)
+void MainWindow::listWidgetTabsSelectionChanged()
 {
-    int index = 0;
-    if (action == m_ui->actionPasswordsTabClicked) {
-        index = TAB_PASSWORDS;
-    } else if (action == m_ui->actionOptionsTabClicked) {
-        index = TAB_OPTIONS;
-    } else if (action == m_ui->actionStatisticsTabClicked) {
-        index = TAB_STATISTICS;
-    } else if (action == m_ui->actionSettingsTabClicked) {
-        index = TAB_SETTINGS;
-    } else if (action ==  m_ui->actionConsoleLogTabClicked) {
-        index = TAB_CONSOLE_LOG;
-    }
-    m_ui->actionCopyToClipboard->setEnabled(index == TAB_PASSWORDS);
-    m_ui->contentStackedWidget->setCurrentIndex(index);
+    m_ui->contentStackedWidget->setCurrentIndex(m_ui->listWidgetTabs->currentRow());
+    m_ui->actionCopyToClipboard->setEnabled(m_ui->listWidgetTabs->currentRow() == PASSWORD_TAB);
 }
 
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
@@ -321,8 +297,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
-        callJohnShow(true);
-        m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
+        callJohnShow();
+        m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == PASSWORD_TAB);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         if (m_isJumbo) {
@@ -435,18 +411,15 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
     QWidget* widget = (QWidget*) watched;
     switch (event->type())
     {
-#if defined Q_OS_OSX
     case QEvent::StyleAnimationUpdate:
         if (widget->inherits("QProgressBar"))
             return true;
         break;
-#endif
     case QEvent::Wheel:
         if (widget->inherits("QTabBar")) {
             event->ignore();
             return true;
         }
-        break;
     default:
         break;
     }
@@ -457,7 +430,7 @@ void MainWindow::startAttack()
 {
     if (!checkSettings())
         return;
-    
+
     // Session for johnny
     QString date = QDateTime::currentDateTime().toString("MM-dd-yy_hh:mm:ss");
     m_session = QDir(m_appDataPath).filePath(date);
@@ -505,7 +478,7 @@ QStringList MainWindow::saveAttackParameters()
     sessionName.remove(m_appDataPath);
     m_settings.beginGroup("johnSessions/" + sessionName);
     m_settings.setValue("passwordFiles", m_passwordFiles);
-    
+
     QStringList parameters;
     // We prepare parameters list from options section.
     // General options
@@ -547,7 +520,7 @@ QStringList MainWindow::saveAttackParameters()
     }
     m_settings.setValue("formatJohn", m_format);
     m_settings.setValue("formatUI", m_ui->comboBox_Format->currentText());
-    
+
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
     if (selectedMode == m_ui->defaultModeTab) {
@@ -563,13 +536,13 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
             m_settings.setValue("singleCrackExternalName", m_ui->comboBox_SingleCrackModeExternalName->currentText());
         }
-        
+
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
         m_settings.setValue("mode", "wordlist");
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
         m_settings.setValue("wordlistFile", m_ui->comboBox_WordlistFile->currentText());
-        
+
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
                 parameters << "--rules";
@@ -599,7 +572,7 @@ QStringList MainWindow::saveAttackParameters()
         }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
-        m_settings.setValue("mode", "external");       
+        m_settings.setValue("mode", "external");
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
         m_settings.setValue("externalModeName", m_ui->comboBox_ExternalModeName->currentText());
     }
@@ -632,7 +605,7 @@ QStringList MainWindow::saveAttackParameters()
         m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
     }
     m_settings.endGroup();
-    
+
     return parameters;
 }
 
@@ -789,7 +762,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
     QString sessionName(m_session);
     sessionName.remove(m_appDataPath);
-   
+
     bool isNewSession = !m_sessionHistory.contains(sessionName);
     bool isRecReadable = QFileInfo(m_session + ".rec").isReadable();
     if ((isNewSession == true) && (isRecReadable == true)) {
@@ -946,19 +919,6 @@ void MainWindow::fillSettingsWithDefaults()
     QStringList possiblePaths;
     QString john;
     // Find john on system path, which is determined by PATH variable
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    foreach (QString dir, env.value("PATH").split(":")) {
-        possiblePaths << QDir(dir).filePath("john");
-    }
-    possiblePaths << QDir::current().filePath("john"); // in the same directory than johnny
-#if defined Q_OS_WIN
-    foreach(QString dir, possiblePaths) {
-        possiblePaths.append(".exe");
-    }
-#endif
-
-#else
     QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
     if(!johnSystemPath.isEmpty())
         possiblePaths << johnSystemPath;
@@ -968,8 +928,7 @@ void MainWindow::fillSettingsWithDefaults()
     QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
     if(!johnOtherPaths.isEmpty())
         possiblePaths << johnOtherPaths;
-#endif
-    
+
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);
@@ -1268,9 +1227,9 @@ void MainWindow::restoreSessionOptions()
         if(m_settings.contains("singleCrackExternalName")) {
             m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
             m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_settings.value("singleCrackExternalName").toString());
-        }      
+        }
     } else if (mode == "wordlist") {
-        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);  
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
         m_ui->comboBox_WordlistFile->setEditText(m_settings.value("wordlistFile").toString());
         //Rules
         if (m_settings.value("isUsingWordListRules").toBool() == true) {
@@ -1293,14 +1252,14 @@ void MainWindow::restoreSessionOptions()
         if (m_settings.contains("incrementalExternalName")) {
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
             m_ui->comboBox_IncrementalModeExternalName->setEditText(m_settings.value("incrementalExternalName").toString());
-        }  
+        }
     } else if (mode == "external") {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
         m_ui->comboBox_ExternalModeName->setEditText(m_settings.value("externalModeName").toString());
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
-    
+
     // Selectors
     if (m_settings.contains("limitUsers")) {
         m_ui->checkBox_LimitUsers->setChecked(true);
@@ -1331,7 +1290,7 @@ void MainWindow::restoreSessionOptions()
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
     m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings.value("OMP_NUM_THREADS").toInt());
-    
+
     if (m_settings.contains("environmentVariables")) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
         m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
@@ -1339,7 +1298,7 @@ void MainWindow::restoreSessionOptions()
     m_settings.endGroup();
 }
 
-/* Clear/or default optional previous session UI options that may 
+/* Clear/or default optional previous session UI options that may
    not be specified in the settings depending on the mode
 */
 void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
@@ -1355,7 +1314,7 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setMinimum(2); // john --fork will error if < 2, let's prevent it
-    m_ui->spinBox_LimitSalts->setValue(0);        
+    m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
 }

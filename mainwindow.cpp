@@ -31,7 +31,7 @@ MainWindow::MainWindow(QSettings &settings)
       m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
-      m_temp(NULL),
+      m_johnShowTemp(NULL),
       m_settings(settings)
 {
     // UI initializations
@@ -90,10 +90,10 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
             SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(finished(int,QProcess::ExitStatus)), this,
+    connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
+    connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this,
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
-    connect(&m_passwordGuessing, SIGNAL(error(QProcess::ProcessError)), this,
+    connect(&m_johnGuess, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
 
     // Handling of buttons regarding settings
@@ -121,22 +121,22 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(m_ui->listWidgetTabs,SIGNAL(itemSelectionChanged()),this,SLOT(listWidgetTabsSelectionChanged()));
 
-    // We create the app data directory for us in $HOME if it does not exist.
-    m_appDataPath = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "johnny" + QDir::separator());
-    if (!QDir::home().mkpath(m_appDataPath)) {
-        QMessageBox::critical( this, tr("Johnny"),
-            tr("Could not create settings directory(%1). Check your permissions, disk space and restart Johnny.").arg(m_appDataPath));
+    // We create the app sessions data directory in $HOME if it does not exist
+    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "sessions" + QDir::separator());
+    if (!QDir::home().mkpath(m_sessionDataDir)) {
+        QMessageBox::critical(this, tr("Johnny"),
+            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
         qApp->quit();
     }
 
-    // Session for Johnny
-    m_settings.beginGroup("johnSessions");
+    // Load sessions
+    m_settings.beginGroup("Sessions");
     QStringList sessionsList = m_settings.childGroups();
     for (int i = sessionsList.size()-1; i >= 0; i--) {
         QString sessionName = sessionsList[i];
-        QString completePath = QDir(m_appDataPath).filePath(sessionName);
+        QString completePath = QDir(m_sessionDataDir).filePath(sessionName);
         if (QFileInfo(completePath + ".rec").isReadable()) {
-            QAction* fileAction = m_sessionMenu->addAction(sessionName);
+            QAction *fileAction = m_sessionMenu->addAction(sessionName);
             fileAction->setData(sessionName);
             m_sessionHistory.append(sessionName);
             QString fileNames = m_settings.value(sessionName + "/passwordFiles").toStringList().join(" ");
@@ -151,13 +151,13 @@ MainWindow::MainWindow(QSettings &settings)
     m_sessionMenu->setToolTipsVisible(true);
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
-    
+
     // Automatically open last session by default
     if (!m_sessionHistory.isEmpty()) {
-        m_session = QDir(m_appDataPath).filePath(m_sessionHistory[0]);
+        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
         openLastSession();
     } else {
-        m_session.clear(); // No session
+        m_sessionCurrent.clear(); // No session
         restoreDefaultAttackOptions(false);
     }
 
@@ -208,14 +208,14 @@ MainWindow::~MainWindow()
     m_johnShow.stop();
     m_johnVersionCheck.stop();
     m_hashTypeChecker.stop();
-    m_passwordGuessing.stop();
+    m_johnGuess.stop();
 
     delete m_ui;
     m_ui = 0;
     delete m_hashesTable;
     m_hashesTable = 0;
-    delete m_temp;
-    m_temp = 0;
+    delete m_johnShowTemp;
+    m_johnShowTemp = 0;
 }
 
 void MainWindow::buttonWordlistFileBrowseClicked()
@@ -241,9 +241,9 @@ void MainWindow::listWidgetTabsSelectionChanged()
 void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 {
     // Remove temporary file is exist
-    if (m_temp != NULL) {
-        delete m_temp;
-        m_temp = NULL;
+    if (m_johnShowTemp != NULL) {
+        delete m_johnShowTemp;
+        m_johnShowTemp = NULL;
     }
 
     // We delete existing model if any.
@@ -278,19 +278,19 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
-        m_passwordFiles = fileNames;
+        m_sessionPasswordFiles = fileNames;
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
-        if (!m_temp) {
-            m_temp = new QTemporaryFile();
-            if (m_temp->open()) {
-                QTextStream temp(m_temp);
+        if (!m_johnShowTemp) {
+            m_johnShowTemp = new QTemporaryFile();
+            if (m_johnShowTemp->open()) {
+                QTextStream temp(m_johnShowTemp);
                 for (int i = 0; i < m_hashesTable->rowCount(); i++) {
                     QString user = m_hashesTable->data(m_hashesTable->index(i, 0)).toString();
                     QString hash = m_hashesTable->data(m_hashesTable->index(i, 2)).toString();
                     temp << user << ":" << hash << "::" << hash << '\n';
                 }
-                m_temp->close();
+                m_johnShowTemp->close();
             } else {
                 QMessageBox::critical(
                     this,
@@ -334,9 +334,9 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    QString sessionName(m_session);
-    sessionName.remove(m_appDataPath);
-    m_settings.beginGroup("johnSessions/" + sessionName);
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+    m_settings.beginGroup("Sessions/" + sessionName);
     QString format = m_settings.value("formatJohn").toString();
     QStringList fileNames = m_settings.value("passwordFiles").toStringList();
     m_settings.endGroup();
@@ -431,37 +431,37 @@ void MainWindow::startAttack()
 {
     if (!checkSettings())
         return;
-    
-    // Session for johnny
-    QString date = QDateTime::currentDateTime().toString("MM-dd-yy_hh:mm:ss");
-    m_session = QDir(m_appDataPath).filePath(date);
-    QString nameOfFile = m_session + ".rec";
 
-    if (QFileInfo(nameOfFile).isReadable()) {
-        int button = QMessageBox::question(
-            this,
-            tr("Johnny"),
-            tr("Johnny is about to overwrite your previous session file. Do you want to proceed?"),
-            QMessageBox::Yes | QMessageBox::No);
-       if (button == QMessageBox::No)
-            return;
-        // Remove .rec file to avoid problem when john does not write it.
-        if(!QFile(nameOfFile).remove())
+    // Session for johnny
+    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh:mm:ss");
+    m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
+    QString sessionFile = m_sessionCurrent + ".rec";
+
+    if (QFileInfo(sessionFile).isReadable())
+    {
+        QMessageBox::StandardButton button =
+                QMessageBox::question(this,
+                tr("Johnny"),
+                tr("A session file already exists with this name (%1). Do you want to overwrite?").arg(sessionFile),
+                QMessageBox::Yes | QMessageBox::No);
+        if (button == QMessageBox::Yes)
         {
-            QMessageBox::warning(
-                this,
-                tr("Warning"),
-                tr("Unable to remove file ") + nameOfFile);
+            // Remove existing session .rec file to avoid issues with JtR
+            if(!QFile(sessionFile).remove())
+            {
+                QMessageBox::warning(this, tr("Warning"),
+                                     tr("Unable to remove file session file %1").arg(sessionFile));
+            }
         }
     }
 
     QStringList parameters = saveAttackParameters();
-    parameters << QString("--session=%1").arg(m_session);
+    parameters << QString("--session=%1").arg(m_sessionCurrent);
 
     // We check that we have file name.
-    if (!m_passwordFiles.isEmpty()) {
+    if (!m_sessionPasswordFiles.isEmpty()) {
         // If file name is not empty then we have file, pass it to John.
-        parameters << m_passwordFiles;
+        parameters << m_sessionPasswordFiles;
         startJohn(parameters);
     } else {
         QMessageBox::warning(
@@ -475,11 +475,11 @@ void MainWindow::startAttack()
  * it returns the selected parameters in Johnny (UI-side) */
 QStringList MainWindow::saveAttackParameters()
 {
-    QString sessionName(m_session);
-    sessionName.remove(m_appDataPath);
-    m_settings.beginGroup("johnSessions/" + sessionName);
-    m_settings.setValue("passwordFiles", m_passwordFiles);
-    
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+    m_settings.beginGroup("Sessions/" + sessionName);
+    m_settings.setValue("passwordFiles", m_sessionPasswordFiles);
+
     QStringList parameters;
     // We prepare parameters list from options section.
     // General options
@@ -521,7 +521,7 @@ QStringList MainWindow::saveAttackParameters()
     }
     m_settings.setValue("formatJohn", m_format);
     m_settings.setValue("formatUI", m_ui->comboBox_Format->currentText());
-    
+
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
     if (selectedMode == m_ui->defaultModeTab) {
@@ -537,13 +537,13 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
             m_settings.setValue("singleCrackExternalName", m_ui->comboBox_SingleCrackModeExternalName->currentText());
         }
-        
+
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
         m_settings.setValue("mode", "wordlist");
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
         m_settings.setValue("wordlistFile", m_ui->comboBox_WordlistFile->currentText());
-        
+
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
                 parameters << "--rules";
@@ -573,7 +573,7 @@ QStringList MainWindow::saveAttackParameters()
         }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
-        m_settings.setValue("mode", "external");       
+        m_settings.setValue("mode", "external");
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
         m_settings.setValue("externalModeName", m_ui->comboBox_ExternalModeName->currentText());
     }
@@ -606,7 +606,7 @@ QStringList MainWindow::saveAttackParameters()
         m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
     }
     m_settings.endGroup();
-    
+
     return parameters;
 }
 
@@ -663,7 +663,7 @@ void MainWindow::resumeAttack()
         return;
 
     QStringList parameters;
-    parameters << QString("--restore=%1").arg(m_session);
+    parameters << QString("--restore=%1").arg(m_sessionCurrent);
 
     startJohn(parameters);
 }
@@ -750,7 +750,7 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
 
     QMessageBox::critical(this, tr("Johnny"), message + "(" + m_pathToJohn + ")");
 
-    if (QObject::sender() == &m_passwordGuessing) {
+    if (QObject::sender() == &m_johnGuess) {
         m_ui->actionGuessPassword->setEnabled(true);
     }
 
@@ -761,23 +761,23 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     Q_UNUSED(exitCode);
     appendLog(CONSOLE_LOG_SEPARATOR);
 
-    QString sessionName(m_session);
-    sessionName.remove(m_appDataPath);
-   
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+
     bool isNewSession = !m_sessionHistory.contains(sessionName);
-    bool isRecReadable = QFileInfo(m_session + ".rec").isReadable();
+    bool isRecReadable = QFileInfo(m_sessionCurrent + ".rec").isReadable();
     if ((isNewSession == true) && (isRecReadable == true)) {
         // New session saved by john, add it to the list
-        QAction* action = new QAction(sessionName,this);
-        m_sessionMenu->insertAction(m_sessionMenu->actions()[0],action);
+        QAction* action = new QAction(sessionName, this);
+        m_sessionMenu->insertAction(m_sessionMenu->actions()[0], action);
         action->setData(sessionName);
         m_sessionHistory.append(sessionName);
-        action->setToolTip(m_passwordFiles.join(" "));
+        action->setToolTip(m_sessionPasswordFiles.join(" "));
     } else if ((isNewSession == false) && (isRecReadable == false)) {
         // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
         // so we remove it from the session history list to have an error-prone UI
         m_sessionHistory.removeOne(sessionName);
-        m_settings.remove("johnSessions/" + sessionName);
+        m_settings.remove("Sessions/" + sessionName);
         foreach(QAction* actions, m_sessionMenu->actions()) {
             if (actions->data().toString() == sessionName) {
                     m_sessionMenu->removeAction(actions);
@@ -813,7 +813,7 @@ void MainWindow::callJohnShow()
     // We add current format key if it is not empty.
     if (!m_format.isEmpty())
         args << m_format;
-    args << "--show" << m_temp->fileName();
+    args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
     m_johnShow.start();
@@ -1103,7 +1103,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
                                  const QStringList &detailedTypesPerRow)
 {
     FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
-    if ((model != NULL) && (pathToPwdFile == m_passwordFiles)) {
+    if ((model != NULL) && (pathToPwdFile == m_sessionPasswordFiles)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
@@ -1128,9 +1128,9 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
-    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_passwordFiles.isEmpty())) {
+    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_sessionPasswordFiles.isEmpty())) {
         m_hashTypeChecker.setJohnProgram(m_pathToJohn);
-        m_hashTypeChecker.setPasswordFiles(m_passwordFiles);
+        m_hashTypeChecker.setPasswordFiles(m_sessionPasswordFiles);
         m_hashTypeChecker.start();
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
@@ -1162,7 +1162,7 @@ void MainWindow::verifyJohnVersion()
 void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
     if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
-        QDir dir(m_appDataPath);
+        QDir dir(m_sessionDataDir);
         dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec");
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {
@@ -1173,13 +1173,13 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
                     m_sessionMenu->removeAction(actions);
             }
         }
-        m_session.clear();
-        m_settings.remove("johnSessions");
+        m_sessionCurrent.clear();
+        m_settings.remove("Sessions");
         m_ui->actionResumeAttack->setEnabled(false);
     } else {
         QString fileName = action->data().toString();
         if (!fileName.isEmpty()) {
-            m_session = QDir(m_appDataPath).filePath(fileName);
+            m_sessionCurrent = QDir(m_sessionDataDir).filePath(fileName);
             openLastSession();
         }
     }
@@ -1193,11 +1193,11 @@ void MainWindow::guessPassword()
                                          "", &isOk);
     if (isOk && !guess.isEmpty()) {
         m_ui->actionGuessPassword->setEnabled(false);
-        m_passwordGuessing.setJohnProgram(m_pathToJohn);
-        m_passwordGuessing.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_passwordFiles);
-        m_passwordGuessing.start();
-        m_passwordGuessing.write(guess);
-        m_passwordGuessing.closeWriteChannel();
+        m_johnGuess.setJohnProgram(m_pathToJohn);
+        m_johnGuess.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_sessionPasswordFiles);
+        m_johnGuess.start();
+        m_johnGuess.write(guess);
+        m_johnGuess.closeWriteChannel();
     }
 }
 
@@ -1215,21 +1215,21 @@ void MainWindow::restoreSessionOptions()
 {
     restoreDefaultAttackOptions();
     // Start restoring required UI fields
-    QString sessionName(m_session);
-    sessionName.remove(m_appDataPath);
-    m_settings.beginGroup("johnSessions/" + sessionName);
+    QString sessionName(m_sessionCurrent);
+    sessionName.remove(m_sessionDataDir);
+    m_settings.beginGroup("Sessions/" + sessionName);
     m_format = m_settings.value("formatJohn").toString();
     m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
     QString mode = m_settings.value("mode").toString();
     if (mode == "single") {
-        m_ui->attackModeTabWidget->setCornerWidget(m_ui->singleModeTab);
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->singleModeTab);
         // External mode, filter
         if(m_settings.contains("singleCrackExternalName")) {
             m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
             m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_settings.value("singleCrackExternalName").toString());
-        }      
+        }
     } else if (mode == "wordlist") {
-        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);  
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
         m_ui->comboBox_WordlistFile->setEditText(m_settings.value("wordlistFile").toString());
         //Rules
         if (m_settings.value("isUsingWordListRules").toBool() == true) {
@@ -1252,14 +1252,14 @@ void MainWindow::restoreSessionOptions()
         if (m_settings.contains("incrementalExternalName")) {
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
             m_ui->comboBox_IncrementalModeExternalName->setEditText(m_settings.value("incrementalExternalName").toString());
-        }  
+        }
     } else if (mode == "external") {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
         m_ui->comboBox_ExternalModeName->setEditText(m_settings.value("externalModeName").toString());
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
-    
+
     // Selectors
     if (m_settings.contains("limitUsers")) {
         m_ui->checkBox_LimitUsers->setChecked(true);
@@ -1290,7 +1290,7 @@ void MainWindow::restoreSessionOptions()
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
     m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings.value("OMP_NUM_THREADS").toInt());
-    
+
     if (m_settings.contains("environmentVariables")) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
         m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
@@ -1298,7 +1298,7 @@ void MainWindow::restoreSessionOptions()
     m_settings.endGroup();
 }
 
-/* Clear/or default optional previous session UI options that may 
+/* Clear/or default optional previous session UI options that may
    not be specified in the settings depending on the mode
 */
 void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
@@ -1314,7 +1314,7 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
     m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
     m_ui->spinBox_nbOfProcess->setMinimum(2); // john --fork will error if < 2, let's prevent it
-    m_ui->spinBox_LimitSalts->setValue(0);        
+    m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
 }

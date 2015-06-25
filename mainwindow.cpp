@@ -78,6 +78,7 @@ MainWindow::MainWindow(QSettings &settings)
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_ui->mainToolBar->insertWidget(m_ui->actionStartAttack, sessionMenuButton);
     m_ui->mainToolBar->insertSeparator(m_ui->actionStartAttack);
+    connect(m_ui->actionOpenLastSession, SIGNAL(triggered()), sessionMenuButton, SLOT(showMenu()));
     connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,

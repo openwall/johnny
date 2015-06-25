@@ -2,12 +2,10 @@
 
 JohnAttack::JohnAttack()
 {
-
 }
 
 JohnAttack::~JohnAttack()
 {
-
 }
 
 void JohnAttack::start()
@@ -19,4 +17,3 @@ void JohnAttack::stop()
 {
     JohnHandler::stop();
 }
-

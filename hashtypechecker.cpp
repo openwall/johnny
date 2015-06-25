@@ -1,10 +1,17 @@
 #include "hashtypechecker.h"
 
+#include <QtDebug>
+#include <QMetaType>
+
 HashTypeChecker::HashTypeChecker()
 {
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
     connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(parseJohnAnswer()), Qt::QueuedConnection);
     connect(this, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()), Qt::QueuedConnection);
+}
+
+HashTypeChecker::~HashTypeChecker()
+{
 }
 
 void HashTypeChecker::start()

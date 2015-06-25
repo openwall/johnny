@@ -7,6 +7,8 @@
 
 class JohnAttack : public JohnHandler
 {
+    Q_OBJECT
+    
 public:
     JohnAttack();
     ~JohnAttack();

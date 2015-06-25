@@ -18,6 +18,8 @@
 
 class JohnProcess : public QProcess
 {
+    Q_OBJECT
+    
 public:
     JohnProcess();
     ~JohnProcess();

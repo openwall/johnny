@@ -109,6 +109,9 @@ MainWindow::MainWindow(QSettings &settings)
             this,SLOT(restoreSavedSettings()));
     connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
             this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->pushButton_ApplySettings, SIGNAL(clicked()),
+            this, SLOT(applySettings()));
+
     // Settings changed by user
     connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
     connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
@@ -1010,7 +1013,7 @@ void MainWindow::applySettings()
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
     // If the language changed, retranslate the UI
-    Translator& translator = Translator::getInstance();
+    Translator &translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
     if (newLanguage != translator.getCurrentLanguage().toLower()) {
         translator.translateApplication(qApp,newLanguage);

@@ -992,6 +992,9 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::PreventContextMenu</enum>
+   </property>
    <property name="iconSize">
     <size>
      <width>32</width>
@@ -1024,9 +1027,6 @@
      <width>1012</width>
      <height>27</height>
     </rect>
-   </property>
-   <property name="contextMenuPolicy">
-    <enum>Qt::PreventContextMenu</enum>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">

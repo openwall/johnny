@@ -3,8 +3,7 @@
 #include <QHelpEvent>
 #include <QToolTip>
 
-Menu::Menu(QWidget *parent)
-    :QMenu(parent)
+Menu::Menu(QWidget *parent): QMenu(parent)
 {
 }
 
@@ -12,7 +11,7 @@ Menu::~Menu()
 {
 }
 
-bool Menu::event (QEvent *event)
+bool Menu::event(QEvent *event)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 1, 0)
     // By default QMenu's tooltip are not visible to the user, which isn't what we want for the session menu

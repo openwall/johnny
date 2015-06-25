@@ -51,7 +51,9 @@ MainWindow::MainWindow(QSettings &settings)
 
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
+#ifdef Q_OS_OSX
     m_ui->progressBar->installEventFilter(this);
+#endif
 
     // We select the PASSWORDS tab
     m_ui->contentStackedWidget->setCurrentIndex(TAB_PASSWORDS);
@@ -63,7 +65,6 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->actionPasswordsTabClicked->setChecked(true);
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
-    m_ui->attackModeTabWidget->installEventFilter(this);
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
@@ -429,21 +430,14 @@ bool MainWindow::checkSettings()
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
-    if (!event)
+    if (!event || !watched || !watched->isWidgetType())
         return false;
-    if (!watched || !watched->isWidgetType())
-        return false;
-    switch (event->type())
+
+    if(event->type() == QEvent::StyleAnimationUpdate)
     {
-#if defined Q_OS_OSX
-    case QEvent::StyleAnimationUpdate:    
-        QWidget* widget = (QWidget*) watched;
+        QWidget *widget = (QWidget*) watched;
         if (widget->inherits("QProgressBar"))
             return true;
-        break;
-#endif
-    default:
-        break;
     }
     return false;
 }
@@ -964,7 +958,7 @@ void MainWindow::fillSettingsWithDefaults()
     if(!johnOtherPaths.isEmpty())
         possiblePaths << johnOtherPaths;
 #endif
-    
+
     // Find first readable, executable file from possible
     foreach (QString path, possiblePaths) {
         QFileInfo iJohn(path);

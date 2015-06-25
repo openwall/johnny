@@ -431,6 +431,7 @@ bool MainWindow::checkSettings()
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     if (!event || !watched || !watched->isWidgetType())
         return false;
 
@@ -440,6 +441,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
         if (widget->inherits("QProgressBar"))
             return true;
     }
+#endif
     return false;
 }
 

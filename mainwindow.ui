@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1012</width>
-    <height>655</height>
+    <width>718</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -107,8 +107,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>628</width>
-             <height>904</height>
+             <width>640</width>
+             <height>899</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -816,8 +816,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>616</width>
-             <height>333</height>
+             <width>599</width>
+             <height>352</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1027,8 +1027,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1012</width>
-     <height>27</height>
+     <width>718</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1045,6 +1045,7 @@
     <addaction name="actionStartAttack"/>
     <addaction name="actionResumeAttack"/>
     <addaction name="actionPauseAttack"/>
+    <addaction name="actionGuessPassword"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1074,8 +1075,8 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>80</width>
-     <height>50</height>
+     <width>32</width>
+     <height>32</height>
     </size>
    </property>
    <property name="toolButtonStyle">
@@ -1100,7 +1101,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Open Passwd File</string>
+    <string>Open Password File</string>
    </property>
    <property name="toolTip">
     <string>Open a password file</string>
@@ -1119,13 +1120,13 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Open Previous Session</string>
+    <string>Attack Sessions</string>
    </property>
    <property name="toolTip">
-    <string>Open Last Session</string>
+    <string>Restore previous sessions</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+L</string>
+    <string>Ctrl+S</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -1163,10 +1164,7 @@
     <string>Start a new session to crack passwords</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+K</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>true</bool>
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionResumeAttack">
@@ -1221,6 +1219,9 @@
    <property name="text">
     <string>Clear Session History</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionGuessPassword">
    <property name="enabled">
@@ -1236,8 +1237,14 @@
    <property name="toolTip">
     <string>I'm feeling lucky!</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
    <property name="menuRole">
-    <enum>QAction::ApplicationSpecificRole</enum>
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionPasswordsTabClicked">
@@ -1254,6 +1261,9 @@
    <property name="text">
     <string>Passwords</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
   </action>
   <action name="actionOptionsTabClicked">
    <property name="checkable">
@@ -1265,6 +1275,9 @@
    </property>
    <property name="text">
     <string>Options</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
   <action name="actionStatisticsTabClicked">
@@ -1278,6 +1291,9 @@
    <property name="text">
     <string>Statistics</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
   </action>
   <action name="actionSettingsTabClicked">
    <property name="checkable">
@@ -1290,6 +1306,9 @@
    <property name="text">
     <string>Settings</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
   </action>
   <action name="actionConsoleLogTabClicked">
    <property name="checkable">
@@ -1301,6 +1320,9 @@
    </property>
    <property name="text">
     <string>Console log</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
    </property>
   </action>
  </widget>

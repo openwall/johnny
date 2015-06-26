@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>564</height>
+    <width>853</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -107,8 +107,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>640</width>
-             <height>899</height>
+             <width>628</width>
+             <height>904</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -816,8 +816,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>352</height>
+             <width>616</width>
+             <height>333</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1027,9 +1027,12 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
-     <height>22</height>
+     <width>853</width>
+     <height>27</height>
     </rect>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::PreventContextMenu</enum>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">

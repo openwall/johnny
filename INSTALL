@@ -1,0 +1,34 @@
+There are two ways to install Johnny which depends on your platform.
+1. Use our easy installer (Windows and OS X only)
+OR
+2. Download source and build johnny (all platforms)
+
+1. Easy-install : use our installer (Windows and OS X only)
+-----------------------------------
+Simply visit http://openwall.info/wiki/john/johnny to get the latest installer
+for your platform. It comes bundled with a working John The Ripper binary.
+So you have everything ready to start cracking passwords.
+
+2. Getting the source code and compiling on Unix/Linux, Windows and OS X
+-----------------------------------
+
+Prerequisites:
+   * Qt 4.6.2 or later (may or may not work on earlier versions too).
+     We recommend the most up to date qt version available on your system.
+   * If you don't have Qt, use the easy online installer available at
+        http://www.qt.io/download-open-source/
+   * John The Ripper, official or jumbo version. We recommend the latest jumbo version
+   available at http://openwall.info/wiki/john/custom-builds to get access to all johnny features.
+
+After installing Qt and John, open a terminal and follow these steps :
+1) git clone https://github.com/shinnok/johnny.git && cd johnny
+2) git checkout v2.0 # switch to the desired version
+3) qmake
+4) make (or mingw32-make or nmake or jom, depending on your platform)
+5) ./johnny
+
+(Optionnal) To clean the build directory:
+make clean && make distclean
+
+If you prefer using an IDE, you can also open the project (johnny.pro)
+in Qt Creator and it'll automate most of these steps.

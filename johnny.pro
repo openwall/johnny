@@ -44,3 +44,6 @@ OTHER_FILES += README \
 ## Default build is debug
 #CONFIG -= release
 #CONFIG += debug
+
+DISTFILES += \
+    INSTALL

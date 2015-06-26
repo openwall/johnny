@@ -33,71 +33,110 @@
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="20"/>
-        <location filename="../mainwindow.cpp" line="135"/>
-        <location filename="../mainwindow.cpp" line="204"/>
-        <location filename="../mainwindow.cpp" line="320"/>
-        <location filename="../mainwindow.cpp" line="337"/>
-        <location filename="../mainwindow.cpp" line="383"/>
-        <location filename="../mainwindow.cpp" line="422"/>
-        <location filename="../mainwindow.cpp" line="464"/>
-        <location filename="../mainwindow.cpp" line="489"/>
-        <location filename="../mainwindow.cpp" line="771"/>
+        <location filename="../mainwindow.cpp" line="146"/>
+        <location filename="../mainwindow.cpp" line="215"/>
+        <location filename="../mainwindow.cpp" line="331"/>
+        <location filename="../mainwindow.cpp" line="348"/>
+        <location filename="../mainwindow.cpp" line="394"/>
+        <location filename="../mainwindow.cpp" line="433"/>
+        <location filename="../mainwindow.cpp" line="470"/>
+        <location filename="../mainwindow.cpp" line="495"/>
+        <location filename="../mainwindow.cpp" line="777"/>
         <source>Johnny</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1054"/>
-        <location filename="../mainwindow.ui" line="1258"/>
+        <location filename="../mainwindow.ui" line="1055"/>
+        <location filename="../mainwindow.ui" line="1265"/>
         <source>Passwords</source>
         <translation>Mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1073"/>
+        <location filename="../mainwindow.ui" line="1074"/>
         <source>toolBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1125"/>
         <source>Open Previous Session</source>
-        <translation>Ouvrir session antérieure</translation>
+        <translation type="vanished">Ouvrir session antérieure</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1147"/>
+        <location filename="../mainwindow.ui" line="1148"/>
         <source>Copy selected part or full Passwords table to clipboard</source>
         <translation>Copiez une partie ou la table complète de mots de passes dans le presse-papier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1163"/>
+        <location filename="../mainwindow.ui" line="1164"/>
         <source>Start New Attack</source>
         <translation>Débuter nouvelle attaque</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1225"/>
+        <location filename="../mainwindow.ui" line="1167"/>
+        <source>Start a new session to crack passwords</source>
+        <translation>Débuter une nouvelle session de cracking de mots de passe</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1170"/>
+        <source>Ctrl+N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1186"/>
+        <source>Resume a cracking password session</source>
+        <translation>Reprendre une session antérieure de cracking de mots de passe</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1208"/>
+        <source>Pause the current cracking password session</source>
+        <translation>Mettre en pause la session courante de cracking de mots de passe</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1223"/>
         <source>Clear Session History</source>
         <translation>Effacer l&apos;historique</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1237"/>
+        <location filename="../mainwindow.ui" line="1238"/>
         <source>Guess</source>
         <translation>Deviner</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1240"/>
+        <location filename="../mainwindow.ui" line="1241"/>
         <source>I&apos;m feeling lucky!</source>
         <translation>Je me sens chanceux!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1270"/>
+        <location filename="../mainwindow.ui" line="1244"/>
+        <source>Ctrl+G</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1268"/>
+        <source>Ctrl+1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1280"/>
         <source>Options</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1282"/>
+        <location filename="../mainwindow.ui" line="1283"/>
+        <source>Ctrl+2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1295"/>
         <source>Statistics</source>
         <translation>Statistiques</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1294"/>
+        <location filename="../mainwindow.ui" line="1298"/>
+        <source>Ctrl+3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1310"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
@@ -116,9 +155,9 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="507"/>
-        <location filename="../mainwindow.cpp" line="1148"/>
-        <location filename="../mainwindow.cpp" line="1174"/>
+        <location filename="../mainwindow.cpp" line="513"/>
+        <location filename="../mainwindow.cpp" line="1156"/>
+        <location filename="../mainwindow.cpp" line="1182"/>
         <source>Auto detect</source>
         <translation>Détecter automatiquement</translation>
     </message>
@@ -131,7 +170,7 @@
         <translation type="vanished">Comportement par défault</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1306"/>
+        <location filename="../mainwindow.ui" line="1325"/>
         <source>Console log</source>
         <translation>Sortie console</translation>
     </message>
@@ -267,6 +306,36 @@
         <translation>Options avancées</translation>
     </message>
     <message>
+        <location filename="../mainwindow.ui" line="1107"/>
+        <source>Open Password File</source>
+        <translation>Ouvrir un fichier de mots de passe</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1126"/>
+        <source>Attack Sessions</source>
+        <translation>Sessions d&apos;attaque</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1129"/>
+        <source>Restore previous sessions</source>
+        <translation>Ouvrir une session antérieure</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1132"/>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1313"/>
+        <source>Ctrl+4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="1328"/>
+        <source>Ctrl+5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Use multiple processes:</source>
         <translation type="vanished">Utiliser plusieurs processus:</translation>
     </message>
@@ -316,7 +385,7 @@
     </message>
     <message>
         <location filename="../mainwindow.ui" line="789"/>
-        <location filename="../mainwindow.cpp" line="1113"/>
+        <location filename="../mainwindow.cpp" line="1121"/>
         <source>-</source>
         <translation></translation>
     </message>
@@ -395,32 +464,25 @@
         <translation type="vanished">Préférences</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1106"/>
         <source>Open Passwd File</source>
-        <translation>Ouvrir un fichier de mots de passes</translation>
+        <translation type="vanished">Ouvrir un fichier de mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1109"/>
+        <location filename="../mainwindow.ui" line="1110"/>
         <source>Open a password file</source>
         <translation>Ouvrir un fichier de mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1112"/>
+        <location filename="../mainwindow.ui" line="1113"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1128"/>
         <source>Open Last Session</source>
-        <translation>Ouvrir dernière session</translation>
+        <translation type="vanished">Ouvrir dernière session</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1131"/>
-        <source>Ctrl+L</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.ui" line="1144"/>
+        <location filename="../mainwindow.ui" line="1145"/>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
@@ -429,7 +491,7 @@
         <translation type="vanished">Copier la partie sélectionnée ou la table complète dans le presse-papier</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1150"/>
+        <location filename="../mainwindow.ui" line="1151"/>
         <source>Ctrl+C</source>
         <translation></translation>
     </message>
@@ -438,42 +500,34 @@
         <translation type="vanished">Débuter l&apos;attaque</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1166"/>
         <source>Start cracking passwords</source>
-        <translation>Débuter le cracking des mots de passes</translation>
+        <translation type="vanished">Débuter le cracking des mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1169"/>
-        <source>Ctrl+K</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../mainwindow.ui" line="1185"/>
+        <location filename="../mainwindow.ui" line="1183"/>
         <source>Resume Attack</source>
         <translation>Reprendre l&apos;attaque</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1188"/>
         <source>Resume cracking passwords</source>
-        <translation>Reprendre le cracking de mots de passes</translation>
+        <translation type="vanished">Reprendre le cracking de mots de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1191"/>
+        <location filename="../mainwindow.ui" line="1189"/>
         <source>Ctrl+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1207"/>
+        <location filename="../mainwindow.ui" line="1205"/>
         <source>Pause Attack</source>
         <translation>Mettre l&apos;attaque en pause</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1210"/>
         <source>Pause the cracking of passwords</source>
-        <translation>Mettre en pause le cracking de most de passes</translation>
+        <translation type="vanished">Mettre en pause le cracking de most de passes</translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="1213"/>
+        <location filename="../mainwindow.ui" line="1211"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>
@@ -502,12 +556,12 @@
         <translation type="vanished">Johnny n&apos;a pas pu ouvrir le fichier pour sauvegarder la description de la session!</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="664"/>
+        <location filename="../mainwindow.cpp" line="670"/>
         <source>Environment variables</source>
         <translation>Variables d&apos;environnements</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="665"/>
+        <location filename="../mainwindow.cpp" line="671"/>
         <source>The format to set environment variable must be in the format : varName1=value, varName2=value etc.. </source>
         <translation>Le format pour ajouter des variables d&apos;environnement doit être nomVariable1=valeur1, nomVariable2=valeur2 etc..</translation>
     </message>
@@ -520,17 +574,17 @@
         <translation type="vanished">John s&apos;est arrêté avec une erreur.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="755"/>
+        <location filename="../mainwindow.cpp" line="761"/>
         <source>A timed out error happened to John.</source>
         <translation>Une erreur de type &quot;TimedOut&quot; est survenue avec John.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="759"/>
+        <location filename="../mainwindow.cpp" line="765"/>
         <source>A write error happened to John.</source>
         <translation>Une erreur d&apos;écriture est survenue avec John.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="763"/>
+        <location filename="../mainwindow.cpp" line="769"/>
         <source>A read error happened to John.</source>
         <translation>Une erreur de lecture est survenue avec John.</translation>
     </message>
@@ -547,103 +601,107 @@
         <translation type="vanished">Une erreur s&apos;est produite et Johnny n&apos;arrive pas à la gérer.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="136"/>
+        <location filename="../mainwindow.cpp" line="147"/>
         <source>Could not create sessions data director y(%1).
 Check your permissions, disk space and restart Johnny.</source>
         <translation>Impossible de créer le répertoire de session(%1). Vérifiez les permissions, l&apos;espace disque et redémarrez Johnny.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="205"/>
+        <location filename="../mainwindow.cpp" line="216"/>
         <source>An attack session is running, it will be terminated if you proceed. Do you really want to quit?</source>
         <translation>John n&apos;a pas terminé.¨Êtes-vous sûr de bien vouloir mettre fin à l&apos;opération en cours ?</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="237"/>
+        <location filename="../mainwindow.cpp" line="248"/>
         <source>World list files (*.lst) ;; Dict files (*.dict);; Any files (*)</source>
         <translation>Fichier de liste de mots(*.lst) ;; Fichier dictionnaire(*.dict);; Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="321"/>
+        <location filename="../mainwindow.cpp" line="332"/>
         <source>Can&apos;t open a temporary file. Your disk might be full.</source>
         <translation>Johnny n&apos;a pas pu ouvrir le fichier pour sauvegarder la description de la session. Votre disque est peut-être plein.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="338"/>
+        <location filename="../mainwindow.cpp" line="349"/>
         <source>Could not read desired password file(s).</source>
         <translation>Johnny n&apos;a pas été capable de lire ce ou ces fichier(s) de mot de passe.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="384"/>
+        <location filename="../mainwindow.cpp" line="395"/>
         <source>Nothing selected. Select rows/columns in the Passwords table to copy.</source>
         <translation>Rien n&apos;est sélectionné. Sélectionnez des rangées/colonnes dans la table de mot de passe pour les copier.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="423"/>
+        <location filename="../mainwindow.cpp" line="434"/>
         <source>Please specify the path to JohntheRipper in settings.</source>
         <translation>Pour que Johnny fonctionne, veuillez spécifier le chemin de l&apos;éxécutable de John the Ripper dans la section paramètres.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="465"/>
+        <location filename="../mainwindow.cpp" line="471"/>
         <source>A session file already exists with this name (%1). Do you want to overwrite?</source>
         <translation>Johnny s&apos;apprête à remplacer le fichier de session (%1). Êtes-vous certain de vouloir cela? </translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="472"/>
+        <location filename="../mainwindow.cpp" line="478"/>
         <source>Warning</source>
         <translation>Attention</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="473"/>
+        <location filename="../mainwindow.cpp" line="479"/>
         <source>Unable to remove file session file %1</source>
         <translation>Impossible de supprimer le fichier de session %1</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="490"/>
+        <location filename="../mainwindow.cpp" line="496"/>
         <source>No password files specified.</source>
         <translation>Aucun fichier de mot de passe sélectionné.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="745"/>
+        <location filename="../mainwindow.cpp" line="751"/>
         <source>John failed to start.Check your path to John.Check permissions on the executable.</source>
         <translation>John n&apos;arrive pas à démarrer. Veuillez vérifier le chemin de l&apos;éxécutable John dans les paramètres. Vérifiez aussi que vous avez la permission d&apos;éxécuter ce fichier.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="751"/>
+        <location filename="../mainwindow.cpp" line="757"/>
         <source>John crashed. Verify Console Log for details.</source>
         <translation>John s&apos;est interrompu abruptement. Vérifiez la sortie console pour plus de détails.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="767"/>
+        <location filename="../mainwindow.cpp" line="773"/>
         <source>An unknown problem happened to John. Verify Console Log for any details.</source>
         <translation>Un problème inconnu est survenue avec John. Vérifiez la sortie console pour plus de détails.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="896"/>
-        <source>No hashes loaded [%1], see output</source>
+        <location filename="../mainwindow.cpp" line="902"/>
+        <source>No hashes loaded [%1], see Console log</source>
         <translation>Aucun hash chargé [%1], veuillez vérifier la sortie du programme</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="902"/>
+        <source>No hashes loaded [%1], see output</source>
+        <translation type="vanished">Aucun hash chargé [%1], veuillez vérifier la sortie du programme</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="908"/>
         <source>%p% (%v/%m: %1 cracked, %2 left) [%3]</source>
         <translation>%p% (%v/%m: %1 crackés, %2 restant(s)) [%3]</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="929"/>
+        <location filename="../mainwindow.cpp" line="937"/>
         <source>Johnny: default path to john</source>
         <translation>Johnny:chemin par défault de John</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="930"/>
+        <location filename="../mainwindow.cpp" line="938"/>
         <source>Currently Johnny filled settings with default path to John the Ripper (%1). You could set your preferred path in settings (just use &apos;john&apos; there to make Johnny search for John the Ripper in PATH on every invocation of John the Ripper). If you are satisfied with defaults then save settings to avoid this message.</source>
         <translation>Par défault, Johnny recherchera l&apos;éxécutable de John the Ripper dans son chemin par défault (%1). S&apos;il ne se trouve pas à cet endroit, vous pouvez spécifier le bon répertoire dans la section paramètres. Si vous y entrez le mot &quot;john&quot;, Johnny cherchera John The Ripper dans PATH à chaque démarrage.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1225"/>
+        <location filename="../mainwindow.cpp" line="1233"/>
         <source>Password Guessing</source>
         <translation>Deviner un mot de passe par essai-erreur</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1226"/>
+        <location filename="../mainwindow.cpp" line="1234"/>
         <source>Your passphrase guess:</source>
         <translation>Entrez un mot:</translation>
     </message>
@@ -652,9 +710,9 @@ Check your permissions, disk space and restart Johnny.</source>
         <translation type="vanished">Par défault, Johnny cherche John The Ripper dans le chemin par défault(%1). Si ce n&apos;est pas le bon endroit, veuillez aller changer le chemin dans les paramètres.</translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="1101"/>
-        <location filename="../mainwindow.cpp" line="1106"/>
-        <location filename="../mainwindow.cpp" line="1107"/>
+        <location filename="../mainwindow.cpp" line="1109"/>
+        <location filename="../mainwindow.cpp" line="1114"/>
+        <location filename="../mainwindow.cpp" line="1115"/>
         <source>:</source>
         <translation></translation>
     </message>

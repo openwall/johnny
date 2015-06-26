@@ -1,41 +1,13 @@
 About Johnny
 ============
 
-Johnny is a GUI for John the Ripper written in C++ using the Qt
-framework.
+Johnny is a cross-platform GUI for John the Ripper, the popular password cracker,
+written in C++ using the Qt framework.
 
-You can find more about Johnny by visiting:
+This application requires John The Ripper to work. Official version or
+community-enhanced version (jumbo) are both supported.
+
+To download official binaries and find more about Johnny, visit:
 http://openwall.info/wiki/john/johnny
 
-Compiling on Unix/Linux and Windows
------------------------------------
-
-Prerequisites:
-   * Qt 4.6.3 or later (may or may not work on earlier versions too)
-   * On Linux you have two choices for installing the Qt SDK:
-        1. Install Qt using your distribution's package manager. The
-            minimum libraries you need are libqt4-core, libqt4-gui and
-            libqt4-dev. Besides that you will need qt4-qmake for qmake
-            and g++/libstdc++5, though these should be automatically
-            installed as dependencies to libqt*.
-            For e.g. on debian you can:
-            apt-get install libqt4-core libqt4-gui libqt4-dev
-            and say yes to the dependencies and you get everything
-            you need.
-        2. Install the latest official Qt SDK available at:
-            http://qt.nokia.com/downloads/
-   * On Windows:
-     -  MinGW 4.4 or later, Visual Studio 2008 or later
-     -  jom
-     The Qt SDK provides you with most of the required software.
-     Grab the official Qt SDK from http://qt.nokia.com/downloads/
-     -  open an instance of Qt SDK Command Prompt
-
-Building:
-
-cd johnny/
-qmake
-make (or mingw32-make or nmake or jom, depending on your platform)
-
-To clean the build directory:
-make clean && make distclean
+For building and install instructions see INSTALL.

@@ -53,6 +53,12 @@ MainWindow::MainWindow(QSettings &settings)
     // https://github.com/shinnok/johnny/issues/11
 #ifdef Q_OS_OSX
     m_ui->progressBar->installEventFilter(this);
+
+    // Also OS X doesn't display text in progress bar, add separate label for
+    // showing stats
+    m_progressStatsLabel = new QLabel(m_ui->contentWidget);
+    m_progressStatsLabel->setAlignment(Qt::AlignHCenter);
+    m_ui->contentWidgetLayout->insertWidget(1, m_progressStatsLabel);
 #endif
 
     // We select the PASSWORDS tab
@@ -885,23 +891,25 @@ void MainWindow::readJohnShow()
     if (pos > -1) {
         int crackedCount = crackedLeft.cap(1).toInt();
         int leftCount = crackedLeft.cap(2).toInt();
-        // We update progress bar.
+        // Update progress bar
         if (crackedCount + leftCount == 0) {
             // There are no hashes.
             m_ui->progressBar->setRange(0, 1);
             m_ui->progressBar->setValue(0);
             m_ui->progressBar->setFormat(
-                tr("No hashes loaded [%1], see output").arg(
+                tr("No hashes loaded [%1], see Console log").arg(
                     m_format));
         } else {
             m_ui->progressBar->setRange(0, crackedCount + leftCount);
             m_ui->progressBar->setValue(crackedCount);
             m_ui->progressBar->setFormat(
-                tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(
-                    crackedCount).arg(
-                        leftCount).arg(
-                            m_format));
+                tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(crackedCount)
+                                                .arg(leftCount).arg(m_format));
         }
+#ifdef Q_OS_OSX
+            if(m_progressStatsLabel)
+                m_progressStatsLabel->setText(m_ui->progressBar->text());
+#endif
     } else {
         // TODO: Error: unexpected john output.
         // TODO: Unknown cyphertext format is here. Read stderr to check exactly.

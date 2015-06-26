@@ -34,30 +34,29 @@ void HashTypeChecker::setPasswordFiles(const QStringList &passwordFiles)
 
 void HashTypeChecker::parseJohnAnswer(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    // John --show=types didn't terminate successfully, so the input is probably incorrect(and not properly formatted)
+    // or useless ! We might have terminated the process because the user changed session file or maybe it crashed.
+    // We shouldn't parse the input in those cases to avoid errors.
     if ((exitStatus != QProcess::NormalExit) || (exitCode != 0)) {
         return;
     }
-    // Parse John's output which is in m_johnResult
-    // when process finished it's work
+
+    // Parse John's output when process finished it's work
     QString johnOutput = readAllStandardOutput();
     QStringList uniqueTypesInFile;
     QStringList detailedTypesPerRow;
     QList<Hash> hashesAllInfos;
-    //qDebug() << exitCode << exitStatus << hashesAllInfos.size() << johnOutput.size() << m_passwordFiles.join(" ");
     QStringList lines = johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
-    if (!johnOutput.isEmpty()) {
-        for (int i = 0; i < lines.size(); i++) {
-            QString currentLine = lines[i];
+    for (int i = 0; i < lines.size(); i++) {
+        QString currentLine = lines[i];
+        if (currentLine.length() >= 3) {
             // Field_separator can be set by john and the right way to find
             // it is by looking at the last character of the line
             QChar field_separator = currentLine[currentLine.length()-1];
+            currentLine.remove(currentLine.length()-3, 3);
             QStringList fields = currentLine.split(field_separator, QString::KeepEmptyParts);
             // Each valid line from john is gonna have at least 7 fields
             if (fields.length() >= 7) {
-
-
-                currentLine.remove(currentLine.length()-4, 3);
-
                 Hash hash;
                 int currentIndex = 0;
                 hash.login = fields[currentIndex++];

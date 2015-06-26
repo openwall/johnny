@@ -23,7 +23,7 @@ FileTableModel::FileTableModel(QObject *parent)
     m_columns << tr("User") << tr("Password") << tr("Hash") <<  tr("Formats") << tr("GECOS");
 }
 
-bool FileTableModel::readFile(const QStringList &fileNames)
+bool FileTableModel::readFiles(const QStringList &fileNames)
 {
     m_data.clear();
 

@@ -30,7 +30,7 @@ public:
                         Qt::Orientation orientation,
                         int role = Qt::DisplayRole) const;
 
-    bool readFile(const QStringList &fileNames);
+    bool readFiles(const QStringList &fileNames);
     void fillHashTypes(const QStringList &listHashTypes);
 
     enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};

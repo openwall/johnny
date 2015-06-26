@@ -32,7 +32,7 @@
 #define TAB_STATISTICS  2
 #define TAB_SETTINGS    3
 #define TAB_CONSOLE_LOG 4
-#define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
+#define CONSOLE_LOG_SEPARATOR "-------------------------------------"
 
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
@@ -78,13 +78,13 @@ MainWindow::MainWindow(QSettings &settings)
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
     QToolButton *sessionMenuButton = new QToolButton(this);
-    sessionMenuButton->setDefaultAction(m_ui->actionOpenLastSession);
+    sessionMenuButton->setDefaultAction(m_ui->actionOpenSession);
     sessionMenuButton->setMenu(m_sessionMenu);
     sessionMenuButton->setPopupMode(QToolButton::InstantPopup);
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_ui->mainToolBar->insertWidget(m_ui->actionStartAttack, sessionMenuButton);
     m_ui->mainToolBar->insertSeparator(m_ui->actionStartAttack);
-    connect(m_ui->actionOpenLastSession, SIGNAL(triggered()), sessionMenuButton, SLOT(showMenu()));
+    connect(m_ui->actionOpenSession, SIGNAL(triggered()), sessionMenuButton, SLOT(showMenu()));
     connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
@@ -189,7 +189,6 @@ MainWindow::MainWindow(QSettings &settings)
         m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
         openLastSession();
     } else {
-        m_sessionCurrent.clear(); // No session
         restoreDefaultAttackOptions(false);
     }
 
@@ -308,11 +307,12 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
 bool MainWindow::readPasswdFiles(const QStringList &fileNames)
 {
     FileTableModel *model = new FileTableModel(this);
-    if (model->readFile(fileNames)) {
+    if (model->readFiles(fileNames)) {
         // We replace existing model with new one.
         replaceTableModel(model);
         // After new model remembered we remember its file name.
         m_sessionPasswordFiles = fileNames;
+        m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
         if (!m_johnShowTemp) {
@@ -372,13 +372,19 @@ void MainWindow::openLastSession()
     sessionName.remove(m_sessionDataDir);
     m_settings.beginGroup("Sessions/" + sessionName);
     QString format = m_settings.value("formatJohn").toString();
-    QStringList fileNames = m_settings.value("passwordFiles").toStringList();
+    QStringList passwordFiles= m_settings.value("passwordFiles").toStringList();
     m_settings.endGroup();
 
-    if (readPasswdFiles(fileNames)) {
+    if (readPasswdFiles(passwordFiles))
+    {
         m_format = format;
         restoreSessionOptions();
         m_ui->actionResumeAttack->setEnabled(true);
+    }
+    else
+    {
+        QMessageBox::critical(this, "Johnny",
+                              tr("Could not open the session password files. (%1)").arg(passwordFiles.join("; ")));
     }
 }
 
@@ -503,6 +509,7 @@ QStringList MainWindow::saveAttackParameters()
 {
     QString sessionName(m_sessionCurrent);
     sessionName.remove(m_sessionDataDir);
+    m_ui->sessionNameLabel->setText(sessionName);
     m_settings.beginGroup("Sessions/" + sessionName);
     m_settings.setValue("passwordFiles", m_sessionPasswordFiles);
 
@@ -510,7 +517,7 @@ QStringList MainWindow::saveAttackParameters()
     // We prepare parameters list from options section.
     // General options
     // Format
-    if (m_ui->comboBox_Format->currentText() != tr("Auto detect")) {
+    if (m_ui->formatComboBox->currentText() != tr("Auto detect")) {
         // We have one list for formats and subformats. Subformats
         // contain short description after it.
         // Strings could be like:
@@ -527,7 +534,7 @@ QStringList MainWindow::saveAttackParameters()
         //       http://www.openwall.com/lists/john-users/2011/08/17/2
         // We remember format key to be used with '-show' to take
         // progress.
-        m_format = "--format=" + m_ui->comboBox_Format->currentText();
+        m_format = "--format=" + m_ui->formatComboBox->currentText();
         // Now we have '--format=format' or '--format=format(N)description'.
         // So we truncate string to ')' if brace is in string.
         //
@@ -546,7 +553,7 @@ QStringList MainWindow::saveAttackParameters()
         m_format.clear();
     }
     m_settings.setValue("formatJohn", m_format);
-    m_settings.setValue("formatUI", m_ui->comboBox_Format->currentText());
+    m_settings.setValue("formatUI", m_ui->formatComboBox->currentText());
 
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
@@ -642,11 +649,7 @@ void MainWindow::startJohn(QStringList args)
     // signals are already connected with our slots. So we need only
     // start it.
 
-    // to visually separate sessions in the console output (make it clearer for the user)
-    QString cmd = CONSOLE_LOG_SEPARATOR +
-            QTime::currentTime().toString("hh:mm:ss : ") + m_pathToJohn + " " + args.join(" ") + '\n';
-
-    appendLog(cmd);
+    appendLog(QTime::currentTime().toString("[hh:mm:ss] ") + m_pathToJohn + " " + args.join(" "));
 
     //We set up environment variables, ex : useful for openMP
     QProcessEnvironment env;
@@ -718,7 +721,7 @@ void MainWindow::showJohnStarted()
     m_ui->actionStartAttack->setEnabled(false);
     m_ui->actionResumeAttack->setEnabled(false);
     m_ui->actionOpenPassword->setEnabled(false);
-    m_ui->actionOpenLastSession->setEnabled(false);
+    m_ui->actionOpenSession->setEnabled(false);
 
     // When John starts we enable stop button.
     m_ui->actionPauseAttack->setEnabled(true);
@@ -754,39 +757,38 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
         break;
 
     case QProcess::Crashed:
-        message = tr("John crashed. Verify Console Log for details.");
+        message = tr("John crashed. Verify the Console Log for details.");
         break;
 
     case QProcess::Timedout:
-        message = tr("A timed out error happened to John.");
+        message = tr("A timed out error occurred to John.");
         break;
 
     case QProcess::WriteError:
-        message = tr("A write error happened to John.");
+        message = tr("A write error occurred to John.");
         break;
 
     case QProcess::ReadError:
-        message = tr("A read error happened to John.");
+        message = tr("A read error occurred to John.");
         break;
 
     case QProcess::UnknownError:
-        message = tr("An unknown problem happened to John. Verify Console Log for any details.");
+        message = tr("An unknown problem occurred to John. Verify Console Log for any details.");
         break;
     }
 
-    QMessageBox::critical(this, tr("Johnny"), message + "(" + m_pathToJohn + ")");
+    QMessageBox::critical(this, tr("Johnny"), message + " (john is " + m_pathToJohn + ")");
 
-    if (QObject::sender() == &m_johnGuess) {
+    if (QObject::sender() == &m_johnGuess)
+    {
         m_ui->actionGuessPassword->setEnabled(true);
     }
-
 }
 
 void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
     appendLog(CONSOLE_LOG_SEPARATOR);
-
     QString sessionName(m_sessionCurrent);
     sessionName.remove(m_sessionDataDir);
 
@@ -816,7 +818,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     m_ui->actionPauseAttack->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(true);
     m_ui->actionOpenPassword->setEnabled(true);
-    m_ui->actionOpenLastSession->setEnabled(true);
+    m_ui->actionOpenSession->setEnabled(true);
     m_ui->actionResumeAttack->setEnabled(m_sessionHistory.contains(sessionName) && isRecReadable);
 
     if (exitStatus == QProcess::CrashExit) {
@@ -1122,20 +1124,9 @@ void MainWindow::updateStatistics()
     }
 }
 
-/*
- * Since QPlainTextEdit::appendPlainText() add newLines without asking us and
- * QPlainTextEdit::insertPlainText() insert text by default at the cursor pos,
- * which can be modified by the user, this function assures the text is
- * inserted at the end without new line by default.
- */
-
 void MainWindow::appendLog(const QString& text)
 {
-    // Preserving cursor preserves selection by user
-    QTextCursor prev_cursor = m_ui->plainTextEdit_JohnOut->textCursor();
-    m_ui->plainTextEdit_JohnOut->moveCursor(QTextCursor::End);
-    m_ui->plainTextEdit_JohnOut->insertPlainText(text);
-    m_ui->plainTextEdit_JohnOut->setTextCursor(prev_cursor);
+    m_ui->consoleLogTextEdit->appendPlainText(text);
 }
 
 /* This slot is triggered when the types changed. This is probably because :
@@ -1150,17 +1141,17 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
         m_ui->tableView_Hashes->setModel(model);
-        QString savedFormat = m_ui->comboBox_Format->currentText();
+        QString savedFormat = m_ui->formatComboBox->currentText();
         // For jumbo, we list only available formats in file in attack option
-        m_ui->comboBox_Format->clear();
-        m_ui->comboBox_Format->addItem(tr("Auto detect"));
-        m_ui->comboBox_Format->addItems(listOfTypesInFile);
+        m_ui->formatComboBox->clear();
+        m_ui->formatComboBox->addItem(tr("Auto detect"));
+        m_ui->formatComboBox->addItems(listOfTypesInFile);
         // Restore user's selection
-        int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
+        int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
         if (indexSavedFormat != -1) {
-            m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
+            m_ui->formatComboBox->setCurrentIndex(indexSavedFormat);
         } else if(savedFormat.isEmpty()){
-            m_ui->comboBox_Format->setEditText(savedFormat);
+            m_ui->formatComboBox->setEditText(savedFormat);
         }
     }
 }
@@ -1181,15 +1172,15 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         QStringList defaultFormats;
         defaultFormats << tr("Auto detect") << "descrypt" << "bsdicrypt" << "md5crypt"
                        << "bcrypt" << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
-        QString savedFormat = m_ui->comboBox_Format->currentText();
-        m_ui->comboBox_Format->clear();
-        m_ui->comboBox_Format->addItems(defaultFormats);
+        QString savedFormat = m_ui->formatComboBox->currentText();
+        m_ui->formatComboBox->clear();
+        m_ui->formatComboBox->addItems(defaultFormats);
         // Restore user's selection
-        int indexSavedFormat = m_ui->comboBox_Format->findText(savedFormat);
+        int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
         if (indexSavedFormat != -1) {
-            m_ui->comboBox_Format->setCurrentIndex(indexSavedFormat);
+            m_ui->formatComboBox->setCurrentIndex(indexSavedFormat);
         } else if (!savedFormat.isEmpty()){
-            m_ui->comboBox_Format->setEditText(savedFormat);
+            m_ui->formatComboBox->setEditText(savedFormat);
         }
     }
 }
@@ -1266,9 +1257,10 @@ void MainWindow::restoreSessionOptions()
     // Start restoring required UI fields
     QString sessionName(m_sessionCurrent);
     sessionName.remove(m_sessionDataDir);
+    m_ui->sessionNameLabel->setText(sessionName);
     m_settings.beginGroup("Sessions/" + sessionName);
     m_format = m_settings.value("formatJohn").toString();
-    m_ui->comboBox_Format->setEditText(m_settings.value("formatUI").toString());
+    m_ui->formatComboBox->setEditText(m_settings.value("formatUI").toString());
     QString mode = m_settings.value("mode").toString();
     if (mode == "single") {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->singleModeTab);

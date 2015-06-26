@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
-    <height>655</height>
+    <width>810</width>
+    <height>638</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -91,6 +91,24 @@
            </property>
            <item>
             <widget class="QTableView" name="tableView_Hashes">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
+             </property>
+             <property name="verticalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <property name="horizontalScrollMode">
+              <enum>QAbstractItemView::ScrollPerPixel</enum>
+             </property>
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>130</number>
+             </attribute>
+             <attribute name="horizontalHeaderMinimumSectionSize">
+              <number>50</number>
+             </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
              </attribute>
@@ -99,6 +117,12 @@
           </layout>
          </widget>
          <widget class="QScrollArea" name="optionsScrollArea">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOn</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -107,477 +131,111 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>628</width>
-             <height>904</height>
+             <width>734</width>
+             <height>872</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
-             <widget class="QLabel" name="label_6">
-              <property name="font">
-               <font>
-                <family>Sans Serif</family>
-                <pointsize>12</pointsize>
-               </font>
+             <widget class="QGroupBox" name="sessionOptionsGroupBox">
+              <property name="title">
+               <string>Session</string>
               </property>
-              <property name="text">
-               <string>General options</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QLabel" name="label_8">
-                  <property name="text">
-                   <string>Format:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox_Format">
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_7">
-              <property name="font">
-               <font>
-                <family>Sans Serif</family>
-                <pointsize>12</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Select attack mode:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="TabWidget" name="attackModeTabWidget">
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <widget class="QWidget" name="defaultModeTab">
-               <attribute name="title">
-                <string>Default mode</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_15">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_2">
-                  <item>
-                   <widget class="QLabel" name="label_2">
-                    <property name="text">
-                     <string>With default behaviour John the Ripper will run &quot;single crack&quot; mode, then wordlist mode, then &quot;incremental&quot; mode. All with default settings.</string>
-                    </property>
-                    <property name="wordWrap">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>205</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="singleModeTab">
-               <attribute name="title">
-                <string>Single crack mode</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_16">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <item>
-                   <widget class="QLabel" name="label_3">
-                    <property name="text">
-                     <string>&quot;Single crack&quot; mode is the most fast mode. It uses login names and other information with word mangling rules named &quot;Single&quot;.</string>
-                    </property>
-                    <property name="wordWrap">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_8">
-                    <item>
-                     <widget class="QCheckBox" name="checkBox_SingleCrackModeExternalName">
-                      <property name="text">
-                       <string>Use external mode, filter name:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="comboBox_SingleCrackModeExternalName">
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>177</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="wordlistModeTab">
-               <attribute name="title">
-                <string>Wordlist mode</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_17">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_6">
-                  <item>
-                   <widget class="QLabel" name="label_4">
-                    <property name="text">
-                     <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. Section &quot;Wordlist&quot; would be used to mangle words with rules.</string>
-                    </property>
-                    <property name="wordWrap">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout">
-                    <item>
-                     <widget class="QLabel" name="label_WordlistFile">
-                      <property name="text">
-                       <string>Wordlist file:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="comboBox_WordlistFile">
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="pushButton_WordlistFileBrowse">
-                      <property name="text">
-                       <string>Browse</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_3">
-                    <item>
-                     <widget class="QCheckBox" name="checkBox_WordlistModeRules">
-                      <property name="text">
-                       <string>Use rules</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_9">
-                    <item>
-                     <widget class="QCheckBox" name="checkBox_WordlistModeExternalName">
-                      <property name="text">
-                       <string>Use external mode, filter name:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="comboBox_WordlistModeExternalName">
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_6">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>104</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="incrementalModeTab">
-               <attribute name="title">
-                <string>Incremental mode</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_18">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_7">
-                  <item>
-                   <widget class="QLabel" name="label_5">
-                    <property name="text">
-                     <string>&quot;Incremental&quot; mode is the most powerfull mode because it can try all possible combinations. Yes, it is long so order of tries is based on frequencies of single characters, pairs and trigraphs. However it could be too long so try this mode as the last chance. Information about frequencies is taken from file called charset. Such files are listed with names in configuration file. So if you would not like to use default charset file turn checkbox on and enter name of charset.</string>
-                    </property>
-                    <property name="wordWrap">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_4">
-                    <item>
-                     <widget class="QCheckBox" name="checkBox_IncrementalModeName">
-                      <property name="text">
-                       <string>Charset (name):</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="comboBox_IncrementalModeName">
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_10">
-                    <item>
-                     <widget class="QCheckBox" name="checkBox_IncrementalModeExternalName">
-                      <property name="text">
-                       <string>Use external mode, filter name:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="comboBox_IncrementalModeExternalName">
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_7">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>110</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="externalModeTab">
-               <attribute name="title">
-                <string>External mode</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_19">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_11">
-                  <item>
-                   <widget class="QLabel" name="label_11">
-                    <property name="text">
-                     <string>External mode is the most flexible mode because you could define your own code to generate candidates. Also you could create filters to reduce amount of candidates to try (such filters are available for use with other modes). There are predefined external routines in configuration file.</string>
-                    </property>
-                    <property name="wordWrap">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_7">
-                    <item>
-                     <widget class="QLabel" name="label_ExternalModeName">
-                      <property name="text">
-                       <string>Name:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="comboBox_ExternalModeName">
-                      <property name="editable">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_8">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>164</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </widget>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_14">
-              <property name="font">
-               <font>
-                <family>Sans Serif</family>
-                <pointsize>12</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Additional Selectors</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_15">
-              <property name="font">
-               <font>
-                <family>Sans Serif</family>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Use comma (&quot;,&quot;) as separator to input list. Use dash (&quot;-&quot;) at the beginning to invert selection.</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_20">
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_16">
-                <item>
-                 <widget class="QCheckBox" name="checkBox_LimitUsers">
-                  <property name="text">
-                   <string>Load only listed users:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox_LimitUsers">
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_17">
-                <item>
-                 <widget class="QCheckBox" name="checkBox_LimitGroups">
-                  <property name="text">
-                   <string>Load only listed groups:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox_LimitGroups">
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_18">
-                <item>
-                 <widget class="QCheckBox" name="checkBox_LimitShells">
-                  <property name="text">
-                   <string>Load only listed shells:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="comboBox_LimitShells">
-                  <property name="editable">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_19">
-                <item>
-                 <widget class="QCheckBox" name="checkBox_LimitSalts">
-                  <property name="text">
-                   <string>Load only hashes with number of same salts more than or equal to:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="spinBox_LimitSalts">
-                  <property name="minimum">
-                   <number>-10000000</number>
-                  </property>
-                  <property name="maximum">
-                   <number>10000000</number>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QWidget" name="advancedOptionsWidget" native="true">
-              <layout class="QVBoxLayout" name="verticalLayout_21">
-               <property name="spacing">
-                <number>9</number>
+              <layout class="QFormLayout" name="formLayout">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::ExpandingFieldsGrow</enum>
                </property>
+               <property name="formAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Session name:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="TextLabel" name="sessionNameLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                 </property>
+                 <property name="elide" stdset="0">
+                  <string>ElideRight</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Input password files:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="TextLabel" name="passwordFilesLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textInteractionFlags">
+                  <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                 </property>
+                 <property name="elide" stdset="0">
+                  <string>ElideRight</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_8">
+                 <property name="toolTip">
+                  <string>The hash format to attack</string>
+                 </property>
+                 <property name="text">
+                  <string>Current hash format:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="formatComboBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="attackModeGroupBox">
+              <property name="title">
+               <string>Attack mode</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout">
                <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
                 <number>0</number>
                </property>
                <property name="rightMargin">
@@ -587,115 +245,572 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="label_advancedOptions">
-                 <property name="font">
-                  <font>
-                   <family>Sans Serif</family>
-                   <pointsize>12</pointsize>
-                  </font>
+                <widget class="TabWidget" name="attackModeTabWidget">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="defaultModeTab">
+                  <attribute name="title">
+                   <string>Default mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_15">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_2">
+                     <property name="text">
+                      <string>With default behaviour John the Ripper will run single crack mode, then wordlist mode, then incremental mode. All attack will be run with default John settings.</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                     <property name="margin">
+                      <number>25</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="singleModeTab">
+                  <attribute name="title">
+                   <string>Single crack mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <item>
+                    <widget class="QLabel" name="label_3">
+                     <property name="text">
+                      <string>Single crack mode is the most fast mode. It uses login names and other information with word mangling rules named &quot;Single&quot;.</string>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_SingleCrackModeExternalName">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Use external mode, filter name:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="comboBox_SingleCrackModeExternalName">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="editable">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="wordlistModeTab">
+                  <attribute name="title">
+                   <string>Wordlist mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_17">
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <item>
+                      <widget class="QLabel" name="label_4">
+                       <property name="text">
+                        <string>Wordlist mode uses data from wordlist file. As an addition rules could be applied. Section &quot;Wordlist&quot; would be used to mangle words with rules.</string>
+                       </property>
+                       <property name="wordWrap">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout">
+                       <item>
+                        <widget class="QLabel" name="label_WordlistFile">
+                         <property name="text">
+                          <string>Wordlist file:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_WordlistFile">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="editable">
+                          <bool>true</bool>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButton_WordlistFileBrowse">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Browse</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_3">
+                       <item>
+                        <widget class="QCheckBox" name="checkBox_WordlistModeExternalName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Use external mode, filter name:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_WordlistModeExternalName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="editable">
+                          <bool>true</bool>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_9">
+                       <item>
+                        <widget class="QCheckBox" name="checkBox_WordlistModeRules">
+                         <property name="text">
+                          <string>Use rules</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="incrementalModeTab">
+                  <attribute name="title">
+                   <string>Incremental mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_18">
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_7">
+                     <item>
+                      <widget class="QLabel" name="label_5">
+                       <property name="text">
+                        <string>&quot;Incremental&quot; mode is the most powerfull mode because it can try all possible combinations. Yes, it is long so order of tries is based on frequencies of single characters, pairs and trigraphs. However it could be too long so try this mode as the last chance. Information about frequencies is taken from file called charset. Such files are listed with names in configuration file. So if you would not like to use default charset file turn checkbox on and enter name of charset.</string>
+                       </property>
+                       <property name="wordWrap">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_4">
+                       <item>
+                        <widget class="QCheckBox" name="checkBox_IncrementalModeName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Charset (name):</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_IncrementalModeName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="editable">
+                          <bool>true</bool>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_10">
+                       <item>
+                        <widget class="QCheckBox" name="checkBox_IncrementalModeExternalName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="text">
+                          <string>Use external mode, filter name:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_IncrementalModeExternalName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="editable">
+                          <bool>true</bool>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="externalModeTab">
+                  <attribute name="title">
+                   <string>External mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_19">
+                   <item>
+                    <layout class="QVBoxLayout" name="verticalLayout_11">
+                     <item>
+                      <widget class="QLabel" name="label_11">
+                       <property name="text">
+                        <string>External mode is the most flexible mode because you could define your own code to generate candidates. Also you could create filters to reduce amount of candidates to try (such filters are available for use with other modes). There are predefined external routines in configuration file.</string>
+                       </property>
+                       <property name="wordWrap">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_7">
+                       <item>
+                        <widget class="QLabel" name="label_ExternalModeName">
+                         <property name="text">
+                          <string>Name:</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QComboBox" name="comboBox_ExternalModeName">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="editable">
+                          <bool>true</bool>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="inputSelectorsGroupBox">
+              <property name="title">
+               <string>Input selectors</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <widget class="QLabel" name="label_15">
                  <property name="text">
-                  <string>Advanced Options</string>
+                  <string>Use comma ',' as separator list between list items. Use dash '-' at the beginning to invert selection.</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QGroupBox" name="groupBox_Parallelization">
-                 <property name="title">
-                  <string>Parallelization</string>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_12">
-                  <property name="spacing">
-                   <number>9</number>
-                  </property>
+                <layout class="QVBoxLayout" name="verticalLayout_20">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_16">
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_LimitUsers">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Load only listed users:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBox_LimitUsers">
+                     <property name="editable">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_17">
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_LimitGroups">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Load only listed groups:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBox_LimitGroups">
+                     <property name="editable">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_18">
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_LimitShells">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Load only listed shells:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="comboBox_LimitShells">
+                     <property name="editable">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_19">
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_LimitSalts">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Load only hashes with number of same salts more than or equal to:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="spinBox_LimitSalts">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximum">
+                      <number>999999999</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="parallelizationGroupBox">
+              <property name="title">
+               <string>Parallelization</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_12">
+               <property name="spacing">
+                <number>9</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>11</number>
+               </property>
+               <item>
+                <widget class="QWidget" name="widgetFork" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_15">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
                   <property name="bottomMargin">
-                   <number>11</number>
+                   <number>0</number>
                   </property>
                   <item>
-                   <widget class="QWidget" name="widgetFork" native="true">
-                    <layout class="QHBoxLayout" name="horizontalLayout_15">
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QCheckBox" name="checkBox_UseFork">
-                       <property name="text">
-                        <string>Use multiple processes (--fork):</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QSpinBox" name="spinBox_nbOfProcess">
-                       <property name="minimum">
-                        <number>1</number>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
+                   <widget class="QCheckBox" name="checkBox_UseFork">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Use multiple processes (--fork):</string>
+                    </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QWidget" name="widget_OpenMP" native="true">
-                    <layout class="QHBoxLayout" name="horizontalLayout_6">
-                     <property name="spacing">
-                      <number>6</number>
-                     </property>
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
-                     <item>
-                      <widget class="QLabel" name="label_openMP">
-                       <property name="text">
-                        <string>If using OpenMP capable JtR, you can specify the number of threads here:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QSpinBox" name="spinBox_nbOfOpenMPThread">
-                       <property name="specialValueText">
-                        <string>default</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
+                   <widget class="QSpinBox" name="spinBox_nbOfProcess">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
                    </widget>
                   </item>
                  </layout>
                 </widget>
                </item>
                <item>
+                <widget class="QWidget" name="widgetOpenMP" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_openMP">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>If using OpenMP capable JtR, you can specify the number of threads to use</string>
+                    </property>
+                    <property name="text">
+                     <string>OpenMP threads:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_nbOfOpenMPThread">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="specialValueText">
+                     <string>default</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="otherOptionsGroupBox">
+              <property name="title">
+               <string>Other options</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_13">
+               <item>
                 <widget class="QLabel" name="label_instructionEnvironmentVar">
-                 <property name="font">
-                  <font>
-                   <family>Ubuntu</family>
-                   <pointsize>9</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
                  <property name="text">
-                  <string>Format to specify new environment variables must be varName1=value1, varName2=value2 etc...</string>
+                  <string>Format to specify new environment variables must be varName1=value1, varName2=value2.</string>
                  </property>
                  <property name="margin">
                   <number>0</number>
@@ -713,20 +828,26 @@
                   </property>
                   <item>
                    <widget class="QCheckBox" name="checkBox_EnvironmentVar">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="text">
-                     <string/>
+                     <string>Use environment variables:</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLabel" name="label_10">
-                    <property name="text">
-                     <string>Use environment variables : </string>
+                   <widget class="QLineEdit" name="lineEdit_EnvironmentVar">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                    </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_EnvironmentVar"/>
                   </item>
                  </layout>
                 </widget>
@@ -808,6 +929,9 @@
           </layout>
          </widget>
          <widget class="QScrollArea" name="settingsScrollArea">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -816,8 +940,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>616</width>
-             <height>333</height>
+             <width>787</width>
+             <height>773</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -939,7 +1063,7 @@
            </layout>
           </widget>
          </widget>
-         <widget class="QWidget" name="outputPage">
+         <widget class="QWidget" name="consoleLogPage">
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <property name="leftMargin">
             <number>0</number>
@@ -954,7 +1078,10 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit_JohnOut">
+            <widget class="QPlainTextEdit" name="consoleLogTextEdit">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
              <property name="readOnly">
               <bool>true</bool>
              </property>
@@ -1027,8 +1154,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
-     <height>27</height>
+     <width>810</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -1039,7 +1166,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpenPassword"/>
-    <addaction name="actionOpenLastSession"/>
+    <addaction name="actionOpenSession"/>
    </widget>
    <widget class="QMenu" name="menuAttack">
     <property name="title">
@@ -1104,10 +1231,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Open Password File</string>
+    <string>Open password file</string>
    </property>
    <property name="toolTip">
-    <string>Open a password file</string>
+    <string>Open a password file and start a new session</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -1116,14 +1243,14 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionOpenLastSession">
+  <action name="actionOpenSession">
    <property name="icon">
     <iconset>
      <normalon>:/icons/fileopen.png</normalon>
     </iconset>
    </property>
    <property name="text">
-    <string>Attack Sessions</string>
+    <string>Open session</string>
    </property>
    <property name="toolTip">
     <string>Restore previous sessions</string>
@@ -1145,7 +1272,7 @@
     <string>Copy</string>
    </property>
    <property name="toolTip">
-    <string>Copy selected part or full Passwords table to clipboard</string>
+    <string>Copy selected fields or entire passwords table to clipboard</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -1161,10 +1288,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Start New Attack</string>
+    <string>Start new attack</string>
    </property>
    <property name="toolTip">
-    <string>Start a new session to crack passwords</string>
+    <string>Starts a new attack session using the defined options</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -1180,10 +1307,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Resume Attack</string>
+    <string>Resume attack</string>
    </property>
    <property name="toolTip">
-    <string>Resume a cracking password session</string>
+    <string>Resume current attack (if you changed attack options, start a new attack)</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -1202,10 +1329,10 @@
     </iconset>
    </property>
    <property name="text">
-    <string>Pause Attack</string>
+    <string>Pause attack</string>
    </property>
    <property name="toolTip">
-    <string>Pause the current cracking password session</string>
+    <string>Pause the currently running attack</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
@@ -1220,7 +1347,10 @@
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
-    <string>Clear Session History</string>
+    <string>Clear history</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear session history</string>
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
@@ -1235,7 +1365,7 @@
      <normaloff>:/icons/tab_log.png</normaloff>:/icons/tab_log.png</iconset>
    </property>
    <property name="text">
-    <string>Guess</string>
+    <string>Guess password</string>
    </property>
    <property name="toolTip">
     <string>I'm feeling lucky!</string>
@@ -1264,6 +1394,9 @@
    <property name="text">
     <string>Passwords</string>
    </property>
+   <property name="toolTip">
+    <string>Attack results</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+1</string>
    </property>
@@ -1278,6 +1411,9 @@
    </property>
    <property name="text">
     <string>Options</string>
+   </property>
+   <property name="toolTip">
+    <string>Attack options</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+2</string>
@@ -1294,6 +1430,9 @@
    <property name="text">
     <string>Statistics</string>
    </property>
+   <property name="toolTip">
+    <string>Attack statistics</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+3</string>
    </property>
@@ -1308,6 +1447,9 @@
    </property>
    <property name="text">
     <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Global settings</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+4</string>
@@ -1324,6 +1466,9 @@
    <property name="text">
     <string>Console log</string>
    </property>
+   <property name="toolTip">
+    <string>John the Ripper output and log</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
    </property>
@@ -1336,6 +1481,11 @@
    <extends>QTabWidget</extends>
    <header>tabwidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TextLabel</class>
+   <extends>QLabel</extends>
+   <header>textlabel.h</header>
   </customwidget>
  </customwidgets>
  <resources>

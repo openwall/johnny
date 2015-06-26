@@ -25,6 +25,7 @@
 #include <QMultiMap>
 #include <QTemporaryFile>
 #include <QPlainTextEdit>
+#include <QLabel>
 
 namespace Ui {
     class MainWindow;
@@ -133,6 +134,10 @@ private:
 
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
+
+#ifdef Q_OS_OSX
+    QLabel         *m_progressStatsLabel;
+#endif
 };
 
 #endif // MAINWINDOW_H

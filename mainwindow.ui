@@ -51,7 +51,7 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="contentWidgetLayout">
        <property name="spacing">
         <number>0</number>
        </property>

@@ -6,8 +6,7 @@
 HashTypeChecker::HashTypeChecker()
 {
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
-    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(parseJohnAnswer()), Qt::QueuedConnection);
-    connect(this, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()), Qt::QueuedConnection);
+    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(parseJohnAnswer(int, QProcess::ExitStatus)), Qt::QueuedConnection);
 }
 
 HashTypeChecker::~HashTypeChecker()
@@ -19,15 +18,10 @@ void HashTypeChecker::start()
     // We make sure last process is terminated correctly before
     // loading a new password file.
     terminate();
-    m_johnOutput.clear();
     setArgs(QStringList() << "--show=types" << m_passwordFiles);
     JohnHandler::start();
 }
 
-void HashTypeChecker::processOutput()
-{
-  m_johnOutput.append(readAllStandardOutput());
-}
 QStringList HashTypeChecker::passwordFiles() const
 {
     return m_passwordFiles;
@@ -38,25 +32,31 @@ void HashTypeChecker::setPasswordFiles(const QStringList &passwordFiles)
     m_passwordFiles = passwordFiles;
 }
 
-void HashTypeChecker::parseJohnAnswer()
+void HashTypeChecker::parseJohnAnswer(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    // Parse John's output which is in m_johnResult
-    // when process finished it's work
+    // John --show=types didn't terminate successfully, so the input is probably incorrect(and not properly formatted)
+    // or useless ! We might have terminated the process because the user changed session file or maybe it crashed.
+    // We shouldn't parse the input in those cases to avoid errors.
+    if ((exitStatus != QProcess::NormalExit) || (exitCode != 0)) {
+        return;
+    }
+
+    // Parse John's output when process finished it's work
+    QString johnOutput = readAllStandardOutput();
     QStringList uniqueTypesInFile;
     QStringList detailedTypesPerRow;
     QList<Hash> hashesAllInfos;
-    QStringList lines = m_johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
-    if (!m_johnOutput.isEmpty()) {
-        for (int i = 0; i < lines.size(); i++) {
-            QString currentLine = lines[i];
+    QStringList lines = johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
+    for (int i = 0; i < lines.size(); i++) {
+        QString currentLine = lines[i];
+        if (currentLine.length() >= 3) {
+            // Field_separator can be set by john and the right way to find
+            // it is by looking at the last character of the line
+            QChar field_separator = currentLine[currentLine.length()-1];
+            currentLine.remove(currentLine.length()-3, 3);
+            QStringList fields = currentLine.split(field_separator, QString::KeepEmptyParts);
             // Each valid line from john is gonna have at least 7 fields
-            if (currentLine.length() >= 7) {
-                // Field_separator can be set by john and the right way to find
-                // it is by looking at the last character of the line
-                QChar field_separator = currentLine[currentLine.length()-1];
-                currentLine.remove(currentLine.length()-4, 3);
-
-                QStringList fields = currentLine.split(field_separator, QString::KeepEmptyParts);
+            if (fields.length() >= 7) {
                 Hash hash;
                 int currentIndex = 0;
                 hash.login = fields[currentIndex++];
@@ -104,7 +104,5 @@ void HashTypeChecker::parseJohnAnswer()
     }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
-    m_johnOutput.clear();
     emit updateHashTypes(m_passwordFiles,uniqueTypesInFile,detailedTypesPerRow);
-    m_passwordFiles.clear();
 }

@@ -65,7 +65,7 @@ private slots:
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(QAbstractTableModel *newTableModel);
     void startJohn(QStringList args);
-    void callJohnShow();
+    void callJohnShow(bool showAllFormats = false);
     void readJohnShow();
     void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);

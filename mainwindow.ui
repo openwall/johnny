@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>564</height>
+    <width>853</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -107,8 +107,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>640</width>
-             <height>899</height>
+             <width>628</width>
+             <height>904</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -816,8 +816,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>352</height>
+             <width>616</width>
+             <height>333</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -995,6 +995,9 @@
    <property name="contextMenuPolicy">
     <enum>Qt::PreventContextMenu</enum>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <property name="iconSize">
     <size>
      <width>32</width>
@@ -1024,9 +1027,12 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
-     <height>22</height>
+     <width>853</width>
+     <height>27</height>
     </rect>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::PreventContextMenu</enum>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -1158,7 +1164,7 @@
     <string>Start New Attack</string>
    </property>
    <property name="toolTip">
-    <string>Start cracking passwords</string>
+    <string>Start a new session to crack passwords</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -1177,7 +1183,7 @@
     <string>Resume Attack</string>
    </property>
    <property name="toolTip">
-    <string>Resume cracking passwords</string>
+    <string>Resume a cracking password session</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
@@ -1199,7 +1205,7 @@
     <string>Pause Attack</string>
    </property>
    <property name="toolTip">
-    <string>Pause the cracking of passwords</string>
+    <string>Pause the current cracking password session</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>

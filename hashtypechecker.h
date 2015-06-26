@@ -47,11 +47,9 @@ signals:
                          const QStringList &detailedTypesPerRow);
 
 private slots:
-    void parseJohnAnswer();
-    void processOutput();
+    void parseJohnAnswer(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-    QString     m_johnOutput;
     QStringList m_passwordFiles;
 };
 

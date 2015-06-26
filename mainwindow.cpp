@@ -107,7 +107,6 @@ MainWindow::MainWindow(QSettings &settings)
 
     connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
             SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
-    connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(callJohnShow()), Qt::QueuedConnection);
     connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this,
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
     connect(&m_johnGuess, SIGNAL(error(QProcess::ProcessError)), this,
@@ -118,6 +117,9 @@ MainWindow::MainWindow(QSettings &settings)
             this,SLOT(restoreSavedSettings()));
     connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
             this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->pushButton_ApplySettings, SIGNAL(clicked()),
+            this, SLOT(applySettings()));
+
     // Settings changed by user
     connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
     connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
@@ -169,15 +171,6 @@ MainWindow::MainWindow(QSettings &settings)
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
-    // Automatically open last session by default
-    if (!m_sessionHistory.isEmpty()) {
-        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
-        openLastSession();
-    } else {
-        m_sessionCurrent.clear(); // No session
-        restoreDefaultAttackOptions(false);
-    }
-
     // We fill form with default values. Then we load settings. When
     // there is no setting old value is used. So if there is no
     // configuration file then we get default values. Also it means
@@ -190,6 +183,15 @@ MainWindow::MainWindow(QSettings &settings)
 
     // We load old settings.
     restoreSavedSettings();
+
+    // Automatically open last session by default
+    if (!m_sessionHistory.isEmpty()) {
+        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
+        openLastSession();
+    } else {
+        m_sessionCurrent.clear(); // No session
+        restoreDefaultAttackOptions(false);
+    }
 
     Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
@@ -330,7 +332,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
-        callJohnShow();
+        callJohnShow(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
@@ -827,7 +829,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     callJohnShow();
 }
 
-void MainWindow::callJohnShow()
+void MainWindow::callJohnShow(bool showAllFormats)
 {
     // Give a chance to terminate cleanly
     if (m_johnShow.state() != QProcess::NotRunning)
@@ -835,7 +837,7 @@ void MainWindow::callJohnShow()
 
     QStringList args;
     // We add current format key if it is not empty.
-    if (!m_format.isEmpty())
+    if (!m_format.isEmpty() && !showAllFormats)
         args << m_format;
     args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
@@ -1016,7 +1018,7 @@ void MainWindow::applySettings()
     m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
     // If the language changed, retranslate the UI
-    Translator& translator = Translator::getInstance();
+    Translator &translator = Translator::getInstance();
     QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
     if (newLanguage != translator.getCurrentLanguage().toLower()) {
         translator.translateApplication(qApp,newLanguage);
@@ -1255,6 +1257,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
         qDebug() << "JtR seems to have crashed.";
         return;
     }
+    callJohnShow(true);
 }
 
 void MainWindow::restoreSessionOptions()

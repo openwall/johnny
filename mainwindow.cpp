@@ -1227,16 +1227,22 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
 
 void MainWindow::guessPassword()
 {
-    bool isOk;
-    QString guess = QInputDialog::getText(this, tr("Password Guessing"),
-                                         tr("Your passphrase guess:"), QLineEdit::Normal,
-                                         "", &isOk);
-    if (isOk && !guess.isEmpty()) {
+    bool proceed;
+    QString pwGuess = QInputDialog::getText(this, tr("Password Guessing"),
+                                            tr("Your passphrase guess:"),
+                                            QLineEdit::Normal, "", &proceed);
+    if (proceed && !pwGuess.isEmpty())
+    {
         m_ui->actionGuessPassword->setEnabled(false);
         m_johnGuess.setJohnProgram(m_pathToJohn);
-        m_johnGuess.setArgs(QStringList() << "--stdin" << "--session=passwordGuessing" << m_sessionPasswordFiles);
+        QStringList args;
+        args << "--stdin";
+        if(!m_format.isEmpty())
+            args << m_format;
+        args << m_sessionPasswordFiles;
+        m_johnGuess.setArgs(args);
         m_johnGuess.start();
-        m_johnGuess.write(guess);
+        m_johnGuess.write(pwGuess);
         m_johnGuess.closeWriteChannel();
     }
 }

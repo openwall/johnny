@@ -1,0 +1,3 @@
+To make a new installer :
+For example, on Windows and Qt 5.4.1, DLLs are
+qwindows.dll

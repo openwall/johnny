@@ -1,3 +1,4 @@
 To make a new installer :
-For example, on Windows and Qt 5.4.1, DLLs are
+If target platform is Windows, add DLLs here.
+For example, on Windows and Qt 5.4.1, DLLs are :
 qwindows.dll

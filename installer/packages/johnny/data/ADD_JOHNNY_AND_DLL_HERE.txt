@@ -1,6 +1,7 @@
 To make a new installer :
 1. Add johnny executable here
-2. For example, on Windows and Qt 5.4.1, DLLs are
+2. If target platform is Windows, add DLLs here.
+For example, on Windows and Qt 5.4.1, DLLs are :
 icudt53.dll
 icuin53.dll
 icuuc53.dll

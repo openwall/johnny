@@ -271,7 +271,7 @@ void MainWindow::tabsSelectionChanged(QAction* action)
     m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 
-void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
+void MainWindow::replaceTableModel(FileTableModel *newTableModel)
 {
     // Remove temporary file is exist
     if (m_johnShowTemp != NULL) {
@@ -638,6 +638,14 @@ QStringList MainWindow::saveAttackParameters()
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
         m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
     }
+    // Save unselected rows
+    QList<QVariant> unselectedRows;
+    for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+        if (m_hashesTable->data(m_hashesTable->index(i,0),Qt::CheckStateRole) == Qt::Unchecked) {
+            unselectedRows.append(i);
+        }
+    }
+    m_settings.setValue("unselectedRows", unselectedRows);
     m_settings.endGroup();
 
     return parameters;
@@ -1135,7 +1143,7 @@ void MainWindow::appendLog(const QString& text)
 void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                                  const QStringList &detailedTypesPerRow)
 {
-    FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
+    FileTableModel* model = m_hashesTable;
     if ((model != NULL) && (pathToPwdFile == m_sessionPasswordFiles)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
@@ -1335,6 +1343,11 @@ void MainWindow::restoreSessionOptions()
     if (m_settings.contains("environmentVariables")) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
         m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
+    }
+    // Unselected hashes
+    QList<QVariant> unselectedRows = m_settings.value("unselectedRows").toList();
+    for (int i = 0; i < unselectedRows.count(); i++) {
+        m_hashesTable->setData(m_hashesTable->index(unselectedRows[i].toInt(),0),Qt::Unchecked,Qt::CheckStateRole);
     }
     m_settings.endGroup();
 }

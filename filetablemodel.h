@@ -6,7 +6,6 @@
 #define FILETABLEMODEL_H
 
 #include "hashtypechecker.h"
-#include <QStandardItemModel>
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QVector>

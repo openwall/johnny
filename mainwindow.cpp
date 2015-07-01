@@ -141,7 +141,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // We create the app sessions data directory in $HOME if it does not exist
-    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "sessions" + QDir::separator());
+    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
     if (!QDir::home().mkpath(m_sessionDataDir)) {
         QMessageBox::critical(this, tr("Johnny"),
             tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
@@ -465,7 +465,7 @@ void MainWindow::startAttack()
         return;
 
     // Session for johnny
-    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh:mm:ss");
+    QString date = QDateTime::currentDateTime().toString("MM-dd-yy hh-mm-ss");
     m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
     QString sessionFile = m_sessionCurrent + ".rec";
 

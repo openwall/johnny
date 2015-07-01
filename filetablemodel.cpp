@@ -71,6 +71,7 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
             for (; column < columnCount(); column++)
                 data[column].append("");
         }
+        file.close();
     }
     // We convert our lists into vectors to store data.
     for (int column = 0; column < columnCount(); column++) {

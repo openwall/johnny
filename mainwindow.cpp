@@ -465,8 +465,8 @@ void MainWindow::startAttack()
         return;
 
     // Session for johnny
-    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh:mm:ss");
-    m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
+    QString sessionName = QDateTime::currentDateTime().toString("MM-dd-yy-hh:mm:ss");
+    m_sessionCurrent = QDir(m_sessionDataDir).filePath(sessionName);
     QString sessionFile = m_sessionCurrent + ".rec";
 
     if (QFileInfo(sessionFile).isReadable())
@@ -492,8 +492,33 @@ void MainWindow::startAttack()
 
     // We check that we have file name.
     if (!m_sessionPasswordFiles.isEmpty()) {
-        // If file name is not empty then we have file, pass it to John.
-        parameters << m_sessionPasswordFiles;
+        QList<QVariant> unselectedRows = m_settings.value("Sessions/" + sessionName + "/unselectedRows").toList();
+        // If some hashes are unselected, write a new file with only selected hashes
+        if (unselectedRows.size() > 0) {
+            QString newFilePath = m_sessionCurrent + ".pw";
+            int currentRow = 0;
+            for (int fileCount = 0; fileCount < m_sessionPasswordFiles.size(); fileCount++) {
+                QFile file(m_sessionPasswordFiles[fileCount]);
+                QFile newFile(newFilePath);
+                if (file.open(QIODevice::ReadOnly | QIODevice::Text)
+                        && newFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+                    QTextStream out(&newFile);
+                    while (!file.atEnd()) {
+                        QString line = file.readLine();
+                        if (unselectedRows.isEmpty() || unselectedRows.first() == currentRow) {
+                            out << line;
+                            if(!unselectedRows.isEmpty())
+                                unselectedRows.removeFirst();
+                        }
+                        currentRow++;
+                    }
+                    parameters << newFilePath;
+                }
+            }
+            // Else, pass the file AS IS to john
+        } else {
+            parameters << m_sessionPasswordFiles;
+        }
         startJohn(parameters);
     } else {
         QMessageBox::warning(
@@ -1204,7 +1229,7 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
     if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
         QDir dir(m_sessionDataDir);
-        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec");
+        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec" << "*.pw");
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {
             dir.remove(dirFile);

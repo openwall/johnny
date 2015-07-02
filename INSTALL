@@ -5,6 +5,7 @@ There are two ways to install Johnny which depends on your platform.
 =====================
 Windows and OS X only
 =====================
+
 1. Easy-install : use our installer
 -----------------------------------
 Simply visit http://openwall.info/wiki/john/johnny to get the latest installer
@@ -15,8 +16,8 @@ John The Ripper binaries.
 Unix/Linux, Windows and OS X
 ============================
 
-2. Getting the source code and compiling on Unix/Linux, Windows and OS X
------------------------------------
+2. Getting the source code and compiling
+----------------------------------------
 
 Prerequisites:
    * Qt 4.6.2 or later (may or may not work on earlier versions too).

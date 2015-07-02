@@ -465,7 +465,7 @@ void MainWindow::startAttack()
         return;
 
     // Session for johnny
-    QString date = QDateTime::currentDateTime().toString("MM-dd-yy hh-mm-ss");
+    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
     m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
     QString sessionFile = m_sessionCurrent + ".rec";
 

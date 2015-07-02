@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Package>
     <DisplayName>Johnny</DisplayName>
-    <Description>Johnny, the cross-platform GUI, for John The Ripper the popular cracking software.</Description>
+    <Description>A GUI frontend to the John the Ripper password cracker.</Description>
     <Version>2.0.0</Version>
     <ReleaseDate>2015-06-28</ReleaseDate>
     <Name>johnny</Name>

@@ -23,8 +23,8 @@ for your platform.
 
 ---------------------------------------------------------------------------------
 
-On other platforms, it is required to build Johnny from source. The steps required
-depends on the family of your distro.
+On other platforms, it is required to build Johnny from source. The steps
+depend on the family of your distro.
 
 ============================
 FreeBSD 10.1
@@ -60,7 +60,7 @@ Red Hat based distros
 Tested on Fedora 22
 
 1) sudo yum install gcc-c++ git qt5-qtbase-devel
-2) git clone https://github.com/shinnok/johnny.git && cd johnny && cd johnny
+2) git clone https://github.com/shinnok/johnny.git && cd johnny
 3) git checkout v2.0 # switch to the desired version
 4) qmake-qt5 && make -j$(nproc)
 5) ./johnny

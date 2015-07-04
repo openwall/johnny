@@ -1,41 +1,64 @@
+=======
+General
+=======
+
 There are two ways to install Johnny which depends on your platform.
 1. Use our easy installer (Windows and OS X only)
 2. Download source and build Johnny (all platforms)
 
+As Johnny requires John The Ripper to work, the first step is to get the
+latest John The Ripper binaries for your platform. Official version or
+community-enhanced version (jumbo) are both supported. You can grab them at
+http://openwall.info/wiki/john/custom-builds .
+
+Asumming that John The Ripper is installed on your system, it is time to install
+Johnny.
+
 =====================
-Windows and OS X only
+Windows and OS X
 =====================
 
-1. Easy-install : use our installer
------------------------------------
 Simply visit http://openwall.info/wiki/john/johnny to get the latest installer
-for your platform and http://openwall.info/wiki/john/custom-builds to get the latest
-John The Ripper binaries.
+for your platform.
 
 ============================
-Unix/Linux, Windows and OS X
+FreeBSD 10.1
 ============================
 
-2. Getting the source code and compiling
-----------------------------------------
+1) pkg install git qt5-core qt5-widgets qt5-qmake qt5-buildtools
+2) git clone https://github.com/shinnok/johnny.git && cd johnny
+3) git checkout v2.0 # switch to the desired version
+4) /usr/local/lib/qt5/bin/qmake
+5) Edit the resulted Makefile and append ",-L,/usr/local/lib" to the LFLAGS line. Somehow
+the clang++ spec of qmake ommits that on FreeBSD. The complete line should look like this:
+LFLAGS        = -pthread -Wl,-rpath,/usr/local/lib,-L,/usr/local/lib
+6) make -j$(sysctl -n hw.ncpu)
+7) ./johnny
 
-Prerequisites:
-   * Qt 4.6.2 or later (may or may not work on earlier versions too).
-     We recommend the most up to date qt version available on your system.
-   * If you don't have Qt, use the easy online installer available at
-        http://www.qt.io/download-open-source/
-   * John The Ripper, official or jumbo version. We recommend the latest jumbo version
-   available at http://openwall.info/wiki/john/custom-builds to get access to all Johnny features.
+====================
+Debian based distros
+====================
 
-After installing Qt and John, open a terminal and follow these steps :
-1) git clone https://github.com/shinnok/johnny.git && cd johnny
-2) git checkout v2.0 # switch to the desired version
-3) qmake
-4) make (or mingw32-make or nmake or jom, depending on your platform)
-5) ./johnny
+These steps apply to all the Debian (included) based flavors such as Ubuntu, Mint etc.
 
-(Optional) To clean the build directory:
-make clean && make distclean
+1) sudo apt-get install g++ git qtbase5-dev
+2) git clone ttps://github.com/shinnok/johnny.git && cd johnny
+3) git checkout v2.0 # switch to the desired version
+4) export QT_SELECT=qt5
+5) qmake && make -j$(nproc)
+6) ./johnny
 
-If you prefer using an IDE, you can also open the project (johnny.pro)
-in Qt Creator and it'll automate most of these steps.
+=====================
+Red Hat based distros
+=====================
+
+Tested on Fedora 22
+
+1) sudo yum install gcc-c++ git qt5-qtbase-devel
+2) git clone https://github.com/Tarsnap/tarsnap-gui.git && cd tarsnap-gui
+3) git checkout v0.5 # switch to the desired version
+4) qmake-qt5 && make -j$(nproc)
+5) ./tarsnap-gui
+
+On any platform, if you prefer using an IDE, you can download Qt Creator at http://www.qt.io/download-open-source/
+and open the project (johnny.pro) it'll automate most of these steps.

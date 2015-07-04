@@ -7,12 +7,12 @@ There are two ways to install Johnny which depends on your platform.
 2. Download source and build Johnny (all platforms)
 
 As Johnny requires John The Ripper to work, the first step is to get the
-latest John The Ripper binaries for your platform. Official version or
-community-enhanced version (jumbo) are both supported. You can grab them at
+latest John The Ripper binary for your platform. Official version or
+community-enhanced version (jumbo) are both supported. You can grab JtR at
 http://openwall.info/wiki/john/custom-builds .
 
-Asumming that John The Ripper is installed on your system, it is time to install
-Johnny.
+Asumming that John The Ripper is installed on your system, the next step is
+to install Johnny.
 
 =====================
 Windows and OS X
@@ -20,6 +20,11 @@ Windows and OS X
 
 Simply visit http://openwall.info/wiki/john/johnny to get the latest installer
 for your platform.
+
+---------------------------------------------------------------------------------
+
+On other platforms, it is required to build Johnny from source. The steps required
+depends on the family of your distro.
 
 ============================
 FreeBSD 10.1
@@ -42,7 +47,7 @@ Debian based distros
 These steps apply to all the Debian (included) based flavors such as Ubuntu, Mint etc.
 
 1) sudo apt-get install g++ git qtbase5-dev
-2) git clone ttps://github.com/shinnok/johnny.git && cd johnny
+2) git clone https://github.com/shinnok/johnny.git && cd johnny
 3) git checkout v2.0 # switch to the desired version
 4) export QT_SELECT=qt5
 5) qmake && make -j$(nproc)
@@ -55,10 +60,10 @@ Red Hat based distros
 Tested on Fedora 22
 
 1) sudo yum install gcc-c++ git qt5-qtbase-devel
-2) git clone https://github.com/Tarsnap/tarsnap-gui.git && cd tarsnap-gui
-3) git checkout v0.5 # switch to the desired version
+2) git clone https://github.com/shinnok/johnny.git && cd johnny && cd johnny
+3) git checkout v2.0 # switch to the desired version
 4) qmake-qt5 && make -j$(nproc)
-5) ./tarsnap-gui
+5) ./johnny
 
 On any platform, if you prefer using an IDE, you can download Qt Creator at http://www.qt.io/download-open-source/
-and open the project (johnny.pro) it'll automate most of these steps.
+and open the project (johnny.pro). It'll automate most of these steps.

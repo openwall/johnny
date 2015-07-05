@@ -36,7 +36,7 @@ void JohnProcess::terminate()
         ::kill(-pid(), SIGTERM);
     }
 #elif defined Q_OS_WIN
-    Q_PID pid = pid();
+    Q_PID pid = this->pid();
     FreeConsole();
     AttachConsole(pid->dwProcessId);
     GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);

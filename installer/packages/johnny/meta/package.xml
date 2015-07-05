@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<Package>
+    <DisplayName>Johnny</DisplayName>
+    <Description>A GUI frontend to the John the Ripper password cracker.</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2015-06-28</ReleaseDate>
+    <Name>johnny</Name>
+    <Default>true</Default>
+    <Script>installscript.qs</Script>
+</Package>

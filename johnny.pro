@@ -1,5 +1,9 @@
 CONFIG   += qt
 
+## Default build is debug
+#CONFIG -= release
+#CONFIG += debug
+
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -37,10 +41,7 @@ CODECFORTR      = UTF-8
 
 RESOURCES += resources/resources.qrc
 
-DISTFILES += README \
-             INSTALL \
-             LICENSE
-
-## Default build is debug
-#CONFIG -= release
-#CONFIG += debug
+OTHER_FILES += README \
+               LICENSE \
+               INSTALL \
+               CHANGELOG

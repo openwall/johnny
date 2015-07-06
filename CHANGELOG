@@ -1,0 +1,21 @@
+Version 2.0
+===========
+Faster, leaner and better looking.
+
+Johnny got a reboot after more than 3 years of inactivity. It has been refactored
+from the ground up for better cross platform compatibility, multithreaded operation,
+upgraded looks, improved usability and extended the JtR functionality coverage.
+
+Contributions from Mathieu Laprise as a student coder for GSoC 2015 with mentoring
+from Shinnok and Aleksey.
+
+Pre 2.0:
+
+Version 1.1
+===========
+Aleksey Cherepanov picked up development part of GSoC 2012, implementing the
+basic core functionality.
+
+Version 1.0
+===========
+Original design and concept by Shinnok; as a potential project for GSoC 2011.

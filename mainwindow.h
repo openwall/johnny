@@ -26,6 +26,7 @@
 #include <QTemporaryFile>
 #include <QPlainTextEdit>
 #include <QLabel>
+#include <QSortFilterProxyModel>
 
 namespace Ui {
     class MainWindow;
@@ -95,10 +96,11 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    bool                 m_terminate;
-    Ui::MainWindow      *m_ui;
-    Menu                *m_sessionMenu;
-    QAbstractTableModel *m_hashesTable;
+    bool                   m_terminate;
+    Ui::MainWindow        *m_ui;
+    Menu                  *m_sessionMenu;
+    QAbstractTableModel   *m_hashesTable;
+    QSortFilterProxyModel *m_hashesTableProxy;
 
     QString             m_sessionDataDir;
     QString             m_sessionCurrent;

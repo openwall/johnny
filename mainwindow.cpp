@@ -39,11 +39,14 @@ MainWindow::MainWindow(QSettings &settings)
       m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
+      m_hashesTableProxy(new QSortFilterProxyModel(this)),
       m_johnShowTemp(NULL),
       m_settings(settings)
 {
     // UI initializations
     m_ui->setupUi(this);
+    m_ui->tableView_Hashes->setModel(m_hashesTableProxy);
+    m_ui->tableView_Hashes->setSortingEnabled(true);
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
@@ -287,7 +290,7 @@ void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
     // We remember new model.
     m_hashesTable = newTableModel;
     // We connect table view with new model.
-    m_ui->tableView_Hashes->setModel(newTableModel);
+    m_hashesTableProxy->setSourceModel(newTableModel);
     // Hide formats column if not jumbo
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJumbo);
 
@@ -1151,7 +1154,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
-        m_ui->tableView_Hashes->setModel(model);
+        m_hashesTableProxy->setSourceModel(model);
         QString savedFormat = m_ui->formatComboBox->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->formatComboBox->clear();

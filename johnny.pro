@@ -46,5 +46,5 @@ OTHER_FILES += README \
                INSTALL \
                CHANGELOG
 
-# To build universal binary or .dmg on OS X, uncomment next line. It should work on all architecture.
+# To build universal binary or .dmg on OS X, uncomment next line. It should work on all architectures.
 #CONFIG += x86 ppc x86_64 ppc64

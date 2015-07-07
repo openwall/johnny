@@ -1181,6 +1181,7 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         m_hashTypeChecker.start();
     }
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !isJumbo);
+    m_ui->checkBoxFormatFilter->setHidden(!isJumbo);
     if (!isJumbo) {
         // Add default format list supported by core john
         QStringList defaultFormats;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>810</width>
-    <height>638</height>
+    <width>853</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -77,6 +77,9 @@
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -89,6 +92,125 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QWidget" name="widgetFilterOptions" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="labelFilter">
+                <property name="text">
+                 <string>Filter :</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditFilter">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxUserFilter">
+                <property name="text">
+                 <string>User</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxPasswordFilter">
+                <property name="text">
+                 <string>Password</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxHashFilter">
+                <property name="text">
+                 <string>Hash</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxFormatFilter">
+                <property name="text">
+                 <string>Format</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxGecoFilter">
+                <property name="text">
+                 <string>GECO</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widgetFilterButtons" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_21">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="buttonSelectAllResults">
+                <property name="text">
+                 <string>Select all results</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonUnselectAllResults">
+                <property name="text">
+                 <string>Unselect all results</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonSelectAllHashes">
+                <property name="text">
+                 <string>Select all hashes in file</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="buttonUnselectAllHashes">
+                <property name="text">
+                 <string>Unselect all hashes in file</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
            <item>
             <widget class="QTableView" name="tableView_Hashes">
              <property name="frameShape">
@@ -131,8 +253,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
-             <height>872</height>
+             <width>670</width>
+             <height>905</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -940,8 +1062,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>787</width>
-             <height>773</height>
+             <width>616</width>
+             <height>333</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1154,8 +1276,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>810</width>
-     <height>22</height>
+     <width>853</width>
+     <height>27</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">

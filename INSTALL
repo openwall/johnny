@@ -9,7 +9,12 @@ There are two ways to install and use Johnny:
 As Johnny requires John The Ripper to do the actual work, the first step is to
 get the latest John The Ripper binary for your platform. Official core version
 or community-enhanced version (jumbo) are both supported. You can grab JtR from:
-http://www.openwall.com/john/
+http://www.openwall.com/john/.
+
+To get access to all new features and bugfixes (particularly on Windows), you should
+use JtR >= 1.8.0.6-jumbo-1. On Windows, JtR must be build with Cygwin and have the
+appropriate DLLs in its folder. As a rule of thumb, if you can't run JtR from the
+Windows command line without error, some DLLs are missing. They can be found in Cygwin/bin.
 
 Assuming that John The Ripper is installed on your system, the next step is
 to install Johnny.
@@ -67,3 +72,27 @@ On any platform, if you prefer building using an IDE or are planning to get
 involved with Johnny development, you can download the Qt Creator at
 http://www.qt.io/download-open-source/ and open the project file
 johnny.pro.
+
+=====
+OS X
+=====
+
+Assuming that you have already built and installed John The Ripper,
+you must have already configured your system for development. As a minimum requirement
+for Qt development you'll need to install install Xcode and the Xcode command line tools.
+
+Then you need to install the proper Qt 5 SDK via one of the following means:
+* Via the Qt Online Installer from https://www.qt.io/download-open-source/
+* Via Homebrew from http://brew.sh (use command "brew install qt5")
+
+Assuming you survived up until now, let's proceed to the actual steps for
+building the app for your system:
+
+1) git clone https://github.com/shinnok/johnny.git && cd johnny
+2) git checkout v2.0 # switch to the desired version
+3) qmake # /usr/local/opt/qt5/bin/qmake for Homebrew
+4) make -j$(sysctl -n hw.ncpu)
+5) open ./johnny.app
+
+Optionally, if you want to install the app on your system:
+6) cp -r ./johnny.app /Applications/

@@ -274,7 +274,7 @@ void MainWindow::tabsSelectionChanged(QAction* action)
     m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 
-void MainWindow::replaceTableModel(QAbstractTableModel *newTableModel)
+void MainWindow::replaceTableModel(FileTableModel *newTableModel)
 {
     // Remove temporary file is exist
     if (m_johnShowTemp != NULL) {
@@ -468,8 +468,8 @@ void MainWindow::startAttack()
         return;
 
     // Session for johnny
-    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
-    m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
+    QString sessionName = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
+    m_sessionCurrent = QDir(m_sessionDataDir).filePath(sessionName);
     QString sessionFile = m_sessionCurrent + ".rec";
 
     if (QFileInfo(sessionFile).isReadable())
@@ -495,8 +495,33 @@ void MainWindow::startAttack()
 
     // We check that we have file name.
     if (!m_sessionPasswordFiles.isEmpty()) {
-        // If file name is not empty then we have file, pass it to John.
-        parameters << m_sessionPasswordFiles;
+        QList<QVariant> unselectedRows = m_settings.value("Sessions/" + sessionName + "/unselectedRows").toList();
+        // If some hashes are unselected, write a new file with only selected hashes
+        if (unselectedRows.size() > 0) {
+            QString newFilePath = m_sessionCurrent + ".pw";
+            int currentRow = 0;
+            for (int fileCount = 0; fileCount < m_sessionPasswordFiles.size(); fileCount++) {
+                QFile file(m_sessionPasswordFiles[fileCount]);
+                QFile newFile(newFilePath);
+                if (file.open(QIODevice::ReadOnly | QIODevice::Text)
+                        && newFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+                    QTextStream out(&newFile);
+                    while (!file.atEnd()) {
+                        QString line = file.readLine();
+                        if (unselectedRows.isEmpty() || unselectedRows.first() == currentRow) {
+                            out << line;
+                            if(!unselectedRows.isEmpty())
+                                unselectedRows.removeFirst();
+                        }
+                        currentRow++;
+                    }
+                    parameters << newFilePath;
+                }
+            }
+            // Else, pass the file AS IS to john
+        } else {
+            parameters << m_sessionPasswordFiles;
+        }
         startJohn(parameters);
     } else {
         QMessageBox::warning(
@@ -641,6 +666,14 @@ QStringList MainWindow::saveAttackParameters()
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
         m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
     }
+    // Save unselected rows
+    QList<QVariant> unselectedRows;
+    for (int i = 0; i < m_hashesTable->rowCount(); i++) {
+        if (m_hashesTable->data(m_hashesTable->index(i,0),Qt::CheckStateRole) == Qt::Unchecked) {
+            unselectedRows.append(i);
+        }
+    }
+    m_settings.setValue("unselectedRows", unselectedRows);
     m_settings.endGroup();
 
     return parameters;
@@ -1149,7 +1182,7 @@ void MainWindow::appendLog(const QString& text)
 void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                                  const QStringList &detailedTypesPerRow)
 {
-    FileTableModel* model = dynamic_cast<FileTableModel*>(m_hashesTable);
+    FileTableModel* model = m_hashesTable;
     if ((model != NULL) && (pathToPwdFile == m_sessionPasswordFiles)) {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
@@ -1211,7 +1244,7 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
     if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
         QDir dir(m_sessionDataDir);
-        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec");
+        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec" << "*.pw");
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {
             dir.remove(dirFile);
@@ -1350,6 +1383,11 @@ void MainWindow::restoreSessionOptions()
     if (m_settings.contains("environmentVariables")) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
         m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
+    }
+    // Unselected hashes
+    QList<QVariant> unselectedRows = m_settings.value("unselectedRows").toList();
+    for (int i = 0; i < unselectedRows.count(); i++) {
+        m_hashesTable->setData(m_hashesTable->index(unselectedRows[i].toInt(),0),Qt::Unchecked,Qt::CheckStateRole);
     }
     m_settings.endGroup();
 }

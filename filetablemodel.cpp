@@ -26,7 +26,6 @@ FileTableModel::FileTableModel(QObject *parent)
 bool FileTableModel::readFiles(const QStringList &fileNames)
 {
     m_data.clear();
-
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -72,6 +71,7 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
             for (; column < columnCount(); column++)
                 data[column].append("");
         }
+        file.close();
     }
     // We convert our lists into vectors to store data.
     for (int column = 0; column < columnCount(); column++) {
@@ -80,6 +80,7 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
         }
         m_data << data.at(column).toVector();
     }
+    m_checkedStates.fill(Qt::Checked, rowCount());
     return true;
 }
 
@@ -106,10 +107,23 @@ QVariant FileTableModel::data(const QModelIndex &index,
                               int role) const
 {
     // We validate arguments.
-    if (!index.isValid() || role != Qt::DisplayRole ||
-            index.column() >= columnCount() || index.row() >= rowCount())
+    if (!index.isValid() || index.column() >= columnCount() || index.row() >= rowCount())
         return QVariant();
-    return m_data.at(index.column()).at(index.row());
+    switch (role) {
+    case Qt::DisplayRole:
+        return m_data.at(index.column()).at(index.row());
+        break;
+    case Qt::CheckStateRole:
+        if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
+            return m_checkedStates[index.row()];
+        }
+        else {
+            return QVariant();
+        }
+        break;
+    default:
+        return QVariant();
+    }
 }
 
 bool FileTableModel::setData(const QModelIndex &index,
@@ -117,11 +131,24 @@ bool FileTableModel::setData(const QModelIndex &index,
                              int role)
 {
     // We validate arguments.
-    if (!index.isValid() || role != Qt::EditRole ||
-            index.column() >= columnCount() || index.row() >= rowCount())
+    if (!index.isValid() || index.column() >= columnCount() || index.row() >= rowCount())
         return false;
-    // We replace data in our table.
-    m_data[index.column()].replace(index.row(), value.toString());
+    switch (role) {
+    case Qt::EditRole:
+        // We replace data in our table.
+        m_data[index.column()].replace(index.row(), value.toString());
+        break;
+    case Qt::CheckStateRole:
+        if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
+            m_checkedStates[index.row()] = value.toInt() ? Qt::Checked : Qt::Unchecked;
+        }
+        else {
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
     // We notice all that we changed our state.
     emit dataChanged(index, index);
     return true;
@@ -142,4 +169,11 @@ QVariant FileTableModel::headerData(int section,
         return m_columns[section];
 
     return QVariant();
+}
+
+Qt::ItemFlags FileTableModel::flags(const QModelIndex & index) const
+{
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    flags |= Qt::ItemIsUserCheckable;
+    return flags;
 }

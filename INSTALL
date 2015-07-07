@@ -1,0 +1,69 @@
+========
+Overview
+========
+
+There are two ways to install and use Johnny:
+1. Use a prebuilt redistributable packge (Windows and OS X only for now)
+2. Download source and build yourself (all platforms)
+
+As Johnny requires John The Ripper to do the actual work, the first step is to
+get the latest John The Ripper binary for your platform. Official core version
+or community-enhanced version (jumbo) are both supported. You can grab JtR from:
+http://www.openwall.com/john/
+
+Assuming that John The Ripper is installed on your system, the next step is
+to install Johnny.
+
+================
+Windows and OS X
+================
+
+Simply visit http://openwall.info/wiki/john/johnny to get the latest installer
+for the latest versions of the respective platforms.
+
+If you want to use Johnny on Linux/BSD flavors or obsolete versions of OS X and
+Windows, you can build Johnny from source or look for it in your distribution's
+official repos.
+
+============
+FreeBSD 10.1
+============
+
+1) pkg install git qt5-core qt5-widgets qt5-qmake qt5-buildtools
+2) git clone https://github.com/shinnok/johnny.git && cd johnny
+3) git checkout v2.0 # switch to the desired version
+4) /usr/local/lib/qt5/bin/qmake
+5) Edit the resulted Makefile and append ",-L,/usr/local/lib" to the LFLAGS line. Somehow
+the clang++ spec of qmake ommits that on FreeBSD. The complete line should look like this:
+LFLAGS        = -pthread -Wl,-rpath,/usr/local/lib,-L,/usr/local/lib
+6) make -j$(sysctl -n hw.ncpu)
+7) ./johnny
+
+====================
+Debian based distros
+====================
+
+These steps apply to all the Debian (included) based flavors such as Ubuntu,
+Mint etc.
+
+1) sudo apt-get install g++ git qtbase5-dev
+2) git clone https://github.com/shinnok/johnny.git && cd johnny
+3) git checkout v2.0 # switch to the desired version
+4) export QT_SELECT=qt5
+5) qmake && make -j$(nproc)
+6) ./johnny
+
+=====================
+Red Hat based distros
+=====================
+
+1) sudo yum install gcc-c++ git qt5-qtbase-devel
+2) git clone https://github.com/shinnok/johnny.git && cd johnny
+3) git checkout v2.0 # switch to the desired version
+4) qmake-qt5 && make -j$(nproc)
+5) ./johnny
+
+On any platform, if you prefer building using an IDE or are planning to get
+involved with Johnny development, you can download the Qt Creator at
+http://www.qt.io/download-open-source/ and open the project file
+johnny.pro.

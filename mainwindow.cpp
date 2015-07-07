@@ -32,7 +32,7 @@
 #define TAB_STATISTICS  2
 #define TAB_SETTINGS    3
 #define TAB_CONSOLE_LOG 4
-#define CONSOLE_LOG_SEPARATOR "-------------------------------------"
+#define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
     : QMainWindow(0),
@@ -141,7 +141,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // We create the app sessions data directory in $HOME if it does not exist
-    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john") + QDir::separator() + "sessions" + QDir::separator());
+    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
     if (!QDir::home().mkpath(m_sessionDataDir)) {
         QMessageBox::critical(this, tr("Johnny"),
             tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
@@ -465,7 +465,7 @@ void MainWindow::startAttack()
         return;
 
     // Session for johnny
-    QString sessionName = QDateTime::currentDateTime().toString("MM-dd-yy-hh:mm:ss");
+    QString sessionName = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
     m_sessionCurrent = QDir(m_sessionDataDir).filePath(sessionName);
     QString sessionFile = m_sessionCurrent + ".rec";
 
@@ -682,7 +682,7 @@ void MainWindow::startJohn(QStringList args)
     // signals are already connected with our slots. So we need only
     // start it.
 
-    appendLog(QTime::currentTime().toString("[hh:mm:ss] ") + m_pathToJohn + " " + args.join(" "));
+    appendLog(QTime::currentTime().toString("[hh:mm:ss] ") + m_pathToJohn + " " + args.join(" ") + '\n');
 
     //We set up environment variables, ex : useful for openMP
     QProcessEnvironment env;
@@ -1157,9 +1157,20 @@ void MainWindow::updateStatistics()
     }
 }
 
+/*
+ * Since QPlainTextEdit::appendPlainText() add newLines without asking us and
+ * QPlainTextEdit::insertPlainText() insert text by default at the cursor pos,
+ * which can be modified by the user, this function assures the text is
+ * inserted at the end without new line by default.
+*/
+
 void MainWindow::appendLog(const QString& text)
 {
-    m_ui->consoleLogTextEdit->appendPlainText(text);
+    // Preserving cursor preserves selection by user
+    QTextCursor prev_cursor = m_ui->consoleLogTextEdit->textCursor();
+    m_ui->consoleLogTextEdit->moveCursor(QTextCursor::End);
+    m_ui->consoleLogTextEdit->insertPlainText(text);
+    m_ui->consoleLogTextEdit->setTextCursor(prev_cursor);
 }
 
 /* This slot is triggered when the types changed. This is probably because :

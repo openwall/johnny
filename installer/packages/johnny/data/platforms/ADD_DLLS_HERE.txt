@@ -1,0 +1,4 @@
+To make a new installer :
+- Add Qt platform plugins here.
+For example, on Windows and Qt 5.4.1, it is :
+qwindows.dll

@@ -1,5 +1,9 @@
 CONFIG   += qt
 
+## Default build is debug
+#CONFIG -= release
+#CONFIG += debug
+
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,7 +21,7 @@ SOURCES +=  main.cpp\
             johnhandler.cpp \
             johnattack.cpp \
             menu.cpp \
-    tabwidget.cpp
+            tabwidget.cpp
 
 HEADERS  += mainwindow.h \
             filetablemodel.h \
@@ -28,7 +32,7 @@ HEADERS  += mainwindow.h \
             johnhandler.h \
             johnattack.h \
             menu.h \
-    tabwidget.h
+            tabwidget.h
 
 FORMS    += mainwindow.ui
 
@@ -38,9 +42,6 @@ CODECFORTR      = UTF-8
 RESOURCES += resources/resources.qrc
 
 OTHER_FILES += README \
-               LICENSE
-
-
-## Default build is debug
-#CONFIG -= release
-#CONFIG += debug
+               LICENSE \
+               INSTALL \
+               CHANGELOG

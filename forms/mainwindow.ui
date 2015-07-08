@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>810</width>
-    <height>638</height>
+    <width>853</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    <string>Johnny</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources/resources.qrc">
+   <iconset resource="../resources/resources.qrc">
     <normaloff>:/icons/johnny.png</normaloff>:/icons/johnny.png</iconset>
   </property>
   <property name="dockNestingEnabled">
@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -131,8 +131,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>734</width>
-             <height>872</height>
+             <width>743</width>
+             <height>865</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -940,8 +940,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>787</width>
-             <height>773</height>
+             <width>616</width>
+             <height>333</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1154,8 +1154,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>810</width>
-     <height>22</height>
+     <width>853</width>
+     <height>27</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -1343,7 +1343,7 @@
   </action>
   <action name="actionClearSessionHistory">
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -1361,7 +1361,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_log.png</normaloff>:/icons/tab_log.png</iconset>
    </property>
    <property name="text">
@@ -1388,7 +1388,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_passwords.png</normaloff>:/icons/tab_passwords.png</iconset>
    </property>
    <property name="text">
@@ -1406,7 +1406,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_options.png</normaloff>:/icons/tab_options.png</iconset>
    </property>
    <property name="text">
@@ -1424,7 +1424,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_statistics.png</normaloff>:/icons/tab_statistics.png</iconset>
    </property>
    <property name="text">
@@ -1442,7 +1442,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_settings.png</normaloff>:/icons/tab_settings.png</iconset>
    </property>
    <property name="text">
@@ -1460,7 +1460,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_output.png</normaloff>:/icons/tab_output.png</iconset>
    </property>
    <property name="text">
@@ -1489,7 +1489,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

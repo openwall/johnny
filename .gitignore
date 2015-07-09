@@ -1,2 +1,11 @@
-*.pro.user
+*.user
 .DS_Store
+# object files
+*.o
+# auto-generated Qt files
+Makefile
+ui_*.h
+moc_*.cpp
+qrc_resources.cpp
+# compiled executable
+johnny

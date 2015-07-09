@@ -6,7 +6,6 @@
 #define FILETABLEMODEL_H
 
 #include "hashtypechecker.h"
-
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QVector>
@@ -32,11 +31,13 @@ public:
 
     bool readFiles(const QStringList &fileNames);
     void fillHashTypes(const QStringList &listHashTypes);
+    Qt::ItemFlags flags(const QModelIndex & index) const;
 
     enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
 
 private:
     QVector<QVector<QString> > m_data;
+    QVector<Qt::CheckState> m_checkedStates;
 
     QVector<QString> m_columns;
 };

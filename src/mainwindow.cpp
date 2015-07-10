@@ -47,6 +47,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->setupUi(this);
     m_ui->tableView_Hashes->setModel(m_hashesTableProxy);
     m_ui->tableView_Hashes->setSortingEnabled(true);
+    m_hashesTableProxy->setDynamicSortFilter(false);
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
@@ -77,6 +78,8 @@ MainWindow::MainWindow(QSettings &settings)
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
+    m_ui->actionSelectAllHashes->setEnabled(false);
+    m_ui->actionDeselectAllHashes->setEnabled(false);
 
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
@@ -142,6 +145,17 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
+
+    // Tableview and filtering-related signals
+    m_ui->tableView_Hashes->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_hashesTableContextMenu = new QMenu(this);
+    m_hashesTableContextMenu->addActions(QList<QAction*>() << m_ui->actionCopyToClipboard << m_ui->actionSelectAllHashes
+                                         << m_ui->actionDeselectAllHashes);
+    connect(m_ui->tableView_Hashes, SIGNAL(customContextMenuRequested(const QPoint&)),
+        this, SLOT(showHashesTableContextMenu(const QPoint&)));
+    connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
+    connect(m_ui->actionSelectAllHashes, SIGNAL(triggered()), this, SLOT(selectAllHashes()));
+    connect(m_ui->actionDeselectAllHashes, SIGNAL(triggered()), this, SLOT(deselectAllHashes()));
 
     // We create the app sessions data directory in $HOME if it does not exist
     m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
@@ -339,6 +353,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
+        m_ui->actionSelectAllHashes->setEnabled(true);
+        m_ui->actionDeselectAllHashes->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
             m_hashTypeChecker.setPasswordFiles(fileNames);
@@ -1411,4 +1427,33 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
     m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
+}
+
+void MainWindow::showHashesTableContextMenu(const QPoint& pos)
+{
+    QPoint globalPos = m_ui->tableView_Hashes->viewport()->mapToGlobal(pos);
+    QAction* selectedItem = m_hashesTableContextMenu->exec(globalPos);
+}
+
+void MainWindow::filterHashesTable()
+{
+    // Implement fun things here ...
+}
+
+/* Hashes that are hidden in the tableview won't be affected by
+ * this function.
+ */
+
+void MainWindow::selectAllHashes()
+{
+    for (int i = 0; i < m_hashesTableProxy->rowCount(); i++) {
+        m_hashesTableProxy->setData(m_hashesTableProxy->index(i, 0), Qt::Checked, Qt::CheckStateRole);
+    }
+}
+
+void MainWindow::deselectAllHashes()
+{
+    for (int i = 0; i < m_hashesTableProxy->rowCount(); i++) {
+        m_hashesTableProxy->setData(m_hashesTableProxy->index(i, 0), Qt::Unchecked, Qt::CheckStateRole);
+    }
 }

@@ -59,6 +59,10 @@ private slots:
     void settingsChangedByUser();
     void restoreSessionOptions();
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
+    void filterHashesTable();
+    void showHashesTableContextMenu(const QPoint& pos);
+    void selectAllHashes();
+    void deselectAllHashes();
 
     // JtR backend
     void updateJohnOutput();
@@ -100,6 +104,7 @@ private:
     bool                   m_terminate;
     Ui::MainWindow        *m_ui;
     Menu                  *m_sessionMenu;
+    QMenu                 *m_hashesTableContextMenu;
     FileTableModel        *m_hashesTable;
     QSortFilterProxyModel *m_hashesTableProxy;
 

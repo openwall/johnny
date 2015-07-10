@@ -1282,7 +1282,7 @@
     <addaction name="actionPauseAttack"/>
     <addaction name="actionGuessPassword"/>
     <addaction name="actionSelectAllHashes"/>
-    <addaction name="actionUnselectAllHashes"/>
+    <addaction name="actionDeselectAllHashes"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1584,10 +1584,16 @@
    <property name="text">
     <string>Select all hashes</string>
    </property>
+   <property name="toolTip">
+    <string>Select all hashes</string>
+   </property>
   </action>
-  <action name="actionUnselectAllHashes">
+  <action name="actionDeselectAllHashes">
    <property name="text">
-    <string>Unselect all hashes</string>
+    <string>Deselect all hashes</string>
+   </property>
+   <property name="toolTip">
+    <string>Deselect all hashes</string>
    </property>
   </action>
  </widget>

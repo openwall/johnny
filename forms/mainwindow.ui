@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
+    <width>858</width>
     <height>655</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
    <string>Johnny</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources/resources.qrc">
+   <iconset resource="../resources/resources.qrc">
     <normaloff>:/icons/johnny.png</normaloff>:/icons/johnny.png</iconset>
   </property>
   <property name="dockNestingEnabled">
@@ -78,7 +78,7 @@
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
-            <number>0</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -129,12 +129,18 @@
                 <property name="text">
                  <string>User</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBoxPasswordFilter">
                 <property name="text">
                  <string>Password</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -143,12 +149,18 @@
                 <property name="text">
                  <string>Hash</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBoxFormatFilter">
                 <property name="text">
                  <string>Format</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -157,54 +169,22 @@
                 <property name="text">
                  <string>GECO</string>
                 </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widgetFilterButtons" native="true">
-             <layout class="QHBoxLayout" name="horizontalLayout_21">
-              <property name="spacing">
-               <number>6</number>
-              </property>
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QPushButton" name="buttonSelectAllResults">
-                <property name="text">
-                 <string>Select all results</string>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="buttonUnselectAllResults">
-                <property name="text">
-                 <string>Unselect all results</string>
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="buttonSelectAllHashes">
+               <widget class="QCheckBox" name="checkBox">
                 <property name="text">
-                 <string>Select all hashes in file</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="buttonUnselectAllHashes">
-                <property name="text">
-                 <string>Unselect all hashes in file</string>
+                 <string>Show only selected</string>
                 </property>
                </widget>
               </item>
@@ -213,6 +193,9 @@
            </item>
            <item>
             <widget class="QTableView" name="tableView_Hashes">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -1276,7 +1259,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
+     <width>858</width>
      <height>27</height>
     </rect>
    </property>
@@ -1298,6 +1281,8 @@
     <addaction name="actionResumeAttack"/>
     <addaction name="actionPauseAttack"/>
     <addaction name="actionGuessPassword"/>
+    <addaction name="actionSelectAllHashes"/>
+    <addaction name="actionUnselectAllHashes"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1465,7 +1450,7 @@
   </action>
   <action name="actionClearSessionHistory">
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/trash.png</normaloff>:/icons/trash.png</iconset>
    </property>
    <property name="text">
@@ -1483,7 +1468,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_log.png</normaloff>:/icons/tab_log.png</iconset>
    </property>
    <property name="text">
@@ -1510,7 +1495,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_passwords.png</normaloff>:/icons/tab_passwords.png</iconset>
    </property>
    <property name="text">
@@ -1528,7 +1513,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_options.png</normaloff>:/icons/tab_options.png</iconset>
    </property>
    <property name="text">
@@ -1546,7 +1531,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_statistics.png</normaloff>:/icons/tab_statistics.png</iconset>
    </property>
    <property name="text">
@@ -1564,7 +1549,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_settings.png</normaloff>:/icons/tab_settings.png</iconset>
    </property>
    <property name="text">
@@ -1582,7 +1567,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="resources/resources.qrc">
+    <iconset resource="../resources/resources.qrc">
      <normaloff>:/icons/tab_output.png</normaloff>:/icons/tab_output.png</iconset>
    </property>
    <property name="text">
@@ -1593,6 +1578,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="actionSelectAllHashes">
+   <property name="text">
+    <string>Select all hashes</string>
+   </property>
+  </action>
+  <action name="actionUnselectAllHashes">
+   <property name="text">
+    <string>Unselect all hashes</string>
    </property>
   </action>
  </widget>
@@ -1611,7 +1606,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

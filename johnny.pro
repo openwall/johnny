@@ -11,30 +11,32 @@ TARGET = johnny
 
 TEMPLATE = app
 
-SOURCES +=  main.cpp\
-            mainwindow.cpp \
-            filetablemodel.cpp \
-            translator.cpp \
-            johnprocess.cpp \
-            hashtypechecker.cpp \
-            textlabel.cpp \
-            johnhandler.cpp \
-            johnattack.cpp \
-            menu.cpp \
-            tabwidget.cpp
+SOURCES +=  src/main.cpp\
+            src/mainwindow.cpp \
+            src/filetablemodel.cpp \
+            src/translator.cpp \
+            src/johnprocess.cpp \
+            src/hashtypechecker.cpp \
+            src/textlabel.cpp \
+            src/johnhandler.cpp \
+            src/johnattack.cpp \
+            src/menu.cpp \
+            src/tabwidget.cpp
 
-HEADERS  += mainwindow.h \
-            filetablemodel.h \
-            translator.h \
-            johnprocess.h \
-            hashtypechecker.h \
-            textlabel.h \
-            johnhandler.h \
-            johnattack.h \
-            menu.h \
-            tabwidget.h
+HEADERS  += src/mainwindow.h \
+            src/filetablemodel.h \
+            src/translator.h \
+            src/johnprocess.h \
+            src/hashtypechecker.h \
+            src/textlabel.h \
+            src/johnhandler.h \
+            src/johnattack.h \
+            src/menu.h \
+            src/tabwidget.h
 
-FORMS    += mainwindow.ui
+INCLUDEPATH += src/
+
+FORMS    += forms/mainwindow.ui
 
 TRANSLATIONS    = translations/johnny_fr.ts
 CODECFORTR      = UTF-8
@@ -45,3 +47,6 @@ OTHER_FILES += README \
                LICENSE \
                INSTALL \
                CHANGELOG
+
+# To build universal binary or .dmg on OS X, uncomment next line. It should work on all architectures.
+#CONFIG += x86 ppc x86_64 ppc64

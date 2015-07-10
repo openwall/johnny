@@ -12,6 +12,7 @@
 #include "hashtypechecker.h"
 #include "menu.h"
 #include "filetablemodel.h"
+#include "hashsortfilterproxymodel.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -27,7 +28,6 @@
 #include <QTemporaryFile>
 #include <QPlainTextEdit>
 #include <QLabel>
-#include <QSortFilterProxyModel>
 
 namespace Ui {
     class MainWindow;
@@ -101,12 +101,12 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    bool                   m_terminate;
-    Ui::MainWindow        *m_ui;
-    Menu                  *m_sessionMenu;
-    QMenu                 *m_hashesTableContextMenu;
-    FileTableModel        *m_hashesTable;
-    QSortFilterProxyModel *m_hashesTableProxy;
+    bool                     m_terminate;
+    Ui::MainWindow           *m_ui;
+    Menu                     *m_sessionMenu;
+    QMenu                    *m_hashesTableContextMenu;
+    FileTableModel           *m_hashesTable;
+    HashSortFilterProxyModel *m_hashesTableProxy;
 
     QString             m_sessionDataDir;
     QString             m_sessionCurrent;

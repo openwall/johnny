@@ -39,7 +39,7 @@ MainWindow::MainWindow(QSettings &settings)
       m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
-      m_hashesTableProxy(new QSortFilterProxyModel(this)),
+      m_hashesTableProxy(new HashSortFilterProxyModel(this)),
       m_johnShowTemp(NULL),
       m_settings(settings)
 {
@@ -1432,16 +1432,17 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
 void MainWindow::showHashesTableContextMenu(const QPoint& pos)
 {
     QPoint globalPos = m_ui->tableView_Hashes->viewport()->mapToGlobal(pos);
-    QAction* selectedItem = m_hashesTableContextMenu->exec(globalPos);
+    m_hashesTableContextMenu->exec(globalPos);
 }
 
 void MainWindow::filterHashesTable()
 {
-    // Implement fun things here ...
+    QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()));
+    m_hashesTableProxy->setFilterRegExp(regExp);
 }
 
 /* Hashes that are hidden in the tableview won't be affected by
- * this function.
+ * (de)selectAllHashes functions.
  */
 
 void MainWindow::selectAllHashes()

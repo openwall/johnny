@@ -44,6 +44,8 @@ MainWindow::MainWindow(QSettings &settings)
 {
     // UI initializations
     m_ui->setupUi(this);
+    Translator &translator = Translator::getInstance();
+    m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
@@ -112,19 +114,10 @@ MainWindow::MainWindow(QSettings &settings)
     connect(&m_johnGuess, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
 
-    // Handling of buttons regarding settings
-    connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
-            this,SLOT(restoreSavedSettings()));
-    connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
-            this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->pushButton_ApplySettings, SIGNAL(clicked()),
-            this, SLOT(applySettings()));
-
     // Settings changed by user
-    connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
-    connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
-    connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(settingsChangedByUser()));
-    connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
+    connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->comboBox_PathToJohn->lineEdit(),SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
     connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
@@ -190,13 +183,6 @@ MainWindow::MainWindow(QSettings &settings)
         openLastSession();
     } else {
         restoreDefaultAttackOptions(false);
-    }
-
-    Translator &translator = Translator::getInstance();
-    m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
-    int languageIndex = m_ui->comboBox_LanguageSelection->findText(translator.getCurrentLanguage());
-    if (languageIndex != -1) {
-        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
     }
 
     #if !OS_FORK
@@ -982,10 +968,12 @@ void MainWindow::fillSettingsWithDefaults()
             break;
         }
     }
-
+    m_ui->comboBox_PathToJohn->blockSignals(true);
+    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(true);
     m_ui->comboBox_PathToJohn->setEditText(john);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
-    m_ui->checkBox_AutoApplySettings->setChecked(false);
+    m_ui->comboBox_PathToJohn->blockSignals(false);
+    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
 }
 
 void MainWindow::buttonFillSettingsWithDefaultsClicked()
@@ -1002,6 +990,7 @@ void MainWindow::buttonBrowsePathToJohnClicked()
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
         m_ui->comboBox_PathToJohn->setEditText(fileName);
+        applyAndSaveSettings();
     }
 }
 
@@ -1017,7 +1006,6 @@ void MainWindow::applySettings()
     // object with current settings.
     m_pathToJohn = newJohnPath;
     m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
-    m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
 
     // If the language changed, retranslate the UI
     Translator &translator = Translator::getInstance();
@@ -1033,14 +1021,15 @@ void MainWindow::applyAndSaveSettings()
     applySettings();
     m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
-    m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
     m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
 
 void MainWindow::restoreSavedSettings()
 {
     // We copy stored settings to the form and then invoke applySettings()
-    // TODO: Add sensible defaults to all values
+    m_ui->comboBox_PathToJohn->blockSignals(true);
+    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(true);
+    m_ui->comboBox_LanguageSelection->blockSignals(true);
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
     m_ui->comboBox_PathToJohn->setEditText(
         settingsPathToJohn == ""
@@ -1050,37 +1039,18 @@ void MainWindow::restoreSavedSettings()
         m_settings.value("TimeIntervalPickCracked").toString() == ""
         ? m_ui->spinBox_TimeIntervalPickCracked->value()
         : m_settings.value("TimeIntervalPickCracked").toInt());
-    m_ui->checkBox_AutoApplySettings->setChecked(
-        m_settings.value("AutoApplySettings").toString() == ""
-        ? m_ui->checkBox_AutoApplySettings->isChecked()
-        : m_settings.value("AutoApplySettings").toBool());
+    int languageIndex = m_ui->comboBox_LanguageSelection->findText(m_settings.value("Language").toString());
+    if (languageIndex != -1) {
+        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
+    }
+    m_ui->comboBox_PathToJohn->blockSignals(false);
+    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
+    m_ui->comboBox_LanguageSelection->blockSignals(false);
     applySettings();
+
 }
 
 // Handlers for settings auto application
-
-void MainWindow::settingsChangedByUser()
-{
-    if (m_autoApplySettings)
-        applySettings();
-}
-
-void MainWindow::checkBoxAutoApplySettingsStateChanged()
-{
-    // First goal is to disable 'apply' button and to apply settings
-    // when auto application is turned on.
-    bool autoApply = m_ui->checkBox_AutoApplySettings->isChecked();
-    m_ui->pushButton_ApplySettings->setEnabled(!autoApply);
-    if (autoApply)
-        applySettings();
-    // Second goal is auto application for auto application setting itself.
-    // NOTE: Deactivation of auto application will be auto applied.
-    // NOTE: Auto application is a setting too. At least it would be
-    //       good to remember its state between program runs.
-    if (m_autoApplySettings)
-        applySettings();
-}
-
 
 // Statistics page code
 

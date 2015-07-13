@@ -52,9 +52,7 @@ private slots:
     void buttonWordlistFileBrowseClicked();
     void buttonFillSettingsWithDefaultsClicked();
     void buttonBrowsePathToJohnClicked();
-    void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
-    void settingsChangedByUser();
     void restoreSessionOptions();
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
 

@@ -253,7 +253,7 @@
                   </sizepolicy>
                  </property>
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>1</number>
                  </property>
                  <widget class="QWidget" name="defaultModeTab">
                   <attribute name="title">
@@ -940,18 +940,11 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>616</width>
-             <height>333</height>
+             <width>756</width>
+             <height>504</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
-            <item>
-             <widget class="QPushButton" name="pushButton_ResetSettings">
-              <property name="text">
-               <string>Reset Settings back to saved state</string>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QPushButton" name="pushButton_FillSettingsWithDefaults">
               <property name="text">
@@ -1021,31 +1014,6 @@
                <widget class="QComboBox" name="comboBox_LanguageSelection"/>
               </item>
              </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_13">
-              <item>
-               <widget class="QCheckBox" name="checkBox_AutoApplySettings">
-                <property name="text">
-                 <string>Apply Settings as soon as they are changed</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_ApplySettings">
-                <property name="text">
-                 <string>Apply Settings but do NOT SAVE them</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_ApplySaveSettings">
-              <property name="text">
-               <string>Apply and Save Settings</string>
-              </property>
-             </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_2">

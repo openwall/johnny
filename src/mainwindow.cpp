@@ -916,7 +916,7 @@ void MainWindow::readJohnShow()
 //       restoreLastSavedSettings,
 //       And of course you should put elements on the form.
 //       And you must connect the signal eventChanged of the widget to the slot
-//       settingsChangedByUser() to take care of autoApply setting
+//       applyAndSaveSettings() to take care of auto-saving
 
 void MainWindow::warnAboutDefaultPathToJohn()
 {

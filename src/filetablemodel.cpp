@@ -6,6 +6,8 @@
 #include "hashtypechecker.h"
 
 #include <QFile>
+#include <QFont>
+#include <QBrush>
 
 #define FIELD_SEPARATOR ':'
 
@@ -121,6 +123,23 @@ QVariant FileTableModel::data(const QModelIndex &index,
             return QVariant();
         }
         break;
+    case Qt::FontRole:
+        if ((index.column() == 0) && (!m_data.at(PASSWORD_COL).at(index.row()).isEmpty())) {
+            QFont font;
+            font.setBold(true);
+            return font;
+        }
+        else {
+            return QVariant();
+        }
+        break;
+    case Qt::BackgroundRole:
+        if ((index.column() == PASSWORD_COL) && (!m_data.at(index.column()).at(index.row()).isEmpty())) {
+            return QVariant(QBrush(Qt::darkGray));
+        }
+        else {
+            return QVariant();
+        }
     default:
         return QVariant();
     }

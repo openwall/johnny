@@ -55,6 +55,7 @@ private slots:
     void updateStatistics();
     void restoreSessionOptions();
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
+    void checkForUpdates();
 
     // JtR backend
     void updateJohnOutput();
@@ -136,6 +137,7 @@ private:
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;
 #endif
+    QWidget         m_aboutWindow;
 };
 
 #endif // MAINWINDOW_H

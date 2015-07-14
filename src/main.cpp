@@ -28,6 +28,9 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
+    // Setting the application version which is defined in johnny.pro
+    app.setApplicationVersion(APP_VERSION);
+
     QSettings settings(QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
                 QSettings::IniFormat);
     QString settingLanguage = settings.value("Language").toString();

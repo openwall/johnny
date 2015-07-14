@@ -940,8 +940,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>756</width>
-             <height>504</height>
+             <width>446</width>
+             <height>220</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1151,9 +1151,17 @@
     </property>
     <addaction name="actionCopyToClipboard"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="actionCheckForUpdates"/>
+    <addaction name="actionAboutJohnny"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAttack"/>
    <addaction name="menuPasswords"/>
+   <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="tabSelectionToolBar">
    <property name="sizePolicy">
@@ -1439,6 +1447,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="actionAboutJohnny">
+   <property name="text">
+    <string>About Johnny</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates">
+   <property name="text">
+    <string>Check for updates</string>
    </property>
   </action>
  </widget>

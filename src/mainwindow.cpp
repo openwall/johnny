@@ -8,6 +8,7 @@
 #include "ui_mainwindow.h"
 #include "translator.h"
 #include "filetablemodel.h"
+#include "ui_aboutwidget.h"
 
 #include <QToolButton>
 #include <QStringListModel>
@@ -22,6 +23,7 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QtDebug>
+#include <QDesktopWidget>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QStandardPaths>
 #endif
@@ -40,7 +42,8 @@ MainWindow::MainWindow(QSettings &settings)
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
       m_johnShowTemp(NULL),
-      m_settings(settings)
+      m_settings(settings),
+      m_aboutWindow(this)
 {
     // UI initializations
     m_ui->setupUi(this);
@@ -189,7 +192,12 @@ MainWindow::MainWindow(QSettings &settings)
     //As of now, fork is only supported on unix platforms
         m_ui->widgetFork->hide();
     #endif
-
+    m_aboutWindow.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint | Qt::WindowCloseButtonHint);
+    Ui::aboutWidget aboutUi;
+    aboutUi.setupUi(&m_aboutWindow);
+    aboutUi.versionLabel->setText(tr("version ") + QCoreApplication::applicationVersion());
+    connect(m_ui->actionAboutJohnny, SIGNAL(triggered()), &m_aboutWindow, SLOT(show()));
+    connect(aboutUi.checkUpdateButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -1339,4 +1347,9 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
     m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
+}
+
+void MainWindow::checkForUpdates()
+{
+    QDesktopServices::openUrl(QUrl("http://openwall.info/wiki/john/johnny"));
 }

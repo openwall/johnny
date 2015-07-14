@@ -134,8 +134,14 @@ QVariant FileTableModel::data(const QModelIndex &index,
         }
         break;
     case Qt::BackgroundRole:
+        // Show differently cracked passwords
         if ((index.column() == PASSWORD_COL) && (!m_data.at(index.column()).at(index.row()).isEmpty())) {
-            return QVariant(QBrush(Qt::darkGray));
+            if (m_rowsWithEmptyPasswords.contains(index.row())) {
+                // Show user that empty password("") is a special case
+                return QVariant(QBrush(Qt::darkGray));
+            } else {
+                return QVariant(QBrush(Qt::darkGreen));
+            }
         }
         else {
             return QVariant();
@@ -152,10 +158,15 @@ bool FileTableModel::setData(const QModelIndex &index,
     // We validate arguments.
     if (!index.isValid() || index.column() >= columnCount() || index.row() >= rowCount())
         return false;
+    QString strValue = value.toString();
     switch (role) {
     case Qt::EditRole:
         // We replace data in our table.
-        m_data[index.column()].replace(index.row(), value.toString());
+        if ((index.column() == PASSWORD_COL) && (strValue.isEmpty())) {
+            strValue = "EMPTY";
+            m_rowsWithEmptyPasswords.append(index.row());
+        }
+        m_data[index.column()].replace(index.row(), strValue);
         break;
     case Qt::CheckStateRole:
         if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {

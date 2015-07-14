@@ -925,7 +925,7 @@ void MainWindow::readJohnShow()
         // If we found user then we put password in table.
         foreach (int row, m_showTableMap.values(hash)) {
             m_hashesTable->setData(
-                m_hashesTable->index(row, 1),
+                m_hashesTable->index(row, FileTableModel::PASSWORD_COL),
                 password);
         }
         // We remove value to speed up.

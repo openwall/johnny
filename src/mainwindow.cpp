@@ -49,6 +49,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->setupUi(this);
     Translator &translator = Translator::getInstance();
     m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
+    m_ui->widgetFork->setVisible(false);
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
@@ -188,10 +189,6 @@ MainWindow::MainWindow(QSettings &settings)
         restoreDefaultAttackOptions(false);
     }
 
-    #if !OS_FORK
-    //As of now, fork is only supported on unix platforms
-        m_ui->widgetFork->hide();
-    #endif
     m_aboutWindow.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint | Qt::WindowCloseButtonHint);
     Ui::aboutWidget aboutUi;
     aboutUi.setupUi(&m_aboutWindow);
@@ -1179,6 +1176,8 @@ void MainWindow::verifyJohnVersion()
     QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
+    bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
+    m_ui->widgetFork->setVisible(isForkEnabled);
 }
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)

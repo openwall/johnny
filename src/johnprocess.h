@@ -4,13 +4,7 @@
 #include <QtGlobal> // to define Q_OS_
 #include <QProcess>
 
-#if defined Q_OS_UNIX
-#define OS_FORK 1
-#else
-#define OS_FORK 0
-#endif
-
-#if OS_FORK
+#ifdef Q_OS_UNIX
 #include <unistd.h>
 #include <sys/types.h>
 #include <signal.h>

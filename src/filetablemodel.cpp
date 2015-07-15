@@ -190,8 +190,12 @@ bool FileTableModel::setData(const QModelIndex &index,
     case Qt::CheckStateRole:
         if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
             m_checkedStates[index.row()] = value.toInt() ? Qt::Checked : Qt::Unchecked;
-            emit dataChanged(createIndex(index.row(), columnCount()), index);
-            return true;
+            QVector<int> role;
+            role.push_back(Qt::BackgroundColorRole);
+            for (int i=1; i < columnCount(); i++) {
+                QModelIndex index2 = this->index(index.row(), i);
+                emit dataChanged(index2,index2, role);
+            }
         }
         else {
             return false;

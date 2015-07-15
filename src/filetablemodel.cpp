@@ -118,34 +118,52 @@ QVariant FileTableModel::data(const QModelIndex &index,
     case Qt::CheckStateRole:
         if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
             return m_checkedStates[index.row()];
-        }
-        else {
+        } else {
             return QVariant();
         }
         break;
+
     case Qt::FontRole:
         if ((index.column() == 0) && (!m_data.at(PASSWORD_COL).at(index.row()).isEmpty())) {
             QFont font;
             font.setBold(true);
             return font;
-        }
-        else {
+        } else if ((index.column() == PASSWORD_COL) && (m_rowsWithEmptyPasswords.contains(index.row()))) {
+            //Special case empty password ("")
+            QFont font;
+            font.setItalic(true);
+            return font;
+        } else {
             return QVariant();
         }
         break;
+
     case Qt::BackgroundRole:
         // Show differently cracked passwords
-        if ((index.column() == PASSWORD_COL) && (!m_data.at(index.column()).at(index.row()).isEmpty())) {
-            if (m_rowsWithEmptyPasswords.contains(index.row())) {
-                // Show user that empty password("") is a special case
-                return QVariant(QBrush(Qt::darkGray));
-            } else {
-                return QVariant(QBrush(Qt::darkGreen));
-            }
-        }
-        else {
+        if (!m_data.at(PASSWORD_COL).at(index.row()).isEmpty()) {
+                return QVariant(QColor("#EEEEEE")); // a kind of light-gray
+        } else {
             return QVariant();
         }
+        break;
+
+    case Qt::ForegroundRole:
+        // Special case empty password ("")
+        if ((index.column() == PASSWORD_COL) && (m_rowsWithEmptyPasswords.contains(index.row()))) {
+            return QVariant(QBrush(Qt::darkGray));
+        } else {
+            return QVariant();
+        }
+        break;
+
+    case Qt::TextAlignmentRole:
+        // Special case empty password ("")
+        if ((index.column() == PASSWORD_COL) && (m_rowsWithEmptyPasswords.contains(index.row()))) {
+            return Qt::AlignCenter;
+        } else {
+            return QVariant();
+        }
+
     default:
         return QVariant();
     }
@@ -163,11 +181,12 @@ bool FileTableModel::setData(const QModelIndex &index,
     case Qt::EditRole:
         // We replace data in our table.
         if ((index.column() == PASSWORD_COL) && (strValue.isEmpty())) {
-            strValue = "EMPTY";
+            strValue = "EMPTY PASS";
             m_rowsWithEmptyPasswords.append(index.row());
         }
         m_data[index.column()].replace(index.row(), strValue);
         break;
+
     case Qt::CheckStateRole:
         if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
             m_checkedStates[index.row()] = value.toInt() ? Qt::Checked : Qt::Unchecked;
@@ -176,6 +195,7 @@ bool FileTableModel::setData(const QModelIndex &index,
             return false;
         }
         break;
+
     default:
         return false;
     }

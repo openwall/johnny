@@ -140,7 +140,7 @@ QVariant FileTableModel::data(const QModelIndex &index,
 
     case Qt::BackgroundRole:
         // Show differently cracked passwords
-        if (!m_data.at(PASSWORD_COL).at(index.row()).isEmpty()) {
+        if (index.row() < m_checkedStates.count() && m_checkedStates.at(index.row()) == Qt::Checked) {
                 return QVariant(QColor("#EEEEEE")); // a kind of light-gray
         } else {
             return QVariant();
@@ -190,6 +190,8 @@ bool FileTableModel::setData(const QModelIndex &index,
     case Qt::CheckStateRole:
         if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
             m_checkedStates[index.row()] = value.toInt() ? Qt::Checked : Qt::Unchecked;
+            emit dataChanged(createIndex(index.row(), columnCount()), index);
+            return true;
         }
         else {
             return false;

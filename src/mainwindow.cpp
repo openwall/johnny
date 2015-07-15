@@ -1437,7 +1437,8 @@ void MainWindow::showHashesTableContextMenu(const QPoint& pos)
 
 void MainWindow::filterHashesTable()
 {
-    QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()));
+    QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()), Qt::CaseInsensitive);
+    m_hashesTableProxy->setFilteredColumns(QList<int>() << 0 << 1 << 2 << 3 << 4);
     m_hashesTableProxy->setFilterRegExp(regExp);
 }
 
@@ -1458,3 +1459,5 @@ void MainWindow::deselectAllHashes()
         m_hashesTableProxy->setData(m_hashesTableProxy->index(i, 0), Qt::Unchecked, Qt::CheckStateRole);
     }
 }
+
+

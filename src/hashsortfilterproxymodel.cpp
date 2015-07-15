@@ -6,16 +6,24 @@ HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
 
 }
 
+void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index)
+{
+    m_filteredColumns = index;
+}
+
 bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
-    // TODO : use the m_filteredColumns attribute instead of hardcoding column 0 1 2
     bool isAccepted = false;
-    QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
-    QModelIndex index1 = sourceModel()->index(sourceRow, 1, sourceParent);
-    QModelIndex index2 = sourceModel()->index(sourceRow, 2, sourceParent);
-
-    return (sourceModel()->data(index0).toString().contains(filterRegExp())
-            || sourceModel()->data(index1).toString().contains(filterRegExp()))
-            || sourceModel()->data(index2).toString().contains(filterRegExp());
+    QModelIndex index;
+    int currentColumn = 0;
+    if (filterRegExp().isEmpty()) {
+        return true;
+    }
+    while ((isAccepted == false) && (currentColumn < m_filteredColumns.count())) {
+        index = sourceModel()->index(sourceRow, currentColumn, sourceParent);
+        isAccepted |= sourceModel()->data(index).toString().contains(filterRegExp());
+        currentColumn++;
+    }
+    return isAccepted;
 }

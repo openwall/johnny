@@ -1,5 +1,5 @@
 #include "hashsortfilterproxymodel.h"
-#include <QApplication>
+
 HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
     :QSortFilterProxyModel(parent)
 {
@@ -12,15 +12,28 @@ void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index)
     invalidateFilter();
 }
 
+void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly)
+{
+    m_showCheckedRowsOnly = showCheckedOnly;
+    invalidateFilter();
+}
+
 bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {
     bool isAccepted = false;
     QModelIndex index;
     int currentColumn = 0;
+
+    QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
+    if (m_showCheckedRowsOnly && sourceModel()->data(index0, Qt::CheckStateRole) == Qt::Unchecked) {
+        return false;
+    }
+
     if (filterRegExp().isEmpty()) {
         return true;
     }
+
     while ((isAccepted == false) && (currentColumn < m_filteredColumns.count())) {
         index = sourceModel()->index(sourceRow, m_filteredColumns[currentColumn], sourceParent);
         isAccepted |= sourceModel()->data(index).toString().contains(filterRegExp());

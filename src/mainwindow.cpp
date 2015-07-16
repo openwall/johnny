@@ -160,6 +160,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBoxPasswordFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxFormatFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxGecoFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
+    connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashesTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
 
     // We create the app sessions data directory in $HOME if it does not exist
     m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));

@@ -63,6 +63,7 @@ private slots:
     void showHashesTableContextMenu(const QPoint& pos);
     void selectAllHashes();
     void deselectAllHashes();
+    void setFilteringColumns();
 
     // JtR backend
     void updateJohnOutput();
@@ -142,6 +143,7 @@ private:
 
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
+    bool            m_isDynamicFilteringEnabled;
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;

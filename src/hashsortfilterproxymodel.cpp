@@ -1,5 +1,5 @@
 #include "hashsortfilterproxymodel.h"
-
+#include <QApplication>
 HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
     :QSortFilterProxyModel(parent)
 {
@@ -9,6 +9,7 @@ HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
 void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index)
 {
     m_filteredColumns = index;
+    invalidateFilter();
 }
 
 bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
@@ -21,7 +22,7 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         return true;
     }
     while ((isAccepted == false) && (currentColumn < m_filteredColumns.count())) {
-        index = sourceModel()->index(sourceRow, currentColumn, sourceParent);
+        index = sourceModel()->index(sourceRow, m_filteredColumns[currentColumn], sourceParent);
         isAccepted |= sourceModel()->data(index).toString().contains(filterRegExp());
         currentColumn++;
     }

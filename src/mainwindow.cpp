@@ -156,6 +156,10 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
     connect(m_ui->actionSelectAllHashes, SIGNAL(triggered()), this, SLOT(selectAllHashes()));
     connect(m_ui->actionDeselectAllHashes, SIGNAL(triggered()), this, SLOT(deselectAllHashes()));
+    connect(m_ui->checkBoxUserFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
+    connect(m_ui->checkBoxPasswordFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
+    connect(m_ui->checkBoxFormatFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
+    connect(m_ui->checkBoxGecoFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
 
     // We create the app sessions data directory in $HOME if it does not exist
     m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
@@ -327,6 +331,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
     if (model->readFiles(fileNames)) {
         // We replace existing model with new one.
         replaceTableModel(model);
+        setFilteringColumns();
         // After new model remembered we remember its file name.
         m_sessionPasswordFiles = fileNames;
         m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));
@@ -1438,7 +1443,6 @@ void MainWindow::showHashesTableContextMenu(const QPoint& pos)
 void MainWindow::filterHashesTable()
 {
     QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()), Qt::CaseInsensitive);
-    m_hashesTableProxy->setFilteredColumns(QList<int>() << 0 << 1 << 2 << 3 << 4);
     m_hashesTableProxy->setFilterRegExp(regExp);
 }
 
@@ -1460,4 +1464,19 @@ void MainWindow::deselectAllHashes()
     }
 }
 
+void MainWindow::setFilteringColumns()
+{
+    QList<int> selectedRows;
+    if (m_ui->checkBoxUserFilter->isChecked())
+        selectedRows.append(FileTableModel::USER_COL);
+    if (m_ui->checkBoxPasswordFilter->isChecked())
+        selectedRows.append(FileTableModel::PASSWORD_COL);
+    if (m_ui->checkBoxHashFilter->isChecked())
+        selectedRows.append(FileTableModel::HASH_COL);
+    if (m_ui->checkBoxFormatFilter->isChecked())
+        selectedRows.append(FileTableModel::FORMATS_COL);
+    if (m_ui->checkBoxGecoFilter->isChecked())
+        selectedRows.append(FileTableModel::GECOS_COL);
 
+    m_hashesTableProxy->setFilteredColumns(selectedRows);
+}

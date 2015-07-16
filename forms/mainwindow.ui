@@ -182,9 +182,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="checkBoxShowOnlyCheckedHashes">
                 <property name="text">
-                 <string>Show only selected</string>
+                 <string>Show only checked</string>
                 </property>
                </widget>
               </item>
@@ -1045,8 +1045,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>616</width>
-             <height>333</height>
+             <width>761</width>
+             <height>504</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">

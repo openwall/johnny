@@ -41,3 +41,19 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
     }
     return isAccepted;
 }
+
+bool HashSortFilterProxyModel::lessThan(const QModelIndex &left,
+                                      const QModelIndex &right) const
+{
+    QString leftData = sourceModel()->data(left).toString();
+    QString rightData = sourceModel()->data(right).toString();
+    int result = leftData.compare(rightData, Qt::CaseInsensitive);
+
+    if (result == 0) {
+        return left.row() < right.row();
+    } else if (result < 0) {
+        return true;
+    } else {
+        return false;
+    }
+}

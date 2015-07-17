@@ -316,7 +316,6 @@ void MainWindow::replaceTableModel(FileTableModel *newTableModel)
 
     // We build hash table for fast access.
     m_showTableMap = QMultiMap<QString, int>();
-
     // In case a newTableModel == NULL parameter is passed
     if(m_hashesTable != NULL){
         for (int i = 0; i < m_hashesTable->rowCount(); i++) {
@@ -1210,7 +1209,6 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
-        m_hashesTableProxy->setSourceModel(model);
         QString savedFormat = m_ui->formatComboBox->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->formatComboBox->clear();

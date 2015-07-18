@@ -47,7 +47,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->setupUi(this);
     m_ui->tableView_Hashes->setModel(m_hashesTableProxy);
     m_ui->tableView_Hashes->setSortingEnabled(true);
-    m_hashesTableProxy->setDynamicSortFilter(true);
+    m_hashesTableProxy->setDynamicSortFilter(false);
     m_hashesTableProxy->setShowCheckedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
     m_ui->tableView_Hashes->sortByColumn(FileTableModel::USER_COL, Qt::AscendingOrder);
     // Until we get a result from john, we disable jumbo features

@@ -42,6 +42,7 @@ MainWindow::MainWindow(QSettings &settings)
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
       m_johnShowTemp(NULL),
+      m_sessionCurrent("", settings),
       m_settings(settings),
       m_aboutWindow(this)
 {
@@ -138,8 +139,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // We create the app sessions data directory in $HOME if it does not exist
-    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
-    if (!QDir::home().mkpath(m_sessionDataDir)) {
+    if (!QDir().mkpath(JohnSession::sessionDir())) {
         QMessageBox::critical(this, tr("Johnny"),
             tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
         qApp->quit();
@@ -183,7 +183,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Automatically open last session by default
     if (!m_sessionHistory.isEmpty()) {
-        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
+        m_sessionCurrent = JohnSession(m_sessionHistory.first(), m_settings);
         openLastSession();
     } else {
         restoreDefaultAttackOptions(false);
@@ -359,16 +359,11 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
-    m_settings.beginGroup("Sessions/" + sessionName);
-    QString format = m_settings.value("formatJohn").toString();
-    QStringList passwordFiles= m_settings.value("passwordFiles").toStringList();
-    m_settings.endGroup();
+    QStringList passwordFiles= m_sessionCurrent.passwordFiles();
 
     if (readPasswdFiles(passwordFiles))
     {
-        m_format = format;
+        m_format = m_sessionCurrent.format();
         restoreSessionOptions();
         m_ui->actionResumeAttack->setEnabled(true);
     }
@@ -457,8 +452,8 @@ void MainWindow::startAttack()
 
     // Session for johnny
     QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
-    m_sessionCurrent = QDir(m_sessionDataDir).filePath(date);
-    QString sessionFile = m_sessionCurrent + ".rec";
+    m_sessionCurrent = JohnSession(date, m_settings);
+    QString sessionFile = m_sessionCurrent.recFile();
 
     if (QFileInfo(sessionFile).isReadable())
     {
@@ -479,7 +474,7 @@ void MainWindow::startAttack()
     }
 
     QStringList parameters = saveAttackParameters();
-    parameters << QString("--session=%1").arg(m_sessionCurrent);
+    parameters << QString("--session=%1").arg(m_sessionCurrent.sessionName());
 
     // We check that we have file name.
     if (!m_sessionPasswordFiles.isEmpty()) {
@@ -498,11 +493,7 @@ void MainWindow::startAttack()
  * it returns the selected parameters in Johnny (UI-side) */
 QStringList MainWindow::saveAttackParameters()
 {
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
-    m_ui->sessionNameLabel->setText(sessionName);
-    m_settings.beginGroup("Sessions/" + sessionName);
-    m_settings.setValue("passwordFiles", m_sessionPasswordFiles);
+    m_ui->sessionNameLabel->setText(m_sessionCurrent.sessionName());
 
     QStringList parameters;
     // We prepare parameters list from options section.
@@ -543,7 +534,7 @@ QStringList MainWindow::saveAttackParameters()
         // key.
         m_format.clear();
     }
-    m_settings.setValue("formatJohn", m_format);
+    m_sessionCurrent.setFormat(m_format);
     m_settings.setValue("formatUI", m_ui->formatComboBox->currentText());
 
     // Modes
@@ -551,26 +542,30 @@ QStringList MainWindow::saveAttackParameters()
     if (selectedMode == m_ui->defaultModeTab) {
         // Default behaviour - no modes
         // There are no options here.
-        m_settings.setValue("mode", "default");
+        m_sessionCurrent.setMode(JohnSession::AttackMode::DEFAULT_MODE);
     } else if (selectedMode == m_ui->singleModeTab) {
         // "Single crack" mode
         parameters << "--single";
-        m_settings.setValue("mode", "single");
+        m_sessionCurrent.setMode(JohnSession::AttackMode::SINGLECRACK_MODE);
         // External mode, filter
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
-            m_settings.setValue("singleCrackExternalName", m_ui->comboBox_SingleCrackModeExternalName->currentText());
+            m_sessionCurrent.setExternalName(m_ui->comboBox_SingleCrackModeExternalName->currentText());
         }
 
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
-        m_settings.setValue("mode", "wordlist");
+        m_sessionCurrent.setMode(JohnSession::AttackMode::WORDLIST_MODE);
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
-        m_settings.setValue("wordlistFile", m_ui->comboBox_WordlistFile->currentText());
+        m_sessionCurrent.setWordlistFile(m_ui->comboBox_WordlistFile->currentText());
 
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
-                parameters << "--rules";
+                if (m_ui->lineEdit_WordlistRules->text().isEmpty()) {
+                    parameters << "--rules";
+                } else {
+                    parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
+                }
         }
         m_settings.setValue("isUsingWordListRules", m_ui->checkBox_WordlistModeRules->isChecked());
         // External mode, filter
@@ -1340,9 +1335,14 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
             widget->setEditText("");
         }
     }
-    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
-    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
-    m_ui->spinBox_nbOfProcess->setMinimum(2); // john --fork will error if < 2, let's prevent it
+    int idealThreadCount = QThread::idealThreadCount();
+    // john --fork will error if < 2, let's prevent it
+    if (idealThreadCount < 2) {
+        idealThreadCount = 2;
+    }
+    m_ui->spinBox_nbOfProcess->setMaximum(idealThreadCount);
+    m_ui->spinBox_nbOfProcess->setValue(idealThreadCount);
+    m_ui->spinBox_nbOfProcess->setMinimum(2);
     m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default

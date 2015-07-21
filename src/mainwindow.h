@@ -11,6 +11,7 @@
 #include "johnattack.h"
 #include "hashtypechecker.h"
 #include "menu.h"
+#include "johnsession.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -100,7 +101,7 @@ private:
     QAbstractTableModel *m_hashesTable;
 
     QString             m_sessionDataDir;
-    QString             m_sessionCurrent;
+    JohnSession         m_sessionCurrent;
     QStringList         m_sessionHistory;
     QStringList         m_sessionPasswordFiles;
     JohnAttack          m_johnAttack;       // main JtR attack handler

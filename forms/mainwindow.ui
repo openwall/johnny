@@ -223,6 +223,21 @@
                  </property>
                 </widget>
                </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="QLabel" name="label_7">
+                 <property name="font">
+                  <font>
+                   <italic>true</italic>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Tip: If you change attack options, you need to Start a new attack for them to come into effect.</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>

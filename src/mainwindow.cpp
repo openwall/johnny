@@ -229,6 +229,9 @@ MainWindow::MainWindow(QSettings &settings)
         m_ui->widgetFork->hide();
     #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+        m_ui->lineEditFilter->setClearButtonEnabled(true);
+#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

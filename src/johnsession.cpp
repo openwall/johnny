@@ -45,7 +45,9 @@ bool JohnSession::load()
         m_wordlistFile = m_settings.value("wordlistFile").toString();
         //Rules
         if (m_settings.value("isUsingWordListRules").toBool() == true) {
-            m_rules = m_settings.value("rules").toString();
+            m_rules = "";
+        } else if (m_settings.contains("rules")) {
+            m_rules = m_settings.value("rules");
         }
         // External mode, filter
         if (m_settings.contains("worldListExternalName")) {
@@ -280,17 +282,26 @@ void JohnSession::setExternalName(const QString &externalName)
 {
     m_externalName = externalName;
 }
+QString JohnSession::formatUI() const
+{
+    return m_formatUI;
+}
+
+void JohnSession::setFormatUI(const QString &formatUI)
+{
+    m_formatUI = formatUI;
+}
 
 
+JohnSession::AttackMode JohnSession::mode()
+{
+    return m_mode;
+}
 
-
-
-
-
-
-
-
-
+void JohnSession::setMode(JohnSession::AttackMode mode)
+{
+    m_mode = mode;
+}
 
 QString JohnSession::sessionDir()
 {

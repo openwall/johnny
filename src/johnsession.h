@@ -19,8 +19,8 @@ public:
     static QString sessionDir();
     QStringList passwordFiles();
     void setPasswordFiles(const QStringList &passwordFiles);
-    AttackMode attackMode();
-    void setMode(AttackMode &mode);
+    AttackMode mode();
+    void setMode(AttackMode mode);
     QString format();
     void setFormat(const QString &format);
     bool isForkEnabled();
@@ -57,6 +57,9 @@ public:
 
     QString externalName() const;
     void setExternalName(const QString &externalName);
+
+    QString formatUI() const;
+    void setFormatUI(const QString &formatUI);
 
 private:
     QString   m_sessionName;

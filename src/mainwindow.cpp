@@ -542,11 +542,11 @@ QStringList MainWindow::saveAttackParameters()
     if (selectedMode == m_ui->defaultModeTab) {
         // Default behaviour - no modes
         // There are no options here.
-        m_sessionCurrent.setMode(JohnSession::AttackMode::DEFAULT_MODE);
+        m_sessionCurrent.setMode(JohnSession::DEFAULT_MODE);
     } else if (selectedMode == m_ui->singleModeTab) {
         // "Single crack" mode
         parameters << "--single";
-        m_sessionCurrent.setMode(JohnSession::AttackMode::SINGLECRACK_MODE);
+        m_sessionCurrent.setMode(JohnSession::SINGLECRACK_MODE);
         // External mode, filter
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
@@ -555,7 +555,7 @@ QStringList MainWindow::saveAttackParameters()
 
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
-        m_sessionCurrent.setMode(JohnSession::AttackMode::WORDLIST_MODE);
+        m_sessionCurrent.setMode(JohnSession::WORDLIST_MODE);
         parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
         m_sessionCurrent.setWordlistFile(m_ui->comboBox_WordlistFile->currentText());
 
@@ -678,7 +678,7 @@ void MainWindow::resumeAttack()
         return;
 
     QStringList parameters;
-    parameters << QString("--restore=%1").arg(m_sessionCurrent);
+    parameters << QString("--restore=%1").arg(m_sessionCurrent.sessionName());
 
     startJohn(parameters);
 }
@@ -775,11 +775,10 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
     appendLog(CONSOLE_LOG_SEPARATOR);
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
+    QString sessionName(m_sessionCurrent.sessionName());
 
     bool isNewSession = !m_sessionHistory.contains(sessionName);
-    bool isRecReadable = QFileInfo(m_sessionCurrent + ".rec").isReadable();
+    bool isRecReadable = QFileInfo(m_sessionCurrent.recFile()).isReadable();
     if ((isNewSession == true) && (isRecReadable == true)) {
         // New session saved by john, add it to the list
         QAction* action = new QAction(sessionName, this);
@@ -1189,7 +1188,7 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
                     m_sessionMenu->removeAction(actions);
             }
         }
-        m_sessionCurrent.clear();
+        m_sessionCurrent = JohnSession("", m_settings);
         m_settings.remove("Sessions");
         m_ui->actionResumeAttack->setEnabled(false);
     } else {
@@ -1238,62 +1237,60 @@ void MainWindow::restoreSessionOptions()
 {
     restoreDefaultAttackOptions();
     // Start restoring required UI fields
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
     m_ui->sessionNameLabel->setText(sessionName);
-    m_settings.beginGroup("Sessions/" + sessionName);
-    m_format = m_settings.value("formatJohn").toString();
-    m_ui->formatComboBox->setEditText(m_settings.value("formatUI").toString());
-    QString mode = m_settings.value("mode").toString();
-    if (mode == "single") {
+    m_format = m_sessionCurrent.format();
+    m_ui->formatComboBox->setEditText(m_sessionCurrent.formatUI());
+    JohnSession::AttackMode mode = m_sessionCurrent.mode();
+    if (mode == JohnSession::SINGLECRACK_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->singleModeTab);
         // External mode, filter
-        if(m_settings.contains("singleCrackExternalName")) {
+        if(!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
-            m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_settings.value("singleCrackExternalName").toString());
+            m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_sessionCurrent.externalName());
         }
-    } else if (mode == "wordlist") {
+    } else if (mode == JohnSession::WORDLIST_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
-        m_ui->comboBox_WordlistFile->setEditText(m_settings.value("wordlistFile").toString());
+        m_ui->comboBox_WordlistFile->setEditText(m_sessionCurrent.wordlistFile());
         //Rules
-        if (m_settings.value("isUsingWordListRules").toBool() == true) {
+        if (!m_sessionCurrent.rules().isNull()) {
             m_ui->checkBox_WordlistModeRules->setChecked(true);
+            m_ui->lineEdit_WordlistRules->setText(m_sessionCurrent.rules());
         }
         // External mode, filter
-        if (m_settings.contains("worldListExternalName")) {
+        if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_WordlistModeExternalName->setChecked(true);
-            m_ui->comboBox_WordlistModeExternalName->setEditText(m_settings.value("worldListExternalName").toString());
+            m_ui->comboBox_WordlistModeExternalName->setEditText(!m_sessionCurrent.externalName());
         }
-    } else if (mode == "incremental") {
+    } else if (mode == JohnSession::INCREMENTAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);
         // "Incremental" mode
         // It could be with or without name.
-        if (m_settings.contains("incrementalModeName")) {
+        if (!m_sessionCurrent.charset().isNull()) {
             m_ui->checkBox_IncrementalModeName->setChecked(true);
-            m_ui->comboBox_IncrementalModeName->setEditText(m_settings.value("incrementalModeName").toString());
+            m_ui->comboBox_IncrementalModeName->setEditText(m_sessionCurrent.charset());
         }
         // External mode, filter
-        if (m_settings.contains("incrementalExternalName")) {
+        if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
-            m_ui->comboBox_IncrementalModeExternalName->setEditText(m_settings.value("incrementalExternalName").toString());
+            m_ui->comboBox_IncrementalModeExternalName->setEditText(m_sessionCurrent.externalName());
         }
-    } else if (mode == "external") {
+    } else if (mode == JohnSession::EXTERNAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
-        m_ui->comboBox_ExternalModeName->setEditText(m_settings.value("externalModeName").toString());
+        m_ui->comboBox_ExternalModeName->setEditText(m_sessionCurrent.externalName());
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
 
     // Selectors
-    if (m_settings.contains("limitUsers")) {
+    if (!m_sessionCurrent.limitUsers().isNull()) {
         m_ui->checkBox_LimitUsers->setChecked(true);
         m_ui->comboBox_LimitUsers->setEditText(m_settings.value("limitUsers").toString());
     }
-    if (m_settings.contains("limitGroups")) {
+    if (!m_sessionCurrent.limitGroups().isNull()) {
         m_ui->checkBox_LimitGroups->setChecked(true);
         m_ui->comboBox_LimitGroups->setEditText(m_settings.value("limitGroups").toString());
     }
-    if (m_settings.contains("limitShells")) {
+    if (!m_sessionCurrent.limitShells().isNull()) {
         m_ui->checkBox_LimitShells->setChecked(true);
         m_ui->comboBox_LimitShells->setEditText(m_settings.value("limitShells").toString());
     }

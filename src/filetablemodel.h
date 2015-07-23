@@ -6,11 +6,13 @@
 #define FILETABLEMODEL_H
 
 #include "hashtypechecker.h"
+
 #include <QAbstractTableModel>
 #include <QStringList>
 #include <QVector>
 #include <QString>
 #define UNCHECKED_PROGRAMMATICALLY 3
+
 class FileTableModel : public QAbstractTableModel
 {
     Q_OBJECT

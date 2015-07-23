@@ -7,7 +7,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "translator.h"
-#include "filetablemodel.h"
 
 #include <QToolButton>
 #include <QStringListModel>
@@ -49,6 +48,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->tableView_Hashes->setSortingEnabled(true);
     m_hashesTableProxy->setDynamicSortFilter(false);
     m_hashesTableProxy->setShowCheckedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
+    m_hashesTableProxy->setShowCrackedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
     m_ui->tableView_Hashes->sortByColumn(FileTableModel::USER_COL, Qt::AscendingOrder);
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
@@ -164,6 +164,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBoxFormatFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxGecoFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashesTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
+    connect(m_ui->checkBoxShowOnlyCrackedHashes, SIGNAL(toggled(bool)), m_hashesTableProxy, SLOT(setShowCrackedRowsOnly(bool)));
     // We create the app sessions data directory in $HOME if it does not exist
     m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
     if (!QDir::home().mkpath(m_sessionDataDir)) {
@@ -921,6 +922,7 @@ void MainWindow::readJohnShow()
     QString firstLine;
     firstLine = line;
     // We read to the end or before empty line.
+    bool hasTableChanged = false;
     while (!line.isNull() && line != "") {
         line.remove(QRegExp("\\r?\\n"));
         // We split lines to fields.
@@ -931,6 +933,7 @@ void MainWindow::readJohnShow()
         // We handle password.
         // If we found user then we put password in table.
         foreach (int row, m_showTableMap.values(hash)) {
+            hasTableChanged = true;
             m_hashesTable->setData(
                 m_hashesTable->index(row, FileTableModel::PASSWORD_COL),
                 password);
@@ -940,6 +943,9 @@ void MainWindow::readJohnShow()
         // We continue reading with next line.
         line = outputStream.readLine();
     }
+    if (hasTableChanged)
+        m_hashesTableProxy->crackingHasChanged();
+
     QString lastLine;
     if (!line.isNull()) {
         // We are on the last line.
@@ -1457,7 +1463,6 @@ void MainWindow::includeSelectedHashes()
 {
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedRows();
     for (int i = 0; i < indexes.count(); i++) {
-
         m_hashesTableProxy->setData(m_hashesTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
     }
 }

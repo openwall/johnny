@@ -1,9 +1,9 @@
 #include "hashsortfilterproxymodel.h"
+#include "filetablemodel.h"
 
 HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
     :QSortFilterProxyModel(parent)
 {
-
 }
 
 void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index)
@@ -18,9 +18,22 @@ void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly)
     invalidateFilter();
 }
 
+void HashSortFilterProxyModel::setShowCrackedRowsOnly(bool showCrackedOnly)
+{
+    m_showCrackedRowsOnly = showCrackedOnly;
+    invalidateFilter();
+}
+
 void HashSortFilterProxyModel::checkBoxHasChanged()
 {
     if (m_showCheckedRowsOnly) {
+        invalidateFilter();
+    }
+}
+
+void HashSortFilterProxyModel::crackingHasChanged()
+{
+    if (m_showCrackedRowsOnly) {
         invalidateFilter();
     }
 }
@@ -34,6 +47,11 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
 
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
     if (m_showCheckedRowsOnly && sourceModel()->data(index0, Qt::CheckStateRole) == Qt::Unchecked) {
+        return false;
+    }
+
+    QModelIndex indexPassword = sourceModel()->index(sourceRow, FileTableModel::PASSWORD_COL, sourceParent);
+    if (m_showCrackedRowsOnly && sourceModel()->data(indexPassword).toString().isEmpty()) {
         return false;
     }
 

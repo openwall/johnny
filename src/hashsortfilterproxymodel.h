@@ -15,7 +15,9 @@ public:
 
 public slots:
     void setShowCheckedRowsOnly(bool showCheckedOnly);
+    void setShowCrackedRowsOnly(bool showCrackedOnly);
     void checkBoxHasChanged();
+    void crackingHasChanged();
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const Q_DECL_OVERRIDE;
@@ -24,5 +26,6 @@ protected:
 private:
     QList<int> m_filteredColumns;
     bool       m_showCheckedRowsOnly;
+    bool       m_showCrackedRowsOnly;
 };
 #endif // HASHSORTFILTERPROXYMODEL_H

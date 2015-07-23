@@ -188,6 +188,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxShowOnlyCrackedHashes">
+                <property name="text">
+                 <string>Show only cracked</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>

@@ -42,7 +42,7 @@ signals:
 
 private:
     QVector<QVector<QString> > m_data;
-    QVector<Qt::CheckState> m_checkedStates;
+    QVector<Qt::CheckState> m_checkedRows;
     QVector<int> m_rowsWithEmptyPasswords;
     QVector<QString> m_columns;
 };

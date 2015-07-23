@@ -46,7 +46,7 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
     int currentColumn = 0;
 
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
-    if (m_showCheckedRowsOnly && sourceModel()->data(index0, Qt::CheckStateRole) == Qt::Unchecked) {
+    if (m_showCheckedRowsOnly && (sourceModel()->data(index0, Qt::CheckStateRole) == Qt::Unchecked)) {
         return false;
     }
 

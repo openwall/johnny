@@ -82,7 +82,7 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
         }
         m_data << data.at(column).toVector();
     }
-    m_checkedStates.fill(Qt::Checked, rowCount());
+    m_checkedRows.fill(Qt::Checked, rowCount());
     return true;
 }
 
@@ -109,15 +109,15 @@ QVariant FileTableModel::data(const QModelIndex &index,
                               int role) const
 {
     // We validate arguments.
-    if (!index.isValid() || index.column() >= columnCount() || index.row() >= rowCount())
+    if (!index.isValid() || (index.column() >= columnCount()) || (index.row() >= rowCount()))
         return QVariant();
     switch (role) {
     case Qt::DisplayRole:
         return m_data.at(index.column()).at(index.row());
         break;
     case Qt::CheckStateRole:
-        if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
-            return m_checkedStates[index.row()];
+        if ((index.column() == 0) && (index.row() < m_checkedRows.count())) {
+            return m_checkedRows[index.row()];
         } else {
             return QVariant();
         }
@@ -140,7 +140,7 @@ QVariant FileTableModel::data(const QModelIndex &index,
 
     case Qt::BackgroundRole:
         // Show differently cracked passwords
-        if (index.row() < m_checkedStates.count() && m_checkedStates.at(index.row()) == Qt::Unchecked) {
+        if ((index.row() < m_checkedRows.count()) && (m_checkedRows.at(index.row()) == Qt::Unchecked)) {
                 return QVariant(QColor("#EEEEEE")); // a kind of light-gray
         } else {
             return QVariant();
@@ -188,15 +188,15 @@ bool FileTableModel::setData(const QModelIndex &index,
         break;
 
     case Qt::CheckStateRole:
-        if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
+        if ((index.column() == 0) && (index.row() < m_checkedRows.count())) {
             int checkState = value.toInt();
             if (checkState == UNCHECKED_PROGRAMMATICALLY) {
-                m_checkedStates[index.row()] = Qt::Unchecked;
+                m_checkedRows[index.row()] = Qt::Unchecked;
             } else if (checkState == Qt::Unchecked) {
-                m_checkedStates[index.row()] = Qt::Unchecked;
+                m_checkedRows[index.row()] = Qt::Unchecked;
                 emit rowUncheckedByUser();
             } else {
-                m_checkedStates[index.row()] = Qt::Checked;
+                m_checkedRows[index.row()] = Qt::Checked;
             }
 
             QVector<int> role;

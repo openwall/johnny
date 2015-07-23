@@ -910,6 +910,8 @@ void MainWindow::callJohnShow(bool showAllFormats)
 void MainWindow::readJohnShow()
 {
     // We read all output.
+    QString formattedFormat(m_format);
+    formattedFormat.remove("--");
     QByteArray output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
@@ -967,13 +969,13 @@ void MainWindow::readJohnShow()
             m_ui->progressBar->setValue(0);
             m_ui->progressBar->setFormat(
                 tr("No hashes loaded [%1], see Console log").arg(
-                    m_format));
+                    formattedFormat));
         } else {
             m_ui->progressBar->setRange(0, crackedCount + leftCount);
             m_ui->progressBar->setValue(crackedCount);
             m_ui->progressBar->setFormat(
                 tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(crackedCount)
-                                                .arg(leftCount).arg(m_format));
+                                                .arg(leftCount).arg(formattedFormat));
         }
 #ifdef Q_OS_OSX
             if(m_progressStatsLabel)
@@ -1454,10 +1456,6 @@ void MainWindow::filterHashesTable()
     QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()), Qt::CaseInsensitive);
     m_hashesTableProxy->setFilterRegExp(regExp);
 }
-
-/* Hashes that are hidden in the tableview won't be affected by
- * (de)selectAllHashes functions.
- */
 
 void MainWindow::includeSelectedHashes()
 {

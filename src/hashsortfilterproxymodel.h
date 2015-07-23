@@ -15,6 +15,7 @@ public:
 
 public slots:
     void setShowCheckedRowsOnly(bool showCheckedOnly);
+    void checkBoxHasChanged();
 
 protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const Q_DECL_OVERRIDE;

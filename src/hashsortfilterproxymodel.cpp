@@ -18,6 +18,13 @@ void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly)
     invalidateFilter();
 }
 
+void HashSortFilterProxyModel::checkBoxHasChanged()
+{
+    if (m_showCheckedRowsOnly) {
+        invalidateFilter();
+    }
+}
+
 bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         const QModelIndex &sourceParent) const
 {

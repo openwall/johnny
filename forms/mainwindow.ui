@@ -1045,8 +1045,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>761</width>
-             <height>504</height>
+             <width>616</width>
+             <height>333</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1281,8 +1281,8 @@
     <addaction name="actionResumeAttack"/>
     <addaction name="actionPauseAttack"/>
     <addaction name="actionGuessPassword"/>
-    <addaction name="actionSelectAllHashes"/>
-    <addaction name="actionDeselectAllHashes"/>
+    <addaction name="actionIncludeSelectedHashes"/>
+    <addaction name="actionExcludeSelectedHashes"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1580,20 +1580,14 @@
     <string>Ctrl+5</string>
    </property>
   </action>
-  <action name="actionSelectAllHashes">
+  <action name="actionIncludeSelectedHashes">
    <property name="text">
-    <string>Select all hashes</string>
-   </property>
-   <property name="toolTip">
-    <string>Select all hashes</string>
+    <string>Include in attack</string>
    </property>
   </action>
-  <action name="actionDeselectAllHashes">
+  <action name="actionExcludeSelectedHashes">
    <property name="text">
-    <string>Deselect all hashes</string>
-   </property>
-   <property name="toolTip">
-    <string>Deselect all hashes</string>
+    <string>Exclude in attack</string>
    </property>
   </action>
  </widget>

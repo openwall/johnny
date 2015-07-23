@@ -140,7 +140,7 @@ QVariant FileTableModel::data(const QModelIndex &index,
 
     case Qt::BackgroundRole:
         // Show differently cracked passwords
-        if (index.row() < m_checkedStates.count() && m_checkedStates.at(index.row()) == Qt::Checked) {
+        if (index.row() < m_checkedStates.count() && m_checkedStates.at(index.row()) == Qt::Unchecked) {
                 return QVariant(QColor("#EEEEEE")); // a kind of light-gray
         } else {
             return QVariant();
@@ -189,8 +189,17 @@ bool FileTableModel::setData(const QModelIndex &index,
 
     case Qt::CheckStateRole:
         if ((index.column() == 0) && (index.row() < m_checkedStates.count())) {
-            m_checkedStates[index.row()] = value.toInt() ? Qt::Checked : Qt::Unchecked;
+            int checkState = value.toInt();
+            if (checkState == UNCHECKED_PROGRAMMATICALLY) {
+                m_checkedStates[index.row()] = Qt::Unchecked;
+            } else if (checkState == Qt::Unchecked) {
+                m_checkedStates[index.row()] = Qt::Unchecked;
+                emit rowUncheckedByUser();
+            } else {
+                m_checkedStates[index.row()] = Qt::Checked;
+            }
             QVector<int> role;
+
             role.push_back(Qt::BackgroundColorRole);
             for (int i=1; i < columnCount(); i++) {
                 QModelIndex index2 = this->index(index.row(), i);

@@ -80,8 +80,8 @@ MainWindow::MainWindow(QSettings &settings)
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
-    m_ui->actionSelectAllHashes->setEnabled(false);
-    m_ui->actionDeselectAllHashes->setEnabled(false);
+    m_ui->actionIncludeSelectedHashes->setEnabled(false);
+    m_ui->actionExcludeSelectedHashes->setEnabled(false);
 
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
@@ -151,20 +151,19 @@ MainWindow::MainWindow(QSettings &settings)
     // Tableview and filtering-related signals
     m_ui->tableView_Hashes->setContextMenuPolicy(Qt::CustomContextMenu);
     m_hashesTableContextMenu = new QMenu(this);
-    m_hashesTableContextMenu->addActions(QList<QAction*>() << m_ui->actionCopyToClipboard << m_ui->actionSelectAllHashes
-                                         << m_ui->actionDeselectAllHashes);
+    m_hashesTableContextMenu->addActions(QList<QAction*>() << m_ui->actionCopyToClipboard << m_ui->actionIncludeSelectedHashes
+                                         << m_ui->actionExcludeSelectedHashes);
     connect(m_ui->tableView_Hashes, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
     connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
-    connect(m_ui->actionSelectAllHashes, SIGNAL(triggered()), this, SLOT(selectAllHashes()));
-    connect(m_ui->actionDeselectAllHashes, SIGNAL(triggered()), this, SLOT(deselectAllHashes()));
+    connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
+    connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
     connect(m_ui->checkBoxUserFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxPasswordFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxHashFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxFormatFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxGecoFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashesTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
-
     // We create the app sessions data directory in $HOME if it does not exist
     m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
     if (!QDir::home().mkpath(m_sessionDataDir)) {
@@ -315,7 +314,7 @@ void MainWindow::replaceTableModel(FileTableModel *newTableModel)
     m_hashesTableProxy->setSourceModel(newTableModel);
     // Hide formats column if not jumbo
     m_ui->tableView_Hashes->setColumnHidden(FileTableModel::FORMATS_COL, !m_isJumbo);
-
+    connect(m_hashesTable, SIGNAL(rowUncheckedByUser()), m_hashesTableProxy, SLOT(checkBoxHasChanged()));
     // We build hash table for fast access.
     m_showTableMap = QMultiMap<QString, int>();
     // In case a newTableModel == NULL parameter is passed
@@ -361,8 +360,8 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
-        m_ui->actionSelectAllHashes->setEnabled(true);
-        m_ui->actionDeselectAllHashes->setEnabled(true);
+        m_ui->actionIncludeSelectedHashes->setEnabled(true);
+        m_ui->actionExcludeSelectedHashes->setEnabled(true);
         if (m_isJumbo) {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
             m_hashTypeChecker.setPasswordFiles(fileNames);
@@ -1410,8 +1409,10 @@ void MainWindow::restoreSessionOptions()
     // Unselected hashes
     QList<QVariant> unselectedRows = m_settings.value("unselectedRows").toList();
     for (int i = 0; i < unselectedRows.count(); i++) {
-        m_hashesTable->setData(m_hashesTable->index(unselectedRows[i].toInt(),0),Qt::Unchecked,Qt::CheckStateRole);
+        m_hashesTable->setData(m_hashesTable->index(unselectedRows[i].toInt(),0),UNCHECKED_PROGRAMMATICALLY,Qt::CheckStateRole);
     }
+    if (unselectedRows.count() > 0)
+        m_hashesTableProxy->checkBoxHasChanged();
     m_settings.endGroup();
 }
 
@@ -1452,18 +1453,22 @@ void MainWindow::filterHashesTable()
  * (de)selectAllHashes functions.
  */
 
-void MainWindow::selectAllHashes()
+void MainWindow::includeSelectedHashes()
 {
-    for (int i = 0; i < m_hashesTableProxy->rowCount(); i++) {
-        m_hashesTableProxy->setData(m_hashesTableProxy->index(i, 0), Qt::Checked, Qt::CheckStateRole);
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedRows();
+    for (int i = 0; i < indexes.count(); i++) {
+
+        m_hashesTableProxy->setData(m_hashesTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
     }
 }
 
-void MainWindow::deselectAllHashes()
+void MainWindow::excludeSelectedHashes()
 {
-    for (int i = 0; i < m_hashesTableProxy->rowCount(); i++) {
-        m_hashesTableProxy->setData(m_hashesTableProxy->index(i, 0), Qt::Unchecked, Qt::CheckStateRole);
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedRows();
+    for (int i = 0; i < indexes.count(); i++) {
+        m_hashesTableProxy->setData(m_hashesTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
     }
+    m_hashesTableProxy->checkBoxHasChanged();
 }
 
 void MainWindow::setFilteringColumns()

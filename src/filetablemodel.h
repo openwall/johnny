@@ -10,7 +10,7 @@
 #include <QStringList>
 #include <QVector>
 #include <QString>
-
+#define UNCHECKED_PROGRAMMATICALLY 3
 class FileTableModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -34,6 +34,9 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const;
 
     enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
+
+signals:
+    void rowUncheckedByUser();
 
 private:
     QVector<QVector<QString> > m_data;

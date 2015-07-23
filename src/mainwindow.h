@@ -61,8 +61,8 @@ private slots:
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
     void filterHashesTable();
     void showHashesTableContextMenu(const QPoint& pos);
-    void selectAllHashes();
-    void deselectAllHashes();
+    void includeSelectedHashes();
+    void excludeSelectedHashes();
     void setFilteringColumns();
 
     // JtR backend

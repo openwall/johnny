@@ -31,6 +31,7 @@
 #define TAB_STATISTICS  2
 #define TAB_SETTINGS    3
 #define TAB_CONSOLE_LOG 4
+#define DYNAMIC_FILTERING_HASH_LIMIT 10000
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -155,7 +156,6 @@ MainWindow::MainWindow(QSettings &settings)
                                          << m_ui->actionExcludeSelectedHashes);
     connect(m_ui->tableView_Hashes, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
-    connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
     connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
     connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
     connect(m_ui->checkBoxUserFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
@@ -367,6 +367,14 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
             m_hashTypeChecker.setPasswordFiles(fileNames);
             m_hashTypeChecker.start();
+        }
+        // QSortFilterProxyModel isn't optimized for fast for dynamic filtering on big files
+        if (model->rowCount() > DYNAMIC_FILTERING_HASH_LIMIT) {
+            disconnect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
+            connect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
+        } else {
+            disconnect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
+            connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
         }
         return true;
     }

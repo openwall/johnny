@@ -1587,7 +1587,7 @@
   </action>
   <action name="actionExcludeSelectedHashes">
    <property name="text">
-    <string>Exclude in attack</string>
+    <string>Exclude from attack</string>
    </property>
   </action>
  </widget>

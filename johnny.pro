@@ -4,9 +4,6 @@ CONFIG   += qt
 #CONFIG -= release
 #CONFIG += debug
 
-# To build universal binary or .dmg on OS X, uncomment next line. It should work on all architectures.
-#CONFIG += x86 ppc x86_64 ppc64
-
 QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -50,3 +47,11 @@ OTHER_FILES += README \
                LICENSE \
                INSTALL \
                CHANGELOG
+
+osx {
+TARGET  = Johnny
+ICON    = resources/icons/johnny.icns
+
+# Build universal binary on OS X for Release target
+release: CONFIG += x86 ppc x86_64 ppc64
+}

@@ -6,22 +6,28 @@ HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
 {
 }
 
-void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index)
+void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index, bool shouldInvalidateFilter)
 {
     m_filteredColumns = index;
-    invalidateFilter();
+    if (shouldInvalidateFilter) {
+        invalidateFilter();
+    }
 }
 
-void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly)
+void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly,  bool shouldInvalidateFilter)
 {
     m_showCheckedRowsOnly = showCheckedOnly;
-    invalidateFilter();
+    if (shouldInvalidateFilter) {
+        invalidateFilter();
+    }
 }
 
-void HashSortFilterProxyModel::setShowCrackedRowsOnly(bool showCrackedOnly)
+void HashSortFilterProxyModel::setShowCrackedRowsOnly(bool showCrackedOnly, bool shouldInvalidateFilter)
 {
     m_showCrackedRowsOnly = showCrackedOnly;
-    invalidateFilter();
+    if (shouldInvalidateFilter) {
+        invalidateFilter();
+    }
 }
 
 void HashSortFilterProxyModel::checkBoxHasChanged()

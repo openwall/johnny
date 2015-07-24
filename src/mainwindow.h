@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
  * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
  * See LICENSE for details.
@@ -64,6 +64,7 @@ private slots:
     void includeSelectedHashes();
     void excludeSelectedHashes();
     void setFilteringColumns();
+    void resetFilters();
 
     // JtR backend
     void updateJohnOutput();
@@ -147,6 +148,9 @@ private:
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;
+#endif
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+    QLabel         *m_filterDirectivesLabel;
 #endif
 };
 

@@ -231,6 +231,11 @@ MainWindow::MainWindow(QSettings &settings)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
         m_ui->lineEditFilter->setClearButtonEnabled(true);
+#elif QT_VERSION < QT_VERSION_CHECK(4,7,0)
+        m_filterDirectivesLabel = new QLabel(this);
+        m_filterDirectivesLabel->setText(tr("For big files, press enter to apply filter."));
+        m_ui->passwordsPageLayout->insertWidget(1, m_filterDirectivesLabel);
+        m_filterDirectivesLabel->hide();
 #endif
 }
 
@@ -335,6 +340,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
 {
     FileTableModel *model = new FileTableModel(this);
     if (model->readFiles(fileNames)) {
+        resetFilters();
         // We replace existing model with new one.
         replaceTableModel(model);
         setFilteringColumns();
@@ -373,9 +379,19 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         }
         // QSortFilterProxyModel isn't optimized for fast for dynamic filtering on big files
         if (model->rowCount() > DYNAMIC_FILTERING_HASH_LIMIT) {
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+            m_filterDirectivesLabel->show();
+#else
+             m_ui->lineEditFilter->setPlaceholderText(tr("For big files, press enter to apply filter."));
+#endif
             disconnect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
             connect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
         } else {
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+            m_filterDirectivesLabel->hide();
+#else
+            m_ui->lineEditFilter->setPlaceholderText("");
+#endif
             disconnect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
             connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
         }
@@ -1500,4 +1516,23 @@ void MainWindow::setFilteringColumns()
         selectedRows.append(FileTableModel::GECOS_COL);
 
     m_hashesTableProxy->setFilteredColumns(selectedRows);
+}
+
+void MainWindow::resetFilters()
+{
+    m_ui->lineEditFilter->clear();
+    m_ui->checkBoxUserFilter->setChecked(true);
+    m_ui->checkBoxFormatFilter->setChecked(true);
+    m_ui->checkBoxGecoFilter->setChecked(true);
+    m_ui->checkBoxHashFilter->setChecked(true);
+    m_ui->checkBoxPasswordFilter->setChecked(true);
+    m_ui->checkBoxShowOnlyCheckedHashes->setChecked(false);
+    m_ui->checkBoxShowOnlyCrackedHashes->setChecked(false);
+    QList<int> defaultFilteredColumns = QList<int>() << FileTableModel::USER_COL << FileTableModel::PASSWORD_COL
+                                                << FileTableModel::HASH_COL << FileTableModel::FORMATS_COL
+                                                << FileTableModel::GECOS_COL;
+    m_hashesTableProxy->setFilteredColumns(defaultFilteredColumns, false);
+    m_hashesTableProxy->setShowCrackedRowsOnly(false,false);
+    m_hashesTableProxy->setShowCheckedRowsOnly(false,false);
+    m_hashesTableProxy->setFilterRegExp("");
 }

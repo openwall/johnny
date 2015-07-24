@@ -10,12 +10,12 @@ class HashSortFilterProxyModel : public QSortFilterProxyModel
 
 public:
     HashSortFilterProxyModel(QObject *parent = 0);
-    void setFilteredColumns(const QList<int> &index);
+    void setFilteredColumns(const QList<int> &index, bool shouldInvalidateFilter = true);
     QList<int> filteredColumns();
 
 public slots:
-    void setShowCheckedRowsOnly(bool showCheckedOnly);
-    void setShowCrackedRowsOnly(bool showCrackedOnly);
+    void setShowCheckedRowsOnly(bool showCheckedOnly, bool shouldInvalidateFilter = true);
+    void setShowCrackedRowsOnly(bool showCrackedOnly, bool shouldInvalidateFilter = true);
     void checkBoxHasChanged();
     void crackingHasChanged();
 

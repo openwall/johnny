@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
+    <width>1016</width>
     <height>655</height>
    </rect>
   </property>
@@ -76,7 +76,7 @@
           <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <layout class="QVBoxLayout" name="passwordsPageLayout">
            <property name="spacing">
             <number>3</number>
            </property>
@@ -243,8 +243,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>670</width>
-             <height>905</height>
+             <width>906</width>
+             <height>865</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1266,7 +1266,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>858</width>
+     <width>1016</width>
      <height>27</height>
     </rect>
    </property>

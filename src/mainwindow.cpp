@@ -41,8 +41,8 @@ MainWindow::MainWindow(QSettings &settings)
       m_terminate(false),
       m_ui(new Ui::MainWindow),
       m_hashesTable(NULL),
+      m_sessionCurrent("", &settings),
       m_johnShowTemp(NULL),
-      m_sessionCurrent("", settings),
       m_settings(settings),
       m_aboutWindow(this)
 {
@@ -183,7 +183,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Automatically open last session by default
     if (!m_sessionHistory.isEmpty()) {
-        m_sessionCurrent = JohnSession(m_sessionHistory.first(), m_settings);
+        m_sessionCurrent = JohnSession(m_sessionHistory.first(), &m_settings);
         openLastSession();
     } else {
         restoreDefaultAttackOptions(false);
@@ -452,7 +452,7 @@ void MainWindow::startAttack()
 
     // Session for johnny
     QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
-    m_sessionCurrent = JohnSession(date, m_settings);
+    m_sessionCurrent = JohnSession(date, &m_settings);
     QString sessionFile = m_sessionCurrent.recFile();
 
     if (QFileInfo(sessionFile).isReadable())
@@ -1188,13 +1188,13 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
                     m_sessionMenu->removeAction(actions);
             }
         }
-        m_sessionCurrent = JohnSession("", m_settings);
+        m_sessionCurrent = JohnSession("", &m_settings);
         m_settings.remove("Sessions");
         m_ui->actionResumeAttack->setEnabled(false);
     } else {
         QString fileName = action->data().toString();
         if (!fileName.isEmpty()) {
-            m_sessionCurrent = QDir(m_sessionDataDir).filePath(fileName);
+            m_sessionCurrent = JohnSession(fileName, &m_settings);
             openLastSession();
         }
     }
@@ -1237,7 +1237,7 @@ void MainWindow::restoreSessionOptions()
 {
     restoreDefaultAttackOptions();
     // Start restoring required UI fields
-    m_ui->sessionNameLabel->setText(sessionName);
+    m_ui->sessionNameLabel->setText(m_sessionCurrent.sessionName());
     m_format = m_sessionCurrent.format();
     m_ui->formatComboBox->setEditText(m_sessionCurrent.formatUI());
     JohnSession::AttackMode mode = m_sessionCurrent.mode();
@@ -1259,7 +1259,7 @@ void MainWindow::restoreSessionOptions()
         // External mode, filter
         if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_WordlistModeExternalName->setChecked(true);
-            m_ui->comboBox_WordlistModeExternalName->setEditText(!m_sessionCurrent.externalName());
+            m_ui->comboBox_WordlistModeExternalName->setEditText(m_sessionCurrent.externalName());
         }
     } else if (mode == JohnSession::INCREMENTAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);

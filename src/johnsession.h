@@ -8,7 +8,7 @@ class JohnSession
 {
 public:
     enum AttackMode {DEFAULT_MODE, SINGLECRACK_MODE, WORDLIST_MODE, INCREMENTAL_MODE, EXTERNAL_MODE};
-    JohnSession(const QString &sessionName, QSettings& settings);
+    JohnSession(const QString &sessionName, QSettings* settings);
     ~JohnSession();
     bool load();
     bool save();
@@ -17,13 +17,16 @@ public:
     QString sessionName();
     QString recFile();
     static QString sessionDir();
-    QStringList passwordFiles();
+    bool isForkEnabled();
+
+    QStringList passwordFiles() const;
     void setPasswordFiles(const QStringList &passwordFiles);
+
     AttackMode mode();
     void setMode(AttackMode mode);
-    QString format();
+
+    QString format() const;
     void setFormat(const QString &format);
-    bool isForkEnabled();
 
     QString environmentVariables() const;
     void setEnvironmentVariables(const QString &environmentVariables);
@@ -63,7 +66,7 @@ public:
 
 private:
     QString   m_sessionName;
-    static QSettings& m_settings;
+    QSettings* m_settings;
     QString   m_sessionGroup;
 
     QString   m_format;

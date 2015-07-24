@@ -131,7 +131,6 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
     connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
-    connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
     connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
@@ -973,12 +972,6 @@ void MainWindow::fillSettingsWithDefaults()
     m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
     m_ui->comboBox_PathToJohn->blockSignals(false);
     m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
-}
-
-void MainWindow::buttonFillSettingsWithDefaultsClicked()
-{
-    fillSettingsWithDefaults();
-    warnAboutDefaultPathToJohn();
 }
 
 void MainWindow::buttonBrowsePathToJohnClicked()

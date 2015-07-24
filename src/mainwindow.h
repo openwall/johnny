@@ -51,7 +51,6 @@ private slots:
     void openLastSession();
     void tabsSelectionChanged(QAction *action);
     void buttonWordlistFileBrowseClicked();
-    void buttonFillSettingsWithDefaultsClicked();
     void buttonBrowsePathToJohnClicked();
     void updateStatistics();
     void restoreSessionOptions();

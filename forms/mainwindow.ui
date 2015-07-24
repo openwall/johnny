@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>3</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -253,7 +253,7 @@
                   </sizepolicy>
                  </property>
                  <property name="currentIndex">
-                  <number>2</number>
+                  <number>3</number>
                  </property>
                  <widget class="QWidget" name="defaultModeTab">
                   <attribute name="title">
@@ -950,18 +950,11 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>446</width>
-             <height>220</height>
+             <width>756</width>
+             <height>504</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
-            <item>
-             <widget class="QPushButton" name="pushButton_FillSettingsWithDefaults">
-              <property name="text">
-               <string>Fill Settings with default values</string>
-              </property>
-             </widget>
-            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>

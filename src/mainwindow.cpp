@@ -343,7 +343,6 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         resetFilters();
         // We replace existing model with new one.
         replaceTableModel(model);
-        setFilteringColumns();
         // After new model remembered we remember its file name.
         m_sessionPasswordFiles = fileNames;
         m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));

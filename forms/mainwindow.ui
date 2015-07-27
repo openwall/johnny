@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
-    <height>655</height>
+    <width>851</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,10 +73,13 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <layout class="QVBoxLayout" name="passwordsPageLayout">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -90,12 +93,93 @@
             <number>0</number>
            </property>
            <item>
+            <widget class="QWidget" name="widgetFilterOptions" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="leftMargin">
+               <number>6</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>6</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="labelFilter">
+                <property name="text">
+                 <string>Filter:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditFilter">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="filterMenuPushButton">
+                <property name="toolTip">
+                 <string>Select columns to filter against</string>
+                </property>
+                <property name="text">
+                 <string>Select columns</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxShowOnlyCheckedHashes">
+                <property name="toolTip">
+                 <string>Show only rows included in attack</string>
+                </property>
+                <property name="text">
+                 <string>Show only checked</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxShowOnlyCrackedHashes">
+                <property name="toolTip">
+                 <string>Show only cracked rows</string>
+                </property>
+                <property name="text">
+                 <string>Show only cracked</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QTableView" name="tableView_Hashes">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QTableView {
+border-top: 1px solid darkgrey;
+border-bottom: 1px solid darkgrey;
+}</string>
+             </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="verticalScrollMode">
               <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -131,8 +215,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>743</width>
-             <height>865</height>
+             <width>632</width>
+             <height>908</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -220,6 +304,21 @@
                  </property>
                  <property name="editable">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="QLabel" name="label_7">
+                 <property name="font">
+                  <font>
+                   <italic>true</italic>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Tip: If you change attack options, you need to Start a new attack for them to come into effect.</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
                  </property>
                 </widget>
                </item>
@@ -950,8 +1049,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>756</width>
-             <height>504</height>
+             <width>599</width>
+             <height>352</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1125,8 +1224,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
-     <height>27</height>
+     <width>851</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -1147,6 +1246,8 @@
     <addaction name="actionResumeAttack"/>
     <addaction name="actionPauseAttack"/>
     <addaction name="actionGuessPassword"/>
+    <addaction name="actionIncludeSelectedHashes"/>
+    <addaction name="actionExcludeSelectedHashes"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1460,6 +1561,100 @@
   <action name="actionCheckForUpdates">
    <property name="text">
     <string>Check for updates</string>
+   </property>
+  </action>
+  <action name="actionIncludeSelectedHashes">
+   <property name="text">
+    <string>Include in attack</string>
+   </property>
+  </action>
+  <action name="actionExcludeSelectedHashes">
+   <property name="text">
+    <string>Exclude from attack</string>
+   </property>
+  </action>
+  <action name="actionFilterUserColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>User column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Users column</string>
+   </property>
+  </action>
+  <action name="actionFilterPasswordColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Password column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Password column</string>
+   </property>
+  </action>
+  <action name="actionFilterHashColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hash column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Hash column</string>
+   </property>
+  </action>
+  <action name="actionFilterFormatColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Format column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Format column</string>
+   </property>
+  </action>
+  <action name="actionFilterGECOSColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GECOS column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the GECOS column</string>
+   </property>
+  </action>
+  <action name="actionFilterAllColumns">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>All columns</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against all columns</string>
    </property>
   </action>
  </widget>

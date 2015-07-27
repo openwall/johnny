@@ -19,7 +19,6 @@ TEMPLATE = app
 
 SOURCES +=  src/main.cpp\
             src/mainwindow.cpp \
-            src/filetablemodel.cpp \
             src/translator.cpp \
             src/johnprocess.cpp \
             src/hashtypechecker.cpp \
@@ -28,10 +27,11 @@ SOURCES +=  src/main.cpp\
             src/johnattack.cpp \
             src/menu.cpp \
             src/tabwidget.cpp \
-            src/johnsession.cpp
+            src/johnsession.cpp \
+            src/hashsortfilterproxymodel.cpp \
+            src/passwordfilemodel.cpp
 
 HEADERS  += src/mainwindow.h \
-            src/filetablemodel.h \
             src/translator.h \
             src/johnprocess.h \
             src/hashtypechecker.h \
@@ -40,7 +40,9 @@ HEADERS  += src/mainwindow.h \
             src/johnattack.h \
             src/menu.h \
             src/tabwidget.h \
-            src/johnsession.h
+            src/johnsession.h \
+            src/hashsortfilterproxymodel.h \
+            src/passwordfilemodel.h
 
 INCLUDEPATH += src/
 
@@ -57,5 +59,10 @@ OTHER_FILES += README \
                INSTALL \
                CHANGELOG
 
-# To build universal binary or .dmg on OS X, uncomment next line. It should work on all architectures.
-#CONFIG += x86 ppc x86_64 ppc64
+osx {
+TARGET  = Johnny
+ICON    = resources/icons/johnny.icns
+
+# Build universal binary on OS X for Release target
+release: CONFIG += x86 ppc x86_64 ppc64
+}

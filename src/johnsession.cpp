@@ -5,8 +5,8 @@
 JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     : m_settings(settings)
 {
-    m_sessionName = sessionName;
-    m_sessionGroup = "Sessions/" + m_sessionName;
+    m_name = sessionName;
+    m_sessionGroup = "Sessions/" + m_name;
 }
 
 QString JohnSession::sessionDir()
@@ -14,12 +14,12 @@ QString JohnSession::sessionDir()
     return QDir::home().filePath(QLatin1String(".john/sessions/"));
 }
 
-QString JohnSession::recFile()
+QString JohnSession::filePath()
 {
-    if (m_sessionName.isEmpty())
+    if (m_name.isEmpty())
         return "";
     else
-        return sessionDir() + m_sessionName + ".rec";
+        return sessionDir() + m_name;
 }
 
 JohnSession::~JohnSession()
@@ -101,14 +101,14 @@ bool JohnSession::load()
     return true;
 }
 
-QString JohnSession::sessionName()
+QString JohnSession::name()
 {
-    return m_sessionName;
+    return m_name;
 }
 
 bool JohnSession::save()
 {
-    if (m_sessionName.isEmpty())
+    if (m_name.isEmpty())
         return false;
 
     m_settings->beginGroup(m_sessionGroup);

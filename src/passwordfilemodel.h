@@ -2,8 +2,8 @@
  * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#ifndef FILETABLEMODEL_H
-#define FILETABLEMODEL_H
+#ifndef PASSWORDFILEMODEL_H
+#define PASSWORDFILEMODEL_H
 
 #include "hashtypechecker.h"
 
@@ -12,12 +12,14 @@
 #include <QVector>
 #include <QString>
 
-class FileTableModel : public QAbstractTableModel
+#define UNCHECKED_PROGRAMMATICALLY 3
+
+class PasswordFileModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    FileTableModel(QObject *parent = 0);
+    PasswordFileModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -32,13 +34,18 @@ public:
 
     bool readFiles(const QStringList &fileNames);
     void fillHashTypes(const QStringList &listHashTypes);
+    Qt::ItemFlags flags(const QModelIndex & index) const;
 
-    enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
+    enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMAT_COL,GECOS_COL};
+
+signals:
+    void rowUncheckedByUser();
 
 private:
     QVector<QVector<QString> > m_data;
-
+    QVector<Qt::CheckState> m_checkedRows;
+    QVector<int> m_rowsWithEmptyPasswords;
     QVector<QString> m_columns;
 };
 
-#endif // FILETABLEMODEL_H
+#endif // PASSWORDFILEMODEL_H

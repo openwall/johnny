@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
  * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
  * See LICENSE for details.
@@ -12,6 +12,8 @@
 #include "hashtypechecker.h"
 #include "menu.h"
 #include "johnsession.h"
+#include "passwordfilemodel.h"
+#include "hashsortfilterproxymodel.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -56,13 +58,19 @@ private slots:
     void restoreSessionOptions();
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
     void checkForUpdates();
+    void filterHashesTable();
+    void showHashesTableContextMenu(const QPoint& pos);
+    void includeSelectedHashes();
+    void excludeSelectedHashes();
+    void setFilteringColumns();
+    void resetFilters();
 
     // JtR backend
     void updateJohnOutput();
     void showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
-    void replaceTableModel(QAbstractTableModel *newTableModel);
+    void replaceTableModel(PasswordFileModel *newTableModel);
     void startJohn(QStringList args);
     void callJohnShow(bool showAllFormats = false);
     void readJohnShow();
@@ -94,10 +102,12 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    bool                 m_terminate;
-    Ui::MainWindow      *m_ui;
-    Menu                *m_sessionMenu;
-    QAbstractTableModel *m_hashesTable;
+    bool                      m_terminate;
+    Ui::MainWindow           *m_ui;
+    Menu                     *m_sessionMenu;
+    QMenu                    *m_hashTableContextMenu;
+    PasswordFileModel        *m_hashTable;
+    HashSortFilterProxyModel *m_hashTableProxy;
 
     QString             m_sessionDataDir;
     JohnSession         m_sessionCurrent;
@@ -133,11 +143,16 @@ private:
 
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
+    bool            m_isDynamicFilteringEnabled;
+
+    QWidget         m_aboutWindow;
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;
 #endif
-    QWidget         m_aboutWindow;
+#if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+    QLabel         *m_filterDirectivesLabel;
+#endif
 };
 
 #endif // MAINWINDOW_H

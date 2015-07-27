@@ -14,8 +14,8 @@ public:
     bool save();
 
     // Fields present in all sessions
-    QString sessionName();
-    QString recFile();
+    QString name();
+    QString filePath();
     static QString sessionDir();
     bool isForkEnabled();
 
@@ -65,7 +65,7 @@ public:
     void setFormatUI(const QString &formatUI);
 
 private:
-    QString   m_sessionName;
+    QString   m_name;
     QSettings* m_settings;
     QString   m_sessionGroup;
 

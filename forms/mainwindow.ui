@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1016</width>
-    <height>655</height>
+    <width>851</width>
+    <height>550</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -78,7 +78,7 @@
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="passwordsPageLayout">
            <property name="spacing">
-            <number>3</number>
+            <number>0</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -95,17 +95,14 @@
            <item>
             <widget class="QWidget" name="widgetFilterOptions" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <property name="spacing">
-               <number>6</number>
-              </property>
               <property name="leftMargin">
-               <number>0</number>
+               <number>6</number>
               </property>
               <property name="topMargin">
                <number>0</number>
               </property>
               <property name="rightMargin">
-               <number>0</number>
+               <number>6</number>
               </property>
               <property name="bottomMargin">
                <number>0</number>
@@ -113,7 +110,7 @@
               <item>
                <widget class="QLabel" name="labelFilter">
                 <property name="text">
-                 <string>Filter :</string>
+                 <string>Filter:</string>
                 </property>
                </widget>
               </item>
@@ -125,52 +122,15 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBoxUserFilter">
+               <widget class="QPushButton" name="filterMenuPushButton">
+                <property name="toolTip">
+                 <string>Select columns to filter against</string>
+                </property>
                 <property name="text">
-                 <string>User</string>
+                 <string>Select columns</string>
                 </property>
                 <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBoxPasswordFilter">
-                <property name="text">
-                 <string>Password</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBoxHashFilter">
-                <property name="text">
-                 <string>Hash</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBoxFormatFilter">
-                <property name="text">
-                 <string>Format</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="checkBoxGecoFilter">
-                <property name="text">
-                 <string>GECO</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -183,6 +143,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="checkBoxShowOnlyCheckedHashes">
+                <property name="toolTip">
+                 <string>Show only rows included in attack</string>
+                </property>
                 <property name="text">
                  <string>Show only checked</string>
                 </property>
@@ -190,6 +153,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="checkBoxShowOnlyCrackedHashes">
+                <property name="toolTip">
+                 <string>Show only cracked rows</string>
+                </property>
                 <property name="text">
                  <string>Show only cracked</string>
                 </property>
@@ -202,6 +168,12 @@
             <widget class="QTableView" name="tableView_Hashes">
              <property name="contextMenuPolicy">
               <enum>Qt::CustomContextMenu</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QTableView {
+border-top: 1px solid darkgrey;
+border-bottom: 1px solid darkgrey;
+}</string>
              </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
@@ -243,8 +215,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>906</width>
-             <height>865</height>
+             <width>632</width>
+             <height>908</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1067,8 +1039,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>616</width>
-             <height>333</height>
+             <width>599</width>
+             <height>352</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1281,8 +1253,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1016</width>
-     <height>27</height>
+     <width>851</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -1610,6 +1582,90 @@
   <action name="actionExcludeSelectedHashes">
    <property name="text">
     <string>Exclude from attack</string>
+   </property>
+  </action>
+  <action name="actionFilterUserColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>User column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Users column</string>
+   </property>
+  </action>
+  <action name="actionFilterPasswordColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Password column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Password column</string>
+   </property>
+  </action>
+  <action name="actionFilterHashColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hash column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Hash column</string>
+   </property>
+  </action>
+  <action name="actionFilterFormatColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Format column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the Format column</string>
+   </property>
+  </action>
+  <action name="actionFilterGECOSColumn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GECOS column</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against the GECOS column</string>
+   </property>
+  </action>
+  <action name="actionFilterAllColumns">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>All columns</string>
+   </property>
+   <property name="toolTip">
+    <string>Filter against all columns</string>
    </property>
   </action>
  </widget>

@@ -36,7 +36,7 @@ public:
     void fillHashTypes(const QStringList &listHashTypes);
     Qt::ItemFlags flags(const QModelIndex & index) const;
 
-    enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
+    enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMAT_COL,GECOS_COL};
 
 signals:
     void rowUncheckedByUser();

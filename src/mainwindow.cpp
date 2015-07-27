@@ -31,7 +31,7 @@
 #define TAB_STATISTICS  2
 #define TAB_SETTINGS    3
 #define TAB_CONSOLE_LOG 4
-#define DYNAMIC_FILTERING_HASH_LIMIT 10000
+#define DYNAMIC_FILTERING_HASH_LIMIT 25000
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -76,6 +76,29 @@ MainWindow::MainWindow(QSettings &settings)
         tabSelectionGroup->addAction(actions);
     }
     m_ui->actionPasswordsTabClicked->setChecked(true);
+
+    QMenu *filterMenu = new QMenu(m_ui->filterMenuPushButton);
+    filterMenu->addAction(m_ui->actionFilterAllColumns);
+    filterMenu->addAction(m_ui->actionFilterUserColumn);
+    filterMenu->addAction(m_ui->actionFilterPasswordColumn);
+    filterMenu->addAction(m_ui->actionFilterHashColumn);
+    filterMenu->addAction(m_ui->actionFilterFormatColumn);
+    filterMenu->addAction(m_ui->actionFilterGECOSColumn);
+    m_ui->filterMenuPushButton->setMenu(filterMenu);
+    m_ui->lineEditFilter->setToolTip(tr("Filter/Search inside the Passwords table using keywords. For large tables (> %1) press Enter/Return key to apply the filter.")
+                                     .arg(DYNAMIC_FILTERING_HASH_LIMIT));
+    connect(filterMenu, SIGNAL(triggered(QAction*)), this, SLOT(setFilteringColumns()));
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
+        m_ui->lineEditFilter->setClearButtonEnabled(true);
+#elif QT_VERSION < QT_VERSION_CHECK(4,7,0)
+        m_filterDirectivesLabel = new QLabel(this);
+        m_filterDirectivesLabel->setText(tr("Press Enter/Return key to apply filter"));
+        m_ui->passwordsPageLayout->insertWidget(1, m_filterDirectivesLabel);
+        m_filterDirectivesLabel->hide();
+#endif
+
+    m_ui->widgetFilterOptions->setEnabled(false);
 
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     // Disable copy button since there is no hash_tables (UI friendly)
@@ -158,11 +181,6 @@ MainWindow::MainWindow(QSettings &settings)
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
     connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
     connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
-    connect(m_ui->checkBoxUserFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
-    connect(m_ui->checkBoxPasswordFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
-    connect(m_ui->checkBoxHashFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
-    connect(m_ui->checkBoxFormatFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
-    connect(m_ui->checkBoxGecoFilter, SIGNAL(stateChanged(int)), this, SLOT(setFilteringColumns()));
     connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
     connect(m_ui->checkBoxShowOnlyCrackedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCrackedRowsOnly(bool)));
     // We create the app sessions data directory in $HOME if it does not exist
@@ -228,15 +246,6 @@ MainWindow::MainWindow(QSettings &settings)
     //As of now, fork is only supported on unix platforms
         m_ui->widgetFork->hide();
     #endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-        m_ui->lineEditFilter->setClearButtonEnabled(true);
-#elif QT_VERSION < QT_VERSION_CHECK(4,7,0)
-        m_filterDirectivesLabel = new QLabel(this);
-        m_filterDirectivesLabel->setText(tr("For big files, press enter to apply filter."));
-        m_ui->passwordsPageLayout->insertWidget(1, m_filterDirectivesLabel);
-        m_filterDirectivesLabel->hide();
-#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -322,7 +331,7 @@ void MainWindow::replaceTableModel(PasswordFileModel *newTableModel)
     // We connect table view with new model.
     m_hashTableProxy->setSourceModel(newTableModel);
     // Hide formats column if not jumbo
-    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMATS_COL, !m_isJumbo);
+    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !m_isJumbo);
     connect(m_hashTable, SIGNAL(rowUncheckedByUser()), m_hashTableProxy, SLOT(checkBoxHasChanged()));
     // We build hash table for fast access.
     m_showTableMap = QMultiMap<QString, int>();
@@ -366,6 +375,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             }
         }
         callJohnShow(true);
+        m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
@@ -381,7 +391,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
             m_filterDirectivesLabel->show();
 #else
-             m_ui->lineEditFilter->setPlaceholderText(tr("For big files, press enter to apply filter."));
+            m_ui->lineEditFilter->setPlaceholderText(tr("Press Enter/Return key to apply filter"));
 #endif
             disconnect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
             connect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
@@ -1269,8 +1279,8 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         m_hashTypeChecker.setPasswordFiles(m_sessionPasswordFiles);
         m_hashTypeChecker.start();
     }
-    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMATS_COL, !isJumbo);
-    m_ui->checkBoxFormatFilter->setHidden(!isJumbo);
+    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
+    m_ui->actionFilterFormatColumn->setEnabled(isJumbo);
     if (!isJumbo) {
         // Add default format list supported by core john
         QStringList defaultFormats;
@@ -1485,7 +1495,7 @@ void MainWindow::filterHashesTable()
 
 void MainWindow::includeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedRows();
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
         m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
     }
@@ -1493,7 +1503,7 @@ void MainWindow::includeSelectedHashes()
 
 void MainWindow::excludeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedRows();
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
         m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
     }
@@ -1503,16 +1513,27 @@ void MainWindow::excludeSelectedHashes()
 void MainWindow::setFilteringColumns()
 {
     QList<int> selectedRows;
-    if (m_ui->checkBoxUserFilter->isChecked())
+    if (m_ui->actionFilterAllColumns->isChecked())
+    {
         selectedRows.append(PasswordFileModel::USER_COL);
-    if (m_ui->checkBoxPasswordFilter->isChecked())
         selectedRows.append(PasswordFileModel::PASSWORD_COL);
-    if (m_ui->checkBoxHashFilter->isChecked())
         selectedRows.append(PasswordFileModel::HASH_COL);
-    if (m_ui->checkBoxFormatFilter->isChecked())
-        selectedRows.append(PasswordFileModel::FORMATS_COL);
-    if (m_ui->checkBoxGecoFilter->isChecked())
+        selectedRows.append(PasswordFileModel::FORMAT_COL);
         selectedRows.append(PasswordFileModel::GECOS_COL);
+    }
+    else
+    {
+        if (m_ui->actionFilterUserColumn->isChecked())
+            selectedRows.append(PasswordFileModel::USER_COL);
+        if (m_ui->actionFilterPasswordColumn->isChecked())
+            selectedRows.append(PasswordFileModel::PASSWORD_COL);
+        if (m_ui->actionFilterHashColumn->isChecked())
+            selectedRows.append(PasswordFileModel::HASH_COL);
+        if (m_ui->actionFilterFormatColumn->isChecked())
+            selectedRows.append(PasswordFileModel::FORMAT_COL);
+        if (m_ui->actionFilterGECOSColumn->isChecked())
+            selectedRows.append(PasswordFileModel::GECOS_COL);
+    }
 
     m_hashTableProxy->setFilteredColumns(selectedRows);
 }
@@ -1520,15 +1541,16 @@ void MainWindow::setFilteringColumns()
 void MainWindow::resetFilters()
 {
     m_ui->lineEditFilter->clear();
-    m_ui->checkBoxUserFilter->setChecked(true);
-    m_ui->checkBoxFormatFilter->setChecked(true);
-    m_ui->checkBoxGecoFilter->setChecked(true);
-    m_ui->checkBoxHashFilter->setChecked(true);
-    m_ui->checkBoxPasswordFilter->setChecked(true);
+    m_ui->actionFilterAllColumns->setChecked(true);
+    m_ui->actionFilterUserColumn->setChecked(true);
+    m_ui->actionFilterPasswordColumn->setChecked(true);
+    m_ui->actionFilterHashColumn->setChecked(true);
+    m_ui->actionFilterFormatColumn->setChecked(true);
+    m_ui->actionFilterGECOSColumn->setChecked(true);
     m_ui->checkBoxShowOnlyCheckedHashes->setChecked(false);
     m_ui->checkBoxShowOnlyCrackedHashes->setChecked(false);
     QList<int> defaultFilteredColumns = QList<int>() << PasswordFileModel::USER_COL << PasswordFileModel::PASSWORD_COL
-                                                << PasswordFileModel::HASH_COL << PasswordFileModel::FORMATS_COL
+                                                << PasswordFileModel::HASH_COL << PasswordFileModel::FORMAT_COL
                                                 << PasswordFileModel::GECOS_COL;
     m_hashTableProxy->setFilteredColumns(defaultFilteredColumns, false);
     m_hashTableProxy->setShowCrackedRowsOnly(false,false);

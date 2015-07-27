@@ -77,7 +77,7 @@ bool PasswordFileModel::readFiles(const QStringList &fileNames)
     }
     // We convert our lists into vectors to store data.
     for (int column = 0; column < columnCount(); column++) {
-        if (column == FORMATS_COL) {
+        if (column == FORMAT_COL) {
             m_data << QVector<QString>(rowCount());
         }
         m_data << data.at(column).toVector();
@@ -89,7 +89,7 @@ bool PasswordFileModel::readFiles(const QStringList &fileNames)
 void PasswordFileModel::fillHashTypes(const QStringList &listHashTypes)
 {
     for (int i = 0; (i < listHashTypes.size()) && (i< rowCount()); i++) {
-        setData(index(i,FORMATS_COL), listHashTypes[i]);
+        setData(index(i,FORMAT_COL), listHashTypes[i]);
     }
 }
 
@@ -181,7 +181,7 @@ bool PasswordFileModel::setData(const QModelIndex &index,
     case Qt::EditRole:
         // We replace data in our table.
         if ((index.column() == PASSWORD_COL) && (strValue.isEmpty())) {
-            strValue = "EMPTY PASS";
+            strValue = "**NULL PASS**";
             m_rowsWithEmptyPasswords.append(index.row());
         }
         m_data[index.column()].replace(index.row(), strValue);

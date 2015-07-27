@@ -11,7 +11,7 @@
 #include "johnattack.h"
 #include "hashtypechecker.h"
 #include "menu.h"
-#include "filetablemodel.h"
+#include "passwordfilemodel.h"
 #include "hashsortfilterproxymodel.h"
 
 #include <QMainWindow>
@@ -71,7 +71,7 @@ private slots:
     void showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void showJohnStarted();
     void showJohnError(QProcess::ProcessError error);
-    void replaceTableModel(FileTableModel *newTableModel);
+    void replaceTableModel(PasswordFileModel *newTableModel);
     void startJohn(QStringList args);
     void callJohnShow(bool showAllFormats = false);
     void readJohnShow();
@@ -103,12 +103,12 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event);
 
 private:
-    bool                     m_terminate;
+    bool                      m_terminate;
     Ui::MainWindow           *m_ui;
     Menu                     *m_sessionMenu;
-    QMenu                    *m_hashesTableContextMenu;
-    FileTableModel           *m_hashesTable;
-    HashSortFilterProxyModel *m_hashesTableProxy;
+    QMenu                    *m_hashTableContextMenu;
+    PasswordFileModel        *m_hashTable;
+    HashSortFilterProxyModel *m_hashTableProxy;
 
     QString             m_sessionDataDir;
     QString             m_sessionCurrent;

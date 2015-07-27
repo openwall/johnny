@@ -2,7 +2,7 @@
  * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#include "filetablemodel.h"
+#include "passwordfilemodel.h"
 #include "hashtypechecker.h"
 
 #include <QFile>
@@ -17,7 +17,7 @@
 //       place file loading into model. Though it seems to be
 //       good.
 
-FileTableModel::FileTableModel(QObject *parent)
+PasswordFileModel::PasswordFileModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
     // We make it as object field because we could not make class field.
@@ -25,7 +25,7 @@ FileTableModel::FileTableModel(QObject *parent)
     m_columns << tr("User") << tr("Password") << tr("Hash") <<  tr("Formats") << tr("GECOS");
 }
 
-bool FileTableModel::readFiles(const QStringList &fileNames)
+bool PasswordFileModel::readFiles(const QStringList &fileNames)
 {
     m_data.clear();
     // We use vector of vectors to store data. It should work faster
@@ -86,26 +86,26 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
     return true;
 }
 
-void FileTableModel::fillHashTypes(const QStringList &listHashTypes)
+void PasswordFileModel::fillHashTypes(const QStringList &listHashTypes)
 {
     for (int i = 0; (i < listHashTypes.size()) && (i< rowCount()); i++) {
         setData(index(i,FORMATS_COL), listHashTypes[i]);
     }
 }
 
-int FileTableModel::rowCount(const QModelIndex &/* parent */) const
+int PasswordFileModel::rowCount(const QModelIndex &/* parent */) const
 {
     // For this size we use size of the first column.
     // NOTE: Sizes of all columns should be equal.
     return m_data.at(0).size();
 }
 
-int FileTableModel::columnCount(const QModelIndex &/* parent */) const
+int PasswordFileModel::columnCount(const QModelIndex &/* parent */) const
 {
     return m_columns.size();
 }
 
-QVariant FileTableModel::data(const QModelIndex &index,
+QVariant PasswordFileModel::data(const QModelIndex &index,
                               int role) const
 {
     // We validate arguments.
@@ -169,7 +169,7 @@ QVariant FileTableModel::data(const QModelIndex &index,
     }
 }
 
-bool FileTableModel::setData(const QModelIndex &index,
+bool PasswordFileModel::setData(const QModelIndex &index,
                              const QVariant &value,
                              int role)
 {
@@ -219,7 +219,7 @@ bool FileTableModel::setData(const QModelIndex &index,
     return true;
 }
 
-QVariant FileTableModel::headerData(int section,
+QVariant PasswordFileModel::headerData(int section,
                                     Qt::Orientation orientation,
                                     int role) const
 {
@@ -236,7 +236,7 @@ QVariant FileTableModel::headerData(int section,
     return QVariant();
 }
 
-Qt::ItemFlags FileTableModel::flags(const QModelIndex & index) const
+Qt::ItemFlags PasswordFileModel::flags(const QModelIndex & index) const
 {
     Qt::ItemFlags flags = QAbstractItemModel::flags(index);
     flags |= Qt::ItemIsUserCheckable;

@@ -1,5 +1,5 @@
 #include "hashsortfilterproxymodel.h"
-#include "filetablemodel.h"
+#include "passwordfilemodel.h"
 
 HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
     :QSortFilterProxyModel(parent)
@@ -56,7 +56,7 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
         return false;
     }
 
-    QModelIndex indexPassword = sourceModel()->index(sourceRow, FileTableModel::PASSWORD_COL, sourceParent);
+    QModelIndex indexPassword = sourceModel()->index(sourceRow, PasswordFileModel::PASSWORD_COL, sourceParent);
     if (m_showCrackedRowsOnly && sourceModel()->data(indexPassword).toString().isEmpty()) {
         return false;
     }

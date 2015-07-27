@@ -2,8 +2,8 @@
  * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
  */
 
-#ifndef FILETABLEMODEL_H
-#define FILETABLEMODEL_H
+#ifndef PASSWORDFILEMODEL_H
+#define PASSWORDFILEMODEL_H
 
 #include "hashtypechecker.h"
 
@@ -11,14 +11,15 @@
 #include <QStringList>
 #include <QVector>
 #include <QString>
+
 #define UNCHECKED_PROGRAMMATICALLY 3
 
-class FileTableModel : public QAbstractTableModel
+class PasswordFileModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    FileTableModel(QObject *parent = 0);
+    PasswordFileModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -47,4 +48,4 @@ private:
     QVector<QString> m_columns;
 };
 
-#endif // FILETABLEMODEL_H
+#endif // PASSWORDFILEMODEL_H

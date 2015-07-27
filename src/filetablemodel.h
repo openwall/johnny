@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <QVector>
 #include <QString>
+#define UNCHECKED_PROGRAMMATICALLY 3
 
 class FileTableModel : public QAbstractTableModel
 {
@@ -32,12 +33,17 @@ public:
 
     bool readFiles(const QStringList &fileNames);
     void fillHashTypes(const QStringList &listHashTypes);
+    Qt::ItemFlags flags(const QModelIndex & index) const;
 
     enum TableColumns {USER_COL,PASSWORD_COL,HASH_COL,FORMATS_COL,GECOS_COL};
 
+signals:
+    void rowUncheckedByUser();
+
 private:
     QVector<QVector<QString> > m_data;
-
+    QVector<Qt::CheckState> m_checkedRows;
+    QVector<int> m_rowsWithEmptyPasswords;
     QVector<QString> m_columns;
 };
 

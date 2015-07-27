@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
+    <width>1016</width>
     <height>655</height>
    </rect>
   </property>
@@ -73,10 +73,13 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
-          <layout class="QVBoxLayout" name="verticalLayout_4">
+          <layout class="QVBoxLayout" name="passwordsPageLayout">
+           <property name="spacing">
+            <number>3</number>
+           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -90,12 +93,121 @@
             <number>0</number>
            </property>
            <item>
+            <widget class="QWidget" name="widgetFilterOptions" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="labelFilter">
+                <property name="text">
+                 <string>Filter :</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEditFilter">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxUserFilter">
+                <property name="text">
+                 <string>User</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxPasswordFilter">
+                <property name="text">
+                 <string>Password</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxHashFilter">
+                <property name="text">
+                 <string>Hash</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxFormatFilter">
+                <property name="text">
+                 <string>Format</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxGecoFilter">
+                <property name="text">
+                 <string>GECO</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxShowOnlyCheckedHashes">
+                <property name="text">
+                 <string>Show only checked</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBoxShowOnlyCrackedHashes">
+                <property name="text">
+                 <string>Show only cracked</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QTableView" name="tableView_Hashes">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="verticalScrollMode">
               <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -131,7 +243,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>743</width>
+             <width>906</width>
              <height>865</height>
             </rect>
            </property>
@@ -1169,7 +1281,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
+     <width>1016</width>
      <height>27</height>
     </rect>
    </property>
@@ -1191,6 +1303,8 @@
     <addaction name="actionResumeAttack"/>
     <addaction name="actionPauseAttack"/>
     <addaction name="actionGuessPassword"/>
+    <addaction name="actionIncludeSelectedHashes"/>
+    <addaction name="actionExcludeSelectedHashes"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
@@ -1486,6 +1600,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="actionIncludeSelectedHashes">
+   <property name="text">
+    <string>Include in attack</string>
+   </property>
+  </action>
+  <action name="actionExcludeSelectedHashes">
+   <property name="text">
+    <string>Exclude from attack</string>
    </property>
   </action>
  </widget>

@@ -6,6 +6,8 @@
 #include "hashtypechecker.h"
 
 #include <QFile>
+#include <QFont>
+#include <QBrush>
 
 #define FIELD_SEPARATOR ':'
 
@@ -26,7 +28,6 @@ FileTableModel::FileTableModel(QObject *parent)
 bool FileTableModel::readFiles(const QStringList &fileNames)
 {
     m_data.clear();
-
     // We use vector of vectors to store data. It should work faster
     // than with lists. But it is easier to fill table using lists as
     // of they could change their size easily. So we build vector of
@@ -72,6 +73,7 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
             for (; column < columnCount(); column++)
                 data[column].append("");
         }
+        file.close();
     }
     // We convert our lists into vectors to store data.
     for (int column = 0; column < columnCount(); column++) {
@@ -80,6 +82,7 @@ bool FileTableModel::readFiles(const QStringList &fileNames)
         }
         m_data << data.at(column).toVector();
     }
+    m_checkedRows.fill(Qt::Checked, rowCount());
     return true;
 }
 
@@ -106,10 +109,64 @@ QVariant FileTableModel::data(const QModelIndex &index,
                               int role) const
 {
     // We validate arguments.
-    if (!index.isValid() || role != Qt::DisplayRole ||
-            index.column() >= columnCount() || index.row() >= rowCount())
+    if (!index.isValid() || (index.column() >= columnCount()) || (index.row() >= rowCount()))
         return QVariant();
-    return m_data.at(index.column()).at(index.row());
+    switch (role) {
+    case Qt::DisplayRole:
+        return m_data.at(index.column()).at(index.row());
+        break;
+    case Qt::CheckStateRole:
+        if ((index.column() == 0) && (index.row() < m_checkedRows.count())) {
+            return m_checkedRows[index.row()];
+        } else {
+            return QVariant();
+        }
+        break;
+
+    case Qt::FontRole:
+        if ((index.column() == 0) && (!m_data.at(PASSWORD_COL).at(index.row()).isEmpty())) {
+            QFont font;
+            font.setBold(true);
+            return font;
+        } else if ((index.column() == PASSWORD_COL) && (m_rowsWithEmptyPasswords.contains(index.row()))) {
+            //Special case empty password ("")
+            QFont font;
+            font.setItalic(true);
+            return font;
+        } else {
+            return QVariant();
+        }
+        break;
+
+    case Qt::BackgroundRole:
+        // Show differently cracked passwords
+        if ((index.row() < m_checkedRows.count()) && (m_checkedRows.at(index.row()) == Qt::Unchecked)) {
+                return QVariant(QColor("#EEEEEE")); // a kind of light-gray
+        } else {
+            return QVariant();
+        }
+        break;
+
+    case Qt::ForegroundRole:
+        // Special case empty password ("")
+        if ((index.column() == PASSWORD_COL) && (m_rowsWithEmptyPasswords.contains(index.row()))) {
+            return QVariant(QBrush(Qt::darkGray));
+        } else {
+            return QVariant();
+        }
+        break;
+
+    case Qt::TextAlignmentRole:
+        // Special case empty password ("")
+        if ((index.column() == PASSWORD_COL) && (m_rowsWithEmptyPasswords.contains(index.row()))) {
+            return Qt::AlignCenter;
+        } else {
+            return QVariant();
+        }
+
+    default:
+        return QVariant();
+    }
 }
 
 bool FileTableModel::setData(const QModelIndex &index,
@@ -117,11 +174,46 @@ bool FileTableModel::setData(const QModelIndex &index,
                              int role)
 {
     // We validate arguments.
-    if (!index.isValid() || role != Qt::EditRole ||
-            index.column() >= columnCount() || index.row() >= rowCount())
+    if (!index.isValid() || index.column() >= columnCount() || index.row() >= rowCount())
         return false;
-    // We replace data in our table.
-    m_data[index.column()].replace(index.row(), value.toString());
+    QString strValue = value.toString();
+    switch (role) {
+    case Qt::EditRole:
+        // We replace data in our table.
+        if ((index.column() == PASSWORD_COL) && (strValue.isEmpty())) {
+            strValue = "EMPTY PASS";
+            m_rowsWithEmptyPasswords.append(index.row());
+        }
+        m_data[index.column()].replace(index.row(), strValue);
+        break;
+
+    case Qt::CheckStateRole:
+        if ((index.column() == 0) && (index.row() < m_checkedRows.count())) {
+            int checkState = value.toInt();
+            if (checkState == UNCHECKED_PROGRAMMATICALLY) {
+                m_checkedRows[index.row()] = Qt::Unchecked;
+            } else if (checkState == Qt::Unchecked) {
+                m_checkedRows[index.row()] = Qt::Unchecked;
+                emit rowUncheckedByUser();
+            } else {
+                m_checkedRows[index.row()] = Qt::Checked;
+            }
+
+            QVector<int> role;
+            role.push_back(Qt::BackgroundColorRole);
+            for (int i=1; i < columnCount(); i++) {
+                QModelIndex index2 = this->index(index.row(), i);
+                emit dataChanged(index2,index2, role);
+            }
+        }
+        else {
+            return false;
+        }
+        break;
+
+    default:
+        return false;
+    }
     // We notice all that we changed our state.
     emit dataChanged(index, index);
     return true;
@@ -142,4 +234,11 @@ QVariant FileTableModel::headerData(int section,
         return m_columns[section];
 
     return QVariant();
+}
+
+Qt::ItemFlags FileTableModel::flags(const QModelIndex & index) const
+{
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    flags |= Qt::ItemIsUserCheckable;
+    return flags;
 }

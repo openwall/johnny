@@ -21,7 +21,8 @@ SOURCES +=  src/main.cpp\
             src/johnhandler.cpp \
             src/johnattack.cpp \
             src/menu.cpp \
-            src/tabwidget.cpp
+            src/tabwidget.cpp \
+    src/hashsortfilterproxymodel.cpp
 
 HEADERS  += src/mainwindow.h \
             src/filetablemodel.h \
@@ -32,7 +33,8 @@ HEADERS  += src/mainwindow.h \
             src/johnhandler.h \
             src/johnattack.h \
             src/menu.h \
-            src/tabwidget.h
+            src/tabwidget.h \
+    src/hashsortfilterproxymodel.h
 
 INCLUDEPATH += src/
 

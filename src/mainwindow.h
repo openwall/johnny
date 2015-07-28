@@ -109,7 +109,6 @@ private:
     PasswordFileModel        *m_hashTable;
     HashSortFilterProxyModel *m_hashTableProxy;
 
-    QString             m_sessionDataDir;
     JohnSession         m_sessionCurrent;
     QStringList         m_sessionHistory;
     QStringList         m_sessionPasswordFiles;

@@ -183,7 +183,7 @@ MainWindow::MainWindow(QSettings &settings)
     // We create the app sessions data directory in $HOME if it does not exist
     if (!QDir().mkpath(JohnSession::sessionDir())) {
         QMessageBox::critical(this, tr("Johnny"),
-            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
+            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(JohnSession::sessionDir()));
         qApp->quit();
     }
 
@@ -192,7 +192,7 @@ MainWindow::MainWindow(QSettings &settings)
     QStringList sessionsList = m_settings.childGroups();
     for (int i = sessionsList.size()-1; i >= 0; i--) {
         QString sessionName = sessionsList[i];
-        QString completePath = QDir(m_sessionDataDir).filePath(sessionName);
+        QString completePath = QDir(JohnSession::sessionDir()).filePath(sessionName);
         if (QFileInfo(completePath + ".rec").isReadable()) {
             QAction *fileAction = m_sessionMenu->addAction(sessionName);
             fileAction->setData(sessionName);
@@ -539,7 +539,7 @@ void MainWindow::startAttack()
 
     QStringList parameters = saveAttackParameters();
     m_sessionCurrent.save();
-    parameters << QString("--session=%1").arg(m_sessionCurrent.name());
+    parameters << QString("--session=%1").arg(m_sessionCurrent.filePath());
 
     // We check that we have file name.
     if (!m_sessionPasswordFiles.isEmpty()) {
@@ -777,7 +777,7 @@ void MainWindow::resumeAttack()
         return;
 
     QStringList parameters;
-    parameters << QString("--restore=%1").arg(m_sessionCurrent.name());
+    parameters << QString("--restore=%1").arg(m_sessionCurrent.filePath());
 
     startJohn(parameters);
 }
@@ -889,7 +889,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
         // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
         // so we remove it from the session history list to have an error-prone UI
         m_sessionHistory.removeOne(sessionName);
-        m_settings.remove("Sessions/" + sessionName);
+        m_sessionCurrent.remove();
         foreach(QAction* actions, m_sessionMenu->actions()) {
             if (actions->data().toString() == sessionName) {
                     m_sessionMenu->removeAction(actions);
@@ -1277,7 +1277,7 @@ void MainWindow::verifyJohnVersion()
 void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
     if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
-        QDir dir(m_sessionDataDir);
+        QDir dir(JohnSession::sessionDir());
         dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec" << "*.pw");
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {

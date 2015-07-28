@@ -422,6 +422,7 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
+    m_sessionCurrent.load();
     QStringList passwordFiles= m_sessionCurrent.passwordFiles();
 
     if (readPasswdFiles(passwordFiles))
@@ -537,11 +538,12 @@ void MainWindow::startAttack()
     }
 
     QStringList parameters = saveAttackParameters();
+    m_sessionCurrent.save();
     parameters << QString("--session=%1").arg(m_sessionCurrent.name());
 
     // We check that we have file name.
     if (!m_sessionPasswordFiles.isEmpty()) {
-        QList<QVariant> unselectedRows = m_settings.value("Sessions/" + m_sessionCurrent.name() + "/unselectedRows").toList();
+        QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
         // If some hashes are unselected, write a new file with only selected hashes
         if (unselectedRows.size() > 0) {
             QString newFilePath = m_sessionCurrent.filePath() + ".pw";
@@ -582,6 +584,7 @@ void MainWindow::startAttack()
 QStringList MainWindow::saveAttackParameters()
 {
     m_ui->sessionNameLabel->setText(m_sessionCurrent.name());
+    m_sessionCurrent.setPasswordFiles(m_sessionPasswordFiles);
 
     QStringList parameters;
     // We prepare parameters list from options section.
@@ -623,7 +626,7 @@ QStringList MainWindow::saveAttackParameters()
         m_format.clear();
     }
     m_sessionCurrent.setFormat(m_format);
-    m_settings.setValue("formatUI", m_ui->formatComboBox->currentText());
+    m_sessionCurrent.setFormatUI(m_ui->formatComboBox->currentText());
 
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
@@ -649,26 +652,27 @@ QStringList MainWindow::saveAttackParameters()
 
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
-                if (m_ui->lineEdit_WordlistRules->text().isEmpty()) {
-                    parameters << "--rules";
-                } else {
-                    parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
-                }
+            if (m_ui->lineEdit_WordlistRules->text().isEmpty()) {
+                parameters << "--rules";
+                m_sessionCurrent.setRules("");
+            } else {
+                parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
+                m_sessionCurrent.setRules(m_ui->lineEdit_WordlistRules->text());
+            }
         }
-        m_settings.setValue("isUsingWordListRules", m_ui->checkBox_WordlistModeRules->isChecked());
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
-            m_settings.setValue("worldListExternalName", m_ui->comboBox_WordlistModeExternalName->currentText());
+            m_sessionCurrent.setExternalName(m_ui->comboBox_WordlistModeExternalName->currentText());
         }
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
-        m_settings.setValue("mode", "incremental");
+        m_sessionCurrent.setMode(JohnSession::INCREMENTAL_MODE);
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
             // With name
             parameters << ("--incremental=" + m_ui->comboBox_IncrementalModeName->currentText());
-            m_settings.setValue("incrementalModeName", m_ui->comboBox_IncrementalModeName->currentText());
+            m_sessionCurrent.setCharset(m_ui->comboBox_IncrementalModeName->currentText());
         } else {
             // Without name
             parameters << "--incremental";
@@ -676,51 +680,50 @@ QStringList MainWindow::saveAttackParameters()
         // External mode, filter
         if (m_ui->checkBox_IncrementalModeExternalName->isChecked()) {
             parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
-            m_settings.setValue("incrementalExternalName", m_ui->comboBox_IncrementalModeExternalName->currentText());
+            m_sessionCurrent.setExternalName(m_ui->comboBox_IncrementalModeExternalName->currentText());
         }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
-        m_settings.setValue("mode", "external");
+        m_sessionCurrent.setMode(JohnSession::EXTERNAL_MODE);
         parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
-        m_settings.setValue("externalModeName", m_ui->comboBox_ExternalModeName->currentText());
+        m_sessionCurrent.setExternalName(m_ui->comboBox_ExternalModeName->currentText());
     }
 
     // Selectors
     if (m_ui->checkBox_LimitUsers->isChecked()) {
         parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
-        m_settings.setValue("limitUsers", m_ui->comboBox_LimitUsers->currentText());
+        m_sessionCurrent.setLimitUsers(m_ui->comboBox_LimitUsers->currentText());
     }
     if (m_ui->checkBox_LimitGroups->isChecked()) {
         parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
-        m_settings.setValue("limitGroups", m_ui->comboBox_LimitGroups->currentText());
+        m_sessionCurrent.setLimitGroups(m_ui->comboBox_LimitGroups->currentText());
     }
     if (m_ui->checkBox_LimitShells->isChecked()) {
         parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
-        m_settings.setValue("limitShells", m_ui->comboBox_LimitShells->currentText());
+        m_sessionCurrent.setLimitShells(m_ui->comboBox_LimitShells->currentText());
     }
     if (m_ui->checkBox_LimitSalts->isChecked()) {
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
-        m_settings.setValue("limitSalts", m_ui->spinBox_LimitSalts->value());
+        m_sessionCurrent.setLimitSalts(m_ui->spinBox_LimitSalts->value());
     }
 
     // Advanced options
     if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
-        m_settings.setValue("nbForkProcess", m_ui->spinBox_nbOfProcess->value());
+        m_sessionCurrent.setNbProcess(m_ui->spinBox_nbOfProcess->value());
     }
-    m_settings.setValue("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->value());
+    m_sessionCurrent.setNbOpenMPThreads(m_ui->spinBox_nbOfOpenMPThread->value());
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
-        m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
+       m_sessionCurrent.setEnvironmentVariables(m_ui->lineEdit_EnvironmentVar->text());
     }
     // Save unselected rows
-    QList<QVariant> unselectedRows;
+    QList<int> unselectedRows;
     for (int i = 0; i < m_hashTable->rowCount(); i++) {
         if (m_hashTable->data(m_hashTable->index(i,0),Qt::CheckStateRole) == Qt::Unchecked) {
             unselectedRows.append(i);
         }
     }
-    m_settings.setValue("unselectedRows", unselectedRows);
-    m_settings.endGroup();
+    m_sessionCurrent.setUnselectedRows(unselectedRows);
 
     return parameters;
 }
@@ -1381,25 +1384,25 @@ void MainWindow::restoreSessionOptions()
     // Selectors
     if (!m_sessionCurrent.limitUsers().isNull()) {
         m_ui->checkBox_LimitUsers->setChecked(true);
-        m_ui->comboBox_LimitUsers->setEditText(m_settings.value("limitUsers").toString());
+        m_ui->comboBox_LimitUsers->setEditText(m_sessionCurrent.limitUsers());
     }
     if (!m_sessionCurrent.limitGroups().isNull()) {
         m_ui->checkBox_LimitGroups->setChecked(true);
-        m_ui->comboBox_LimitGroups->setEditText(m_settings.value("limitGroups").toString());
+        m_ui->comboBox_LimitGroups->setEditText(m_sessionCurrent.limitGroups());
     }
     if (!m_sessionCurrent.limitShells().isNull()) {
         m_ui->checkBox_LimitShells->setChecked(true);
-        m_ui->comboBox_LimitShells->setEditText(m_settings.value("limitShells").toString());
+        m_ui->comboBox_LimitShells->setEditText(m_sessionCurrent.limitShells());
     }
-    if (m_settings.contains("limitSalts")) {
+    if (m_sessionCurrent.limitSalts() >= 0) {
         m_ui->checkBox_LimitSalts->setChecked(true);
-        m_ui->spinBox_LimitSalts->setValue(m_settings.value("limitSalts").toInt());
+        m_ui->spinBox_LimitSalts->setValue(m_sessionCurrent.limitSalts());
     }
 
     // Advanced options
-    if (m_settings.contains("nbForkProcess")) {
+    if (m_sessionCurrent.isForkEnabled()) {
         m_ui->checkBox_UseFork->setChecked(true);
-        int nbOfProcess = m_settings.value("nbForkProcess").toInt();
+        int nbOfProcess = m_sessionCurrent.nbProcess();
         // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
         // we have to restore the right previous session value.
         if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
@@ -1407,20 +1410,19 @@ void MainWindow::restoreSessionOptions()
         }
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
-    m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings.value("OMP_NUM_THREADS").toInt());
+    m_ui->spinBox_nbOfOpenMPThread->setValue(m_sessionCurrent.nbOpenMPThreads());
 
-    if (m_settings.contains("environmentVariables")) {
+    if (!m_sessionCurrent.environmentVariables().isNull()) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
-        m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
+        m_ui->lineEdit_EnvironmentVar->setText(m_sessionCurrent.environmentVariables());
     }
     // Unselected hashes
-    QList<QVariant> unselectedRows = m_settings.value("unselectedRows").toList();
+    QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
     for (int i = 0; i < unselectedRows.count(); i++) {
-        m_hashTable->setData(m_hashTable->index(unselectedRows[i].toInt(),0),UNCHECKED_PROGRAMMATICALLY,Qt::CheckStateRole);
+        m_hashTable->setData(m_hashTable->index(unselectedRows[i],0),UNCHECKED_PROGRAMMATICALLY,Qt::CheckStateRole);
     }
     if (unselectedRows.count() > 0)
         m_hashTableProxy->checkBoxHasChanged();
-    m_settings.endGroup();
 }
 
 /* Clear/or default optional previous session UI options that may

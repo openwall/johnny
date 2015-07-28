@@ -12,6 +12,7 @@ public:
     ~JohnSession();
     bool load();
     bool save();
+    void remove();
 
     // Fields present in all sessions
     QString name();
@@ -64,6 +65,9 @@ public:
     QString formatUI() const;
     void setFormatUI(const QString &formatUI);
 
+    QList<int> unselectedRows() const;
+    void setUnselectedRows(const QList<int> &unselectedRows);
+
 private:
     QString   m_name;
     QSettings* m_settings;
@@ -86,6 +90,8 @@ private:
     int     m_nbProcess;
     int     m_nbOpenMPThreads;
     QString m_environmentVariables;
+
+    QList<int> m_unselectedRows;
 };
 
 #endif // JOHNSESSION_H

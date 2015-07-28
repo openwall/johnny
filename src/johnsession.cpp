@@ -7,11 +7,7 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
 {
     m_name = sessionName;
     m_sessionGroup = "Sessions/" + m_name;
-}
-
-QString JohnSession::sessionDir()
-{
-    return QDir::home().filePath(QLatin1String(".john/sessions/"));
+    m_limitSalts = -1;
 }
 
 QString JohnSession::filePath()
@@ -29,12 +25,16 @@ JohnSession::~JohnSession()
 
 bool JohnSession::load()
 {
-    bool success = m_settings->contains(m_sessionGroup);
+    m_settings->beginGroup("Sessions");
+    bool success = m_settings->childGroups().contains(m_name);
     if (!success)
         return false;
+    m_settings->endGroup();
 
     m_settings->beginGroup(m_sessionGroup);
+    m_passwordFiles = m_settings->value("passwordFiles").toStringList();
     m_format = m_settings->value("formatJohn").toString();
+    m_formatUI = m_settings->value("formatUI").toString();
     QString mode = m_settings->value("mode").toString();
     if (mode == "single") {
         m_mode = SINGLECRACK_MODE;
@@ -90,12 +90,17 @@ bool JohnSession::load()
     if (m_settings->contains("nbForkProcess")) {
         m_nbProcess = m_settings->value("nbForkProcess").toInt();
     }
-    /*m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings->value("OMP_NUM_THREADS").toInt());
+    m_nbOpenMPThreads = m_settings->value("OMP_NUM_THREADS").toInt();
 
     if (m_settings->contains("environmentVariables")) {
-        m_ui->checkBox_EnvironmentVar->setChecked(true);
-        m_ui->lineEdit_EnvironmentVar->setText(m_settings->value("environmentVariables").toString());
-    }*/
+        m_environmentVariables = m_settings->value("environmentVariables").toString();
+    }
+    // Unselected hashes
+    m_unselectedRows.clear();
+    QList<QVariant> unselectedRows = m_settings->value("unselectedRows").toList();
+    for (int i=0; i < unselectedRows.count(); i++) {
+        m_unselectedRows.append(unselectedRows[i].toInt());
+    }
     m_settings->endGroup();
 
     return true;
@@ -114,13 +119,13 @@ bool JohnSession::save()
     m_settings->beginGroup(m_sessionGroup);
     m_settings->remove("");
     m_settings->setValue("formatJohn", m_format);
-   ////// m_ui->formatComboBox->setEditText(m_settings->value("formatUI").toString());
-    QString mode = m_settings->value("mode").toString();
+    m_settings->setValue("formatUI", m_formatUI);
+    m_settings->setValue("passwordFiles", m_passwordFiles);
     if (m_mode == SINGLECRACK_MODE) {
         m_settings->setValue("mode", "single");
         // External mode, filter
-        if (m_settings->contains("singleCrackExternalName")) {
-            m_externalName = m_settings->value("singleCrackExternalName").toString();
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("singleCrackExternalName", m_externalName);
         }
     } else if (m_mode == WORDLIST_MODE) {
         m_settings->setValue("mode", "wordlist");
@@ -147,48 +152,55 @@ bool JohnSession::save()
 
     } else if (m_mode == JohnSession::EXTERNAL_MODE) {
         m_settings->setValue("mode", "external");
-        m_settings->value("externalModeName", m_externalName);
+        m_settings->setValue("externalModeName", m_externalName);
     } else {
-        m_mode = JohnSession::DEFAULT_MODE;
+        m_settings->setValue("mode", "default");
     }
 
     // Selectors
     if (!m_limitUsers.isNull()) {
         m_settings->setValue("limitUsers", m_limitUsers);
     }
-    if (m_settings->contains("limitGroups")) {
-        m_limitGroups = m_settings->value("limitGroups").toString();
+    if (!m_limitGroups.isNull()) {
+        m_settings->setValue("limitGroups", m_limitGroups);
     }
-    if (m_settings->contains("limitShells")) {
-        m_limitShells = m_settings->value("limitShells").toString();
+    if (!m_limitShells.isNull()) {
+        m_settings->setValue("limitShells", m_limitShells);
     }
-    if (m_settings->contains("limitSalts")) {
-        m_limitSalts = m_settings->value("limitSalts").toInt();
+    if (m_limitSalts >= 0) {
+        m_settings->setValue("limitSalts", m_limitSalts);
     }
-/*
-    // Advanced options
-    if (m_settings->contains("nbForkProcess")) {
-        m_ui->checkBox_UseFork->setChecked(true);
-        int nbOfProcess = m_settings->value("nbForkProcess").toInt();
-        // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
-        // we have to restore the right previous session value.
-        if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
-            m_ui->spinBox_nbOfProcess->setMaximum(nbOfProcess);
-        }
-        m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
-    }
-    m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings->value("OMP_NUM_THREADS").toInt());
 
-    if (m_settings->contains("environmentVariables")) {
-        m_ui->checkBox_EnvironmentVar->setChecked(true);
-        m_ui->lineEdit_EnvironmentVar->setText(m_settings->value("environmentVariables").toString());
-    }*/
+    // Advanced options
+    if (isForkEnabled()) {
+        m_settings->setValue("nbForkProcess", m_nbProcess);
+    }
+    m_settings->setValue("OMP_NUM_THREADS", m_nbOpenMPThreads);
+
+    if (!m_environmentVariables.isNull()) {
+        m_settings->setValue("environmentVariables", m_environmentVariables);
+    }
     m_settings->endGroup();
+    return true;
+}
+
+void JohnSession::remove()
+{
+    if (!m_name.isEmpty()) {
+        m_settings->beginGroup(m_sessionGroup);
+        m_settings->remove("");
+        m_settings->endGroup();
+    }
 }
 
 bool JohnSession::isForkEnabled()
 {
     return m_nbProcess > 1;
+}
+
+QString JohnSession::sessionDir()
+{
+    return QDir::home().filePath(QLatin1String(".john/sessions/"));
 }
 
 QStringList JohnSession::passwordFiles() const
@@ -210,6 +222,7 @@ void JohnSession::setEnvironmentVariables(const QString &environmentVariables)
 {
     m_environmentVariables = environmentVariables;
 }
+
 int JohnSession::nbOpenMPThreads() const
 {
     return m_nbOpenMPThreads;
@@ -219,6 +232,7 @@ void JohnSession::setNbOpenMPThreads(int nbOpenMPThreads)
 {
     m_nbOpenMPThreads = nbOpenMPThreads;
 }
+
 int JohnSession::nbProcess() const
 {
     return m_nbProcess;
@@ -228,6 +242,7 @@ void JohnSession::setNbProcess(int nbProcess)
 {
     m_nbProcess = nbProcess;
 }
+
 int JohnSession::limitSalts() const
 {
     return m_limitSalts;
@@ -237,6 +252,7 @@ void JohnSession::setLimitSalts(int limitSalts)
 {
     m_limitSalts = limitSalts;
 }
+
 QString JohnSession::limitShells() const
 {
     return m_limitShells;
@@ -246,6 +262,7 @@ void JohnSession::setLimitShells(const QString &limitShells)
 {
     m_limitShells = limitShells;
 }
+
 QString JohnSession::limitGroups() const
 {
     return m_limitGroups;
@@ -255,6 +272,7 @@ void JohnSession::setLimitGroups(const QString &limitGroups)
 {
     m_limitGroups = limitGroups;
 }
+
 QString JohnSession::limitUsers() const
 {
     return m_limitUsers;
@@ -264,6 +282,7 @@ void JohnSession::setLimitUsers(const QString &limitUsers)
 {
     m_limitUsers = limitUsers;
 }
+
 QString JohnSession::charset() const
 {
     return m_charset;
@@ -273,6 +292,7 @@ void JohnSession::setCharset(const QString &charset)
 {
     m_charset = charset;
 }
+
 QString JohnSession::rules() const
 {
     return m_rules;
@@ -282,6 +302,7 @@ void JohnSession::setRules(const QString &rules)
 {
     m_rules = rules;
 }
+
 QString JohnSession::wordlistFile() const
 {
     return m_wordlistFile;
@@ -291,6 +312,7 @@ void JohnSession::setWordlistFile(const QString &wordlistFile)
 {
     m_wordlistFile = wordlistFile;
 }
+
 QString JohnSession::externalName() const
 {
     return m_externalName;
@@ -310,7 +332,15 @@ void JohnSession::setFormatUI(const QString &formatUI)
 {
     m_formatUI = formatUI;
 }
+QList<int> JohnSession::unselectedRows() const
+{
+    return m_unselectedRows;
+}
 
+void JohnSession::setUnselectedRows(const QList<int> &unselectedRows)
+{
+    m_unselectedRows = unselectedRows;
+}
 
 JohnSession::AttackMode JohnSession::mode()
 {

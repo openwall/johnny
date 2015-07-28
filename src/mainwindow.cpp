@@ -1472,7 +1472,9 @@ void MainWindow::includeSelectedHashes()
 {
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
-        m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
+        if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Checked) {
+            m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
+        }
     }
 }
 
@@ -1480,7 +1482,9 @@ void MainWindow::excludeSelectedHashes()
 {
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
-        m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
+        if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Unchecked) {
+            m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
+        }
     }
     m_hashTableProxy->checkBoxHasChanged();
 }

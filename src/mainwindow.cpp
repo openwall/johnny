@@ -556,10 +556,10 @@ void MainWindow::startAttack()
                     QTextStream out(&newFile);
                     while (!file.atEnd()) {
                         QString line = file.readLine();
-                        if (unselectedRows.isEmpty() || unselectedRows.first() == currentRow) {
+                        if (unselectedRows.isEmpty() || unselectedRows.first() != currentRow) {
                             out << line;
-                            if(!unselectedRows.isEmpty())
-                                unselectedRows.removeFirst();
+                        } else if(!unselectedRows.isEmpty()) {
+                            unselectedRows.removeFirst();
                         }
                         currentRow++;
                     }

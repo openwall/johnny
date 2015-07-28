@@ -143,6 +143,7 @@ MainWindow::MainWindow(QSettings &settings)
             SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
     connect(&m_johnGuess, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
+    connect(&m_johnDefaultFormat, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(getDefaultFormatFinished(int,QProcess::ExitStatus)));
 
     // Handling of buttons regarding settings
     connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
@@ -386,6 +387,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             m_hashTypeChecker.setPasswordFiles(fileNames);
             m_hashTypeChecker.start();
         }
+        getDefaultFormat();
         // QSortFilterProxyModel isn't optimized for fast for dynamic filtering on big files
         if (model->rowCount() > DYNAMIC_FILTERING_HASH_LIMIT) {
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
@@ -1556,4 +1558,33 @@ void MainWindow::resetFilters()
     m_hashTableProxy->setShowCrackedRowsOnly(false,false);
     m_hashTableProxy->setShowCheckedRowsOnly(false,false);
     m_hashTableProxy->setFilterRegExp("");
+}
+
+void MainWindow::getDefaultFormat()
+{
+    m_johnDefaultFormat.setJohnProgram(m_pathToJohn);
+    QStringList args;
+    args << "-stdin";
+    args << "--session=defaultFormat";
+    args << m_sessionPasswordFiles;
+    m_johnDefaultFormat.setArgs(args);
+    m_johnDefaultFormat.start();
+    m_johnDefaultFormat.write("");
+    m_johnDefaultFormat.closeWriteChannel();
+}
+
+void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    Q_UNUSED(exitCode);
+    if (exitStatus == QProcess::CrashExit) {
+        qDebug() << "JtR seems to have crashed.";
+        return;
+    }
+    /*printf("Loaded %s (%s%s%s [%s])\n",
+        john_loaded_counts(),
+        database.format->params.label,
+        database.format->params.format_name[0] ? ", " : "",
+        database.format->params.format_name,
+        database.format->params.algorithm_name);*/
+    qDebug() << m_johnDefaultFormat.readAllStandardOutput();
 }

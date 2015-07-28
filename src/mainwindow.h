@@ -82,6 +82,8 @@ private slots:
     void guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void setAvailabilityOfFeatures(bool isJumbo);
     void verifyJohnVersion();
+    void getDefaultFormat();
+    void getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     // Settings related
     void fillSettingsWithDefaults();
@@ -144,6 +146,7 @@ private:
 
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
+    JohnAttack      m_johnDefaultFormat;
     bool            m_isDynamicFilteringEnabled;
 
 #ifdef Q_OS_OSX

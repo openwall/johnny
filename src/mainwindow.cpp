@@ -652,12 +652,11 @@ QStringList MainWindow::saveAttackParameters()
 
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
+            m_sessionCurrent.setRules(m_ui->lineEdit_WordlistRules->text());
             if (m_ui->lineEdit_WordlistRules->text().isEmpty()) {
                 parameters << "--rules";
-                m_sessionCurrent.setRules("");
             } else {
                 parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
-                m_sessionCurrent.setRules(m_ui->lineEdit_WordlistRules->text());
             }
         }
         // External mode, filter
@@ -1436,6 +1435,9 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
         }
         foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox*>()) {
             widget->setEditText("");
+        }
+        foreach(QLineEdit *widget, m_ui->optionsPage->findChildren<QLineEdit*>()) {
+            widget->setText("");
         }
     }
     int idealThreadCount = QThread::idealThreadCount();

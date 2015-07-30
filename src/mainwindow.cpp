@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "translator.h"
+#include "ui_aboutwidget.h"
 
 #include <QToolButton>
 #include <QStringListModel>
@@ -21,6 +22,7 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QtDebug>
+#include <QDesktopWidget>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QStandardPaths>
 #endif
@@ -40,11 +42,16 @@ MainWindow::MainWindow(QSettings &settings)
       m_ui(new Ui::MainWindow),
       m_hashTable(NULL),
       m_hashTableProxy(new HashSortFilterProxyModel(this)),
+      m_sessionCurrent("", &settings),
       m_johnShowTemp(NULL),
-      m_settings(settings)
+      m_settings(settings),
+      m_aboutWindow(this)
 {
     // UI initializations
     m_ui->setupUi(this);
+    Translator &translator = Translator::getInstance();
+    m_ui->comboBoxLanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
+    m_ui->widgetFork->setVisible(false);
     m_ui->tableView_Hashes->setModel(m_hashTableProxy);
     m_ui->tableView_Hashes->setSortingEnabled(true);
     m_hashTableProxy->setDynamicSortFilter(false);
@@ -145,29 +152,19 @@ MainWindow::MainWindow(QSettings &settings)
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
     connect(&m_johnDefaultFormat, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(getDefaultFormatFinished(int,QProcess::ExitStatus)));
 
-    // Handling of buttons regarding settings
-    connect(m_ui->pushButton_ResetSettings,SIGNAL(clicked()),
-            this,SLOT(restoreSavedSettings()));
-    connect(m_ui->pushButton_ApplySaveSettings,SIGNAL(clicked()),
-            this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->pushButton_ApplySettings, SIGNAL(clicked()),
-            this, SLOT(applySettings()));
-
     // Settings changed by user
-    connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(settingsChangedByUser()));
-    connect(m_ui->comboBox_PathToJohn,SIGNAL(editTextChanged(QString)),this,SLOT(settingsChangedByUser()));
-    connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(settingsChangedByUser()));
-    connect(m_ui->checkBox_AutoApplySettings,SIGNAL(stateChanged(int)),this,SLOT(checkBoxAutoApplySettingsStateChanged()));
+    connect(m_ui->spinBoxTimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->comboBoxLanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
     connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
     connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
     connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
     connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
-    connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
+    connect(m_ui->pushButtonStatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
-    connect(m_ui->pushButton_FillSettingsWithDefaults,SIGNAL(clicked()),this,SLOT(buttonFillSettingsWithDefaultsClicked()));
-    connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
+    connect(m_ui->pushButtonBrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
@@ -185,10 +182,9 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
     connect(m_ui->checkBoxShowOnlyCrackedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCrackedRowsOnly(bool)));
     // We create the app sessions data directory in $HOME if it does not exist
-    m_sessionDataDir = QDir::home().filePath(QLatin1String(".john/sessions/"));
-    if (!QDir::home().mkpath(m_sessionDataDir)) {
+    if (!QDir().mkpath(JohnSession::sessionDir())) {
         QMessageBox::critical(this, tr("Johnny"),
-            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(m_sessionDataDir));
+            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(JohnSession::sessionDir()));
         qApp->quit();
     }
 
@@ -197,7 +193,7 @@ MainWindow::MainWindow(QSettings &settings)
     QStringList sessionsList = m_settings.childGroups();
     for (int i = sessionsList.size()-1; i >= 0; i--) {
         QString sessionName = sessionsList[i];
-        QString completePath = QDir(m_sessionDataDir).filePath(sessionName);
+        QString completePath = QDir(JohnSession::sessionDir()).filePath(sessionName);
         if (QFileInfo(completePath + ".rec").isReadable()) {
             QAction *fileAction = m_sessionMenu->addAction(sessionName);
             fileAction->setData(sessionName);
@@ -230,23 +226,19 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Automatically open last session by default
     if (!m_sessionHistory.isEmpty()) {
-        m_sessionCurrent = QDir(m_sessionDataDir).filePath(m_sessionHistory.first());
+        m_sessionCurrent = JohnSession(m_sessionHistory.first(), &m_settings);
         openLastSession();
     } else {
         restoreDefaultAttackOptions(false);
     }
 
-    Translator &translator = Translator::getInstance();
-    m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
-    int languageIndex = m_ui->comboBox_LanguageSelection->findText(translator.getCurrentLanguage());
-    if (languageIndex != -1) {
-        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
-    }
-
-    #if !OS_FORK
-    //As of now, fork is only supported on unix platforms
-        m_ui->widgetFork->hide();
-    #endif
+    m_aboutWindow.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint | Qt::WindowCloseButtonHint);
+    Ui::aboutWidget aboutUi;
+    aboutUi.setupUi(&m_aboutWindow);
+    aboutUi.versionLabel->setText(tr("version ") + QCoreApplication::applicationVersion());
+    connect(m_ui->actionAboutJohnny, SIGNAL(triggered()), &m_aboutWindow, SLOT(show()));
+    connect(m_ui->actionCheckForUpdates, SIGNAL(triggered()), this, SLOT(checkForUpdates()));
+    connect(aboutUi.checkUpdateButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -292,7 +284,7 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        m_ui->comboBox_WordlistFile->setEditText(fileName);
+        m_ui->lineEditWordlistFile->setText(fileName);
     }
 }
 
@@ -433,16 +425,12 @@ void MainWindow::openPasswordFile()
 
 void MainWindow::openLastSession()
 {
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
-    m_settings.beginGroup("Sessions/" + sessionName);
-    QString format = m_settings.value("formatJohn").toString();
-    QStringList passwordFiles= m_settings.value("passwordFiles").toStringList();
-    m_settings.endGroup();
+    m_sessionCurrent.load();
+    QStringList passwordFiles= m_sessionCurrent.passwordFiles();
 
     if (readPasswdFiles(passwordFiles))
     {
-        m_format = format;
+        m_format = m_sessionCurrent.format();
         restoreSessionOptions();
         m_ui->actionResumeAttack->setEnabled(true);
     }
@@ -530,9 +518,9 @@ void MainWindow::startAttack()
         return;
 
     // Session for johnny
-    QString sessionName = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
-    m_sessionCurrent = QDir(m_sessionDataDir).filePath(sessionName);
-    QString sessionFile = m_sessionCurrent + ".rec";
+    QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
+    m_sessionCurrent = JohnSession(date, &m_settings);
+    QString sessionFile = m_sessionCurrent.filePath() + ".rec";
 
     if (QFileInfo(sessionFile).isReadable())
     {
@@ -553,14 +541,15 @@ void MainWindow::startAttack()
     }
 
     QStringList parameters = saveAttackParameters();
-    parameters << QString("--session=%1").arg(m_sessionCurrent);
+    m_sessionCurrent.save();
+    parameters << QString("--session=%1").arg(m_sessionCurrent.filePath());
 
     // We check that we have file name.
     if (!m_sessionPasswordFiles.isEmpty()) {
-        QList<QVariant> unselectedRows = m_settings.value("Sessions/" + sessionName + "/unselectedRows").toList();
+        QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
         // If some hashes are unselected, write a new file with only selected hashes
         if (unselectedRows.size() > 0) {
-            QString newFilePath = m_sessionCurrent + ".pw";
+            QString newFilePath = m_sessionCurrent.filePath() + ".pw";
             int currentRow = 0;
             for (int fileCount = 0; fileCount < m_sessionPasswordFiles.size(); fileCount++) {
                 QFile file(m_sessionPasswordFiles[fileCount]);
@@ -570,10 +559,10 @@ void MainWindow::startAttack()
                     QTextStream out(&newFile);
                     while (!file.atEnd()) {
                         QString line = file.readLine();
-                        if (unselectedRows.isEmpty() || unselectedRows.first() == currentRow) {
+                        if (unselectedRows.isEmpty() || unselectedRows.first() != currentRow) {
                             out << line;
-                            if(!unselectedRows.isEmpty())
-                                unselectedRows.removeFirst();
+                        } else if(!unselectedRows.isEmpty()) {
+                            unselectedRows.removeFirst();
                         }
                         currentRow++;
                     }
@@ -597,11 +586,8 @@ void MainWindow::startAttack()
  * it returns the selected parameters in Johnny (UI-side) */
 QStringList MainWindow::saveAttackParameters()
 {
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
-    m_ui->sessionNameLabel->setText(sessionName);
-    m_settings.beginGroup("Sessions/" + sessionName);
-    m_settings.setValue("passwordFiles", m_sessionPasswordFiles);
+    m_ui->sessionNameLabel->setText(m_sessionCurrent.name());
+    m_sessionCurrent.setPasswordFiles(m_sessionPasswordFiles);
 
     QStringList parameters;
     // We prepare parameters list from options section.
@@ -642,101 +628,104 @@ QStringList MainWindow::saveAttackParameters()
         // key.
         m_format.clear();
     }
-    m_settings.setValue("formatJohn", m_format);
-    m_settings.setValue("formatUI", m_ui->formatComboBox->currentText());
+    m_sessionCurrent.setFormat(m_format);
+    m_sessionCurrent.setFormatUI(m_ui->formatComboBox->currentText());
 
     // Modes
     QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
     if (selectedMode == m_ui->defaultModeTab) {
         // Default behaviour - no modes
         // There are no options here.
-        m_settings.setValue("mode", "default");
+        m_sessionCurrent.setMode(JohnSession::DEFAULT_MODE);
     } else if (selectedMode == m_ui->singleModeTab) {
         // "Single crack" mode
         parameters << "--single";
-        m_settings.setValue("mode", "single");
+        m_sessionCurrent.setMode(JohnSession::SINGLECRACK_MODE);
         // External mode, filter
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
-            m_settings.setValue("singleCrackExternalName", m_ui->comboBox_SingleCrackModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->lineEditSingleCrackModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditSingleCrackModeExternalName->text());
         }
 
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
-        m_settings.setValue("mode", "wordlist");
-        parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
-        m_settings.setValue("wordlistFile", m_ui->comboBox_WordlistFile->currentText());
+        m_sessionCurrent.setMode(JohnSession::WORDLIST_MODE);
+        parameters << ("--wordlist=" + m_ui->lineEditWordlistFile->text());
+        m_sessionCurrent.setWordlistFile(m_ui->lineEditWordlistFile->text());
 
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
+            m_sessionCurrent.setRules(m_ui->lineEdit_WordlistRules->text());
+            if (m_ui->lineEdit_WordlistRules->text().isEmpty()) {
                 parameters << "--rules";
+            } else {
+                parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
+            }
         }
-        m_settings.setValue("isUsingWordListRules", m_ui->checkBox_WordlistModeRules->isChecked());
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
-            m_settings.setValue("worldListExternalName", m_ui->comboBox_WordlistModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->lineEditWordlistModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditWordlistModeExternalName->text());
         }
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
-        m_settings.setValue("mode", "incremental");
+        m_sessionCurrent.setMode(JohnSession::INCREMENTAL_MODE);
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
             // With name
-            parameters << ("--incremental=" + m_ui->comboBox_IncrementalModeName->currentText());
-            m_settings.setValue("incrementalModeName", m_ui->comboBox_IncrementalModeName->currentText());
+            parameters << ("--incremental=" + m_ui->lineEditIncrementalModeName->text());
+            m_sessionCurrent.setCharset(m_ui->lineEditIncrementalModeName->text());
         } else {
             // Without name
             parameters << "--incremental";
         }
         // External mode, filter
         if (m_ui->checkBox_IncrementalModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
-            m_settings.setValue("incrementalExternalName", m_ui->comboBox_IncrementalModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->lineEditIncrementalModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditIncrementalModeExternalName->text());
         }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
-        m_settings.setValue("mode", "external");
-        parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
-        m_settings.setValue("externalModeName", m_ui->comboBox_ExternalModeName->currentText());
+        m_sessionCurrent.setMode(JohnSession::EXTERNAL_MODE);
+        parameters << ("--external=" + m_ui->lineEditExternalModeName->text());
+        m_sessionCurrent.setExternalName(m_ui->lineEditExternalModeName->text());
     }
 
     // Selectors
     if (m_ui->checkBox_LimitUsers->isChecked()) {
-        parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
-        m_settings.setValue("limitUsers", m_ui->comboBox_LimitUsers->currentText());
+        parameters << ("--users=" + m_ui->lineEditLimitUsers->text());
+        m_sessionCurrent.setLimitUsers(m_ui->lineEditLimitUsers->text());
     }
     if (m_ui->checkBox_LimitGroups->isChecked()) {
-        parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
-        m_settings.setValue("limitGroups", m_ui->comboBox_LimitGroups->currentText());
+        parameters << ("--groups=" + m_ui->lineEditLimitGroups->text());
+        m_sessionCurrent.setLimitGroups(m_ui->lineEditLimitGroups->text());
     }
     if (m_ui->checkBox_LimitShells->isChecked()) {
-        parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
-        m_settings.setValue("limitShells", m_ui->comboBox_LimitShells->currentText());
+        parameters << ("--shells=" + m_ui->lineEditLimitShells->text());
+        m_sessionCurrent.setLimitShells(m_ui->lineEditLimitShells->text());
     }
     if (m_ui->checkBox_LimitSalts->isChecked()) {
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
-        m_settings.setValue("limitSalts", m_ui->spinBox_LimitSalts->value());
+        m_sessionCurrent.setLimitSalts(m_ui->spinBox_LimitSalts->value());
     }
 
     // Advanced options
     if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
-        m_settings.setValue("nbForkProcess", m_ui->spinBox_nbOfProcess->value());
+        m_sessionCurrent.setNbProcess(m_ui->spinBox_nbOfProcess->value());
     }
-    m_settings.setValue("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->value());
+    m_sessionCurrent.setNbOpenMPThreads(m_ui->spinBox_nbOfOpenMPThread->value());
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
-        m_settings.setValue("environmentVariables", m_ui->lineEdit_EnvironmentVar->text());
+       m_sessionCurrent.setEnvironmentVariables(m_ui->lineEdit_EnvironmentVar->text());
     }
     // Save unselected rows
-    QList<QVariant> unselectedRows;
+    QList<int> unselectedRows;
     for (int i = 0; i < m_hashTable->rowCount(); i++) {
         if (m_hashTable->data(m_hashTable->index(i,0),Qt::CheckStateRole) == Qt::Unchecked) {
             unselectedRows.append(i);
         }
     }
-    m_settings.setValue("unselectedRows", unselectedRows);
-    m_settings.endGroup();
+    m_sessionCurrent.setUnselectedRows(unselectedRows);
 
     return parameters;
 }
@@ -778,9 +767,6 @@ void MainWindow::startJohn(QStringList args)
     m_johnAttack.setArgs(args);
     m_johnAttack.setJohnProgram(m_pathToJohn);
     m_johnAttack.start();
-
-    // We remember date and time of the start.
-    m_startDateTime = QDateTime::currentDateTime();
 }
 
 
@@ -790,7 +776,7 @@ void MainWindow::resumeAttack()
         return;
 
     QStringList parameters;
-    parameters << QString("--restore=%1").arg(m_sessionCurrent);
+    parameters << QString("--restore=%1").arg(m_sessionCurrent.filePath());
 
     startJohn(parameters);
 }
@@ -887,11 +873,10 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
     appendLog(CONSOLE_LOG_SEPARATOR);
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
+    QString sessionName(m_sessionCurrent.name());
 
     bool isNewSession = !m_sessionHistory.contains(sessionName);
-    bool isRecReadable = QFileInfo(m_sessionCurrent + ".rec").isReadable();
+    bool isRecReadable = QFileInfo(m_sessionCurrent.filePath() + ".rec").isReadable();
     if ((isNewSession == true) && (isRecReadable == true)) {
         // New session saved by john, add it to the list
         QAction* action = new QAction(sessionName, this);
@@ -903,7 +888,7 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
         // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
         // so we remove it from the session history list to have an error-prone UI
         m_sessionHistory.removeOne(sessionName);
-        m_settings.remove("Sessions/" + sessionName);
+        m_sessionCurrent.remove();
         foreach(QAction* actions, m_sessionMenu->actions()) {
             if (actions->data().toString() == sessionName) {
                     m_sessionMenu->removeAction(actions);
@@ -1035,7 +1020,7 @@ void MainWindow::readJohnShow()
 //       restoreLastSavedSettings,
 //       And of course you should put elements on the form.
 //       And you must connect the signal eventChanged of the widget to the slot
-//       settingsChangedByUser() to take care of autoApply setting
+//       applyAndSaveSettings() to take care of auto-saving
 
 void MainWindow::warnAboutDefaultPathToJohn()
 {
@@ -1047,7 +1032,7 @@ void MainWindow::warnAboutDefaultPathToJohn()
            "(just use 'john' there to make Johnny search for John the Ripper "
            "in PATH on every invocation of John the Ripper). "
            "If you are satisfied with defaults then save settings to avoid this message.").arg(
-               m_ui->comboBox_PathToJohn->currentText()));
+               m_ui->lineEditPathToJohn->text()));
 }
 
 void MainWindow::fillSettingsWithDefaults()
@@ -1087,16 +1072,12 @@ void MainWindow::fillSettingsWithDefaults()
             break;
         }
     }
-
-    m_ui->comboBox_PathToJohn->setEditText(john);
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
-    m_ui->checkBox_AutoApplySettings->setChecked(false);
-}
-
-void MainWindow::buttonFillSettingsWithDefaultsClicked()
-{
-    fillSettingsWithDefaults();
-    warnAboutDefaultPathToJohn();
+    m_ui->lineEditPathToJohn->blockSignals(true);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(true);
+    m_ui->lineEditPathToJohn->setText(john);
+    m_ui->spinBoxTimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
+    m_ui->lineEditPathToJohn->blockSignals(false);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(false);
 }
 
 void MainWindow::buttonBrowsePathToJohnClicked()
@@ -1106,14 +1087,15 @@ void MainWindow::buttonBrowsePathToJohnClicked()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        m_ui->comboBox_PathToJohn->setEditText(fileName);
+        m_ui->lineEditPathToJohn->setText(fileName);
+        applyAndSaveSettings();
     }
 }
 
 void MainWindow::applySettings()
 {
     // We verify john version
-    QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
+    QString newJohnPath = m_ui->lineEditPathToJohn->text();
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
         m_johnVersionCheck.setJohnProgram(newJohnPath);
         m_johnVersionCheck.start();
@@ -1121,12 +1103,11 @@ void MainWindow::applySettings()
     // We copy settings from elements on the form to the settings
     // object with current settings.
     m_pathToJohn = newJohnPath;
-    m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
-    m_autoApplySettings = m_ui->checkBox_AutoApplySettings->isChecked();
+    m_timeIntervalPickCracked = m_ui->spinBoxTimeIntervalPickCracked->value();
 
     // If the language changed, retranslate the UI
     Translator &translator = Translator::getInstance();
-    QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
+    QString newLanguage = m_ui->comboBoxLanguageSelection->currentText().toLower();
     if (newLanguage != translator.getCurrentLanguage().toLower()) {
         translator.translateApplication(qApp,newLanguage);
         m_ui->retranslateUi(this);
@@ -1136,83 +1117,48 @@ void MainWindow::applySettings()
 void MainWindow::applyAndSaveSettings()
 {
     applySettings();
-    m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
-    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
-    m_settings.setValue("AutoApplySettings", m_ui->checkBox_AutoApplySettings->isChecked());
-    m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
+    m_settings.setValue("PathToJohn", m_ui->lineEditPathToJohn->text());
+    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBoxTimeIntervalPickCracked->value());
+    m_settings.setValue("Language", m_ui->comboBoxLanguageSelection->currentText().toLower());
 }
 
 void MainWindow::restoreSavedSettings()
 {
     // We copy stored settings to the form and then invoke applySettings()
-    // TODO: Add sensible defaults to all values
+    m_ui->lineEditPathToJohn->blockSignals(true);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(true);
+    m_ui->comboBoxLanguageSelection->blockSignals(true);
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
-    m_ui->comboBox_PathToJohn->setEditText(
+    m_ui->lineEditPathToJohn->setText(
         settingsPathToJohn == ""
-        ? m_ui->comboBox_PathToJohn->currentText()
+        ? m_ui->lineEditPathToJohn->text()
         : settingsPathToJohn);
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(
+    m_ui->spinBoxTimeIntervalPickCracked->setValue(
         m_settings.value("TimeIntervalPickCracked").toString() == ""
-        ? m_ui->spinBox_TimeIntervalPickCracked->value()
+        ? m_ui->spinBoxTimeIntervalPickCracked->value()
         : m_settings.value("TimeIntervalPickCracked").toInt());
-    m_ui->checkBox_AutoApplySettings->setChecked(
-        m_settings.value("AutoApplySettings").toString() == ""
-        ? m_ui->checkBox_AutoApplySettings->isChecked()
-        : m_settings.value("AutoApplySettings").toBool());
+    int languageIndex = m_ui->comboBoxLanguageSelection->findText(m_settings.value("Language").toString());
+    if (languageIndex != -1) {
+        m_ui->comboBoxLanguageSelection->setCurrentIndex(languageIndex);
+    }
+    m_ui->lineEditPathToJohn->blockSignals(false);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(false);
+    m_ui->comboBoxLanguageSelection->blockSignals(false);
     applySettings();
+
 }
-
-// Handlers for settings auto application
-
-void MainWindow::settingsChangedByUser()
-{
-    if (m_autoApplySettings)
-        applySettings();
-}
-
-void MainWindow::checkBoxAutoApplySettingsStateChanged()
-{
-    // First goal is to disable 'apply' button and to apply settings
-    // when auto application is turned on.
-    bool autoApply = m_ui->checkBox_AutoApplySettings->isChecked();
-    m_ui->pushButton_ApplySettings->setEnabled(!autoApply);
-    if (autoApply)
-        applySettings();
-    // Second goal is auto application for auto application setting itself.
-    // NOTE: Deactivation of auto application will be auto applied.
-    // NOTE: Auto application is a setting too. At least it would be
-    //       good to remember its state between program runs.
-    if (m_autoApplySettings)
-        applySettings();
-}
-
-
-// Statistics page code
 
 void MainWindow::updateStatistics()
 {
-    // Working time
-    // We could not just subtract one time from another. But we could
-    // know days and seconds between two time points.
-    //
-    // We check whether John is running.
     if (m_johnAttack.state() == QProcess::Running) {
-        // If John is running then we put time of its work on the
-        // form.
-        // We remember current time.
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        // We count days and seconds since attack start.
-        int days = m_startDateTime.daysTo(currentDateTime),
-            seconds = m_startDateTime.secsTo(currentDateTime);
-        // We compute minutes and hours since attack start.
-        int minutes = seconds / 60 % 60,
-            hours = seconds / 60 / 60 % 24;
-        // We modify seconds value to be shorter than minute.
-        seconds %= 60;
-        // We produce a string representing distance between time points.
+        qint64 secondsElapsed = m_johnAttack.startTime().secsTo(QDateTime::currentDateTime());
+        qint64 days    = secondsElapsed / 86400;
+        qint64 hours   = (secondsElapsed % 86400) / 3600;
+        qint64 minutes = ((secondsElapsed % 86400) % 3600) / 60;
+        qint64 seconds = ((secondsElapsed % 86400) % 3600) % 60;
+
         QString workingTime;
         QTextStream stream(&workingTime);
-
         stream << days << tr(":");
         // Hours, minutes and seconds have padding with zeroes to two
         // chars.
@@ -1221,12 +1167,12 @@ void MainWindow::updateStatistics()
         stream << qSetFieldWidth(2) << hours << qSetFieldWidth(1) << tr(":");
         stream << qSetFieldWidth(2) << minutes << qSetFieldWidth(1) << tr(":");
         stream << qSetFieldWidth(2) << seconds;
-        // We put prepared string on the form.
-        m_ui->label_StatisticsWorkingTime->setText(workingTime);
+
+        m_ui->labelStatisticsWorkingTime->setText(workingTime);
     } else {
-        // Else (if John is not running) we put dash instead of time.
-        m_ui->label_StatisticsWorkingTime->setText(tr("-"));
+        m_ui->labelStatisticsWorkingTime->setText("-");
     }
+    callJohnShow();
 }
 
 /*
@@ -1306,12 +1252,14 @@ void MainWindow::verifyJohnVersion()
     QString output = m_johnVersionCheck.readAllStandardOutput();
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     setAvailabilityOfFeatures(isJumbo);
+    bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
+    m_ui->widgetFork->setVisible(isForkEnabled);
 }
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)
 {
     if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
-        QDir dir(m_sessionDataDir);
+        QDir dir(JohnSession::sessionDir());
         dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec" << "*.pw");
         dir.setFilter(QDir::Files);
         foreach (QString dirFile, dir.entryList()) {
@@ -1322,13 +1270,13 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
                     m_sessionMenu->removeAction(actions);
             }
         }
-        m_sessionCurrent.clear();
+        m_sessionCurrent = JohnSession("", &m_settings);
         m_settings.remove("Sessions");
         m_ui->actionResumeAttack->setEnabled(false);
     } else {
         QString fileName = action->data().toString();
         if (!fileName.isEmpty()) {
-            m_sessionCurrent = QDir(m_sessionDataDir).filePath(fileName);
+            m_sessionCurrent = JohnSession(fileName, &m_settings);
             openLastSession();
         }
     }
@@ -1371,74 +1319,72 @@ void MainWindow::restoreSessionOptions()
 {
     restoreDefaultAttackOptions();
     // Start restoring required UI fields
-    QString sessionName(m_sessionCurrent);
-    sessionName.remove(m_sessionDataDir);
-    m_ui->sessionNameLabel->setText(sessionName);
-    m_settings.beginGroup("Sessions/" + sessionName);
-    m_format = m_settings.value("formatJohn").toString();
-    m_ui->formatComboBox->setEditText(m_settings.value("formatUI").toString());
-    QString mode = m_settings.value("mode").toString();
-    if (mode == "single") {
+    m_ui->sessionNameLabel->setText(m_sessionCurrent.name());
+    m_format = m_sessionCurrent.format();
+    m_ui->formatComboBox->setEditText(m_sessionCurrent.formatUI());
+    JohnSession::AttackMode mode = m_sessionCurrent.mode();
+    if (mode == JohnSession::SINGLECRACK_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->singleModeTab);
         // External mode, filter
-        if(m_settings.contains("singleCrackExternalName")) {
+        if(!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
-            m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_settings.value("singleCrackExternalName").toString());
+            m_ui->lineEditSingleCrackModeExternalName->setText(m_sessionCurrent.externalName());
         }
-    } else if (mode == "wordlist") {
+    } else if (mode == JohnSession::WORDLIST_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
-        m_ui->comboBox_WordlistFile->setEditText(m_settings.value("wordlistFile").toString());
+        m_ui->lineEditWordlistFile->setText(m_sessionCurrent.wordlistFile());
         //Rules
-        if (m_settings.value("isUsingWordListRules").toBool() == true) {
+        if (!m_sessionCurrent.rules().isNull()) {
             m_ui->checkBox_WordlistModeRules->setChecked(true);
+            m_ui->lineEdit_WordlistRules->setText(m_sessionCurrent.rules());
         }
         // External mode, filter
-        if (m_settings.contains("worldListExternalName")) {
+        if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_WordlistModeExternalName->setChecked(true);
-            m_ui->comboBox_WordlistModeExternalName->setEditText(m_settings.value("worldListExternalName").toString());
+            m_ui->lineEditWordlistModeExternalName->setText(m_sessionCurrent.externalName());
         }
-    } else if (mode == "incremental") {
+    } else if (mode == JohnSession::INCREMENTAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);
         // "Incremental" mode
         // It could be with or without name.
-        if (m_settings.contains("incrementalModeName")) {
+        if (!m_sessionCurrent.charset().isNull()) {
             m_ui->checkBox_IncrementalModeName->setChecked(true);
-            m_ui->comboBox_IncrementalModeName->setEditText(m_settings.value("incrementalModeName").toString());
+            m_ui->lineEditIncrementalModeName->setText(m_sessionCurrent.charset());
         }
         // External mode, filter
-        if (m_settings.contains("incrementalExternalName")) {
+        if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
-            m_ui->comboBox_IncrementalModeExternalName->setEditText(m_settings.value("incrementalExternalName").toString());
+            m_ui->lineEditIncrementalModeExternalName->setText(m_sessionCurrent.externalName());
         }
-    } else if (mode == "external") {
+    } else if (mode == JohnSession::EXTERNAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
-        m_ui->comboBox_ExternalModeName->setEditText(m_settings.value("externalModeName").toString());
+        m_ui->lineEditExternalModeName->setText(m_sessionCurrent.externalName());
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
 
     // Selectors
-    if (m_settings.contains("limitUsers")) {
+    if (!m_sessionCurrent.limitUsers().isNull()) {
         m_ui->checkBox_LimitUsers->setChecked(true);
-        m_ui->comboBox_LimitUsers->setEditText(m_settings.value("limitUsers").toString());
+        m_ui->lineEditLimitUsers->setText(m_sessionCurrent.limitUsers());
     }
-    if (m_settings.contains("limitGroups")) {
+    if (!m_sessionCurrent.limitGroups().isNull()) {
         m_ui->checkBox_LimitGroups->setChecked(true);
-        m_ui->comboBox_LimitGroups->setEditText(m_settings.value("limitGroups").toString());
+        m_ui->lineEditLimitGroups->setText(m_sessionCurrent.limitGroups());
     }
-    if (m_settings.contains("limitShells")) {
+    if (!m_sessionCurrent.limitShells().isNull()) {
         m_ui->checkBox_LimitShells->setChecked(true);
-        m_ui->comboBox_LimitShells->setEditText(m_settings.value("limitShells").toString());
+        m_ui->lineEditLimitShells->setText(m_sessionCurrent.limitShells());
     }
-    if (m_settings.contains("limitSalts")) {
+    if (m_sessionCurrent.limitSalts() >= 0) {
         m_ui->checkBox_LimitSalts->setChecked(true);
-        m_ui->spinBox_LimitSalts->setValue(m_settings.value("limitSalts").toInt());
+        m_ui->spinBox_LimitSalts->setValue(m_sessionCurrent.limitSalts());
     }
 
     // Advanced options
-    if (m_settings.contains("nbForkProcess")) {
+    if (m_sessionCurrent.isForkEnabled()) {
         m_ui->checkBox_UseFork->setChecked(true);
-        int nbOfProcess = m_settings.value("nbForkProcess").toInt();
+        int nbOfProcess = m_sessionCurrent.nbProcess();
         // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
         // we have to restore the right previous session value.
         if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
@@ -1446,20 +1392,19 @@ void MainWindow::restoreSessionOptions()
         }
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
-    m_ui->spinBox_nbOfOpenMPThread->setValue(m_settings.value("OMP_NUM_THREADS").toInt());
+    m_ui->spinBox_nbOfOpenMPThread->setValue(m_sessionCurrent.nbOpenMPThreads());
 
-    if (m_settings.contains("environmentVariables")) {
+    if (!m_sessionCurrent.environmentVariables().isNull()) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
-        m_ui->lineEdit_EnvironmentVar->setText(m_settings.value("environmentVariables").toString());
+        m_ui->lineEdit_EnvironmentVar->setText(m_sessionCurrent.environmentVariables());
     }
     // Unselected hashes
-    QList<QVariant> unselectedRows = m_settings.value("unselectedRows").toList();
+    QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
     for (int i = 0; i < unselectedRows.count(); i++) {
-        m_hashTable->setData(m_hashTable->index(unselectedRows[i].toInt(),0),UNCHECKED_PROGRAMMATICALLY,Qt::CheckStateRole);
+        m_hashTable->setData(m_hashTable->index(unselectedRows[i],0),UNCHECKED_PROGRAMMATICALLY,Qt::CheckStateRole);
     }
     if (unselectedRows.count() > 0)
         m_hashTableProxy->checkBoxHasChanged();
-    m_settings.endGroup();
 }
 
 /* Clear/or default optional previous session UI options that may
@@ -1474,13 +1419,26 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
         foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox*>()) {
             widget->setEditText("");
         }
+        foreach(QLineEdit *widget, m_ui->optionsPage->findChildren<QLineEdit*>()) {
+            widget->setText("");
+        }
     }
-    m_ui->spinBox_nbOfProcess->setMaximum(QThread::idealThreadCount());
-    m_ui->spinBox_nbOfProcess->setValue(QThread::idealThreadCount());
-    m_ui->spinBox_nbOfProcess->setMinimum(2); // john --fork will error if < 2, let's prevent it
+    int idealThreadCount = QThread::idealThreadCount();
+    // john --fork will error if < 2, let's prevent it
+    if (idealThreadCount < 2) {
+        idealThreadCount = 2;
+    }
+    m_ui->spinBox_nbOfProcess->setMaximum(idealThreadCount);
+    m_ui->spinBox_nbOfProcess->setValue(idealThreadCount);
+    m_ui->spinBox_nbOfProcess->setMinimum(2);
     m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
+}
+
+void MainWindow::checkForUpdates()
+{
+    QDesktopServices::openUrl(QUrl("http://openwall.info/wiki/john/johnny"));
 }
 
 void MainWindow::showHashesTableContextMenu(const QPoint& pos)
@@ -1499,7 +1457,9 @@ void MainWindow::includeSelectedHashes()
 {
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
-        m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
+        if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Checked) {
+            m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
+        }
     }
 }
 
@@ -1507,7 +1467,9 @@ void MainWindow::excludeSelectedHashes()
 {
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
-        m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
+        if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Unchecked) {
+            m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
+        }
     }
     m_hashTableProxy->checkBoxHasChanged();
 }

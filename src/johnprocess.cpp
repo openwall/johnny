@@ -15,7 +15,7 @@ JohnProcess::~JohnProcess()
 
 void JohnProcess::setupChildProcess()
 {
-#if OS_FORK
+#ifdef Q_OS_UNIX
     // Create a group for children created by
     // JtR when -- fork option is available (unix-like)
     setsid();
@@ -26,7 +26,7 @@ void JohnProcess::setupChildProcess()
 
 void JohnProcess::terminate()
 {
-#if OS_FORK
+#ifdef Q_OS_UNIX
     if (pid() != 0) {
         /* Send sigterm to all processes of the group
          * created previously with setsid()
@@ -35,7 +35,7 @@ void JohnProcess::terminate()
          * compatibility with those versions of John for now */
         ::kill(-pid(), SIGTERM);
     }
-#elif defined Q_OS_WIN
+#elif Q_OS_WIN
     Q_PID pid = this->pid();
     FreeConsole();
     AttachConsole(pid->dwProcessId);

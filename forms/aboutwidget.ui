@@ -9,41 +9,48 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
-    <height>380</height>
+    <width>402</width>
+    <height>402</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item alignment="Qt::AlignHCenter">
-    <widget class="QLabel" name="johnnyLogo">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="bottomMargin">
+      <number>20</number>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>128</width>
-       <height>128</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>128</width>
-       <height>128</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../resources/resources.qrc">:/icons/johnny.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
-     </property>
-    </widget>
+     <item>
+      <widget class="QLabel" name="johnnyLogo">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>128</width>
+         <height>128</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>128</width>
+         <height>128</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../resources/resources.qrc">:/icons/johnny.png</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -61,7 +68,7 @@
      </property>
     </spacer>
    </item>
-   <item alignment="Qt::AlignHCenter">
+   <item>
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
@@ -80,7 +87,7 @@
      </property>
     </widget>
    </item>
-   <item alignment="Qt::AlignHCenter">
+   <item>
     <widget class="QLabel" name="versionLabel">
      <property name="text">
       <string>version </string>
@@ -93,21 +100,28 @@
      </property>
     </widget>
    </item>
-   <item alignment="Qt::AlignHCenter">
-    <widget class="QPushButton" name="checkUpdateButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="toolTip">
-      <string/>
-     </property>
-     <property name="text">
-      <string>Check for update</string>
-     </property>
-    </widget>
+   <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="checkUpdateButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text">
+         <string>Check for update</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
    </item>
    <item>
     <widget class="QLabel" name="label_3">

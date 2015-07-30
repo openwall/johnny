@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>729</height>
+    <width>781</width>
+    <height>640</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -214,9 +214,9 @@ border-bottom: 1px solid darkgrey;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-48</y>
-             <width>751</width>
-             <height>928</height>
+             <y>0</y>
+             <width>705</width>
+             <height>889</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1003,46 +1003,62 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>756</width>
-             <height>504</height>
+             <width>705</width>
+             <height>517</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_11">
-              <item>
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Path to John the Ripper executable:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLineEdit" name="lineEditPathToJohn"/>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_BrowsePathToJohn">
-                <property name="text">
-                 <string>Browse</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Johnny relies on John the Ripper for the actual work. Please set the path to John main executable bellow, it can be either core John or jumbo John. Jumbo is the better option of the two, since it supports many more features that Johnny can take advantage of.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_12">
-              <item>
-               <widget class="QLabel" name="label_9">
+             <layout class="QFormLayout" name="formLayout_6">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+              </property>
+              <property name="formAlignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>Time interval in seconds between cracked passwords picking (edit john.conf respectively):</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>true</bool>
+                 <string>Path to John the Ripper:</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QSpinBox" name="spinBox_TimeIntervalPickCracked">
+              <item row="0" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLineEdit" name="lineEditPathToJohn"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButtonBrowsePathToJohn">
+                  <property name="text">
+                   <string>Browse</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="toolTip">
+                 <string>John --show is invoked at that interval to pick the cracked passwords.</string>
+                </property>
+                <property name="text">
+                 <string>Interval in seconds between attack updates:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="spinBoxTimeIntervalPickCracked">
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -1051,19 +1067,15 @@ border-bottom: 1px solid darkgrey;
                 </property>
                </widget>
               </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="language_layout">
-              <item>
-               <widget class="QLabel" name="label_Language">
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelLanguage">
                 <property name="text">
-                 <string>Language:</string>
+                 <string>Interface language:</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QComboBox" name="comboBox_LanguageSelection"/>
+              <item row="2" column="1">
+               <widget class="QComboBox" name="comboBoxLanguageSelection"/>
               </item>
              </layout>
             </item>
@@ -1174,8 +1186,8 @@ border-bottom: 1px solid darkgrey;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>861</width>
-     <height>27</height>
+     <width>781</width>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -1207,7 +1219,7 @@ border-bottom: 1px solid darkgrey;
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>?</string>
+     <string>Help</string>
     </property>
     <addaction name="actionCheckForUpdates"/>
     <addaction name="actionAboutJohnny"/>

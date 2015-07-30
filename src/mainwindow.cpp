@@ -50,7 +50,7 @@ MainWindow::MainWindow(QSettings &settings)
     // UI initializations
     m_ui->setupUi(this);
     Translator &translator = Translator::getInstance();
-    m_ui->comboBox_LanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
+    m_ui->comboBoxLanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     m_ui->widgetFork->setVisible(false);
     m_ui->tableView_Hashes->setModel(m_hashTableProxy);
     m_ui->tableView_Hashes->setSortingEnabled(true);
@@ -152,9 +152,9 @@ MainWindow::MainWindow(QSettings &settings)
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
 
     // Settings changed by user
-    connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->spinBoxTimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
     connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->comboBoxLanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
     connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
@@ -163,7 +163,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
     connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
-    connect(m_ui->pushButton_BrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
+    connect(m_ui->pushButtonBrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
@@ -236,6 +236,7 @@ MainWindow::MainWindow(QSettings &settings)
     aboutUi.setupUi(&m_aboutWindow);
     aboutUi.versionLabel->setText(tr("version ") + QCoreApplication::applicationVersion());
     connect(m_ui->actionAboutJohnny, SIGNAL(triggered()), &m_aboutWindow, SLOT(show()));
+    connect(m_ui->actionCheckForUpdates, SIGNAL(triggered()), this, SLOT(checkForUpdates()));
     connect(aboutUi.checkUpdateButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
 }
 
@@ -1073,11 +1074,11 @@ void MainWindow::fillSettingsWithDefaults()
         }
     }
     m_ui->lineEditPathToJohn->blockSignals(true);
-    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(true);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(true);
     m_ui->lineEditPathToJohn->setText(john);
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
+    m_ui->spinBoxTimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
     m_ui->lineEditPathToJohn->blockSignals(false);
-    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(false);
 }
 
 void MainWindow::buttonBrowsePathToJohnClicked()
@@ -1103,11 +1104,11 @@ void MainWindow::applySettings()
     // We copy settings from elements on the form to the settings
     // object with current settings.
     m_pathToJohn = newJohnPath;
-    m_timeIntervalPickCracked = m_ui->spinBox_TimeIntervalPickCracked->value();
+    m_timeIntervalPickCracked = m_ui->spinBoxTimeIntervalPickCracked->value();
 
     // If the language changed, retranslate the UI
     Translator &translator = Translator::getInstance();
-    QString newLanguage = m_ui->comboBox_LanguageSelection->currentText().toLower();
+    QString newLanguage = m_ui->comboBoxLanguageSelection->currentText().toLower();
     if (newLanguage != translator.getCurrentLanguage().toLower()) {
         translator.translateApplication(qApp,newLanguage);
         m_ui->retranslateUi(this);
@@ -1118,32 +1119,32 @@ void MainWindow::applyAndSaveSettings()
 {
     applySettings();
     m_settings.setValue("PathToJohn", m_ui->lineEditPathToJohn->text());
-    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
-    m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
+    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBoxTimeIntervalPickCracked->value());
+    m_settings.setValue("Language", m_ui->comboBoxLanguageSelection->currentText().toLower());
 }
 
 void MainWindow::restoreSavedSettings()
 {
     // We copy stored settings to the form and then invoke applySettings()
     m_ui->lineEditPathToJohn->blockSignals(true);
-    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(true);
-    m_ui->comboBox_LanguageSelection->blockSignals(true);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(true);
+    m_ui->comboBoxLanguageSelection->blockSignals(true);
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
     m_ui->lineEditPathToJohn->setText(
         settingsPathToJohn == ""
         ? m_ui->lineEditPathToJohn->text()
         : settingsPathToJohn);
-    m_ui->spinBox_TimeIntervalPickCracked->setValue(
+    m_ui->spinBoxTimeIntervalPickCracked->setValue(
         m_settings.value("TimeIntervalPickCracked").toString() == ""
-        ? m_ui->spinBox_TimeIntervalPickCracked->value()
+        ? m_ui->spinBoxTimeIntervalPickCracked->value()
         : m_settings.value("TimeIntervalPickCracked").toInt());
-    int languageIndex = m_ui->comboBox_LanguageSelection->findText(m_settings.value("Language").toString());
+    int languageIndex = m_ui->comboBoxLanguageSelection->findText(m_settings.value("Language").toString());
     if (languageIndex != -1) {
-        m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
+        m_ui->comboBoxLanguageSelection->setCurrentIndex(languageIndex);
     }
     m_ui->lineEditPathToJohn->blockSignals(false);
-    m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
-    m_ui->comboBox_LanguageSelection->blockSignals(false);
+    m_ui->spinBoxTimeIntervalPickCracked->blockSignals(false);
+    m_ui->comboBoxLanguageSelection->blockSignals(false);
     applySettings();
 
 }

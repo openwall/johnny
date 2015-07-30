@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>851</width>
-    <height>550</height>
+    <width>853</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="passwordsPageLayout">
@@ -215,7 +215,7 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>632</width>
+             <width>743</width>
              <height>908</height>
             </rect>
            </property>
@@ -352,7 +352,7 @@ border-bottom: 1px solid darkgrey;
                   </sizepolicy>
                  </property>
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>2</number>
                  </property>
                  <widget class="QWidget" name="defaultModeTab">
                   <attribute name="title">
@@ -531,6 +531,9 @@ border-bottom: 1px solid darkgrey;
                         <string>Use rules</string>
                        </property>
                       </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="lineEdit_WordlistRules"/>
                      </item>
                     </layout>
                    </item>
@@ -1044,25 +1047,11 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>352</height>
+             <width>446</width>
+             <height>183</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
-            <item>
-             <widget class="QPushButton" name="pushButton_ResetSettings">
-              <property name="text">
-               <string>Reset Settings back to saved state</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_FillSettingsWithDefaults">
-              <property name="text">
-               <string>Fill Settings with default values</string>
-              </property>
-             </widget>
-            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>
@@ -1125,31 +1114,6 @@ border-bottom: 1px solid darkgrey;
                <widget class="QComboBox" name="comboBox_LanguageSelection"/>
               </item>
              </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_13">
-              <item>
-               <widget class="QCheckBox" name="checkBox_AutoApplySettings">
-                <property name="text">
-                 <string>Apply Settings as soon as they are changed</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_ApplySettings">
-                <property name="text">
-                 <string>Apply Settings but do NOT SAVE them</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_ApplySaveSettings">
-              <property name="text">
-               <string>Apply and Save Settings</string>
-              </property>
-             </widget>
             </item>
             <item>
              <spacer name="verticalSpacer_2">
@@ -1258,8 +1222,8 @@ border-bottom: 1px solid darkgrey;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>851</width>
-     <height>22</height>
+     <width>853</width>
+     <height>27</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -1289,9 +1253,17 @@ border-bottom: 1px solid darkgrey;
     </property>
     <addaction name="actionCopyToClipboard"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="actionCheckForUpdates"/>
+    <addaction name="actionAboutJohnny"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAttack"/>
    <addaction name="menuPasswords"/>
+   <addaction name="menu"/>
   </widget>
   <widget class="QToolBar" name="tabSelectionToolBar">
    <property name="sizePolicy">
@@ -1553,6 +1525,16 @@ border-bottom: 1px solid darkgrey;
    </property>
    <property name="shortcut">
     <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="actionAboutJohnny">
+   <property name="text">
+    <string>About Johnny</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates">
+   <property name="text">
+    <string>Check for updates</string>
    </property>
   </action>
   <action name="actionIncludeSelectedHashes">

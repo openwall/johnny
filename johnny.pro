@@ -9,6 +9,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = johnny
 
+# The application version
+VERSION = 2.0
+
+# Define the preprocessor macro to get the application version in our application.
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 TEMPLATE = app
 
 SOURCES +=  src/main.cpp\
@@ -21,6 +27,7 @@ SOURCES +=  src/main.cpp\
             src/johnattack.cpp \
             src/menu.cpp \
             src/tabwidget.cpp \
+            src/johnsession.cpp \
             src/hashsortfilterproxymodel.cpp \
             src/passwordfilemodel.cpp
 
@@ -33,12 +40,14 @@ HEADERS  += src/mainwindow.h \
             src/johnattack.h \
             src/menu.h \
             src/tabwidget.h \
+            src/johnsession.h \
             src/hashsortfilterproxymodel.h \
             src/passwordfilemodel.h
 
 INCLUDEPATH += src/
 
-FORMS    += forms/mainwindow.ui
+FORMS    += forms/mainwindow.ui \
+            forms/aboutwidget.ui
 
 TRANSLATIONS    = translations/johnny_fr.ts
 CODECFORTR      = UTF-8

@@ -28,9 +28,11 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
+    // Setting the application version which is defined in johnny.pro
+    app.setApplicationVersion(APP_VERSION);
+
     QSettings settings(QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
                 QSettings::IniFormat);
-
     QString settingLanguage = settings.value("Language").toString();
     Translator& translator = Translator::getInstance();
 
@@ -38,6 +40,7 @@ int main(int argc, char *argv[])
     if (settingLanguage.isEmpty()) {
         QString systemLanguage =  QLocale::languageToString(QLocale().language());
         translator.translateApplication(&app, systemLanguage);
+        settings.setValue("Language", translator.getCurrentLanguage().toLower());
     } else {
         //Use the language specified in the settings
         translator.translateApplication(&app, settingLanguage);

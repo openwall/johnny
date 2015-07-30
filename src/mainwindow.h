@@ -11,6 +11,7 @@
 #include "johnattack.h"
 #include "hashtypechecker.h"
 #include "menu.h"
+#include "johnsession.h"
 #include "passwordfilemodel.h"
 #include "hashsortfilterproxymodel.h"
 
@@ -52,13 +53,11 @@ private slots:
     void openLastSession();
     void tabsSelectionChanged(QAction *action);
     void buttonWordlistFileBrowseClicked();
-    void buttonFillSettingsWithDefaultsClicked();
     void buttonBrowsePathToJohnClicked();
-    void checkBoxAutoApplySettingsStateChanged();
     void updateStatistics();
-    void settingsChangedByUser();
     void restoreSessionOptions();
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
+    void checkForUpdates();
     void filterHashesTable();
     void showHashesTableContextMenu(const QPoint& pos);
     void includeSelectedHashes();
@@ -110,8 +109,7 @@ private:
     PasswordFileModel        *m_hashTable;
     HashSortFilterProxyModel *m_hashTableProxy;
 
-    QString             m_sessionDataDir;
-    QString             m_sessionCurrent;
+    JohnSession         m_sessionCurrent;
     QStringList         m_sessionHistory;
     QStringList         m_sessionPasswordFiles;
     JohnAttack          m_johnAttack;       // main JtR attack handler
@@ -145,6 +143,8 @@ private:
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
     bool            m_isDynamicFilteringEnabled;
+
+    QWidget         m_aboutWindow;
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;

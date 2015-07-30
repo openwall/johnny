@@ -952,25 +952,31 @@ border-bottom: 1px solid darkgrey;
             <number>0</number>
            </property>
            <item>
-            <widget class="QPushButton" name="pushButton_StatisticsUpdateStatus">
+            <widget class="QPushButton" name="pushButtonStatisticsUpdateStatus">
              <property name="text">
               <string>Update Status/Collect Statistics</string>
              </property>
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_14">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
               <widget class="QLabel" name="label_13">
                <property name="text">
-                <string>Working time:</string>
+                <string>Working time</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_StatisticsWorkingTime">
+              <widget class="QLabel" name="labelStatisticsWorkingTime">
                <property name="text">
                 <string>-</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>

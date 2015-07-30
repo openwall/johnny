@@ -161,7 +161,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
     connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
     connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
-    connect(m_ui->pushButton_StatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
+    connect(m_ui->pushButtonStatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
     connect(m_ui->pushButtonBrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
@@ -765,9 +765,6 @@ void MainWindow::startJohn(QStringList args)
     m_johnAttack.setArgs(args);
     m_johnAttack.setJohnProgram(m_pathToJohn);
     m_johnAttack.start();
-
-    // We remember date and time of the start.
-    m_startDateTime = QDateTime::currentDateTime();
 }
 
 
@@ -1149,34 +1146,17 @@ void MainWindow::restoreSavedSettings()
 
 }
 
-// Handlers for settings auto application
-
-// Statistics page code
-
 void MainWindow::updateStatistics()
 {
-    // Working time
-    // We could not just subtract one time from another. But we could
-    // know days and seconds between two time points.
-    //
-    // We check whether John is running.
     if (m_johnAttack.state() == QProcess::Running) {
-        // If John is running then we put time of its work on the
-        // form.
-        // We remember current time.
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        // We count days and seconds since attack start.
-        int days = m_startDateTime.daysTo(currentDateTime),
-            seconds = m_startDateTime.secsTo(currentDateTime);
-        // We compute minutes and hours since attack start.
-        int minutes = seconds / 60 % 60,
-            hours = seconds / 60 / 60 % 24;
-        // We modify seconds value to be shorter than minute.
-        seconds %= 60;
-        // We produce a string representing distance between time points.
+        qint64 secondsElapsed = m_johnAttack.startTime().secsTo(QDateTime::currentDateTime());
+        qint64 days    = secondsElapsed / 86400;
+        qint64 hours   = (secondsElapsed % 86400) / 3600;
+        qint64 minutes = ((secondsElapsed % 86400) % 3600) / 60;
+        qint64 seconds = ((secondsElapsed % 86400) % 3600) % 60;
+
         QString workingTime;
         QTextStream stream(&workingTime);
-
         stream << days << tr(":");
         // Hours, minutes and seconds have padding with zeroes to two
         // chars.
@@ -1185,12 +1165,12 @@ void MainWindow::updateStatistics()
         stream << qSetFieldWidth(2) << hours << qSetFieldWidth(1) << tr(":");
         stream << qSetFieldWidth(2) << minutes << qSetFieldWidth(1) << tr(":");
         stream << qSetFieldWidth(2) << seconds;
-        // We put prepared string on the form.
-        m_ui->label_StatisticsWorkingTime->setText(workingTime);
+
+        m_ui->labelStatisticsWorkingTime->setText(workingTime);
     } else {
-        // Else (if John is not running) we put dash instead of time.
-        m_ui->label_StatisticsWorkingTime->setText(tr("-"));
+        m_ui->labelStatisticsWorkingTime->setText("-");
     }
+    callJohnShow();
 }
 
 /*

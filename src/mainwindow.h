@@ -113,7 +113,6 @@ private:
     QStringList         m_sessionHistory;
     QStringList         m_sessionPasswordFiles;
     JohnAttack          m_johnAttack;       // main JtR attack handler
-    QDateTime           m_startDateTime;    // Date and time of the start of the sttack
 
     // To read cracked passwords we use this timer and john --show.
     QTimer                   m_showTimer;

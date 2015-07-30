@@ -8,6 +8,8 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_name = sessionName;
     m_sessionGroup = "Sessions/" + m_name;
     m_limitSalts = -1;
+    m_nbProcess = 1;
+    m_nbOpenMPThreads = 0;
 }
 
 QString JohnSession::filePath()

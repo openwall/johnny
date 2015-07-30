@@ -1,6 +1,8 @@
 #include "hashsortfilterproxymodel.h"
 #include "passwordfilemodel.h"
 
+#include <QRegExp>
+
 HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
     :QSortFilterProxyModel(parent)
 {
@@ -67,7 +69,9 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
 
     while ((isAccepted == false) && (currentColumn < m_filteredColumns.count())) {
         index = sourceModel()->index(sourceRow, m_filteredColumns[currentColumn], sourceParent);
-        isAccepted |= sourceModel()->data(index).toString().contains(filterRegExp());
+        if (sourceModel()->data(index).toString().contains(filterRegExp())) {
+		isAccepted = true;
+	}
         currentColumn++;
     }
     return isAccepted;

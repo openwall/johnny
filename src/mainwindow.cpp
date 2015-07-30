@@ -153,7 +153,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Settings changed by user
     connect(m_ui->spinBox_TimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->comboBox_PathToJohn->lineEdit(),SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
     connect(m_ui->comboBox_LanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
@@ -282,7 +282,7 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        m_ui->comboBox_WordlistFile->setEditText(fileName);
+        m_ui->lineEditWordlistFile->setText(fileName);
     }
 }
 
@@ -640,15 +640,15 @@ QStringList MainWindow::saveAttackParameters()
         m_sessionCurrent.setMode(JohnSession::SINGLECRACK_MODE);
         // External mode, filter
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->comboBox_SingleCrackModeExternalName->currentText());
-            m_sessionCurrent.setExternalName(m_ui->comboBox_SingleCrackModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->lineEditSingleCrackModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditSingleCrackModeExternalName->text());
         }
 
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
         m_sessionCurrent.setMode(JohnSession::WORDLIST_MODE);
-        parameters << ("--wordlist=" + m_ui->comboBox_WordlistFile->currentText());
-        m_sessionCurrent.setWordlistFile(m_ui->comboBox_WordlistFile->currentText());
+        parameters << ("--wordlist=" + m_ui->lineEditWordlistFile->text());
+        m_sessionCurrent.setWordlistFile(m_ui->lineEditWordlistFile->text());
 
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
@@ -661,8 +661,8 @@ QStringList MainWindow::saveAttackParameters()
         }
         // External mode, filter
         if (m_ui->checkBox_WordlistModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->comboBox_WordlistModeExternalName->currentText());
-            m_sessionCurrent.setExternalName(m_ui->comboBox_WordlistModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->lineEditWordlistModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditWordlistModeExternalName->text());
         }
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
@@ -670,36 +670,36 @@ QStringList MainWindow::saveAttackParameters()
         m_sessionCurrent.setMode(JohnSession::INCREMENTAL_MODE);
         if (m_ui->checkBox_IncrementalModeName->isChecked()) {
             // With name
-            parameters << ("--incremental=" + m_ui->comboBox_IncrementalModeName->currentText());
-            m_sessionCurrent.setCharset(m_ui->comboBox_IncrementalModeName->currentText());
+            parameters << ("--incremental=" + m_ui->lineEditIncrementalModeName->text());
+            m_sessionCurrent.setCharset(m_ui->lineEditIncrementalModeName->text());
         } else {
             // Without name
             parameters << "--incremental";
         }
         // External mode, filter
         if (m_ui->checkBox_IncrementalModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->comboBox_IncrementalModeExternalName->currentText());
-            m_sessionCurrent.setExternalName(m_ui->comboBox_IncrementalModeExternalName->currentText());
+            parameters << ("--external=" + m_ui->lineEditIncrementalModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditIncrementalModeExternalName->text());
         }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
         m_sessionCurrent.setMode(JohnSession::EXTERNAL_MODE);
-        parameters << ("--external=" + m_ui->comboBox_ExternalModeName->currentText());
-        m_sessionCurrent.setExternalName(m_ui->comboBox_ExternalModeName->currentText());
+        parameters << ("--external=" + m_ui->lineEditExternalModeName->text());
+        m_sessionCurrent.setExternalName(m_ui->lineEditExternalModeName->text());
     }
 
     // Selectors
     if (m_ui->checkBox_LimitUsers->isChecked()) {
-        parameters << ("--users=" + m_ui->comboBox_LimitUsers->currentText());
-        m_sessionCurrent.setLimitUsers(m_ui->comboBox_LimitUsers->currentText());
+        parameters << ("--users=" + m_ui->lineEditLimitUsers->text());
+        m_sessionCurrent.setLimitUsers(m_ui->lineEditLimitUsers->text());
     }
     if (m_ui->checkBox_LimitGroups->isChecked()) {
-        parameters << ("--groups=" + m_ui->comboBox_LimitGroups->currentText());
-        m_sessionCurrent.setLimitGroups(m_ui->comboBox_LimitGroups->currentText());
+        parameters << ("--groups=" + m_ui->lineEditLimitGroups->text());
+        m_sessionCurrent.setLimitGroups(m_ui->lineEditLimitGroups->text());
     }
     if (m_ui->checkBox_LimitShells->isChecked()) {
-        parameters << ("--shells=" + m_ui->comboBox_LimitShells->currentText());
-        m_sessionCurrent.setLimitShells(m_ui->comboBox_LimitShells->currentText());
+        parameters << ("--shells=" + m_ui->lineEditLimitShells->text());
+        m_sessionCurrent.setLimitShells(m_ui->lineEditLimitShells->text());
     }
     if (m_ui->checkBox_LimitSalts->isChecked()) {
         parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
@@ -1032,7 +1032,7 @@ void MainWindow::warnAboutDefaultPathToJohn()
            "(just use 'john' there to make Johnny search for John the Ripper "
            "in PATH on every invocation of John the Ripper). "
            "If you are satisfied with defaults then save settings to avoid this message.").arg(
-               m_ui->comboBox_PathToJohn->currentText()));
+               m_ui->lineEditPathToJohn->text()));
 }
 
 void MainWindow::fillSettingsWithDefaults()
@@ -1072,11 +1072,11 @@ void MainWindow::fillSettingsWithDefaults()
             break;
         }
     }
-    m_ui->comboBox_PathToJohn->blockSignals(true);
+    m_ui->lineEditPathToJohn->blockSignals(true);
     m_ui->spinBox_TimeIntervalPickCracked->blockSignals(true);
-    m_ui->comboBox_PathToJohn->setEditText(john);
+    m_ui->lineEditPathToJohn->setText(john);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(INTERVAL_PICK_CRACKED);
-    m_ui->comboBox_PathToJohn->blockSignals(false);
+    m_ui->lineEditPathToJohn->blockSignals(false);
     m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
 }
 
@@ -1087,7 +1087,7 @@ void MainWindow::buttonBrowsePathToJohnClicked()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        m_ui->comboBox_PathToJohn->setEditText(fileName);
+        m_ui->lineEditPathToJohn->setText(fileName);
         applyAndSaveSettings();
     }
 }
@@ -1095,7 +1095,7 @@ void MainWindow::buttonBrowsePathToJohnClicked()
 void MainWindow::applySettings()
 {
     // We verify john version
-    QString newJohnPath = m_ui->comboBox_PathToJohn->currentText();
+    QString newJohnPath = m_ui->lineEditPathToJohn->text();
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
         m_johnVersionCheck.setJohnProgram(newJohnPath);
         m_johnVersionCheck.start();
@@ -1117,7 +1117,7 @@ void MainWindow::applySettings()
 void MainWindow::applyAndSaveSettings()
 {
     applySettings();
-    m_settings.setValue("PathToJohn", m_ui->comboBox_PathToJohn->currentText());
+    m_settings.setValue("PathToJohn", m_ui->lineEditPathToJohn->text());
     m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBox_TimeIntervalPickCracked->value());
     m_settings.setValue("Language", m_ui->comboBox_LanguageSelection->currentText().toLower());
 }
@@ -1125,13 +1125,13 @@ void MainWindow::applyAndSaveSettings()
 void MainWindow::restoreSavedSettings()
 {
     // We copy stored settings to the form and then invoke applySettings()
-    m_ui->comboBox_PathToJohn->blockSignals(true);
+    m_ui->lineEditPathToJohn->blockSignals(true);
     m_ui->spinBox_TimeIntervalPickCracked->blockSignals(true);
     m_ui->comboBox_LanguageSelection->blockSignals(true);
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
-    m_ui->comboBox_PathToJohn->setEditText(
+    m_ui->lineEditPathToJohn->setText(
         settingsPathToJohn == ""
-        ? m_ui->comboBox_PathToJohn->currentText()
+        ? m_ui->lineEditPathToJohn->text()
         : settingsPathToJohn);
     m_ui->spinBox_TimeIntervalPickCracked->setValue(
         m_settings.value("TimeIntervalPickCracked").toString() == ""
@@ -1141,7 +1141,7 @@ void MainWindow::restoreSavedSettings()
     if (languageIndex != -1) {
         m_ui->comboBox_LanguageSelection->setCurrentIndex(languageIndex);
     }
-    m_ui->comboBox_PathToJohn->blockSignals(false);
+    m_ui->lineEditPathToJohn->blockSignals(false);
     m_ui->spinBox_TimeIntervalPickCracked->blockSignals(false);
     m_ui->comboBox_LanguageSelection->blockSignals(false);
     applySettings();
@@ -1345,11 +1345,11 @@ void MainWindow::restoreSessionOptions()
         // External mode, filter
         if(!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
-            m_ui->comboBox_SingleCrackModeExternalName->setEditText(m_sessionCurrent.externalName());
+            m_ui->lineEditSingleCrackModeExternalName->setText(m_sessionCurrent.externalName());
         }
     } else if (mode == JohnSession::WORDLIST_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
-        m_ui->comboBox_WordlistFile->setEditText(m_sessionCurrent.wordlistFile());
+        m_ui->lineEditWordlistFile->setText(m_sessionCurrent.wordlistFile());
         //Rules
         if (!m_sessionCurrent.rules().isNull()) {
             m_ui->checkBox_WordlistModeRules->setChecked(true);
@@ -1358,7 +1358,7 @@ void MainWindow::restoreSessionOptions()
         // External mode, filter
         if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_WordlistModeExternalName->setChecked(true);
-            m_ui->comboBox_WordlistModeExternalName->setEditText(m_sessionCurrent.externalName());
+            m_ui->lineEditWordlistModeExternalName->setText(m_sessionCurrent.externalName());
         }
     } else if (mode == JohnSession::INCREMENTAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);
@@ -1366,16 +1366,16 @@ void MainWindow::restoreSessionOptions()
         // It could be with or without name.
         if (!m_sessionCurrent.charset().isNull()) {
             m_ui->checkBox_IncrementalModeName->setChecked(true);
-            m_ui->comboBox_IncrementalModeName->setEditText(m_sessionCurrent.charset());
+            m_ui->lineEditIncrementalModeName->setText(m_sessionCurrent.charset());
         }
         // External mode, filter
         if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
-            m_ui->comboBox_IncrementalModeExternalName->setEditText(m_sessionCurrent.externalName());
+            m_ui->lineEditIncrementalModeExternalName->setText(m_sessionCurrent.externalName());
         }
     } else if (mode == JohnSession::EXTERNAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
-        m_ui->comboBox_ExternalModeName->setEditText(m_sessionCurrent.externalName());
+        m_ui->lineEditExternalModeName->setText(m_sessionCurrent.externalName());
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
@@ -1383,15 +1383,15 @@ void MainWindow::restoreSessionOptions()
     // Selectors
     if (!m_sessionCurrent.limitUsers().isNull()) {
         m_ui->checkBox_LimitUsers->setChecked(true);
-        m_ui->comboBox_LimitUsers->setEditText(m_sessionCurrent.limitUsers());
+        m_ui->lineEditLimitUsers->setText(m_sessionCurrent.limitUsers());
     }
     if (!m_sessionCurrent.limitGroups().isNull()) {
         m_ui->checkBox_LimitGroups->setChecked(true);
-        m_ui->comboBox_LimitGroups->setEditText(m_sessionCurrent.limitGroups());
+        m_ui->lineEditLimitGroups->setText(m_sessionCurrent.limitGroups());
     }
     if (!m_sessionCurrent.limitShells().isNull()) {
         m_ui->checkBox_LimitShells->setChecked(true);
-        m_ui->comboBox_LimitShells->setEditText(m_sessionCurrent.limitShells());
+        m_ui->lineEditLimitShells->setText(m_sessionCurrent.limitShells());
     }
     if (m_sessionCurrent.limitSalts() >= 0) {
         m_ui->checkBox_LimitSalts->setChecked(true);

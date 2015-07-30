@@ -348,6 +348,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // After new model remembered we remember its file name.
         m_sessionPasswordFiles = fileNames;
         m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));
+        m_defaultFormat.clear();
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
         if (!m_johnShowTemp) {
@@ -367,7 +368,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
-        callJohnShow(true);
+        getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
@@ -379,7 +380,6 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
             m_hashTypeChecker.setPasswordFiles(fileNames);
             m_hashTypeChecker.start();
         }
-        getDefaultFormat();
         // QSortFilterProxyModel isn't optimized for fast for dynamic filtering on big files
         if (model->rowCount() > DYNAMIC_FILTERING_HASH_LIMIT) {
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
@@ -593,7 +593,7 @@ QStringList MainWindow::saveAttackParameters()
     // We prepare parameters list from options section.
     // General options
     // Format
-    if (m_ui->formatComboBox->currentText() != tr("Auto detect")) {
+    if (!m_ui->formatComboBox->currentText().startsWith(tr("Auto detect"))) {
         // We have one list for formats and subformats. Subformats
         // contain short description after it.
         // Strings could be like:
@@ -935,6 +935,9 @@ void MainWindow::readJohnShow()
     // We read all output.
     QString formattedFormat(m_format);
     formattedFormat.remove("--");
+    if (formattedFormat.isEmpty() && !m_defaultFormat.isEmpty()) { // default format was used
+        formattedFormat = "format=" + m_defaultFormat;
+    }
     QByteArray output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
@@ -1205,7 +1208,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         QString savedFormat = m_ui->formatComboBox->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->formatComboBox->clear();
-        m_ui->formatComboBox->addItem(tr("Auto detect"));
+        m_ui->formatComboBox->addItem(tr("Auto detect") + (m_defaultFormat.isEmpty() ? "" : " (" + m_defaultFormat + ")"));
         m_ui->formatComboBox->addItems(listOfTypesInFile);
         // Restore user's selection
         int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
@@ -1232,8 +1235,9 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     if (!isJumbo) {
         // Add default format list supported by core john
         QStringList defaultFormats;
-        defaultFormats << tr("Auto detect") << "descrypt" << "bsdicrypt" << "md5crypt"
-                       << "bcrypt" << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
+        defaultFormats << tr("Auto detect") + (m_defaultFormat.isEmpty() ? "" : " (" + m_defaultFormat + ")")
+                       << "descrypt" << "bsdicrypt" << "md5crypt" << "bcrypt"
+                       << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
         QString savedFormat = m_ui->formatComboBox->currentText();
         m_ui->formatComboBox->clear();
         m_ui->formatComboBox->addItems(defaultFormats);
@@ -1542,11 +1546,20 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
         qDebug() << "JtR seems to have crashed.";
         return;
     }
-    /*printf("Loaded %s (%s%s%s [%s])\n",
-        john_loaded_counts(),
-        database.format->params.label,
-        database.format->params.format_name[0] ? ", " : "",
-        database.format->params.format_name,
-        database.format->params.algorithm_name);*/
-    qDebug() << m_johnDefaultFormat.readAllStandardOutput();
+
+    QString output = m_johnDefaultFormat.readAllStandardOutput();
+    QRegExp exp("Loaded .+ \\((\\S+)[,| ].+\\)\n");
+    exp.setMinimal(true);
+    int pos = exp.indexIn(output);
+    if (pos > -1) {
+        m_defaultFormat = exp.cap(1);
+        if (m_defaultFormat.endsWith(','))
+            m_defaultFormat.remove(m_defaultFormat.length()-1, 1);
+    } else {
+        m_defaultFormat = "";
+    }
+
+    m_ui->formatComboBox->setItemText(0, tr("Auto detect") + (m_defaultFormat.isEmpty() ? "" : " (" + m_defaultFormat + ")"));
+    callJohnShow(true);
+
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>781</width>
-    <height>640</height>
+    <width>853</width>
+    <height>655</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="passwordsPageLayout">
@@ -215,8 +215,8 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>705</width>
-             <height>889</height>
+             <width>743</width>
+             <height>928</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -304,6 +304,9 @@ border-bottom: 1px solid darkgrey;
                  </property>
                  <property name="editable">
                   <bool>true</bool>
+                 </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QComboBox::AdjustToContents</enum>
                  </property>
                 </widget>
                </item>
@@ -1009,8 +1012,8 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>705</width>
-             <height>517</height>
+             <width>434</width>
+             <height>280</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1192,8 +1195,8 @@ border-bottom: 1px solid darkgrey;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>781</width>
-     <height>22</height>
+     <width>853</width>
+     <height>27</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">

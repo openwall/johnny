@@ -144,6 +144,7 @@ private:
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
     JohnAttack      m_johnDefaultFormat;
+    QString         m_defaultFormat;
     bool            m_isDynamicFilteringEnabled;
 
     QWidget         m_aboutWindow;

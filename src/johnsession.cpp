@@ -8,7 +8,7 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_name = sessionName;
     m_sessionGroup = "Sessions/" + m_name;
     m_limitSalts = -1;
-    m_nbProcess = 1;
+    m_fork = 1;
     m_nbOpenMPThreads = 0;
 }
 
@@ -90,7 +90,7 @@ bool JohnSession::load()
     }
     // Advanced options
     if (m_settings->contains("nbForkProcess")) {
-        m_nbProcess = m_settings->value("nbForkProcess").toInt();
+        m_fork = m_settings->value("nbForkProcess").toInt();
     }
     m_nbOpenMPThreads = m_settings->value("OMP_NUM_THREADS").toInt();
 
@@ -175,7 +175,7 @@ bool JohnSession::save()
 
     // Advanced options
     if (isForkEnabled()) {
-        m_settings->setValue("nbForkProcess", m_nbProcess);
+        m_settings->setValue("nbForkProcess", m_fork);
     }
     m_settings->setValue("OMP_NUM_THREADS", m_nbOpenMPThreads);
 
@@ -197,7 +197,7 @@ void JohnSession::remove()
 
 bool JohnSession::isForkEnabled()
 {
-    return m_nbProcess > 1;
+    return m_fork > 1;
 }
 
 QString JohnSession::sessionDir()
@@ -235,14 +235,14 @@ void JohnSession::setNbOpenMPThreads(int nbOpenMPThreads)
     m_nbOpenMPThreads = nbOpenMPThreads;
 }
 
-int JohnSession::nbProcess() const
+int JohnSession::nbForkProcess() const
 {
-    return m_nbProcess;
+    return m_fork;
 }
 
-void JohnSession::setNbProcess(int nbProcess)
+void JohnSession::setNbForkProcess(int nbProcess)
 {
-    m_nbProcess = nbProcess;
+    m_fork = nbProcess;
 }
 
 int JohnSession::limitSalts() const
@@ -343,6 +343,16 @@ void JohnSession::setUnselectedRows(const QList<int> &unselectedRows)
 {
     m_unselectedRows = unselectedRows;
 }
+QString JohnSession::defaultFormat() const
+{
+    return m_defaultFormat;
+}
+
+void JohnSession::setDefaultFormat(const QString &defaultFormat)
+{
+    m_defaultFormat = defaultFormat;
+}
+
 
 JohnSession::AttackMode JohnSession::mode()
 {

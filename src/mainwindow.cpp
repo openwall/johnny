@@ -348,7 +348,6 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // After new model remembered we remember its file name.
         m_sessionPasswordFiles = fileNames;
         m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));
-        m_defaultFormat.clear();
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
         if (!m_johnShowTemp) {
@@ -430,7 +429,6 @@ void MainWindow::openLastSession()
 
     if (readPasswdFiles(passwordFiles))
     {
-        m_format = m_sessionCurrent.format();
         restoreSessionOptions();
         m_ui->actionResumeAttack->setEnabled(true);
     }
@@ -519,7 +517,10 @@ void MainWindow::startAttack()
 
     // Session for johnny
     QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
+    QString defaultFormat = m_sessionCurrent.defaultFormat();
     m_sessionCurrent = JohnSession(date, &m_settings);
+    m_sessionCurrent.setDefaultFormat(defaultFormat);
+
     QString sessionFile = m_sessionCurrent.filePath() + ".rec";
 
     if (QFileInfo(sessionFile).isReadable())
@@ -590,6 +591,7 @@ QStringList MainWindow::saveAttackParameters()
     m_sessionCurrent.setPasswordFiles(m_sessionPasswordFiles);
 
     QStringList parameters;
+    QString format = ""; // default
     // We prepare parameters list from options section.
     // General options
     // Format
@@ -610,25 +612,21 @@ QStringList MainWindow::saveAttackParameters()
         //       http://www.openwall.com/lists/john-users/2011/08/17/2
         // We remember format key to be used with '-show' to take
         // progress.
-        m_format = "--format=" + m_ui->formatComboBox->currentText();
+        format = "--format=" + m_ui->formatComboBox->currentText();
         // Now we have '--format=format' or '--format=format(N)description'.
         // So we truncate string to ')' if brace is in string.
         //
         // We try to find ')'.
-        int index = m_format.indexOf(")");
+        int index = format.indexOf(")");
         // We check that we have brace in string.
         if (index >= 0) {
             // We truncate line to index keeping index.
-            m_format.truncate(index + 1);
+            format.truncate(index + 1);
         }
         // We add format key onto parameters list.
-        parameters << m_format;
-    } else {
-        // In case we do not have explicit format we erase remembered
-        // key.
-        m_format.clear();
+        parameters << format;
     }
-    m_sessionCurrent.setFormat(m_format);
+    m_sessionCurrent.setFormat(format);
     m_sessionCurrent.setFormatUI(m_ui->formatComboBox->currentText());
 
     // Modes
@@ -712,7 +710,7 @@ QStringList MainWindow::saveAttackParameters()
     // Advanced options
     if (m_ui->checkBox_UseFork->isChecked()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
-        m_sessionCurrent.setNbProcess(m_ui->spinBox_nbOfProcess->value());
+        m_sessionCurrent.setNbForkProcess(m_ui->spinBox_nbOfProcess->value());
     }
     m_sessionCurrent.setNbOpenMPThreads(m_ui->spinBox_nbOfOpenMPThread->value());
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
@@ -922,8 +920,8 @@ void MainWindow::callJohnShow(bool showAllFormats)
 
     QStringList args;
     // We add current format key if it is not empty.
-    if (!m_format.isEmpty() && !showAllFormats)
-        args << m_format;
+    if (!m_sessionCurrent.format().isEmpty() && !showAllFormats)
+        args << m_sessionCurrent.format();
     args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
@@ -933,10 +931,10 @@ void MainWindow::callJohnShow(bool showAllFormats)
 void MainWindow::readJohnShow()
 {
     // We read all output.
-    QString formattedFormat(m_format);
+    QString formattedFormat(m_sessionCurrent.format());
     formattedFormat.remove("--");
-    if (formattedFormat.isEmpty() && !m_defaultFormat.isEmpty()) { // default format was used
-        formattedFormat = "format=" + m_defaultFormat;
+    if (formattedFormat.isEmpty() && !m_sessionCurrent.defaultFormat().isEmpty()) { // default format was used
+        formattedFormat = "format=" + m_sessionCurrent.defaultFormat();
     }
     QByteArray output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
@@ -1208,7 +1206,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         QString savedFormat = m_ui->formatComboBox->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->formatComboBox->clear();
-        m_ui->formatComboBox->addItem(tr("Auto detect") + (m_defaultFormat.isEmpty() ? "" : " (" + m_defaultFormat + ")"));
+        m_ui->formatComboBox->addItem(tr("Auto detect") + (m_sessionCurrent.defaultFormat().isEmpty() ? "" : " (" + m_sessionCurrent.defaultFormat() + ")"));
         m_ui->formatComboBox->addItems(listOfTypesInFile);
         // Restore user's selection
         int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
@@ -1235,7 +1233,7 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     if (!isJumbo) {
         // Add default format list supported by core john
         QStringList defaultFormats;
-        defaultFormats << tr("Auto detect") + (m_defaultFormat.isEmpty() ? "" : " (" + m_defaultFormat + ")")
+        defaultFormats << tr("Auto detect") + (m_sessionCurrent.defaultFormat().isEmpty() ? "" : " (" + m_sessionCurrent.defaultFormat() + ")")
                        << "descrypt" << "bsdicrypt" << "md5crypt" << "bcrypt"
                        << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
         QString savedFormat = m_ui->formatComboBox->currentText();
@@ -1274,7 +1272,6 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
                     m_sessionMenu->removeAction(actions);
             }
         }
-        m_sessionCurrent = JohnSession("", &m_settings);
         m_settings.remove("Sessions");
         m_ui->actionResumeAttack->setEnabled(false);
     } else {
@@ -1298,8 +1295,8 @@ void MainWindow::guessPassword()
         m_johnGuess.setJohnProgram(m_pathToJohn);
         QStringList args;
         args << "--stdin";
-        if(!m_format.isEmpty())
-            args << m_format;
+        if(!m_sessionCurrent.format().isEmpty())
+            args << m_sessionCurrent.format();
         args << m_sessionPasswordFiles;
         m_johnGuess.setArgs(args);
         m_johnGuess.start();
@@ -1324,7 +1321,6 @@ void MainWindow::restoreSessionOptions()
     restoreDefaultAttackOptions();
     // Start restoring required UI fields
     m_ui->sessionNameLabel->setText(m_sessionCurrent.name());
-    m_format = m_sessionCurrent.format();
     m_ui->formatComboBox->setEditText(m_sessionCurrent.formatUI());
     JohnSession::AttackMode mode = m_sessionCurrent.mode();
     if (mode == JohnSession::SINGLECRACK_MODE) {
@@ -1388,7 +1384,7 @@ void MainWindow::restoreSessionOptions()
     // Advanced options
     if (m_sessionCurrent.isForkEnabled()) {
         m_ui->checkBox_UseFork->setChecked(true);
-        int nbOfProcess = m_sessionCurrent.nbProcess();
+        int nbOfProcess = m_sessionCurrent.nbForkProcess();
         // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
         // we have to restore the right previous session value.
         if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
@@ -1548,18 +1544,17 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
     }
 
     QString output = m_johnDefaultFormat.readAllStandardOutput();
+    QString defaultFormat = "";
     QRegExp exp("Loaded .+ \\((\\S+)[,| ].+\\)\n");
-    exp.setMinimal(true);
     int pos = exp.indexIn(output);
     if (pos > -1) {
-        m_defaultFormat = exp.cap(1);
-        if (m_defaultFormat.endsWith(','))
-            m_defaultFormat.remove(m_defaultFormat.length()-1, 1);
-    } else {
-        m_defaultFormat = "";
+        defaultFormat = exp.cap(1);
+        if (defaultFormat.endsWith(','))
+            defaultFormat.remove(defaultFormat.length()-1, 1);
     }
+    m_sessionCurrent.setDefaultFormat(defaultFormat);
 
-    m_ui->formatComboBox->setItemText(0, tr("Auto detect") + (m_defaultFormat.isEmpty() ? "" : " (" + m_defaultFormat + ")"));
+    m_ui->formatComboBox->setItemText(0, tr("Auto detect") + (defaultFormat.isEmpty() ? "" : " (" + defaultFormat + ")"));
     callJohnShow(true);
 
 }

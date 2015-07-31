@@ -35,8 +35,8 @@ public:
     int nbOpenMPThreads() const;
     void setNbOpenMPThreads(int nbOpenMPThreads);
 
-    int nbProcess() const;
-    void setNbProcess(int nbProcess);
+    int nbForkProcess() const;
+    void setNbForkProcess(int nbProcess);
 
     int limitSalts() const;
     void setLimitSalts(int limitSalts);
@@ -68,6 +68,9 @@ public:
     QList<int> unselectedRows() const;
     void setUnselectedRows(const QList<int> &unselectedRows);
 
+    QString defaultFormat() const;
+    void setDefaultFormat(const QString &defaultFormat);
+
 private:
     QString   m_name;
     QSettings* m_settings;
@@ -75,6 +78,7 @@ private:
 
     QString   m_format;
     QString   m_formatUI;
+    QString   m_defaultFormat;
     QStringList m_passwordFiles;
     AttackMode m_mode;
 
@@ -87,7 +91,7 @@ private:
     QString m_limitGroups;
     QString m_limitShells;
     int     m_limitSalts;
-    int     m_nbProcess;
+    int     m_fork;
     int     m_nbOpenMPThreads;
     QString m_environmentVariables;
 

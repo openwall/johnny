@@ -121,9 +121,6 @@ private:
     JohnHandler              m_johnShow;
     // Temporary file for `john --show` output
     QTemporaryFile          *m_johnShowTemp;
-    // Format key to use with --show.
-    // With this key current John was started.
-    QString                  m_format;
     // Map (hash table) for fast access after `john --show`
     QMultiMap<QString, int>  m_showTableMap;
 
@@ -136,7 +133,6 @@ private:
     QString         m_pathToJohn;
     // Interval between loading of cracked passwords
     int             m_timeIntervalPickCracked;
-    bool            m_autoApplySettings;
 
     JohnHandler     m_johnVersionCheck;
     bool            m_isJumbo;
@@ -144,7 +140,6 @@ private:
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
     JohnAttack      m_johnDefaultFormat;
-    QString         m_defaultFormat;
     bool            m_isDynamicFilteringEnabled;
 
     QWidget         m_aboutWindow;

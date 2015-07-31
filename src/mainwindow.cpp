@@ -1209,7 +1209,7 @@ void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QString
         int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
         if (indexSavedFormat != -1) {
             m_ui->formatComboBox->setCurrentIndex(indexSavedFormat);
-        } else if(savedFormat.isEmpty()){
+        } else if(!savedFormat.isEmpty()){
             m_ui->formatComboBox->setEditText(savedFormat);
         }
     }
@@ -1553,7 +1553,12 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
             defaultFormat.remove(defaultFormat.length()-1, 1);
     }
     m_sessionCurrent.setDefaultFormat(defaultFormat);
-
+    // Restore user's selection
+    QString editText = m_ui->formatComboBox->currentText();
+    QString defaultFormatText = m_ui->formatComboBox->itemText(0);
     m_ui->formatComboBox->setItemText(0, tr("Auto detect") + (defaultFormat.isEmpty() ? "" : " (" + defaultFormat + ")"));
+    if (editText != defaultFormatText) {
+        m_ui->formatComboBox->setEditText(editText);
+    }
     callJohnShow(true);
 }

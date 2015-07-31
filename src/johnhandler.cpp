@@ -96,6 +96,9 @@ void JohnHandler::setJohnProgram(const QString &johnProgram)
 
 void JohnHandler::start()
 {
+    // Give a chance to terminate cleanly
+    if (m_john.state() != QProcess::NotRunning)
+        terminate();
     JohnHandler::exec();
 }
 

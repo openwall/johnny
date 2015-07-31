@@ -155,6 +155,7 @@ MainWindow::MainWindow(QSettings &settings)
     // Settings changed by user
     connect(m_ui->spinBoxTimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
     connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(getDefaultFormat()));
     connect(m_ui->comboBoxLanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
@@ -914,10 +915,6 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 void MainWindow::callJohnShow(bool showAllFormats)
 {
-    // Give a chance to terminate cleanly
-    if (m_johnShow.state() != QProcess::NotRunning)
-        m_johnShow.stop();
-
     QStringList args;
     // We add current format key if it is not empty.
     if (!m_sessionCurrent.format().isEmpty() && !showAllFormats)
@@ -1230,7 +1227,9 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     }
     m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
     m_ui->actionFilterFormatColumn->setEnabled(isJumbo);
+    m_ui->lineEdit_WordlistRules->setVisible(isJumbo);
     if (!isJumbo) {
+        m_ui->lineEdit_WordlistRules->clear();
         // Add default format list supported by core john
         QStringList defaultFormats;
         defaultFormats << tr("Auto detect") + (m_sessionCurrent.defaultFormat().isEmpty() ? "" : " (" + m_sessionCurrent.defaultFormat() + ")")
@@ -1524,7 +1523,8 @@ void MainWindow::resetFilters()
 
 void MainWindow::getDefaultFormat()
 {
-    m_johnDefaultFormat.setJohnProgram(m_pathToJohn);
+    // This signal may be called 1 ms before applySettings() so use the lineEdit text
+    m_johnDefaultFormat.setJohnProgram(m_ui->lineEditPathToJohn->text());
     QStringList args;
     args << "-stdin";
     args << "--session=defaultFormat";
@@ -1556,5 +1556,4 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
 
     m_ui->formatComboBox->setItemText(0, tr("Auto detect") + (defaultFormat.isEmpty() ? "" : " (" + defaultFormat + ")"));
     callJohnShow(true);
-
 }

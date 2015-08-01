@@ -1017,7 +1017,7 @@ border-bottom: 1px solid darkgrey;
             <item>
              <widget class="QLabel" name="label_10">
               <property name="text">
-               <string>Johnny relies on John the Ripper for the actual work. Please set the path to John main executable bellow, it can be either core John or jumbo John. Jumbo is the better option of the two, since it supports many more features that Johnny can take advantage of.</string>
+               <string>Johnny relies on John the Ripper for the actual work. Set the path to John main executable below, it can be either core John or jumbo John. Jumbo is the recommended option, since it supports many more features, attack modes and hash types than core (also called proper) John.</string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>

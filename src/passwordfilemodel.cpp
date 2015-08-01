@@ -203,7 +203,7 @@ bool PasswordFileModel::setData(const QModelIndex &index,
             role.push_back(Qt::BackgroundColorRole);
             for (int i=1; i < columnCount(); i++) {
                 QModelIndex index2 = this->index(index.row(), i);
-                emit dataChanged(index2,index2, role);
+                emit dataChanged(index2,index2);
             }
         }
         else {

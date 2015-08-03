@@ -614,8 +614,8 @@ QStringList MainWindow::saveAttackParameters()
         //       http://www.openwall.com/lists/john-users/2011/08/17/2
         // We remember format key to be used with '-show' to take
         // progress.
-        format = "--format=" + m_ui->formatComboBox->currentText();
-        // Now we have '--format=format' or '--format=format(N)description'.
+        format = m_ui->formatComboBox->currentText();
+        // Now we have '--format' or '--format=format(N)description'.
         // So we truncate string to ')' if brace is in string.
         //
         // We try to find ')'.
@@ -626,7 +626,7 @@ QStringList MainWindow::saveAttackParameters()
             format.truncate(index + 1);
         }
         // We add format key onto parameters list.
-        parameters << format;
+        parameters << "--format=" + format;
     }
     m_sessionCurrent.setFormat(format);
     m_sessionCurrent.setFormatUI(m_ui->formatComboBox->currentText());
@@ -710,11 +710,11 @@ QStringList MainWindow::saveAttackParameters()
     }
 
     // Advanced options
-    if (m_ui->checkBox_UseFork->isChecked()) {
+    if (m_ui->checkBox_UseFork->isChecked() && m_ui->widgetFork->isVisible()) {
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
-        m_sessionCurrent.setNbForkProcess(m_ui->spinBox_nbOfProcess->value());
+        m_sessionCurrent.setForkProcesses(m_ui->spinBox_nbOfProcess->value());
     }
-    m_sessionCurrent.setNbOpenMPThreads(m_ui->spinBox_nbOfOpenMPThread->value());
+    m_sessionCurrent.setOpenMPThreads(m_ui->spinBox_nbOfOpenMPThread->value());
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
        m_sessionCurrent.setEnvironmentVariables(m_ui->lineEdit_EnvironmentVar->text());
     }
@@ -930,9 +930,10 @@ void MainWindow::readJohnShow()
 {
     // We read all output.
     QString formattedFormat(m_sessionCurrent.format());
-    formattedFormat.remove("--");
     if (formattedFormat.isEmpty() && !m_sessionCurrent.defaultFormat().isEmpty()) { // default format was used
         formattedFormat = "format=" + m_sessionCurrent.defaultFormat();
+    } else {
+        formattedFormat.prepend("format=");
     }
     QByteArray output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
@@ -1384,7 +1385,7 @@ void MainWindow::restoreSessionOptions()
     // Advanced options
     if (m_sessionCurrent.isForkEnabled()) {
         m_ui->checkBox_UseFork->setChecked(true);
-        int nbOfProcess = m_sessionCurrent.nbForkProcess();
+        int nbOfProcess = m_sessionCurrent.forkProcesses();
         // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
         // we have to restore the right previous session value.
         if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
@@ -1392,7 +1393,7 @@ void MainWindow::restoreSessionOptions()
         }
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
-    m_ui->spinBox_nbOfOpenMPThread->setValue(m_sessionCurrent.nbOpenMPThreads());
+    m_ui->spinBox_nbOfOpenMPThread->setValue(m_sessionCurrent.openMPThreads());
 
     if (!m_sessionCurrent.environmentVariables().isNull()) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
@@ -1528,7 +1529,7 @@ void MainWindow::getDefaultFormat()
     m_johnDefaultFormat.setJohnProgram(m_ui->lineEditPathToJohn->text());
     QStringList args;
     args << "-stdin";
-    args << "--session=defaultFormat";
+    args << "--session=" + JohnSession::sessionDir() + "defaultFormat";
     args << m_sessionPasswordFiles;
     m_johnDefaultFormat.setArgs(args);
     m_johnDefaultFormat.start();

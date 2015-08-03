@@ -33,11 +33,11 @@ public:
     QString environmentVariables() const;
     void setEnvironmentVariables(const QString &environmentVariables);
 
-    int nbOpenMPThreads() const;
-    void setNbOpenMPThreads(int nbOpenMPThreads);
+    int openMPThreads() const;
+    void setOpenMPThreads(int nbOpenMPThreads);
 
-    int nbForkProcess() const;
-    void setNbForkProcess(int nbProcess);
+    int forkProcesses() const;
+    void setForkProcesses(int nbProcess);
 
     int limitSalts() const;
     void setLimitSalts(int limitSalts);
@@ -92,8 +92,8 @@ private:
     QString m_limitGroups;
     QString m_limitShells;
     int     m_limitSalts;
-    int     m_fork;
-    int     m_nbOpenMPThreads;
+    int     m_forkProcesses;
+    int     m_openMPThreads;
     QString m_environmentVariables;
 
     QList<int> m_unselectedRows;

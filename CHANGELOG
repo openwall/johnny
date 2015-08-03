@@ -1,3 +1,14 @@
+Version 2.1
+===========
+* Ability to select/deselect individual hashes from being handled in a cracking session
+* Search/Filter inside the Passwords tab table view
+* Identify which hash format JtR use by default for a given password file
+* Add option to specify wordlist rules with jumbo
+* Simplify settings with an auto-saving mechanism
+* UI improvements
+* Visually indicate NULL/EMPTY passwords and cracked hashes in the table view
+* Bug fixes and new icon
+
 Version 2.0
 ===========
 Faster, leaner and better looking.

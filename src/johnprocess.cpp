@@ -35,7 +35,7 @@ void JohnProcess::terminate()
          * compatibility with those versions of John for now */
         ::kill(-pid(), SIGTERM);
     }
-#elif Q_OS_WIN
+#elif defined(Q_OS_WIN)
     Q_PID pid = this->pid();
     FreeConsole();
     AttachConsole(pid->dwProcessId);

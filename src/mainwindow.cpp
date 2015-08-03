@@ -23,6 +23,7 @@
 #include <QInputDialog>
 #include <QtDebug>
 #include <QDesktopWidget>
+#include <QUrl>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QStandardPaths>
 #endif

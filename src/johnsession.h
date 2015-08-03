@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QSettings>
+#include <QStringList>
 
 class JohnSession
 {

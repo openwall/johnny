@@ -1,7 +1,7 @@
 #include "johnsession.h"
 
 #include <QDir>
-#include <QDebug>
+
 JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     : m_settings(settings)
 {

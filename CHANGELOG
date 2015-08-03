@@ -1,3 +1,26 @@
+Version 2.1
+===========
+
+What's new:
+
+* Ability to select/deselect individual hashes from being handled in a cracking
+  session
+* Search and Filter the Passwords table. All columns are searched against,
+  unless otherwise specified
+* Identify which hash format JtR will attack by default for a new session and
+  select and display it in the UI
+* Add field to specify rules for wordlist mode; jumbo only
+* Visually indicate NULL/EMPTY passwords and cracked hashes in the Passwords table
+* Added about Johnny widget; conforming to the OS X design guidelines
+
+What's changed:
+* App settings are now auto saved
+* Greatly improved how attack session options are being stored
+* General UI and usability improvements
+* Changed the default app icon; also OS X app bundle has an icon now
+* Updated a few other action icons
+* Various bug fixes
+
 Version 2.0
 ===========
 Faster, leaner and better looking.

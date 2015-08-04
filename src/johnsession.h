@@ -34,10 +34,10 @@ public:
     void setEnvironmentVariables(const QString &environmentVariables);
 
     int openMPThreads() const;
-    void setOpenMPThreads(int nbOpenMPThreads);
+    void setOpenMPThreads(int openMPThreads);
 
     int forkProcesses() const;
-    void setForkProcesses(int nbProcess);
+    void setForkProcesses(int forkProcesses);
 
     int limitSalts() const;
     void setLimitSalts(int limitSalts);

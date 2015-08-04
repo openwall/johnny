@@ -714,7 +714,7 @@ QStringList MainWindow::saveAttackParameters()
         parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
         m_sessionCurrent.setForkProcesses(m_ui->spinBox_nbOfProcess->value());
     }
-    m_sessionCurrent.setOpenMPThreads(m_ui->spinBox_nbOfOpenMPThread->value());
+    m_sessionCurrent.setOpenMPThreads(m_ui->spinBox_openMPThreads->value());
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
        m_sessionCurrent.setEnvironmentVariables(m_ui->lineEdit_EnvironmentVar->text());
     }
@@ -742,8 +742,8 @@ void MainWindow::startJohn(QStringList args)
     QProcessEnvironment env;
     // If default is chosen, we don't specify OMP_NUM_THREADS and john will choose the number of
     // threads based on the number of processors.
-    if (m_ui->spinBox_nbOfOpenMPThread->text() != m_ui->spinBox_nbOfOpenMPThread->specialValueText()) {
-        env.insert("OMP_NUM_THREADS", m_ui->spinBox_nbOfOpenMPThread->text()); // Add an environment variable
+    if (m_ui->spinBox_openMPThreads->text() != m_ui->spinBox_openMPThreads->specialValueText()) {
+        env.insert("OMP_NUM_THREADS", m_ui->spinBox_openMPThreads->text()); // Add an environment variable
     }
 
     // User specified environment variables
@@ -1393,7 +1393,7 @@ void MainWindow::restoreSessionOptions()
         }
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
-    m_ui->spinBox_nbOfOpenMPThread->setValue(m_sessionCurrent.openMPThreads());
+    m_ui->spinBox_openMPThreads->setValue(m_sessionCurrent.openMPThreads());
 
     if (!m_sessionCurrent.environmentVariables().isNull()) {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
@@ -1434,7 +1434,7 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
     m_ui->spinBox_nbOfProcess->setMinimum(2);
     m_ui->spinBox_LimitSalts->setValue(0);
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
-    m_ui->spinBox_nbOfOpenMPThread->setValue(0); // 0 means special value = default
+    m_ui->spinBox_openMPThreads->setValue(0); // 0 means special value = default
 }
 
 void MainWindow::checkForUpdates()

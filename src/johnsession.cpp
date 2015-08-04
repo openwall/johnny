@@ -92,8 +92,6 @@ bool JohnSession::load()
     // Advanced options
     if (m_settings->contains("forkProcesses")) {
         m_forkProcesses = m_settings->value("forkProcesses").toInt();
-    } else if (m_settings->contains("nbForkProcess")) {
-        m_forkProcesses = m_settings->value("nbForkProcess").toInt();
     }
     m_openMPThreads = m_settings->value("OMP_NUM_THREADS").toInt();
 
@@ -233,9 +231,9 @@ int JohnSession::openMPThreads() const
     return m_openMPThreads;
 }
 
-void JohnSession::setOpenMPThreads(int nbOpenMPThreads)
+void JohnSession::setOpenMPThreads(int openMPThreads)
 {
-    m_openMPThreads = nbOpenMPThreads;
+    m_openMPThreads = openMPThreads;
 }
 
 int JohnSession::forkProcesses() const
@@ -243,9 +241,9 @@ int JohnSession::forkProcesses() const
     return m_forkProcesses;
 }
 
-void JohnSession::setForkProcesses(int nbProcess)
+void JohnSession::setForkProcesses(int forkProcesses)
 {
-    m_forkProcesses = nbProcess;
+    m_forkProcesses = forkProcesses;
 }
 
 int JohnSession::limitSalts() const

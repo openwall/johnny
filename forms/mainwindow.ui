@@ -214,9 +214,9 @@ border-bottom: 1px solid darkgrey;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
-             <width>743</width>
-             <height>928</height>
+             <y>-317</y>
+             <width>741</width>
+             <height>835</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -849,7 +849,7 @@ border-bottom: 1px solid darkgrey;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="spinBox_nbOfOpenMPThread">
+                   <widget class="QSpinBox" name="spinBox_openMPThreads">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1012,8 +1012,8 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>434</width>
-             <height>280</height>
+             <width>477</width>
+             <height>252</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -1196,7 +1196,7 @@ border-bottom: 1px solid darkgrey;
      <x>0</x>
      <y>0</y>
      <width>853</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">

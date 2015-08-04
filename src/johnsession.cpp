@@ -8,6 +8,8 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_name = sessionName;
     m_sessionGroup = "Sessions/" + m_name;
     m_limitSalts = -1;
+    m_forkProcesses = 1;
+    m_openMPThreads = 0;
 }
 
 QString JohnSession::filePath()
@@ -34,6 +36,7 @@ bool JohnSession::load()
     m_settings->beginGroup(m_sessionGroup);
     m_passwordFiles = m_settings->value("passwordFiles").toStringList();
     m_format = m_settings->value("formatJohn").toString();
+    m_format.remove("--format=");
     m_formatUI = m_settings->value("formatUI").toString();
     QString mode = m_settings->value("mode").toString();
     if (mode == "single") {
@@ -87,10 +90,10 @@ bool JohnSession::load()
         m_limitSalts = m_settings->value("limitSalts").toInt();
     }
     // Advanced options
-    if (m_settings->contains("nbForkProcess")) {
-        m_nbProcess = m_settings->value("nbForkProcess").toInt();
+    if (m_settings->contains("forkProcesses")) {
+        m_forkProcesses = m_settings->value("forkProcesses").toInt();
     }
-    m_nbOpenMPThreads = m_settings->value("OMP_NUM_THREADS").toInt();
+    m_openMPThreads = m_settings->value("OMP_NUM_THREADS").toInt();
 
     if (m_settings->contains("environmentVariables")) {
         m_environmentVariables = m_settings->value("environmentVariables").toString();
@@ -173,9 +176,9 @@ bool JohnSession::save()
 
     // Advanced options
     if (isForkEnabled()) {
-        m_settings->setValue("nbForkProcess", m_nbProcess);
+        m_settings->setValue("forkProcesses", m_forkProcesses);
     }
-    m_settings->setValue("OMP_NUM_THREADS", m_nbOpenMPThreads);
+    m_settings->setValue("OMP_NUM_THREADS", m_openMPThreads);
 
     if (!m_environmentVariables.isNull()) {
         m_settings->setValue("environmentVariables", m_environmentVariables);
@@ -195,7 +198,7 @@ void JohnSession::remove()
 
 bool JohnSession::isForkEnabled()
 {
-    return m_nbProcess > 1;
+    return m_forkProcesses > 1;
 }
 
 QString JohnSession::sessionDir()
@@ -223,24 +226,24 @@ void JohnSession::setEnvironmentVariables(const QString &environmentVariables)
     m_environmentVariables = environmentVariables;
 }
 
-int JohnSession::nbOpenMPThreads() const
+int JohnSession::openMPThreads() const
 {
-    return m_nbOpenMPThreads;
+    return m_openMPThreads;
 }
 
-void JohnSession::setNbOpenMPThreads(int nbOpenMPThreads)
+void JohnSession::setOpenMPThreads(int openMPThreads)
 {
-    m_nbOpenMPThreads = nbOpenMPThreads;
+    m_openMPThreads = openMPThreads;
 }
 
-int JohnSession::nbProcess() const
+int JohnSession::forkProcesses() const
 {
-    return m_nbProcess;
+    return m_forkProcesses;
 }
 
-void JohnSession::setNbProcess(int nbProcess)
+void JohnSession::setForkProcesses(int forkProcesses)
 {
-    m_nbProcess = nbProcess;
+    m_forkProcesses = forkProcesses;
 }
 
 int JohnSession::limitSalts() const
@@ -341,6 +344,16 @@ void JohnSession::setUnselectedRows(const QList<int> &unselectedRows)
 {
     m_unselectedRows = unselectedRows;
 }
+QString JohnSession::defaultFormat() const
+{
+    return m_defaultFormat;
+}
+
+void JohnSession::setDefaultFormat(const QString &defaultFormat)
+{
+    m_defaultFormat = defaultFormat;
+}
+
 
 JohnSession::AttackMode JohnSession::mode()
 {

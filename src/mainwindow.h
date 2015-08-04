@@ -81,6 +81,8 @@ private slots:
     void guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void setAvailabilityOfFeatures(bool isJumbo);
     void verifyJohnVersion();
+    void getDefaultFormat();
+    void getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
     // Settings related
     void fillSettingsWithDefaults();
@@ -119,9 +121,6 @@ private:
     JohnHandler              m_johnShow;
     // Temporary file for `john --show` output
     QTemporaryFile          *m_johnShowTemp;
-    // Format key to use with --show.
-    // With this key current John was started.
-    QString                  m_format;
     // Map (hash table) for fast access after `john --show`
     QMultiMap<QString, int>  m_showTableMap;
 
@@ -134,13 +133,13 @@ private:
     QString         m_pathToJohn;
     // Interval between loading of cracked passwords
     int             m_timeIntervalPickCracked;
-    bool            m_autoApplySettings;
 
     JohnHandler     m_johnVersionCheck;
     bool            m_isJumbo;
 
     HashTypeChecker m_hashTypeChecker;
     JohnHandler     m_johnGuess;
+    JohnAttack      m_johnDefaultFormat;
     bool            m_isDynamicFilteringEnabled;
 
     QWidget         m_aboutWindow;

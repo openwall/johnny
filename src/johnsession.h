@@ -33,11 +33,11 @@ public:
     QString environmentVariables() const;
     void setEnvironmentVariables(const QString &environmentVariables);
 
-    int nbOpenMPThreads() const;
-    void setNbOpenMPThreads(int nbOpenMPThreads);
+    int openMPThreads() const;
+    void setOpenMPThreads(int openMPThreads);
 
-    int nbProcess() const;
-    void setNbProcess(int nbProcess);
+    int forkProcesses() const;
+    void setForkProcesses(int forkProcesses);
 
     int limitSalts() const;
     void setLimitSalts(int limitSalts);
@@ -69,6 +69,9 @@ public:
     QList<int> unselectedRows() const;
     void setUnselectedRows(const QList<int> &unselectedRows);
 
+    QString defaultFormat() const;
+    void setDefaultFormat(const QString &defaultFormat);
+
 private:
     QString   m_name;
     QSettings* m_settings;
@@ -76,6 +79,7 @@ private:
 
     QString   m_format;
     QString   m_formatUI;
+    QString   m_defaultFormat;
     QStringList m_passwordFiles;
     AttackMode m_mode;
 
@@ -88,8 +92,8 @@ private:
     QString m_limitGroups;
     QString m_limitShells;
     int     m_limitSalts;
-    int     m_nbProcess;
-    int     m_nbOpenMPThreads;
+    int     m_forkProcesses;
+    int     m_openMPThreads;
     QString m_environmentVariables;
 
     QList<int> m_unselectedRows;

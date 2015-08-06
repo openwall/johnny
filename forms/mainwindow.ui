@@ -214,7 +214,7 @@ border-bottom: 1px solid darkgrey;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-317</y>
+             <y>0</y>
              <width>741</width>
              <height>835</height>
             </rect>
@@ -1602,6 +1602,25 @@ border-bottom: 1px solid darkgrey;
    </property>
    <property name="toolTip">
     <string>Filter against all columns</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export</string>
+   </property>
+  </action>
+  <action name="actionExportToCSV">
+   <property name="text">
+    <string>Export to CSV</string>
+   </property>
+  </action>
+  <action name="actionExportToColonSeparated">
+   <property name="text">
+    <string>Export to Colon Separated</string>
    </property>
   </action>
  </widget>

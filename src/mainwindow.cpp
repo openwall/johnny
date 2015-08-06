@@ -127,6 +127,19 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionOpenSession, SIGNAL(triggered()), sessionMenuButton, SLOT(showMenu()));
     connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
 
+    // Export menu
+    Menu *exportMenu = new Menu(this);
+    QToolButton *exportMenuButton = new QToolButton(this);
+    exportMenuButton->setDefaultAction(m_ui->actionExport);
+    exportMenuButton->setMenu(exportMenu);
+    exportMenuButton->setPopupMode(QToolButton::InstantPopup);
+    exportMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_ui->mainToolBar->addWidget(exportMenuButton);
+    exportMenu->addAction(m_ui->actionExportToCSV);
+    exportMenu->addAction(m_ui->actionExportToColonSeparated);
+    connect(m_ui->actionExport, SIGNAL(triggered()), exportMenuButton, SLOT(showMenu()));
+    connect(exportMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionExportToTriggered(QAction*)));
+
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
     connect(&m_johnAttack, SIGNAL(started()), this,
@@ -1563,4 +1576,33 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
         m_ui->formatComboBox->setEditText(editText);
     }
     callJohnShow(true);
+}
+
+void MainWindow::actionExportToTriggered(QAction* action)
+{
+    QString fileFormat;
+    char delimiter;
+
+    if (action == m_ui->actionExportToCSV) {
+        fileFormat = ".csv";
+        delimiter = ',';
+
+    } else if (action == m_ui->actionExportToColonSeparated) {
+        fileFormat = ".txt";
+        delimiter = ':';
+    } else {
+        return;
+    }
+    QString fileName = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), fileFormat);
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(fileFormat)) {
+            fileName.append(fileFormat);
+        }
+        exportTo(delimiter, fileName);
+    }
+}
+
+void MainWindow::exportTo(char delimiter, QString fileName)
+{
+
 }

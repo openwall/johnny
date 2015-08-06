@@ -456,45 +456,8 @@ void MainWindow::openLastSession()
 
 void MainWindow::actionCopyToClipboardTriggered()
 {
-    if (!m_hashTable)
-        return;
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
-    if (indexes.count() == 0)
-    {
-        QMessageBox::warning(
-            this,
-            tr("Johnny"),
-            tr("Nothing selected. Select rows/columns in the Passwords table to copy."));
-        return;
-    }
-
-    QString out;
-    if (indexes.count() == 1) {
-        out = indexes.at(0).data().toString();
-    } else {
-        qSort(indexes);
-        int previousRow = -1;
-        // TODO: such table making works bad with ctrl+mouse
-        //       selection. I'd say in such case not selected fields
-        //       inside the rectangle should be exported as empty.
-        foreach (const QModelIndex &index, indexes) {
-            // TODO: do it faster.
-            // TODO: check for tabs inside.
-            // TODO: use mimetype to make good tables.
-            if (previousRow == index.row()) {
-                out += "\t";
-            } else if (previousRow != -1) {
-                out += "\n";
-            }
-            out += index.data().toString();
-            previousRow = index.row();
-        }
-    }
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->clear();
-    if (clipboard->supportsSelection())
-        clipboard->setText(out, QClipboard::Selection);
-    clipboard->setText(out);
+    // Empty file name means will copy to clipboard
+    exportTo('\t', "");
 }
 
 bool MainWindow::checkSettings()
@@ -1604,5 +1567,56 @@ void MainWindow::actionExportToTriggered(QAction* action)
 
 void MainWindow::exportTo(char delimiter, QString fileName)
 {
+    if (!m_hashTable)
+        return;
+    bool shouldCopyToClipboard = fileName.isEmpty();
+    QString out;
 
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    if (indexes.count() == 0) {
+        m_ui->tableView_Hashes->selectAll();
+        indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    }
+
+    if (indexes.count() == 1) {
+        out = indexes.at(0).data().toString();
+    } else {
+        qSort(indexes);
+        int previousRow = -1;
+        // TODO: such table making works bad with ctrl+mouse
+        //       selection. I'd say in such case not selected fields
+        //       inside the rectangle should be exported as empty.
+        foreach (const QModelIndex &index, indexes) {
+            if (previousRow == index.row()) {
+                out += delimiter;
+            } else if (previousRow != -1) {
+                out += "\n";
+            }
+
+            QString data = index.data().toString();
+            // In case the field contains the delimiter character or " character, escape it.
+            if (data.contains(QRegExp( "(" + QString(delimiter) + "|\")"))) {
+                out += "\"" + data + "\"";
+            } else {
+                out += data;
+            }
+            previousRow = index.row();
+        }
+    }
+
+    // Copy the result to the requested media
+    if (shouldCopyToClipboard) {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->clear();
+        if (clipboard->supportsSelection())
+            clipboard->setText(out, QClipboard::Selection);
+        clipboard->setText(out);
+    } else { // export to file
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream outStream(&file);
+            outStream << out;
+            file.close();
+        }
+    }
 }

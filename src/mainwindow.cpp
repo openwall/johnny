@@ -919,7 +919,7 @@ void MainWindow::callJohnShow(bool showAllFormats)
     QStringList args;
     // We add current format key if it is not empty.
     if (!m_sessionCurrent.format().isEmpty() && !showAllFormats)
-        args << m_sessionCurrent.format();
+        args << "--format=" + m_sessionCurrent.format();
     args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
@@ -1297,7 +1297,7 @@ void MainWindow::guessPassword()
         QStringList args;
         args << "--stdin";
         if(!m_sessionCurrent.format().isEmpty())
-            args << m_sessionCurrent.format();
+            args << "--format=" + m_sessionCurrent.format();
         args << m_sessionPasswordFiles;
         m_johnGuess.setArgs(args);
         m_johnGuess.start();

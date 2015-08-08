@@ -914,11 +914,11 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     callJohnShow();
 }
 
-void MainWindow::callJohnShow(bool showAllFormats)
+void MainWindow::callJohnShow()
 {
     QStringList args;
     // We add current format key if it is not empty.
-    if (!m_sessionCurrent.format().isEmpty() && !showAllFormats)
+    if (!m_sessionCurrent.format().isEmpty())
         args << "--format=" + m_sessionCurrent.format();
     args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
@@ -1314,7 +1314,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
         qDebug() << "JtR seems to have crashed.";
         return;
     }
-    callJohnShow(true);
+    callJohnShow();
 }
 
 void MainWindow::restoreSessionOptions()
@@ -1562,5 +1562,5 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
     if (editText != defaultFormatText) {
         m_ui->formatComboBox->setEditText(editText);
     }
-    callJohnShow(true);
+    callJohnShow();
 }

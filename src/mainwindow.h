@@ -72,7 +72,7 @@ private slots:
     void showJohnError(QProcess::ProcessError error);
     void replaceTableModel(PasswordFileModel *newTableModel);
     void startJohn(QStringList args);
-    void callJohnShow(bool showAllFormats = false);
+    void callJohnShow();
     void readJohnShow();
     void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);

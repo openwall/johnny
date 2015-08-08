@@ -83,6 +83,7 @@ private slots:
     void verifyJohnVersion();
     void getDefaultFormat();
     void getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void johnPathChanged();
 
     // Settings related
     void fillSettingsWithDefaults();

@@ -1569,9 +1569,9 @@ void MainWindow::exportTo(char delimiter, QString fileName)
 {
     if (!m_hashTable)
         return;
+
     bool shouldCopyToClipboard = fileName.isEmpty();
     QString out;
-
     QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
     if (indexes.count() == 0) {
         m_ui->tableView_Hashes->selectAll();
@@ -1581,26 +1581,41 @@ void MainWindow::exportTo(char delimiter, QString fileName)
     if (indexes.count() == 1) {
         out = indexes.at(0).data().toString();
     } else {
+        // We build a table that works good with ctrl+mouse selection
         qSort(indexes);
+        QMap<int, bool> selectedColumnsMap;
+        foreach (QModelIndex current, indexes) {
+            selectedColumnsMap[current.column()] = true;
+        }
+        QList<int> selectedColumns = selectedColumnsMap.uniqueKeys();
+
         int previousRow = -1;
-        // TODO: such table making works bad with ctrl+mouse
-        //       selection. I'd say in such case not selected fields
-        //       inside the rectangle should be exported as empty.
-        foreach (const QModelIndex &index, indexes) {
-            if (previousRow == index.row()) {
+        int previousColumn = -1;
+        foreach (const QModelIndex &current, indexes) {
+            if (previousRow == current.row()) {
                 out += delimiter;
             } else if (previousRow != -1) {
                 out += "\n";
+                previousColumn = -1;
             }
 
-            QString data = index.data().toString();
+            // Not selected fields inside the rectangle will be exported as empty.
+            // so we must add some delimiters character
+            int nbDelimiter = current.column() - previousColumn - 1;
+            for (int i= 0; i < nbDelimiter; i++) {
+                if (selectedColumns.contains(previousColumn+i+1))
+                    out += delimiter;
+            }
+
+            QString data = current.data().toString();
             // In case the field contains the delimiter character or " character, escape it.
             if (data.contains(QRegExp( "(" + QString(delimiter) + "|\")"))) {
                 out += "\"" + data + "\"";
             } else {
                 out += data;
             }
-            previousRow = index.row();
+            previousRow = current.row();
+            previousColumn = current.column();
         }
     }
 

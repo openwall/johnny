@@ -1612,15 +1612,24 @@ border-bottom: 1px solid darkgrey;
    <property name="text">
     <string>Export</string>
    </property>
+   <property name="toolTip">
+    <string>Copy selected fields or entire passwords table to file</string>
+   </property>
   </action>
   <action name="actionExportToCSV">
    <property name="text">
     <string>Export to CSV</string>
    </property>
+   <property name="toolTip">
+    <string>Export to CSV (val,val,val)</string>
+   </property>
   </action>
   <action name="actionExportToColonSeparated">
    <property name="text">
     <string>Export to Colon Separated</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to Colon Separated (val:val:val)</string>
    </property>
   </action>
  </widget>

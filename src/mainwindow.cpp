@@ -111,6 +111,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
+    m_ui->actionExport->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
     m_ui->actionIncludeSelectedHashes->setEnabled(false);
     m_ui->actionExcludeSelectedHashes->setEnabled(false);
@@ -223,6 +224,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_settings.endGroup();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
     m_sessionMenu->setToolTipsVisible(true);
+    exportMenu->setToolTipsVisible(true);
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
@@ -385,6 +387,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
+        m_ui->actionExport->setEnabled(true);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         m_ui->actionIncludeSelectedHashes->setEnabled(true);
@@ -1556,7 +1559,7 @@ void MainWindow::actionExportToTriggered(QAction* action)
     } else {
         return;
     }
-    QString fileName = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), fileFormat);
+    QString fileName = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), "*"+ fileFormat);
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(fileFormat)) {
             fileName.append(fileFormat);

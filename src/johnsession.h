@@ -8,7 +8,7 @@
 class JohnSession
 {
 public:
-    enum AttackMode {DEFAULT_MODE, SINGLECRACK_MODE, WORDLIST_MODE, INCREMENTAL_MODE, EXTERNAL_MODE};
+    enum AttackMode {DEFAULT_MODE, SINGLECRACK_MODE, WORDLIST_MODE, INCREMENTAL_MODE, EXTERNAL_MODE, MASK_MODE, MARKOV_MODE, PRINCE_MODE};
     JohnSession(const QString &sessionName, QSettings* settings);
     ~JohnSession();
     bool load();

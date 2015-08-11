@@ -1240,6 +1240,10 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     m_ui->lineEditExternalModeMask->setVisible(isJumbo);
     m_ui->checkBoxIncrementalModeMask->setVisible(isJumbo);
     m_ui->lineEditIncrementalModeMask->setVisible(isJumbo);
+    m_ui->checkBoxMaxCandidateLength->setVisible(isJumbo);
+    m_ui->checkBoxMinCandidateLength->setVisible(isJumbo);
+    m_ui->spinBoxMinCandidateLength->setVisible(isJumbo);
+    m_ui->spinBoxMaxCandidateLength->setVisible(isJumbo);
     if (!isJumbo) {
         m_ui->lineEdit_WordlistRules->clear();
         // Add default format list supported by core john

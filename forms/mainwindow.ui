@@ -213,10 +213,10 @@ border-bottom: 1px solid darkgrey;
           <widget class="QWidget" name="optionsPage">
            <property name="geometry">
             <rect>
-             <x>0</x>
-             <y>-317</y>
-             <width>741</width>
-             <height>835</height>
+             <x>-151</x>
+             <y>-63</y>
+             <width>892</width>
+             <height>1258</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -355,7 +355,7 @@ border-bottom: 1px solid darkgrey;
                   </sizepolicy>
                  </property>
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>7</number>
                  </property>
                  <widget class="QWidget" name="defaultModeTab">
                   <attribute name="title">
@@ -390,6 +390,19 @@ border-bottom: 1px solid darkgrey;
                      </property>
                     </widget>
                    </item>
+                   <item>
+                    <spacer name="verticalSpacer_4">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
                   </layout>
                  </widget>
                  <widget class="QWidget" name="singleModeTab">
@@ -397,6 +410,12 @@ border-bottom: 1px solid darkgrey;
                    <string>Single crack mode</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <property name="spacing">
+                    <number>15</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>15</number>
+                   </property>
                    <item>
                     <widget class="QLabel" name="label_3">
                      <property name="text">
@@ -429,6 +448,19 @@ border-bottom: 1px solid darkgrey;
                       <widget class="QLineEdit" name="lineEditSingleCrackModeExternalName"/>
                      </item>
                     </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_5">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                   </layout>
                  </widget>
@@ -467,7 +499,7 @@ border-bottom: 1px solid darkgrey;
                        <item>
                         <widget class="QLineEdit" name="lineEditWordlistFile">
                          <property name="sizePolicy">
-                          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
@@ -484,6 +516,16 @@ border-bottom: 1px solid darkgrey;
                          </property>
                          <property name="text">
                           <string>Browse</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QCheckBox" name="checkBoxWordlistLoopback">
+                         <property name="toolTip">
+                          <string>Check this option if your wordlist is a pot file</string>
+                         </property>
+                         <property name="text">
+                          <string>Loopback</string>
                          </property>
                         </widget>
                        </item>
@@ -505,7 +547,7 @@ border-bottom: 1px solid darkgrey;
                      <item row="2" column="0">
                       <widget class="QCheckBox" name="checkBox_WordlistModeRules">
                        <property name="text">
-                        <string>Use rules</string>
+                        <string>Use rules:</string>
                        </property>
                       </widget>
                      </item>
@@ -515,7 +557,30 @@ border-bottom: 1px solid darkgrey;
                      <item row="1" column="1">
                       <widget class="QLineEdit" name="lineEditWordlistModeExternalName"/>
                      </item>
+                     <item row="3" column="0">
+                      <widget class="QCheckBox" name="checkBoxWordlistModeMask">
+                       <property name="text">
+                        <string>Use Hybrid Mask mode with mask :</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="lineEditWordlistModeMask"/>
+                     </item>
                     </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_6">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                   </layout>
                  </widget>
@@ -555,7 +620,7 @@ border-bottom: 1px solid darkgrey;
                        </property>
                       </widget>
                      </item>
-                     <item row="1" column="0">
+                     <item row="2" column="0">
                       <widget class="QCheckBox" name="checkBox_IncrementalModeExternalName">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -571,10 +636,33 @@ border-bottom: 1px solid darkgrey;
                      <item row="0" column="1">
                       <widget class="QLineEdit" name="lineEditIncrementalModeName"/>
                      </item>
-                     <item row="1" column="1">
+                     <item row="2" column="1">
                       <widget class="QLineEdit" name="lineEditIncrementalModeExternalName"/>
                      </item>
+                     <item row="3" column="0">
+                      <widget class="QCheckBox" name="checkBoxIncrementalModeMask">
+                       <property name="text">
+                        <string>Use Hybrid Mask mode with mask :</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="lineEditIncrementalModeMask"/>
+                     </item>
                     </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_7">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                   </layout>
                  </widget>
@@ -613,7 +701,377 @@ border-bottom: 1px solid darkgrey;
                        <item row="0" column="1">
                         <widget class="QLineEdit" name="lineEditExternalModeName"/>
                        </item>
+                       <item row="1" column="0">
+                        <widget class="QCheckBox" name="checkBoxExternalModeMask">
+                         <property name="text">
+                          <string>Use Hybrid Mask mode with mask :</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="lineEditExternalModeMask"/>
+                       </item>
                       </layout>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_8">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="maskModeTab">
+                  <attribute name="title">
+                   <string>Mask mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_7">
+                   <item>
+                    <widget class="QLabel" name="label_14">
+                     <property name="text">
+                      <string>Mask mode is a fast way to produce password candidates given a &quot;mask&quot; that describes what the words should look like. For example, the mask ?u?l?l will generate all possible three-letter words, with first character uppercased and the remaining in lowercase.  To see the right syntax to build your mask, refer to the file called MASK in JtR jumbo doc folder.</string>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QFormLayout" name="formLayout_7">
+                     <property name="fieldGrowthPolicy">
+                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                     </property>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_16">
+                       <property name="text">
+                        <string>Mask:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLineEdit" name="lineEditMaskModeMask"/>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QCheckBox" name="checkBoxMaskModeExternalName">
+                       <property name="text">
+                        <string>Use external mode, filter name:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="lineEditMaskModeExternalName"/>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QCheckBox" name="checkBoxMaskModeRules">
+                       <property name="text">
+                        <string>Use rules:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="lineEditMaskModeRules"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="markovModeTab">
+                  <attribute name="title">
+                   <string>Markov mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_16">
+                   <item>
+                    <widget class="QLabel" name="label_17">
+                     <property name="text">
+                      <string>This is a stand alone mode, where word-like strings are created based upon a complex algorithm based upon 'weights' or likeliness of characters following characters. A full description of this mode, and its usage is found in the JtR /doc/MARKOV document.</string>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QFormLayout" name="formLayout_9">
+                     <property name="fieldGrowthPolicy">
+                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                     </property>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_18">
+                       <property name="text">
+                        <string>Mode (leave field empty to use default mode):</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="lineEditMarkovMode"/>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMinLevel">
+                       <property name="text">
+                        <string>Minimum Markov level:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel"/>
+                     </item>
+                     <item row="6" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMaxLevel">
+                       <property name="text">
+                        <string>Maximum Markov level:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel"/>
+                     </item>
+                     <item row="7" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeStartIndex">
+                       <property name="text">
+                        <string>Start index:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex"/>
+                     </item>
+                     <item row="8" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex"/>
+                     </item>
+                     <item row="8" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeEndIndex">
+                       <property name="text">
+                        <string>End index:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeExternalName">
+                       <property name="text">
+                        <string>Use external mode, filter name:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="lineEditMarkovModeExternalName"/>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeRules">
+                       <property name="text">
+                        <string>Use rules:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="lineEditMarkovModeRules"/>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMask">
+                       <property name="text">
+                        <string>Use Hybrid Mask mode with mask :</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QLineEdit" name="lineEditMarkovModeMask"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_10">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="princeModeTab">
+                  <attribute name="title">
+                   <string>Prince mode</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout_17">
+                   <item>
+                    <widget class="QLabel" name="label_19">
+                     <property name="text">
+                      <string>Prince mode is a modern password guessing algorithm. Rather than taking as input two different dictionaries and then outputting all the possible two word combinations though, PRINCE only has one input dictionary and builds &quot;chains&quot; of combined words. These chains can have 1 to N words from the input dictionary concatenated together. So for example if it is outputting guesses of length four, it could generate them using combinations from the input dictionary such as: 4 letter word or 2 letter word + 2 letter word or 1 letter word + 3 letter word  or 1 letter word + 1 letter word + 2 letter word etc...</string>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QFormLayout" name="formLayout_10">
+                     <property name="fieldGrowthPolicy">
+                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                     </property>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_20">
+                       <property name="text">
+                        <string>Wordlist file:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <layout class="QHBoxLayout" name="horizontalLayout_4">
+                       <item>
+                        <widget class="QLineEdit" name="lineEditPrinceModeWordlistFile"/>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="pushButtonPrinceModeBrowseFile">
+                         <property name="text">
+                          <string>Browse</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QCheckBox" name="checkBoxPrinceModeLoopback">
+                         <property name="toolTip">
+                          <string>Check this option if your wordlist is a pot file</string>
+                         </property>
+                         <property name="text">
+                          <string>Loopback</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeExternalName">
+                       <property name="text">
+                        <string>Use external mode, filter name:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="lineEditPrinceModeExternalName"/>
+                     </item>
+                     <item row="2" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeRules">
+                       <property name="text">
+                        <string>Use rules:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="2" column="1">
+                      <widget class="QLineEdit" name="lineEditPrinceModeRules"/>
+                     </item>
+                     <item row="3" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeMask">
+                       <property name="text">
+                        <string>Use Hybrid Mask mode with mask :</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="3" column="1">
+                      <widget class="QLineEdit" name="lineEditPrinceModeMask"/>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceMinElementsPerChain">
+                       <property name="text">
+                        <string>Minimum number of elements per chain:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QSpinBox" name="spinBoxPrinceMinElementsPerChain"/>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceMaxElementsPerChain">
+                       <property name="text">
+                        <string>Maximum number of elements per chain:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QSpinBox" name="spinBoxPrinceMaxElementsPerChain"/>
+                     </item>
+                     <item row="6" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeInitialSkip">
+                       <property name="text">
+                        <string>Initial skip:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1">
+                      <widget class="QSpinBox" name="spinBoxPrinceModeInitialSkip"/>
+                     </item>
+                     <item row="7" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeLimitInputWords">
+                       <property name="text">
+                        <string>Load only specified number of words from input wordlist:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="1">
+                      <widget class="QSpinBox" name="spinBoxPrinceModeLimitInputWords"/>
+                     </item>
+                     <item row="8" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeLimitCandidates">
+                       <property name="text">
+                        <string>Limit number of candidates generated to:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="8" column="1">
+                      <widget class="QSpinBox" name="spinBoxPrinceModeLimitCandidates"/>
+                     </item>
+                     <item row="9" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceCalculateDistributionWithWordlist">
+                       <property name="text">
+                        <string> Calculate length distribution from wordlist instead of using built-in table</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="10" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModePermuteCase">
+                       <property name="text">
+                        <string>Permute case of first letter</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="11" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeMapToMemory">
+                       <property name="text">
+                        <string>Memory-map infile (not available when permuting case)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="12" column="0">
+                      <widget class="QCheckBox" name="checkBoxPrinceModeShowTotalKeyspace">
+                       <property name="text">
+                        <string>Just show total keyspace that would be produced (disregarding skip and limit)</string>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -885,14 +1343,14 @@ border-bottom: 1px solid darkgrey;
                </item>
                <item>
                 <widget class="QWidget" name="widget_EnvironmentVar" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_20">
+                 <layout class="QFormLayout" name="formLayout_8">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
                   <property name="topMargin">
                    <number>0</number>
                   </property>
-                  <item>
+                  <item row="0" column="0">
                    <widget class="QCheckBox" name="checkBox_EnvironmentVar">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -905,7 +1363,7 @@ border-bottom: 1px solid darkgrey;
                     </property>
                    </widget>
                   </item>
-                  <item>
+                  <item row="0" column="1">
                    <widget class="QLineEdit" name="lineEdit_EnvironmentVar">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -914,6 +1372,26 @@ border-bottom: 1px solid darkgrey;
                      </sizepolicy>
                     </property>
                    </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QCheckBox" name="checkBox_3">
+                    <property name="text">
+                     <string>Minimum password candidate length:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QSpinBox" name="spinBox"/>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QCheckBox" name="checkBox_4">
+                    <property name="text">
+                     <string>Maximum password candidate length:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QSpinBox" name="spinBox_2"/>
                   </item>
                  </layout>
                 </widget>

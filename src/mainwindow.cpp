@@ -1230,6 +1230,16 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
     m_ui->actionFilterFormatColumn->setEnabled(isJumbo);
     m_ui->lineEdit_WordlistRules->setVisible(isJumbo);
+    m_ui->princeModeTab->setEnabled(isJumbo);
+    m_ui->maskModeTab->setEnabled(isJumbo);
+    m_ui->markovModeTab->setEnabled(isJumbo);
+    m_ui->checkBoxWordlistModeMask->setVisible(isJumbo);
+    m_ui->checkBoxWordlistLoopback->setVisible(isJumbo);
+    m_ui->lineEditWordlistModeMask->setVisible(isJumbo);
+    m_ui->checkBoxExternalModeMask->setVisible(isJumbo);
+    m_ui->lineEditExternalModeMask->setVisible(isJumbo);
+    m_ui->checkBoxIncrementalModeMask->setVisible(isJumbo);
+    m_ui->lineEditIncrementalModeMask->setVisible(isJumbo);
     if (!isJumbo) {
         m_ui->lineEdit_WordlistRules->clear();
         // Add default format list supported by core john

@@ -213,10 +213,10 @@ border-bottom: 1px solid darkgrey;
           <widget class="QWidget" name="optionsPage">
            <property name="geometry">
             <rect>
-             <x>-151</x>
+             <x>0</x>
              <y>-63</y>
              <width>892</width>
-             <height>1258</height>
+             <height>1275</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -738,7 +738,8 @@ border-bottom: 1px solid darkgrey;
                    <item>
                     <widget class="QLabel" name="label_14">
                      <property name="text">
-                      <string>Mask mode is a fast way to produce password candidates given a &quot;mask&quot; that describes what the words should look like. For example, the mask ?u?l?l will generate all possible three-letter words, with first character uppercased and the remaining in lowercase.  To see the right syntax to build your mask, refer to the file called MASK in JtR jumbo doc folder.</string>
+                      <string>(Require JtR jumbo)
+Mask mode is a fast way to produce password candidates given a &quot;mask&quot; that describes what the words should look like. For example, the mask ?u?l?l will generate all possible three-letter words, with first character uppercased and the remaining in lowercase.  To see the right syntax to build your mask, refer to the file called MASK in JtR jumbo doc folder.</string>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
@@ -805,7 +806,8 @@ border-bottom: 1px solid darkgrey;
                    <item>
                     <widget class="QLabel" name="label_17">
                      <property name="text">
-                      <string>This is a stand alone mode, where word-like strings are created based upon a complex algorithm based upon 'weights' or likeliness of characters following characters. A full description of this mode, and its usage is found in the JtR /doc/MARKOV document.</string>
+                      <string>(Require JtR jumbo)
+This is a stand alone mode, where word-like strings are created based upon a complex algorithm based upon 'weights' or likeliness of characters following characters. A full description of this mode, and its usage is found in the JtR /doc/MARKOV document.</string>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
@@ -922,7 +924,8 @@ border-bottom: 1px solid darkgrey;
                    <item>
                     <widget class="QLabel" name="label_19">
                      <property name="text">
-                      <string>Prince mode is a modern password guessing algorithm. Rather than taking as input two different dictionaries and then outputting all the possible two word combinations though, PRINCE only has one input dictionary and builds &quot;chains&quot; of combined words. These chains can have 1 to N words from the input dictionary concatenated together. So for example if it is outputting guesses of length four, it could generate them using combinations from the input dictionary such as: 4 letter word or 2 letter word + 2 letter word or 1 letter word + 3 letter word  or 1 letter word + 1 letter word + 2 letter word etc...</string>
+                      <string>(Require JtR jumbo)
+Prince mode is a modern password guessing algorithm. Rather than taking as input two different dictionaries and then outputting all the possible two word combinations though, PRINCE only has one input dictionary and builds &quot;chains&quot; of combined words. These chains can have 1 to N words from the input dictionary concatenated together. So for example if it is outputting guesses of length four, it could generate them using combinations from the input dictionary such as: 4 letter word or 2 letter word + 2 letter word or 1 letter word + 3 letter word  or 1 letter word + 1 letter word + 2 letter word etc...</string>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>

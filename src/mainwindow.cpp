@@ -667,6 +667,11 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--external=" + m_ui->lineEditWordlistModeExternalName->text());
             m_sessionCurrent.setExternalName(m_ui->lineEditWordlistModeExternalName->text());
         }
+        // Hybrid mask mode
+        if (m_isJumbo && m_ui->checkBoxWordlistModeMask->isChecked()) {
+            parameters << ("--mask=" + m_ui->lineEditWordlistModeMask->text());
+            m_sessionCurrent.setMask(m_ui->lineEditWordlistModeMask->text());
+        }
     } else if (selectedMode == m_ui->incrementalModeTab) {
         // "Incremental" mode
         // It could be with or without name.
@@ -684,11 +689,21 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--external=" + m_ui->lineEditIncrementalModeExternalName->text());
             m_sessionCurrent.setExternalName(m_ui->lineEditIncrementalModeExternalName->text());
         }
+        // Hybrid mask mode
+        if (m_isJumbo && m_ui->checkBoxIncrementalModeMask->isChecked()) {
+            parameters << ("--mask=" + m_ui->lineEditIncrementalModeMask->text());
+            m_sessionCurrent.setMask(m_ui->lineEditIncrementalModeMask->text());
+        }
     } else if (selectedMode == m_ui->externalModeTab) {
         // External mode
         m_sessionCurrent.setMode(JohnSession::EXTERNAL_MODE);
         parameters << ("--external=" + m_ui->lineEditExternalModeName->text());
         m_sessionCurrent.setExternalName(m_ui->lineEditExternalModeName->text());
+        // Hybrid mask mode
+        if (m_isJumbo && m_ui->checkBoxExternalModeMask->isChecked()) {
+            parameters << ("--mask=" + m_ui->lineEditExternalModeMask->text());
+            m_sessionCurrent.setMask(m_ui->lineEditExternalModeMask->text());
+        }
     }
 
     // Selectors
@@ -718,6 +733,18 @@ QStringList MainWindow::saveAttackParameters()
     if (m_ui->checkBox_EnvironmentVar->isChecked()) {
        m_sessionCurrent.setEnvironmentVariables(m_ui->lineEdit_EnvironmentVar->text());
     }
+    // Jumbo global options
+    if (m_isJumbo) {
+        if (m_ui->checkBoxMinCandidateLength->isChecked()) {
+            parameters << (QString("--min-len=%1").arg(m_ui->spinBoxMinCandidateLength->value()));
+            m_sessionCurrent.setMinPasswordCandidatesLength(m_ui->spinBoxMinCandidateLength->value());
+        }
+        if (m_ui->checkBoxMaxCandidateLength->isChecked()) {
+            parameters << (QString("--max-len=%1").arg(m_ui->spinBoxMaxCandidateLength->value()));
+            m_sessionCurrent.setMaxPasswordCandidatesLength(m_ui->spinBoxMaxCandidateLength->value());
+        }
+    }
+
     // Save unselected rows
     QList<int> unselectedRows;
     for (int i = 0; i < m_hashTable->rowCount(); i++) {
@@ -1358,6 +1385,11 @@ void MainWindow::restoreSessionOptions()
             m_ui->checkBox_WordlistModeExternalName->setChecked(true);
             m_ui->lineEditWordlistModeExternalName->setText(m_sessionCurrent.externalName());
         }
+        // Hybrid mask mode
+        if (!m_sessionCurrent.mask().isNull()) {
+            m_ui->checkBoxWordlistModeMask->setChecked(true);
+            m_ui->lineEditWordlistModeMask->setText(m_sessionCurrent.mask());
+        }
     } else if (mode == JohnSession::INCREMENTAL_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);
         // "Incremental" mode
@@ -1371,9 +1403,32 @@ void MainWindow::restoreSessionOptions()
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
             m_ui->lineEditIncrementalModeExternalName->setText(m_sessionCurrent.externalName());
         }
+        // Hybrid mask mode
+        if (!m_sessionCurrent.mask().isNull()) {
+            m_ui->checkBoxIncrementalModeMask->setChecked(true);
+            m_ui->lineEditIncrementalModeMask->setText(m_sessionCurrent.mask());
+        }
     } else if (mode == JohnSession::EXTERNAL_MODE) {
-        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab)  ;
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab);
         m_ui->lineEditExternalModeName->setText(m_sessionCurrent.externalName());
+        // Hybrid mask mode
+        if (!m_sessionCurrent.mask().isNull()) {
+            m_ui->checkBoxExternalModeMask->setChecked(true);
+            m_ui->lineEditExternalModeMask->setText(m_sessionCurrent.mask());
+        }
+    } else if (mode == JohnSession::MASK_MODE) {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->maskModeTab);
+        m_ui->lineEditMaskModeMask->setText(m_sessionCurrent.mask());
+        //Rules
+        if (!m_sessionCurrent.rules().isNull()) {
+            m_ui->checkBoxMaskModeRules->setChecked(true);
+            m_ui->lineEditMaskModeRules->setText(m_sessionCurrent.rules());
+        }
+        // External mode, filter
+        if (!m_sessionCurrent.externalName().isNull()) {
+            m_ui->checkBoxMaskModeExternalName->setChecked(true);
+            m_ui->lineEditMaskModeExternalName->setText(m_sessionCurrent.externalName());
+        }
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
@@ -1413,6 +1468,15 @@ void MainWindow::restoreSessionOptions()
         m_ui->checkBox_EnvironmentVar->setChecked(true);
         m_ui->lineEdit_EnvironmentVar->setText(m_sessionCurrent.environmentVariables());
     }
+    if (m_sessionCurrent.minPasswordCandidatesLength() >= 0) {
+        m_ui->checkBoxMinCandidateLength->setChecked(true);
+        m_ui->spinBoxMinCandidateLength->setValue(m_sessionCurrent.minPasswordCandidatesLength());
+    }
+    if (m_sessionCurrent.maxPasswordCandidatesLength() >= 0) {
+        m_ui->checkBoxMaxCandidateLength->setChecked(true);
+        m_ui->spinBoxMaxCandidateLength->setValue(m_sessionCurrent.maxPasswordCandidatesLength());
+    }
+
     // Unselected hashes
     QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
     for (int i = 0; i < unselectedRows.count(); i++) {
@@ -1436,6 +1500,9 @@ void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
         }
         foreach(QLineEdit *widget, m_ui->optionsPage->findChildren<QLineEdit*>()) {
             widget->setText("");
+        }
+        foreach(QSpinBox *widget, m_ui->optionsPage->findChildren<QSpinBox*>()) {
+            widget->setValue(0);
         }
     }
     int idealThreadCount = QThread::idealThreadCount();

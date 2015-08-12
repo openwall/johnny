@@ -10,6 +10,21 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_limitSalts = -1;
     m_forkProcesses = 1;
     m_openMPThreads = 0;
+    m_minPasswordCandidatesLength = -1;
+    m_maxPasswordCandidatesLength = -1;
+    m_minMarkovLevel = -1;
+    m_maxMarkovLevel = -1;
+    m_startIndex = -1;
+    m_endIndex = -1;
+    m_minElementsPerChain = -1;
+    m_maxElementsPerChain = -1;
+    m_initialSkip = -1;
+    m_limitWords = -1;
+    m_limitNbPasswordCandidates = -1;
+    m_useWordlistForLengthDistribution = false;
+    m_permuteCaseOfFirstLetter = false;
+    m_memoryMap = false;
+    m_showTotalKeyspace = false;
 }
 
 QString JohnSession::filePath()
@@ -72,7 +87,7 @@ bool JohnSession::load()
     } else if (mode == "external") {
         m_mode = EXTERNAL_MODE;
         m_externalName = m_settings->value("externalModeName").toString();
-    } else {
+    } else if (mode == "default"){
         m_mode = DEFAULT_MODE;
     }
 
@@ -353,6 +368,176 @@ void JohnSession::setDefaultFormat(const QString &defaultFormat)
 {
     m_defaultFormat = defaultFormat;
 }
+QString JohnSession::mask() const
+{
+    return m_mask;
+}
+
+void JohnSession::setMask(const QString &mask)
+{
+    m_mask = mask;
+}
+QString JohnSession::markovMode() const
+{
+    return m_markovMode;
+}
+
+void JohnSession::setMarkovMode(const QString &markovMode)
+{
+    m_markovMode = markovMode;
+}
+int JohnSession::minMarkovLevel() const
+{
+    return m_minMarkovLevel;
+}
+
+void JohnSession::setMinMarkovLevel(int minMarkovLevel)
+{
+    m_minMarkovLevel = minMarkovLevel;
+}
+int JohnSession::maxMarkovLevel() const
+{
+    return m_maxMarkovLevel;
+}
+
+void JohnSession::setMaxMarkovLevel(int maxMarkovLevel)
+{
+    m_maxMarkovLevel = maxMarkovLevel;
+}
+int JohnSession::startIndex() const
+{
+    return m_startIndex;
+}
+
+void JohnSession::setStartIndex(int startIndex)
+{
+    m_startIndex = startIndex;
+}
+int JohnSession::endIndex() const
+{
+    return m_endIndex;
+}
+
+void JohnSession::setEndIndex(int endIndex)
+{
+    m_endIndex = endIndex;
+}
+int JohnSession::minElementsPerChain() const
+{
+    return m_minElementsPerChain;
+}
+
+void JohnSession::setMinElementsPerChain(int minElementsPerChain)
+{
+    m_minElementsPerChain = minElementsPerChain;
+}
+int JohnSession::maxElementsPerChain() const
+{
+    return m_maxElementsPerChain;
+}
+
+void JohnSession::setMaxElementsPerChain(int maxElementsPerChain)
+{
+    m_maxElementsPerChain = maxElementsPerChain;
+}
+int JohnSession::initialSkip() const
+{
+    return m_initialSkip;
+}
+
+void JohnSession::setInitialSkip(int initialSkip)
+{
+    m_initialSkip = initialSkip;
+}
+int JohnSession::limitWords() const
+{
+    return m_limitWords;
+}
+
+void JohnSession::setLimitWords(int limitWords)
+{
+    m_limitWords = limitWords;
+}
+int JohnSession::limitNbPasswordCandidates() const
+{
+    return m_limitNbPasswordCandidates;
+}
+
+void JohnSession::setLimitNbPasswordCandidates(int limitNbPasswordCandidates)
+{
+    m_limitNbPasswordCandidates = limitNbPasswordCandidates;
+}
+bool JohnSession::useWordlistForLengthDistribution() const
+{
+    return m_useWordlistForLengthDistribution;
+}
+
+void JohnSession::setUseWordlistForLengthDistribution(bool useWordlistForLengthDistribution)
+{
+    m_useWordlistForLengthDistribution = useWordlistForLengthDistribution;
+}
+bool JohnSession::permuteCaseOfFirstLetter() const
+{
+    return m_permuteCaseOfFirstLetter;
+}
+
+void JohnSession::setPermuteCaseOfFirstLetter(bool permuteCaseOfFirstLetter)
+{
+    m_permuteCaseOfFirstLetter = permuteCaseOfFirstLetter;
+}
+bool JohnSession::memoryMap() const
+{
+    return m_memoryMap;
+}
+
+void JohnSession::setMemoryMap(bool memoryMap)
+{
+    m_memoryMap = memoryMap;
+}
+bool JohnSession::showTotalKeyspace() const
+{
+    return m_showTotalKeyspace;
+}
+
+void JohnSession::setShowTotalKeyspace(bool showTotalKeyspace)
+{
+    m_showTotalKeyspace = showTotalKeyspace;
+}
+int JohnSession::minPasswordCandidatesLength() const
+{
+    return m_minPasswordCandidatesLength;
+}
+
+void JohnSession::setMinPasswordCandidatesLength(int minPasswordCandidatesLength)
+{
+    m_minPasswordCandidatesLength = minPasswordCandidatesLength;
+}
+int JohnSession::maxPasswordCandidatesLength() const
+{
+    return m_maxPasswordCandidatesLength;
+}
+
+void JohnSession::setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength)
+{
+    m_maxPasswordCandidatesLength = maxPasswordCandidatesLength;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 JohnSession::AttackMode JohnSession::mode()

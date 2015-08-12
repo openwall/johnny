@@ -72,6 +72,57 @@ public:
     QString defaultFormat() const;
     void setDefaultFormat(const QString &defaultFormat);
 
+    QString mask() const;
+    void setMask(const QString &mask);
+
+    QString markovMode() const;
+    void setMarkovMode(const QString &markovMode);
+
+    int minMarkovLevel() const;
+    void setMinMarkovLevel(int minMarkovLevel);
+
+    int maxMarkovLevel() const;
+    void setMaxMarkovLevel(int maxMarkovLevel);
+
+    int startIndex() const;
+    void setStartIndex(int startIndex);
+
+    int endIndex() const;
+    void setEndIndex(int endIndex);
+
+    int minElementsPerChain() const;
+    void setMinElementsPerChain(int minElementsPerChain);
+
+    int maxElementsPerChain() const;
+    void setMaxElementsPerChain(int maxElementsPerChain);
+
+    int initialSkip() const;
+    void setInitialSkip(int initialSkip);
+
+    int limitWords() const;
+    void setLimitWords(int limitWords);
+
+    int limitNbPasswordCandidates() const;
+    void setLimitNbPasswordCandidates(int limitNbPasswordCandidates);
+
+    bool useWordlistForLengthDistribution() const;
+    void setUseWordlistForLengthDistribution(bool useWordlistForLengthDistribution);
+
+    bool permuteCaseOfFirstLetter() const;
+    void setPermuteCaseOfFirstLetter(bool permuteCaseOfFirstLetter);
+
+    bool memoryMap() const;
+    void setMemoryMap(bool memoryMap);
+
+    bool showTotalKeyspace() const;
+    void setShowTotalKeyspace(bool showTotalKeyspace);
+
+    int minPasswordCandidatesLength() const;
+    void setMinPasswordCandidatesLength(int minPasswordCandidatesLength);
+
+    int maxPasswordCandidatesLength() const;
+    void setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength);
+
 private:
     QString   m_name;
     QSettings* m_settings;
@@ -97,6 +148,29 @@ private:
     QString m_environmentVariables;
 
     QList<int> m_unselectedRows;
+
+    // JtR jumbo only fields
+    int m_minPasswordCandidatesLength;
+    int m_maxPasswordCandidatesLength;
+    QString m_mask;
+
+    // Markov-related
+    QString m_markovMode;
+    int m_minMarkovLevel;
+    int m_maxMarkovLevel;
+    int m_startIndex;
+    int m_endIndex;
+
+    // Prince-related
+    int m_minElementsPerChain;
+    int m_maxElementsPerChain;
+    int m_initialSkip;
+    int m_limitWords;
+    int m_limitNbPasswordCandidates;
+    bool m_useWordlistForLengthDistribution;
+    bool m_permuteCaseOfFirstLetter;
+    bool m_memoryMap;
+    bool m_showTotalKeyspace;
 };
 
 #endif // JOHNSESSION_H

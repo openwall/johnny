@@ -20,5 +20,6 @@
         <file>../translations/johnny_fr.qm</file>
         <file>icons/trash.png</file>
         <file>icons/guess.png</file>
+        <file>icons/export.png</file>
     </qresource>
 </RCC>

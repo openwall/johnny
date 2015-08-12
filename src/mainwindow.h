@@ -64,6 +64,8 @@ private slots:
     void excludeSelectedHashes();
     void setFilteringColumns();
     void resetFilters();
+    void actionExportToTriggered(QAction* action);
+    void exportTo(char delimiter, QString fileName);
 
     // JtR backend
     void updateJohnOutput();

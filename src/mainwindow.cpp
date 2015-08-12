@@ -111,6 +111,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     // Disable copy button since there is no hash_tables (UI friendly)
     m_ui->actionCopyToClipboard->setEnabled(false);
+    m_ui->actionExport->setEnabled(false);
     m_ui->actionStartAttack->setEnabled(false);
     m_ui->actionIncludeSelectedHashes->setEnabled(false);
     m_ui->actionExcludeSelectedHashes->setEnabled(false);
@@ -126,6 +127,19 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->insertSeparator(m_ui->actionStartAttack);
     connect(m_ui->actionOpenSession, SIGNAL(triggered()), sessionMenuButton, SLOT(showMenu()));
     connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
+
+    // Export menu
+    Menu *exportMenu = new Menu(this);
+    QToolButton *exportMenuButton = new QToolButton(this);
+    exportMenuButton->setDefaultAction(m_ui->actionExport);
+    exportMenuButton->setMenu(exportMenu);
+    exportMenuButton->setPopupMode(QToolButton::InstantPopup);
+    exportMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_ui->mainToolBar->addWidget(exportMenuButton);
+    exportMenu->addAction(m_ui->actionExportToCSV);
+    exportMenu->addAction(m_ui->actionExportToColonSeparated);
+    connect(m_ui->actionExport, SIGNAL(triggered()), exportMenuButton, SLOT(showMenu()));
+    connect(exportMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionExportToTriggered(QAction*)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
             SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
@@ -210,6 +224,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_settings.endGroup();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
     m_sessionMenu->setToolTipsVisible(true);
+    exportMenu->setToolTipsVisible(true);
 #endif
     m_sessionMenu->addAction(m_ui->actionClearSessionHistory);
 
@@ -372,6 +387,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
+        m_ui->actionExport->setEnabled(true);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         m_ui->actionIncludeSelectedHashes->setEnabled(true);
@@ -443,45 +459,8 @@ void MainWindow::openLastSession()
 
 void MainWindow::actionCopyToClipboardTriggered()
 {
-    if (!m_hashTable)
-        return;
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
-    if (indexes.count() == 0)
-    {
-        QMessageBox::warning(
-            this,
-            tr("Johnny"),
-            tr("Nothing selected. Select rows/columns in the Passwords table to copy."));
-        return;
-    }
-
-    QString out;
-    if (indexes.count() == 1) {
-        out = indexes.at(0).data().toString();
-    } else {
-        qSort(indexes);
-        int previousRow = -1;
-        // TODO: such table making works bad with ctrl+mouse
-        //       selection. I'd say in such case not selected fields
-        //       inside the rectangle should be exported as empty.
-        foreach (const QModelIndex &index, indexes) {
-            // TODO: do it faster.
-            // TODO: check for tabs inside.
-            // TODO: use mimetype to make good tables.
-            if (previousRow == index.row()) {
-                out += "\t";
-            } else if (previousRow != -1) {
-                out += "\n";
-            }
-            out += index.data().toString();
-            previousRow = index.row();
-        }
-    }
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->clear();
-    if (clipboard->supportsSelection())
-        clipboard->setText(out, QClipboard::Selection);
-    clipboard->setText(out);
+    // Empty file name means will copy to clipboard
+    exportTo('\t', "");
 }
 
 bool MainWindow::checkSettings()
@@ -1563,4 +1542,99 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
         m_ui->formatComboBox->setEditText(editText);
     }
     callJohnShow(true);
+}
+
+void MainWindow::actionExportToTriggered(QAction* action)
+{
+    QString fileFormat;
+    char delimiter;
+
+    if (action == m_ui->actionExportToCSV) {
+        fileFormat = ".csv";
+        delimiter = ',';
+
+    } else if (action == m_ui->actionExportToColonSeparated) {
+        fileFormat = ".txt";
+        delimiter = ':';
+    } else {
+        return;
+    }
+    QString fileName = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), "*"+ fileFormat);
+    if (!fileName.isEmpty()) {
+        if (!fileName.endsWith(fileFormat)) {
+            fileName.append(fileFormat);
+        }
+        exportTo(delimiter, fileName);
+    }
+}
+
+void MainWindow::exportTo(char delimiter, QString fileName)
+{
+    if (!m_hashTable)
+        return;
+
+    bool shouldCopyToClipboard = fileName.isEmpty();
+    QString out;
+    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    if (indexes.count() == 0) {
+        m_ui->tableView_Hashes->selectAll();
+        indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    }
+
+    if (indexes.count() == 1) {
+        out = indexes.at(0).data().toString();
+    } else {
+        // We build a table that works good with ctrl+mouse selection
+        qSort(indexes);
+        QMap<int, bool> selectedColumnsMap;
+        foreach (QModelIndex current, indexes) {
+            selectedColumnsMap[current.column()] = true;
+        }
+        QList<int> selectedColumns = selectedColumnsMap.uniqueKeys();
+
+        int previousRow = -1;
+        int previousColumn = -1;
+        foreach (const QModelIndex &current, indexes) {
+            if (previousRow == current.row()) {
+                out += delimiter;
+            } else if (previousRow != -1) {
+                out += "\n";
+                previousColumn = -1;
+            }
+
+            // Not selected fields inside the rectangle will be exported as empty.
+            // so we must add some delimiters character
+            int nbDelimiter = current.column() - previousColumn - 1;
+            for (int i= 0; i < nbDelimiter; i++) {
+                if (selectedColumns.contains(previousColumn+i+1))
+                    out += delimiter;
+            }
+
+            QString data = current.data().toString();
+            // In case the field contains the delimiter character or " character, escape it.
+            if (data.contains(QRegExp( "(" + QString(delimiter) + "|\")"))) {
+                out += "\"" + data + "\"";
+            } else {
+                out += data;
+            }
+            previousRow = current.row();
+            previousColumn = current.column();
+        }
+    }
+
+    // Copy the result to the requested media
+    if (shouldCopyToClipboard) {
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->clear();
+        if (clipboard->supportsSelection())
+            clipboard->setText(out, QClipboard::Selection);
+        clipboard->setText(out);
+    } else { // export to file
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream outStream(&file);
+            outStream << out;
+            file.close();
+        }
+    }
 }

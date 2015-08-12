@@ -2085,6 +2085,34 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
     <string>Filter against all columns</string>
    </property>
   </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export</string>
+   </property>
+   <property name="toolTip">
+    <string>Export selected fields or entire Passwords table to file</string>
+   </property>
+  </action>
+  <action name="actionExportToCSV">
+   <property name="text">
+    <string>Export to CSV</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to CSV format (comma separated)</string>
+   </property>
+  </action>
+  <action name="actionExportToColonSeparated">
+   <property name="text">
+    <string>Export to PASSWD format</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to password file format (colon separated)</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

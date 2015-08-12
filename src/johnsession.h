@@ -108,8 +108,8 @@ public:
     bool useWordlistForLengthDistribution() const;
     void setUseWordlistForLengthDistribution(bool useWordlistForLengthDistribution);
 
-    bool permuteCaseOfFirstLetter() const;
-    void setPermuteCaseOfFirstLetter(bool permuteCaseOfFirstLetter);
+    bool permuteFirstLetterCase() const;
+    void setPermuteFirstLetterCase(bool permuteFirstLetterCase);
 
     bool memoryMap() const;
     void setMemoryMap(bool memoryMap);
@@ -168,7 +168,7 @@ private:
     int m_limitWords;
     int m_limitNbPasswordCandidates;
     bool m_useWordlistForLengthDistribution;
-    bool m_permuteCaseOfFirstLetter;
+    bool m_permuteFirstLetterCase;
     bool m_memoryMap;
     bool m_showTotalKeyspace;
 };

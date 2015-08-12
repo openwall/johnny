@@ -683,6 +683,45 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--mask=" + m_ui->lineEditExternalModeMask->text());
             m_sessionCurrent.setMask(m_ui->lineEditExternalModeMask->text());
         }
+    } else if (selectedMode == m_ui->maskModeTab) {
+
+    } else if (selectedMode == m_ui->markovModeTab) {
+        m_sessionCurrent.setMode(JohnSession::MARKOV_MODE);
+        m_sessionCurrent.setMarkovMode(m_ui->lineEditMarkovMode->text());
+        if (m_ui->checkBoxMarkovModeMinLevel->isChecked())
+            m_sessionCurrent.setMinMarkovLevel(m_ui->spinBoxMarkovModeMinLevel->value());
+        if (m_ui->checkBoxMarkovModeMaxLevel)
+            m_sessionCurrent.setMaxMarkovLevel(m_ui->spinBoxMarkovModeMaxLevel->value());
+        if (m_ui->checkBoxMarkovModeStartIndex->isChecked())
+            m_sessionCurrent.setStartIndex(m_ui->spinBoxMarkovModeStartIndex->value());
+        if (m_ui->checkBoxMarkovModeEndIndex->isChecked())
+            m_sessionCurrent.setEndIndex(m_ui->spinBoxMarkovModeEndIndex->value());
+        QString markov;
+        // --markov=MODE[:LEVEL[:START[:END[:LENGTH]]]]
+        // We don't use length parameter since magnum said it was deprecated, global option -min-leng and -max-len are the way to go
+        markov += m_ui->lineEditMarkovMode->text() + ":";
+        markov += (m_ui->checkBoxMarkovModeMinLevel->isChecked() ? (m_ui->spinBoxMarkovModeMinLevel->value() + "-") : "");
+        markov += (m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (m_ui->spinBoxMarkovModeMaxLevel->value() + ":") : ":");
+        markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (m_ui->spinBoxMarkovModeStartIndex->value() + ":") : ":");
+        markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString(m_ui->spinBoxMarkovModeEndIndex->value()) : "");
+        parameters << ("--markov=" + markov);
+        //Rules
+        if (m_ui->checkBoxMarkovModeRules->isChecked()) {
+            m_sessionCurrent.setRules(m_ui->lineEditMarkovModeRules->text());
+            parameters << ("--rules=" + m_ui->lineEditMarkovModeRules->text());
+        }
+        // External mode, filter
+        if (m_ui->checkBoxMarkovModeExternalName->isChecked()) {
+            parameters << ("--external=" + m_ui->lineEditMarkovModeExternalName->text());
+            m_sessionCurrent.setExternalName(m_ui->lineEditMarkovModeExternalName->text());
+        }
+        // Hybrid mask mode
+        if (m_isJumbo && m_ui->checkBoxMarkovModeMask->isChecked()) {
+            parameters << ("--mask=" + m_ui->lineEditMarkovModeMask->text());
+            m_sessionCurrent.setMask(m_ui->lineEditMarkovModeMask->text());
+        }
+    } else if (selectedMode == m_ui->princeModeTab) {
+
     }
 
     // Selectors
@@ -1408,6 +1447,12 @@ void MainWindow::restoreSessionOptions()
             m_ui->checkBoxMaskModeExternalName->setChecked(true);
             m_ui->lineEditMaskModeExternalName->setText(m_sessionCurrent.externalName());
         }
+    } else if (mode == JohnSession::MARKOV_MODE) {
+        m_ui->attackModeTabWidget->setCurrentWidget(m_ui->markovModeTab);
+
+
+    } else if (mode == JohnSession::PRINCE_MODE) {
+
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }

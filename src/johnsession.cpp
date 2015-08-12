@@ -22,7 +22,7 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_limitWords = -1;
     m_limitNbPasswordCandidates = -1;
     m_useWordlistForLengthDistribution = false;
-    m_permuteCaseOfFirstLetter = false;
+    m_permuteFirstLetterCase = false;
     m_memoryMap = false;
     m_showTotalKeyspace = false;
 }
@@ -350,6 +350,7 @@ void JohnSession::setFormatUI(const QString &formatUI)
 {
     m_formatUI = formatUI;
 }
+
 QList<int> JohnSession::unselectedRows() const
 {
     return m_unselectedRows;
@@ -359,6 +360,7 @@ void JohnSession::setUnselectedRows(const QList<int> &unselectedRows)
 {
     m_unselectedRows = unselectedRows;
 }
+
 QString JohnSession::defaultFormat() const
 {
     return m_defaultFormat;
@@ -368,6 +370,7 @@ void JohnSession::setDefaultFormat(const QString &defaultFormat)
 {
     m_defaultFormat = defaultFormat;
 }
+
 QString JohnSession::mask() const
 {
     return m_mask;
@@ -377,6 +380,7 @@ void JohnSession::setMask(const QString &mask)
 {
     m_mask = mask;
 }
+
 QString JohnSession::markovMode() const
 {
     return m_markovMode;
@@ -386,6 +390,7 @@ void JohnSession::setMarkovMode(const QString &markovMode)
 {
     m_markovMode = markovMode;
 }
+
 int JohnSession::minMarkovLevel() const
 {
     return m_minMarkovLevel;
@@ -395,6 +400,7 @@ void JohnSession::setMinMarkovLevel(int minMarkovLevel)
 {
     m_minMarkovLevel = minMarkovLevel;
 }
+
 int JohnSession::maxMarkovLevel() const
 {
     return m_maxMarkovLevel;
@@ -404,6 +410,7 @@ void JohnSession::setMaxMarkovLevel(int maxMarkovLevel)
 {
     m_maxMarkovLevel = maxMarkovLevel;
 }
+
 int JohnSession::startIndex() const
 {
     return m_startIndex;
@@ -413,6 +420,7 @@ void JohnSession::setStartIndex(int startIndex)
 {
     m_startIndex = startIndex;
 }
+
 int JohnSession::endIndex() const
 {
     return m_endIndex;
@@ -422,6 +430,7 @@ void JohnSession::setEndIndex(int endIndex)
 {
     m_endIndex = endIndex;
 }
+
 int JohnSession::minElementsPerChain() const
 {
     return m_minElementsPerChain;
@@ -431,6 +440,7 @@ void JohnSession::setMinElementsPerChain(int minElementsPerChain)
 {
     m_minElementsPerChain = minElementsPerChain;
 }
+
 int JohnSession::maxElementsPerChain() const
 {
     return m_maxElementsPerChain;
@@ -440,6 +450,7 @@ void JohnSession::setMaxElementsPerChain(int maxElementsPerChain)
 {
     m_maxElementsPerChain = maxElementsPerChain;
 }
+
 int JohnSession::initialSkip() const
 {
     return m_initialSkip;
@@ -449,6 +460,7 @@ void JohnSession::setInitialSkip(int initialSkip)
 {
     m_initialSkip = initialSkip;
 }
+
 int JohnSession::limitWords() const
 {
     return m_limitWords;
@@ -458,6 +470,7 @@ void JohnSession::setLimitWords(int limitWords)
 {
     m_limitWords = limitWords;
 }
+
 int JohnSession::limitNbPasswordCandidates() const
 {
     return m_limitNbPasswordCandidates;
@@ -467,6 +480,7 @@ void JohnSession::setLimitNbPasswordCandidates(int limitNbPasswordCandidates)
 {
     m_limitNbPasswordCandidates = limitNbPasswordCandidates;
 }
+
 bool JohnSession::useWordlistForLengthDistribution() const
 {
     return m_useWordlistForLengthDistribution;
@@ -476,15 +490,17 @@ void JohnSession::setUseWordlistForLengthDistribution(bool useWordlistForLengthD
 {
     m_useWordlistForLengthDistribution = useWordlistForLengthDistribution;
 }
-bool JohnSession::permuteCaseOfFirstLetter() const
+
+bool JohnSession::permuteFirstLetterCase() const
 {
-    return m_permuteCaseOfFirstLetter;
+    return m_permuteFirstLetterCase;
 }
 
-void JohnSession::setPermuteCaseOfFirstLetter(bool permuteCaseOfFirstLetter)
+void JohnSession::setPermuteFirstLetterCase(bool permuteFirstLetterCase)
 {
-    m_permuteCaseOfFirstLetter = permuteCaseOfFirstLetter;
+    m_permuteFirstLetterCase = permuteFirstLetterCase;
 }
+
 bool JohnSession::memoryMap() const
 {
     return m_memoryMap;
@@ -494,6 +510,7 @@ void JohnSession::setMemoryMap(bool memoryMap)
 {
     m_memoryMap = memoryMap;
 }
+
 bool JohnSession::showTotalKeyspace() const
 {
     return m_showTotalKeyspace;
@@ -503,6 +520,7 @@ void JohnSession::setShowTotalKeyspace(bool showTotalKeyspace)
 {
     m_showTotalKeyspace = showTotalKeyspace;
 }
+
 int JohnSession::minPasswordCandidatesLength() const
 {
     return m_minPasswordCandidatesLength;
@@ -512,6 +530,7 @@ void JohnSession::setMinPasswordCandidatesLength(int minPasswordCandidatesLength
 {
     m_minPasswordCandidatesLength = minPasswordCandidatesLength;
 }
+
 int JohnSession::maxPasswordCandidatesLength() const
 {
     return m_maxPasswordCandidatesLength;
@@ -521,24 +540,6 @@ void JohnSession::setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength
 {
     m_maxPasswordCandidatesLength = maxPasswordCandidatesLength;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 JohnSession::AttackMode JohnSession::mode()
 {

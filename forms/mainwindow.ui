@@ -1613,7 +1613,7 @@ border-bottom: 1px solid darkgrey;
     <string>Export</string>
    </property>
    <property name="toolTip">
-    <string>Copy selected fields or entire passwords table to file</string>
+    <string>Export selected fields or entire Passwords table to file</string>
    </property>
   </action>
   <action name="actionExportToCSV">
@@ -1621,15 +1621,15 @@ border-bottom: 1px solid darkgrey;
     <string>Export to CSV</string>
    </property>
    <property name="toolTip">
-    <string>Export to CSV (val,val,val)</string>
+    <string>Export to CSV format (comma separated)</string>
    </property>
   </action>
   <action name="actionExportToColonSeparated">
    <property name="text">
-    <string>Export to Colon Separated</string>
+    <string>Export to PASSWD format</string>
    </property>
    <property name="toolTip">
-    <string>Export to Colon Separated (val:val:val)</string>
+    <string>Export to password file format (colon separated)</string>
    </property>
   </action>
  </widget>

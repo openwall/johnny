@@ -99,8 +99,8 @@ public:
     int initialSkip() const;
     void setInitialSkip(int initialSkip);
 
-    int limitWords() const;
-    void setLimitWords(int limitWords);
+    int limitWordsFromWordlist() const;
+    void setLimitWordsFromWordlist(int limitWordsFromWordlist);
 
     int limitNbPasswordCandidates() const;
     void setLimitNbPasswordCandidates(int limitNbPasswordCandidates);
@@ -165,7 +165,7 @@ private:
     int m_minElementsPerChain;
     int m_maxElementsPerChain;
     int m_initialSkip;
-    int m_limitWords;
+    int m_limitWordsFromWordlist;
     int m_limitNbPasswordCandidates;
     bool m_useWordlistForLengthDistribution;
     bool m_permuteFirstLetterCase;

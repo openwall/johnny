@@ -214,9 +214,9 @@ border-bottom: 1px solid darkgrey;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-757</y>
+             <y>-436</y>
              <width>892</width>
-             <height>1275</height>
+             <height>1269</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">

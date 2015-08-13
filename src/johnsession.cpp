@@ -19,7 +19,7 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_minElementsPerChain = -1;
     m_maxElementsPerChain = -1;
     m_initialSkip = -1;
-    m_limitWords = -1;
+    m_limitWordsFromWordlist = -1;
     m_limitNbPasswordCandidates = -1;
     m_useWordlistForLengthDistribution = false;
     m_permuteFirstLetterCase = false;
@@ -461,14 +461,14 @@ void JohnSession::setInitialSkip(int initialSkip)
     m_initialSkip = initialSkip;
 }
 
-int JohnSession::limitWords() const
+int JohnSession::limitWordsFromWordlist() const
 {
-    return m_limitWords;
+    return m_limitWordsFromWordlist;
 }
 
-void JohnSession::setLimitWords(int limitWords)
+void JohnSession::setLimitWordsFromWordlist(int limitWordsFromWordlist)
 {
-    m_limitWords = limitWords;
+    m_limitWordsFromWordlist = limitWordsFromWordlist;
 }
 
 int JohnSession::limitNbPasswordCandidates() const

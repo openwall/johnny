@@ -63,11 +63,10 @@ bool JohnSession::load()
         }
     } else if (mode == "wordlist") {
         m_mode = WORDLIST_MODE;
+        m_loopback = m_settings->value("loopback").toBool();
         m_wordlistFile = m_settings->value("wordlistFile").toString();
         //Rules
-        if (m_settings->value("isUsingWordListRules").toBool() == true) {
-            m_rules = "";
-        } else if (m_settings->contains("rules")) {
+        if (m_settings->contains("rules")) {
             m_rules = m_settings->value("rules").toString();
         }
         // External mode, filter
@@ -98,6 +97,7 @@ bool JohnSession::load()
             m_rules = m_settings->value("rules").toString();
         }
     } else if (mode == "markov") {
+        m_mode = MARKOV_MODE;
         m_markovMode = m_settings->value("markovMode").toString();
         if (m_settings->contains("externalName")) {
             m_externalName = m_settings->value("externalName").toString();
@@ -121,7 +121,37 @@ bool JohnSession::load()
             m_endIndex = m_settings->value("endIndex").toInt();
         }
     } else if (mode == "prince") {
-
+        m_mode = PRINCE_MODE;
+        m_wordlistFile = m_settings->value("wordlistFile").toString();
+        m_loopback = m_settings->value("loopback").toBool();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        if (m_settings->contains("rules")) {
+            m_rules = m_settings->value("rules").toString();
+        }
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
+        }
+        if (m_settings->contains("minElementsPerChain")) {
+            m_minElementsPerChain = m_settings->value("minElementsPerChain").toInt();
+        }
+        if (m_settings->contains("maxElementsPerChain")) {
+            m_maxElementsPerChain = m_settings->value("maxElementsPerChain").toInt();
+        }
+        if (m_settings->contains("initialSkip")) {
+            m_initialSkip = m_settings->value("initialSkip").toInt();
+        }
+        if (m_settings->contains("limitWordsFromWordlist")) {
+            m_limitWordsFromWordlist = m_settings->value("limitWordsFromWordlist").toInt();
+        }
+        if (m_settings->contains("limitNbPasswordCandidates")) {
+            m_limitNbPasswordCandidates = m_settings->value("limitNbPasswordCandidates").toInt();
+        }
+        m_useWordlistForLengthDistribution = m_settings->value("useWordlistForLengthDistribution").toBool();
+        m_permuteFirstLetterCase = m_settings->value("permuteFirstLetterCase").toBool();
+        m_memoryMap = m_settings->value("memoryMap").toBool();
+        m_showTotalKeyspace = m_settings->value("showTotalKeyspace").toBool();
     } else if (mode == "default"){
         m_mode = DEFAULT_MODE;
     }
@@ -262,7 +292,36 @@ bool JohnSession::save()
 
     } else if (m_mode == JohnSession::PRINCE_MODE) {
         m_settings->setValue("mode", "prince");
+        m_settings->setValue("wordlistFile", m_wordlistFile);
         m_settings->setValue("loopback", m_loopback);
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        if (!m_rules.isNull()) {
+            m_settings->setValue("rules", m_rules);
+        }
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
+        if (m_minElementsPerChain >= 0) {
+            m_settings->setValue("minElementsPerChain", m_minElementsPerChain);
+        }
+        if (m_maxElementsPerChain >= 0) {
+            m_settings->setValue("maxElementsPerChain", m_maxElementsPerChain);
+        }
+        if (m_initialSkip >= 0) {
+            m_settings->setValue("initialSkip", m_initialSkip);
+        }
+        if (m_limitWordsFromWordlist >= 0) {
+            m_settings->setValue("limitWordsFromWordlist", m_limitWordsFromWordlist);
+        }
+        if (m_limitNbPasswordCandidates >= 0) {
+            m_settings->setValue("limitNbPasswordCandidates", m_limitNbPasswordCandidates);
+        }
+        m_settings->setValue("useWordlistForLengthDistribution", m_useWordlistForLengthDistribution);
+        m_settings->setValue("permuteFirstLetterCase", m_permuteFirstLetterCase);
+        m_settings->setValue("memoryMap", m_memoryMap);
+        m_settings->setValue("showTotalKeyspace", m_showTotalKeyspace);
     } else {
         m_settings->setValue("mode", "default");
     }

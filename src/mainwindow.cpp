@@ -631,8 +631,10 @@ QStringList MainWindow::saveAttackParameters()
         m_sessionCurrent.setMode(JohnSession::WORDLIST_MODE);
         if (m_isJumbo && m_ui->checkBoxWordlistLoopback->isChecked()) {
             parameters << ("--loopback=" + m_ui->lineEditWordlistFile->text());
+            m_sessionCurrent.setLoopback(true);
         } else {
             parameters << ("--wordlist=" + m_ui->lineEditWordlistFile->text());
+            m_sessionCurrent.setLoopback(false);
         }
         m_sessionCurrent.setWordlistFile(m_ui->lineEditWordlistFile->text());
 
@@ -742,8 +744,10 @@ QStringList MainWindow::saveAttackParameters()
         m_sessionCurrent.setWordlistFile(m_ui->lineEditPrinceModeWordlistFile->text());
         if (m_ui->checkBoxPrinceModeLoopback->isChecked()) {
             parameters << ("--prince-loopback=" + m_ui->lineEditPrinceModeWordlistFile->text());
+            m_sessionCurrent.setLoopback(true);
         } else {
             parameters << ("--prince=" + m_ui->lineEditPrinceModeWordlistFile->text());
+            m_sessionCurrent.setLoopback(false);
         }
         //Rules
         if (m_ui->checkBoxPrinceModeRules->isChecked()) {
@@ -779,7 +783,6 @@ QStringList MainWindow::saveAttackParameters()
         if (m_ui->checkBoxPrinceModeLimitInputWords->isChecked()) {
             m_sessionCurrent.setLimitWordsFromWordlist(m_ui->spinBoxPrinceModeLimitInputWords->value());
             parameters << ("--prince-wl-max=" + m_ui->spinBoxPrinceModeLimitInputWords->value());
-
         }
         // Limit number of password candidates
         if (m_ui->checkBoxPrinceModeLimitCandidates->isChecked()) {

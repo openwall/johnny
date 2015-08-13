@@ -88,6 +88,40 @@ bool JohnSession::load()
     } else if (mode == "external") {
         m_mode = EXTERNAL_MODE;
         m_externalName = m_settings->value("externalModeName").toString();
+    } else if (mode == "mask") {
+        m_mode = MASK_MODE;
+        m_mask = m_settings->value("mask").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        if (m_settings->contains("rules")) {
+            m_rules = m_settings->value("rules").toString();
+        }
+    } else if (mode == "markov") {
+        m_markovMode = m_settings->value("markovMode").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        if (m_settings->contains("rules")) {
+            m_rules = m_settings->value("rules").toString();
+        }
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
+        }
+        if (m_settings->contains("minMarkovLevel")) {
+            m_minMarkovLevel = m_settings->value("minMarkovLevel").toInt();
+        }
+        if (m_settings->contains("maxMarkovLevel")) {
+            m_maxMarkovLevel = m_settings->value("maxMarkovLevel").toInt();
+        }
+        if (m_settings->contains("startIndex")) {
+            m_startIndex = m_settings->value("startIndex").toInt();
+        }
+        if (m_settings->contains("endIndex")) {
+            m_endIndex = m_settings->value("endIndex").toInt();
+        }
+    } else if (mode == "prince") {
+
     } else if (mode == "default"){
         m_mode = DEFAULT_MODE;
     }
@@ -114,6 +148,13 @@ bool JohnSession::load()
     if (m_settings->contains("environmentVariables")) {
         m_environmentVariables = m_settings->value("environmentVariables").toString();
     }
+    if (m_settings->contains("minPasswordCandidatesLength")) {
+        m_minPasswordCandidatesLength = m_settings->value("minPasswordCandidatesLength").toInt();
+    }
+    if (m_settings->contains("maxPasswordCandidatesLength")) {
+        m_maxPasswordCandidatesLength = m_settings->value("maxPasswordCandidatesLength").toInt();
+    }
+
     // Unselected hashes
     m_unselectedRows.clear();
     QList<QVariant> unselectedRows = m_settings->value("unselectedRows").toList();
@@ -149,13 +190,18 @@ bool JohnSession::save()
     } else if (m_mode == WORDLIST_MODE) {
         m_settings->setValue("mode", "wordlist");
         m_settings->setValue("wordlistFile", m_wordlistFile);
-        //Rules
+        m_settings->setValue("loopback", m_loopback);
+        // Rules
         if (!m_rules.isNull()) {
             m_settings->setValue("rules", m_rules);
         }
         // External mode, filter
         if (!m_externalName.isNull()) {
             m_settings->setValue("worldListExternalName", m_externalName);
+        }
+        // Mask
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
         }
     } else if (m_mode == INCREMENTAL_MODE) {
         m_settings->setValue("mode", "incremental");
@@ -168,10 +214,55 @@ bool JohnSession::save()
         if (!m_externalName.isNull()) {
             m_settings->setValue("incrementalExternalName", m_externalName);
         }
+        // Mask
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
 
     } else if (m_mode == JohnSession::EXTERNAL_MODE) {
         m_settings->setValue("mode", "external");
         m_settings->setValue("externalModeName", m_externalName);
+        // Mask
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
+    } else if (m_mode == JohnSession::MASK_MODE) {
+        m_settings->setValue("mode", "mask");
+        m_settings->setValue("mask", m_mask);
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        if (!m_rules.isNull()) {
+            m_settings->setValue("rules", m_rules);
+        }
+    } else if (m_mode == JohnSession::MARKOV_MODE) {
+        m_settings->setValue("mode", "markov");
+        m_settings->setValue("markovMode", m_markovMode);
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        if (!m_rules.isNull()) {
+            m_settings->setValue("rules", m_rules);
+        }
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
+        if (m_minMarkovLevel >= 0) {
+            m_settings->setValue("minMarkovLevel", m_minMarkovLevel);
+        }
+        if (m_maxMarkovLevel >= 0) {
+            m_settings->setValue("maxMarkovLevel", m_maxMarkovLevel);
+        }
+        if (m_startIndex >= 0) {
+            m_settings->setValue("startIndex", m_startIndex);
+        }
+        if (m_endIndex >= 0) {
+            m_settings->setValue("endIndex", m_endIndex);
+        }
+
+    } else if (m_mode == JohnSession::PRINCE_MODE) {
+        m_settings->setValue("mode", "prince");
+        m_settings->setValue("loopback", m_loopback);
     } else {
         m_settings->setValue("mode", "default");
     }
@@ -198,6 +289,12 @@ bool JohnSession::save()
 
     if (!m_environmentVariables.isNull()) {
         m_settings->setValue("environmentVariables", m_environmentVariables);
+    }
+    if (m_minPasswordCandidatesLength >= 0) {
+        m_settings->setValue("minPasswordCandidatesLength", m_minPasswordCandidatesLength);
+    }
+    if (m_maxPasswordCandidatesLength >= 0) {
+        m_settings->setValue("maxPasswordCandidatesLength", m_maxPasswordCandidatesLength);
     }
     m_settings->endGroup();
     return true;

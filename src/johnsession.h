@@ -123,6 +123,9 @@ public:
     int maxPasswordCandidatesLength() const;
     void setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength);
 
+    bool loopback() const;
+    void setLoopback(bool loopback);
+
 private:
     QString   m_name;
     QSettings* m_settings;
@@ -153,6 +156,7 @@ private:
     int m_minPasswordCandidatesLength;
     int m_maxPasswordCandidatesLength;
     QString m_mask;
+    bool m_loopback;
 
     // Markov-related
     QString m_markovMode;

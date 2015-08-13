@@ -629,7 +629,11 @@ QStringList MainWindow::saveAttackParameters()
     } else if (selectedMode == m_ui->wordlistModeTab) {
         // Wordlist mode
         m_sessionCurrent.setMode(JohnSession::WORDLIST_MODE);
-        parameters << ("--wordlist=" + m_ui->lineEditWordlistFile->text());
+        if (m_isJumbo && m_ui->checkBoxWordlistLoopback->isChecked()) {
+            parameters << ("--loopback=" + m_ui->lineEditWordlistFile->text());
+        } else {
+            parameters << ("--wordlist=" + m_ui->lineEditWordlistFile->text());
+        }
         m_sessionCurrent.setWordlistFile(m_ui->lineEditWordlistFile->text());
 
         // Rules
@@ -736,7 +740,11 @@ QStringList MainWindow::saveAttackParameters()
     } else if (selectedMode == m_ui->princeModeTab) {
         m_sessionCurrent.setMode(JohnSession::PRINCE_MODE);
         m_sessionCurrent.setWordlistFile(m_ui->lineEditPrinceModeWordlistFile->text());
-        parameters << ("--prince=" + m_ui->lineEditPrinceModeWordlistFile->text());
+        if (m_ui->checkBoxPrinceModeLoopback->isChecked()) {
+            parameters << ("--prince-loopback=" + m_ui->lineEditPrinceModeWordlistFile->text());
+        } else {
+            parameters << ("--prince=" + m_ui->lineEditPrinceModeWordlistFile->text());
+        }
         //Rules
         if (m_ui->checkBoxPrinceModeRules->isChecked()) {
             m_sessionCurrent.setRules(m_ui->lineEditPrinceModeRules->text());

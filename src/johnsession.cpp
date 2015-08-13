@@ -25,6 +25,7 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_permuteFirstLetterCase = false;
     m_memoryMap = false;
     m_showTotalKeyspace = false;
+    m_loopback = false;
 }
 
 QString JohnSession::filePath()
@@ -540,6 +541,17 @@ void JohnSession::setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength
 {
     m_maxPasswordCandidatesLength = maxPasswordCandidatesLength;
 }
+
+bool JohnSession::loopback() const
+{
+    return m_loopback;
+}
+
+void JohnSession::setLoopback(bool loopback)
+{
+    m_loopback = loopback;
+}
+
 
 JohnSession::AttackMode JohnSession::mode()
 {

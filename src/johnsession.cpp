@@ -52,14 +52,13 @@ bool JohnSession::load()
     m_settings->beginGroup(m_sessionGroup);
     m_passwordFiles = m_settings->value("passwordFiles").toStringList();
     m_format = m_settings->value("formatJohn").toString();
-    m_format.remove("--format=");
     m_formatUI = m_settings->value("formatUI").toString();
     QString mode = m_settings->value("mode").toString();
     if (mode == "single") {
         m_mode = SINGLECRACK_MODE;
         // External mode, filter
-        if (m_settings->contains("singleCrackExternalName")) {
-            m_externalName = m_settings->value("singleCrackExternalName").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
         }
     } else if (mode == "wordlist") {
         m_mode = WORDLIST_MODE;
@@ -70,23 +69,35 @@ bool JohnSession::load()
             m_rules = m_settings->value("rules").toString();
         }
         // External mode, filter
-        if (m_settings->contains("worldListExternalName")) {
-            m_externalName = m_settings->value("worldListExternalName").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        // Hybrid mask mode
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
         }
     } else if (mode == "incremental") {
         m_mode = INCREMENTAL_MODE;
         // "Incremental" mode
         // It could be with or without name.
-        if (m_settings->contains("incrementalModeName")) {
-            m_charset = m_settings->value("incrementalModeName").toString();
+        if (m_settings->contains("charset")) {
+            m_charset = m_settings->value("charset").toString();
         }
         // External mode, filter
-        if (m_settings->contains("incrementalExternalName")) {
-            m_externalName = m_settings->value("incrementalExternalName").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        // Hybrid mask mode
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
         }
     } else if (mode == "external") {
         m_mode = EXTERNAL_MODE;
-        m_externalName = m_settings->value("externalModeName").toString();
+        m_externalName = m_settings->value("externalName").toString();
+        // Hybrid mask mode
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
+        }
     } else if (mode == "mask") {
         m_mode = MASK_MODE;
         m_mask = m_settings->value("mask").toString();
@@ -215,19 +226,19 @@ bool JohnSession::save()
         m_settings->setValue("mode", "single");
         // External mode, filter
         if (!m_externalName.isNull()) {
-            m_settings->setValue("singleCrackExternalName", m_externalName);
+            m_settings->setValue("externalName", m_externalName);
         }
     } else if (m_mode == WORDLIST_MODE) {
         m_settings->setValue("mode", "wordlist");
         m_settings->setValue("wordlistFile", m_wordlistFile);
         m_settings->setValue("loopback", m_loopback);
+        // External mode, filter
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
         // Rules
         if (!m_rules.isNull()) {
             m_settings->setValue("rules", m_rules);
-        }
-        // External mode, filter
-        if (!m_externalName.isNull()) {
-            m_settings->setValue("worldListExternalName", m_externalName);
         }
         // Mask
         if (!m_mask.isNull()) {
@@ -238,11 +249,11 @@ bool JohnSession::save()
         // "Incremental" mode
         // It could be with or without name.
         if (!m_charset.isNull()) {
-            m_settings->setValue("incrementalModeName", m_charset);
+            m_settings->setValue("charset", m_charset);
         }
         // External mode, filter
         if (!m_externalName.isNull()) {
-            m_settings->setValue("incrementalExternalName", m_externalName);
+            m_settings->setValue("externalName", m_externalName);
         }
         // Mask
         if (!m_mask.isNull()) {
@@ -251,7 +262,7 @@ bool JohnSession::save()
 
     } else if (m_mode == JohnSession::EXTERNAL_MODE) {
         m_settings->setValue("mode", "external");
-        m_settings->setValue("externalModeName", m_externalName);
+        m_settings->setValue("externalName", m_externalName);
         // Mask
         if (!m_mask.isNull()) {
             m_settings->setValue("mask", m_mask);

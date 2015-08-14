@@ -627,8 +627,8 @@ QStringList MainWindow::saveAttackParameters()
         m_sessionCurrent.setMode(JohnSession::SINGLECRACK_MODE);
         // External mode, filter
         if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->lineEditSingleCrackModeExternalName->text());
             m_sessionCurrent.setExternalName(m_ui->lineEditSingleCrackModeExternalName->text());
+            parameters << ("--external=" + m_ui->lineEditSingleCrackModeExternalName->text());
         }
 
     } else if (selectedMode == m_ui->wordlistModeTab) {
@@ -646,7 +646,7 @@ QStringList MainWindow::saveAttackParameters()
         // Rules
         if (m_ui->checkBox_WordlistModeRules->isChecked()) {
             m_sessionCurrent.setRules(m_ui->lineEdit_WordlistRules->text());
-            if (m_ui->lineEdit_WordlistRules->text().isEmpty()) {
+            if (!m_isJumbo || m_ui->lineEdit_WordlistRules->text().isEmpty()) {
                 parameters << "--rules";
             } else {
                 parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
@@ -724,10 +724,10 @@ QStringList MainWindow::saveAttackParameters()
         // --markov=MODE[:LEVEL[:START[:END[:LENGTH]]]]
         // We don't use length parameter since magnum said it was deprecated, global option -min-leng and -max-len are the way to go
         markov += m_ui->lineEditMarkovMode->text() + ":";
-        markov += (m_ui->checkBoxMarkovModeMinLevel->isChecked() ? (m_ui->spinBoxMarkovModeMinLevel->value() + "-") : "");
-        markov += (m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (m_ui->spinBoxMarkovModeMaxLevel->value() + ":") : ":");
-        markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (m_ui->spinBoxMarkovModeStartIndex->value() + ":") : ":");
-        markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString(m_ui->spinBoxMarkovModeEndIndex->value()) : "");
+        markov += (m_ui->checkBoxMarkovModeMinLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMinLevel->value()) + "-") : "");
+        markov += (m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMaxLevel->value()) + ":") : ":");
+        markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeStartIndex->value()) + ":") : ":");
+        markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString::number(m_ui->spinBoxMarkovModeEndIndex->value()) : "");
         parameters << ("--markov=" + markov);
         //Rules
         if (m_ui->checkBoxMarkovModeRules->isChecked()) {
@@ -740,7 +740,7 @@ QStringList MainWindow::saveAttackParameters()
             parameters << ("--external=" + m_ui->lineEditMarkovModeExternalName->text());
         }
         // Hybrid mask mode
-        if (m_isJumbo && m_ui->checkBoxMarkovModeMask->isChecked()) {
+        if (m_ui->checkBoxMarkovModeMask->isChecked()) {
             m_sessionCurrent.setMask(m_ui->lineEditMarkovModeMask->text());
             parameters << ("--mask=" + m_ui->lineEditMarkovModeMask->text());
         }
@@ -772,27 +772,27 @@ QStringList MainWindow::saveAttackParameters()
         // Minimum number of elements per chain
         if (m_ui->checkBoxPrinceMinElementsPerChain->isChecked()) {
             m_sessionCurrent.setMinElementsPerChain(m_ui->spinBoxPrinceMinElementsPerChain->value());
-            parameters << ("--prince-elem-cnt-min=" + m_ui->spinBoxPrinceMinElementsPerChain->text());
+            parameters << (QString("--prince-elem-cnt-min=%1").arg(m_ui->spinBoxPrinceMinElementsPerChain->value()));
         }
         // Maximum number of elements per chain
         if (m_ui->checkBoxPrinceMaxElementsPerChain->isChecked()) {
             m_sessionCurrent.setMaxElementsPerChain(m_ui->spinBoxPrinceMaxElementsPerChain->value());
-            parameters << ("--prince-elem-cnt-max=" + m_ui->spinBoxPrinceMaxElementsPerChain->text());
+            parameters << (QString("--prince-elem-cnt-max=%1").arg(m_ui->spinBoxPrinceMaxElementsPerChain->value()));
         }
         // Initial skip
         if (m_ui->checkBoxPrinceModeInitialSkip->isChecked()) {
             m_sessionCurrent.setInitialSkip(m_ui->spinBoxPrinceModeInitialSkip->value());
-            parameters << ("--prince-skip=" + m_ui->spinBoxPrinceModeInitialSkip->text());
+            parameters << (QString("--prince-skip=%1").arg(m_ui->spinBoxPrinceModeInitialSkip->value()));
         }
         // Load only specified number of words from input wordlist
         if (m_ui->checkBoxPrinceModeLimitInputWords->isChecked()) {
             m_sessionCurrent.setLimitWordsFromWordlist(m_ui->spinBoxPrinceModeLimitInputWords->value());
-            parameters << ("--prince-wl-max=" + m_ui->spinBoxPrinceModeLimitInputWords->value());
+            parameters << (QString("--prince-wl-max=%1").arg(m_ui->spinBoxPrinceModeLimitInputWords->value()));
         }
         // Limit number of password candidates
         if (m_ui->checkBoxPrinceModeLimitCandidates->isChecked()) {
             m_sessionCurrent.setLimitNbPasswordCandidates(m_ui->spinBoxPrinceModeLimitCandidates->value());
-            parameters << ("--prince-limit=" + m_ui->spinBoxPrinceModeLimitCandidates->value());
+            parameters << (QString("--prince-limit=%1").arg(m_ui->spinBoxPrinceModeLimitCandidates->value()));
         }
         // Calculate length distribution from wordlist instead of using built-in table
         m_sessionCurrent.setUseWordlistForLengthDistribution(m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked());
@@ -1556,22 +1556,22 @@ void MainWindow::restoreSessionOptions()
             m_ui->lineEditMarkovModeMask->setText(m_sessionCurrent.mask());
         }
         // Minimum markov level
-        if (!m_sessionCurrent.minMarkovLevel() >= 0) {
+        if (m_sessionCurrent.minMarkovLevel() >= 0) {
             m_ui->checkBoxMarkovModeMinLevel->setChecked(true);
             m_ui->spinBoxMarkovModeMinLevel->setValue(m_sessionCurrent.minMarkovLevel());
         }
         // Maximum markov level
-        if (!m_sessionCurrent.maxMarkovLevel() >= 0) {
+        if (m_sessionCurrent.maxMarkovLevel() >= 0) {
             m_ui->checkBoxMarkovModeMaxLevel->setChecked(true);
             m_ui->spinBoxMarkovModeMaxLevel->setValue(m_sessionCurrent.maxMarkovLevel());
         }
         // Start index
-        if (!m_sessionCurrent.startIndex() >= 0) {
+        if (m_sessionCurrent.startIndex() >= 0) {
             m_ui->checkBoxMarkovModeStartIndex->setChecked(true);
             m_ui->spinBoxMarkovModeStartIndex->setValue(m_sessionCurrent.startIndex());
         }
         // End index
-        if (!m_sessionCurrent.endIndex() >= 0) {
+        if (m_sessionCurrent.endIndex() >= 0) {
             m_ui->checkBoxMarkovModeEndIndex->setChecked(true);
             m_ui->spinBoxMarkovModeEndIndex->setValue(m_sessionCurrent.endIndex());
         }

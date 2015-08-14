@@ -214,7 +214,7 @@ border-bottom: 1px solid darkgrey;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-436</y>
+             <y>-608</y>
              <width>892</width>
              <height>1269</height>
             </rect>
@@ -837,7 +837,11 @@ This is a stand alone mode, where word-like strings are created based upon a com
                       </widget>
                      </item>
                      <item row="5" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel"/>
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="6" column="0">
                       <widget class="QCheckBox" name="checkBoxMarkovModeMaxLevel">
@@ -847,7 +851,11 @@ This is a stand alone mode, where word-like strings are created based upon a com
                       </widget>
                      </item>
                      <item row="6" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel"/>
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="7" column="0">
                       <widget class="QCheckBox" name="checkBoxMarkovModeStartIndex">
@@ -857,10 +865,18 @@ This is a stand alone mode, where word-like strings are created based upon a com
                       </widget>
                      </item>
                      <item row="7" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex"/>
+                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="8" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex"/>
+                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="8" column="0">
                       <widget class="QCheckBox" name="checkBoxMarkovModeEndIndex">
@@ -1006,7 +1022,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                       </widget>
                      </item>
                      <item row="4" column="1">
-                      <widget class="QSpinBox" name="spinBoxPrinceMinElementsPerChain"/>
+                      <widget class="QSpinBox" name="spinBoxPrinceMinElementsPerChain">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="5" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceMaxElementsPerChain">
@@ -1016,7 +1036,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                       </widget>
                      </item>
                      <item row="5" column="1">
-                      <widget class="QSpinBox" name="spinBoxPrinceMaxElementsPerChain"/>
+                      <widget class="QSpinBox" name="spinBoxPrinceMaxElementsPerChain">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="6" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeInitialSkip">
@@ -1026,7 +1050,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                       </widget>
                      </item>
                      <item row="6" column="1">
-                      <widget class="QSpinBox" name="spinBoxPrinceModeInitialSkip"/>
+                      <widget class="QSpinBox" name="spinBoxPrinceModeInitialSkip">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="7" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeLimitInputWords">
@@ -1036,7 +1064,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                       </widget>
                      </item>
                      <item row="7" column="1">
-                      <widget class="QSpinBox" name="spinBoxPrinceModeLimitInputWords"/>
+                      <widget class="QSpinBox" name="spinBoxPrinceModeLimitInputWords">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="8" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeLimitCandidates">
@@ -1046,7 +1078,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                       </widget>
                      </item>
                      <item row="8" column="1">
-                      <widget class="QSpinBox" name="spinBoxPrinceModeLimitCandidates"/>
+                      <widget class="QSpinBox" name="spinBoxPrinceModeLimitCandidates">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                      <item row="9" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceCalculateDistributionWithWordlist">
@@ -1320,6 +1356,9 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                     <property name="specialValueText">
                      <string>default</string>
                     </property>
+                    <property name="maximum">
+                     <number>999999999</number>
+                    </property>
                    </widget>
                   </item>
                  </layout>
@@ -1384,7 +1423,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QSpinBox" name="spinBoxMinCandidateLength"/>
+                   <widget class="QSpinBox" name="spinBoxMinCandidateLength">
+                    <property name="maximum">
+                     <number>999999999</number>
+                    </property>
+                   </widget>
                   </item>
                   <item row="3" column="0">
                    <widget class="QCheckBox" name="checkBoxMaxCandidateLength">
@@ -1394,7 +1437,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                    </widget>
                   </item>
                   <item row="3" column="1">
-                   <widget class="QSpinBox" name="spinBoxMaxCandidateLength"/>
+                   <widget class="QSpinBox" name="spinBoxMaxCandidateLength">
+                    <property name="maximum">
+                     <number>999999999</number>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>

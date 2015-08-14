@@ -169,8 +169,7 @@ MainWindow::MainWindow(QSettings &settings)
 
     // Settings changed by user
     connect(m_ui->spinBoxTimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(getDefaultFormat()));
+    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(johnPathChanged()));
     connect(m_ui->comboBoxLanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
@@ -365,6 +364,11 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         // After new model remembered we remember its file name.
         m_sessionPasswordFiles = fileNames;
         m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));
+        m_ui->progressBar->reset();
+#ifdef Q_OS_OSX
+            if(m_progressStatsLabel)
+                m_progressStatsLabel->setText("");
+#endif
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
         if (!m_johnShowTemp) {
@@ -384,6 +388,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
                     tr("Can't open a temporary file. Your disk might be full."));
             }
         }
+        callJohnShow();
         getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
@@ -1042,12 +1047,12 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     callJohnShow();
 }
 
-void MainWindow::callJohnShow(bool showAllFormats)
+void MainWindow::callJohnShow()
 {
     QStringList args;
     // We add current format key if it is not empty.
-    if (!m_sessionCurrent.format().isEmpty() && !showAllFormats)
-        args << m_sessionCurrent.format();
+    if (!m_sessionCurrent.format().isEmpty())
+        args << "--format=" + m_sessionCurrent.format();
     args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
@@ -1215,8 +1220,10 @@ void MainWindow::buttonBrowsePathToJohnClicked()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        m_ui->lineEditPathToJohn->setText(fileName);
-        applyAndSaveSettings();
+        if (m_ui->lineEditPathToJohn->text() != fileName) {
+            m_ui->lineEditPathToJohn->setText(fileName);
+            johnPathChanged();
+        }
     }
 }
 
@@ -1439,7 +1446,7 @@ void MainWindow::guessPassword()
         QStringList args;
         args << "--stdin";
         if(!m_sessionCurrent.format().isEmpty())
-            args << m_sessionCurrent.format();
+            args << "--format=" + m_sessionCurrent.format();
         args << m_sessionPasswordFiles;
         m_johnGuess.setArgs(args);
         m_johnGuess.start();
@@ -1456,7 +1463,7 @@ void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitSt
         qDebug() << "JtR seems to have crashed.";
         return;
     }
-    callJohnShow(true);
+    callJohnShow();
 }
 
 void MainWindow::restoreSessionOptions()
@@ -1793,7 +1800,7 @@ void MainWindow::resetFilters()
 void MainWindow::getDefaultFormat()
 {
     // This signal may be called 1 ms before applySettings() so use the lineEdit text
-    m_johnDefaultFormat.setJohnProgram(m_ui->lineEditPathToJohn->text());
+    m_johnDefaultFormat.setJohnProgram(m_pathToJohn);
     QStringList args;
     args << "-stdin";
     args << "--session=" + JohnSession::sessionDir() + "defaultFormat";
@@ -1829,7 +1836,20 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
     if (editText != defaultFormatText) {
         m_ui->formatComboBox->setEditText(editText);
     }
-    callJohnShow(true);
+    if (m_sessionCurrent.format().isEmpty()) {
+        // Update format on progress bar
+        QString progressBarText = m_ui->progressBar->text();
+        progressBarText.replace(QRegExp("\\[.*\\]"), "[format=" + defaultFormat +"]");
+        m_ui->progressBar->setFormat(progressBarText);
+    }
+}
+
+void MainWindow::johnPathChanged()
+{
+    // TO DO : We could validate john path here, start a new session etc..
+    applyAndSaveSettings();
+    callJohnShow();
+    getDefaultFormat();
 }
 
 void MainWindow::actionExportToTriggered(QAction* action)

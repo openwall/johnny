@@ -63,7 +63,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
     connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
-
+    connect(&m_johnVersionCheck, SIGNAL(error(QProcess::ProcessError)), this, SLOT(invalidJohnPathDetected()));
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
 #ifdef Q_OS_OSX
@@ -1086,6 +1086,8 @@ void MainWindow::applySettings()
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
         m_johnVersionCheck.setJohnProgram(newJohnPath);
         m_johnVersionCheck.start();
+    } else if (newJohnPath.isEmpty()) {
+        invalidJohnPathDetected();
     }
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1240,10 +1242,25 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 void MainWindow::verifyJohnVersion()
 {
     QString output = m_johnVersionCheck.readAllStandardOutput();
+    QStringList lines = output.split('\n');
     bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
+    if (!output.contains("John the Ripper"), Qt::CaseInsensitive) {
+        invalidJohnPathDetected();
+    } else {
+        if (lines.size() > 0) {
+            m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] + (isJumbo ? "" : " (core)"));
+        }
+        m_ui->lineEditPathToJohn->setStyleSheet("");
+    }
     setAvailabilityOfFeatures(isJumbo);
     bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
     m_ui->widgetFork->setVisible(isForkEnabled);
+}
+
+void MainWindow::invalidJohnPathDetected()
+{
+    m_ui->labelJohnPathValidator->setText(tr("No valid John The Ripper executable detected at this path !"));
+    m_ui->lineEditPathToJohn->setStyleSheet("color:red");
 }
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)

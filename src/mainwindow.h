@@ -85,7 +85,6 @@ private slots:
     void verifyJohnVersion();
     void getDefaultFormat();
     void getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    void johnPathChanged();
 
     // Settings related
     void fillSettingsWithDefaults();
@@ -95,6 +94,8 @@ private slots:
     void warnAboutDefaultPathToJohn();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
+    void johnPathChanged();
+    void invalidJohnPathDetected();
 
     // Helpers
     void appendLog(const QString& text);

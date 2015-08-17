@@ -1,6 +1,7 @@
 ﻿/*
- * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
+ * Copyright (c) 2011, 2015 Shinnok <admin at shinnok.com>.
  * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
  * See LICENSE for details.
  */
 

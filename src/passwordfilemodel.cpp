@@ -1,5 +1,7 @@
 /*
- * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
+ * See LICENSE for details.
  */
 
 #include "passwordfilemodel.h"

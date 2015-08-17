@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
+ * See LICENSE for details.
+ */
+
 #ifndef TRANSLATOR_H
 #define TRANSLATOR_H
 

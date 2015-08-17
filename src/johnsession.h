@@ -1,3 +1,8 @@
+/*
+ * Copyright © 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
+ * See LICENSE for details.
+ */
+
 #ifndef JOHNSESSION_H
 #define JOHNSESSION_H
 

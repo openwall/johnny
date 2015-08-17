@@ -904,7 +904,8 @@ void MainWindow::callJohnShow()
     // We add current format key if it is not empty.
     if (!m_sessionCurrent.format().isEmpty())
         args << "--format=" + m_sessionCurrent.format();
-    args << "--show" << m_johnShowTemp->fileName();
+    if (m_johnShowTemp)
+        args << "--show" << m_johnShowTemp->fileName();
     m_johnShow.setJohnProgram(m_pathToJohn);
     m_johnShow.setArgs(args);
     m_johnShow.start();
@@ -1560,8 +1561,10 @@ void MainWindow::johnPathChanged()
 {
     // TO DO : We could validate john path here, start a new session etc..
     applyAndSaveSettings();
-    callJohnShow();
-    getDefaultFormat();
+    if (!m_sessionPasswordFiles.isEmpty()) {
+        callJohnShow();
+        getDefaultFormat();
+    }
 }
 
 void MainWindow::actionExportToTriggered(QAction* action)

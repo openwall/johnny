@@ -78,44 +78,17 @@ public:
     QString markovMode() const;
     void setMarkovMode(const QString &markovMode);
 
-    int minMarkovLevel() const;
-    void setMinMarkovLevel(int minMarkovLevel);
+    int markovEndIndex() const;
+    void setMarkovEndIndex(int markovEndIndex);
 
-    int maxMarkovLevel() const;
-    void setMaxMarkovLevel(int maxMarkovLevel);
+    int markovStartIndex() const;
+    void setMarkovStartIndex(int markovStartIndex);
 
-    int startIndex() const;
-    void setStartIndex(int startIndex);
+    int markovMaxLevel() const;
+    void setMarkovMaxLevel(int markovMaxLevel);
 
-    int endIndex() const;
-    void setEndIndex(int endIndex);
-
-    int minElementsPerChain() const;
-    void setMinElementsPerChain(int minElementsPerChain);
-
-    int maxElementsPerChain() const;
-    void setMaxElementsPerChain(int maxElementsPerChain);
-
-    int initialSkip() const;
-    void setInitialSkip(int initialSkip);
-
-    int limitWordsFromWordlist() const;
-    void setLimitWordsFromWordlist(int limitWordsFromWordlist);
-
-    int limitNbPasswordCandidates() const;
-    void setLimitNbPasswordCandidates(int limitNbPasswordCandidates);
-
-    bool useWordlistForLengthDistribution() const;
-    void setUseWordlistForLengthDistribution(bool useWordlistForLengthDistribution);
-
-    bool permuteFirstLetterCase() const;
-    void setPermuteFirstLetterCase(bool permuteFirstLetterCase);
-
-    bool memoryMap() const;
-    void setMemoryMap(bool memoryMap);
-
-    bool showTotalKeyspace() const;
-    void setShowTotalKeyspace(bool showTotalKeyspace);
+    int markovMinLevel() const;
+    void setMarkovMinLevel(int markovMinLevel);
 
     int minPasswordCandidatesLength() const;
     void setMinPasswordCandidatesLength(int minPasswordCandidatesLength);
@@ -125,6 +98,33 @@ public:
 
     bool loopback() const;
     void setLoopback(bool loopback);
+
+    int princeMinElementsPerChain() const;
+    void setPrinceMinElementsPerChain(int princeMinElementsPerChain);
+
+    int princeMaxElementsPerChain() const;
+    void setPrinceMaxElementsPerChain(int princeMaxElementsPerChain);
+
+    int princeInitialSkip() const;
+    void setPrinceInitialSkip(int princeInitialSkip);
+
+    int princeLimitWordsFromWordlist() const;
+    void setPrinceLimitWordsFromWordlist(int princeLimitWordsFromWordlist);
+
+    int princeLimitNbPasswordCandidates() const;
+    void setPrinceLimitNbPasswordCandidates(int princeLimitNbPasswordCandidates);
+
+    bool princeUseWordlistForLengthDistribution() const;
+    void setPrinceUseWordlistForLengthDistribution(bool princeUseWordlistForLengthDistribution);
+
+    bool princePermuteFirstLetterCase() const;
+    void setPrincePermuteFirstLetterCase(bool princePermuteFirstLetterCase);
+
+    bool princeMemoryMap() const;
+    void setPrinceMemoryMap(bool princeMemoryMap);
+
+    bool princeShowTotalKeyspace() const;
+    void setPrinceShowTotalKeyspace(bool princeShowTotalKeyspace);
 
 private:
     QString   m_name;
@@ -160,21 +160,21 @@ private:
 
     // Markov-related
     QString m_markovMode;
-    int m_minMarkovLevel;
-    int m_maxMarkovLevel;
-    int m_startIndex;
-    int m_endIndex;
+    int m_markovMinLevel;
+    int m_markovMaxLevel;
+    int m_markovStartIndex;
+    int m_markovEndIndex;
 
     // Prince-related
-    int m_minElementsPerChain;
-    int m_maxElementsPerChain;
-    int m_initialSkip;
-    int m_limitWordsFromWordlist;
-    int m_limitNbPasswordCandidates;
-    bool m_useWordlistForLengthDistribution;
-    bool m_permuteFirstLetterCase;
-    bool m_memoryMap;
-    bool m_showTotalKeyspace;
+    int m_princeMinElementsPerChain;
+    int m_princeMaxElementsPerChain;
+    int m_princeInitialSkip;
+    int m_princeLimitWordsFromWordlist;
+    int m_princeLimitNbPasswordCandidates;
+    bool m_princeUseWordlistForLengthDistribution;
+    bool m_princePermuteFirstLetterCase;
+    bool m_princeMemoryMap;
+    bool m_princeShowTotalKeyspace;
 };
 
 #endif // JOHNSESSION_H

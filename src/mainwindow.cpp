@@ -713,13 +713,13 @@ QStringList MainWindow::saveAttackParameters()
         m_sessionCurrent.setMode(JohnSession::MARKOV_MODE);
         m_sessionCurrent.setMarkovMode(m_ui->lineEditMarkovMode->text());
         if (m_ui->checkBoxMarkovModeMinLevel->isChecked())
-            m_sessionCurrent.setMinMarkovLevel(m_ui->spinBoxMarkovModeMinLevel->value());
+            m_sessionCurrent.setMarkovMinLevel(m_ui->spinBoxMarkovModeMinLevel->value());
         if (m_ui->checkBoxMarkovModeMaxLevel)
-            m_sessionCurrent.setMaxMarkovLevel(m_ui->spinBoxMarkovModeMaxLevel->value());
+            m_sessionCurrent.setMarkovMaxLevel(m_ui->spinBoxMarkovModeMaxLevel->value());
         if (m_ui->checkBoxMarkovModeStartIndex->isChecked())
-            m_sessionCurrent.setStartIndex(m_ui->spinBoxMarkovModeStartIndex->value());
+            m_sessionCurrent.setMarkovStartIndex(m_ui->spinBoxMarkovModeStartIndex->value());
         if (m_ui->checkBoxMarkovModeEndIndex->isChecked())
-            m_sessionCurrent.setEndIndex(m_ui->spinBoxMarkovModeEndIndex->value());
+            m_sessionCurrent.setMarkovEndIndex(m_ui->spinBoxMarkovModeEndIndex->value());
         QString markov;
         // --markov=MODE[:LEVEL[:START[:END[:LENGTH]]]]
         // We don't use length parameter since magnum said it was deprecated, global option -min-leng and -max-len are the way to go
@@ -771,43 +771,43 @@ QStringList MainWindow::saveAttackParameters()
         }
         // Minimum number of elements per chain
         if (m_ui->checkBoxPrinceMinElementsPerChain->isChecked()) {
-            m_sessionCurrent.setMinElementsPerChain(m_ui->spinBoxPrinceMinElementsPerChain->value());
+            m_sessionCurrent.setPrinceMinElementsPerChain(m_ui->spinBoxPrinceMinElementsPerChain->value());
             parameters << (QString("--prince-elem-cnt-min=%1").arg(m_ui->spinBoxPrinceMinElementsPerChain->value()));
         }
         // Maximum number of elements per chain
         if (m_ui->checkBoxPrinceMaxElementsPerChain->isChecked()) {
-            m_sessionCurrent.setMaxElementsPerChain(m_ui->spinBoxPrinceMaxElementsPerChain->value());
+            m_sessionCurrent.setPrinceMaxElementsPerChain(m_ui->spinBoxPrinceMaxElementsPerChain->value());
             parameters << (QString("--prince-elem-cnt-max=%1").arg(m_ui->spinBoxPrinceMaxElementsPerChain->value()));
         }
         // Initial skip
         if (m_ui->checkBoxPrinceModeInitialSkip->isChecked()) {
-            m_sessionCurrent.setInitialSkip(m_ui->spinBoxPrinceModeInitialSkip->value());
+            m_sessionCurrent.setPrinceInitialSkip(m_ui->spinBoxPrinceModeInitialSkip->value());
             parameters << (QString("--prince-skip=%1").arg(m_ui->spinBoxPrinceModeInitialSkip->value()));
         }
         // Load only specified number of words from input wordlist
         if (m_ui->checkBoxPrinceModeLimitInputWords->isChecked()) {
-            m_sessionCurrent.setLimitWordsFromWordlist(m_ui->spinBoxPrinceModeLimitInputWords->value());
+            m_sessionCurrent.setPrinceLimitWordsFromWordlist(m_ui->spinBoxPrinceModeLimitInputWords->value());
             parameters << (QString("--prince-wl-max=%1").arg(m_ui->spinBoxPrinceModeLimitInputWords->value()));
         }
         // Limit number of password candidates
         if (m_ui->checkBoxPrinceModeLimitCandidates->isChecked()) {
-            m_sessionCurrent.setLimitNbPasswordCandidates(m_ui->spinBoxPrinceModeLimitCandidates->value());
+            m_sessionCurrent.setPrinceLimitNbPasswordCandidates(m_ui->spinBoxPrinceModeLimitCandidates->value());
             parameters << (QString("--prince-limit=%1").arg(m_ui->spinBoxPrinceModeLimitCandidates->value()));
         }
         // Calculate length distribution from wordlist instead of using built-in table
-        m_sessionCurrent.setUseWordlistForLengthDistribution(m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked());
+        m_sessionCurrent.setPrinceUseWordlistForLengthDistribution(m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked());
         if (m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked())
             parameters << "--prince-wl-dist-len";
         // Permute first letter case
-        m_sessionCurrent.setPermuteFirstLetterCase(m_ui->checkBoxPrinceModePermuteCase->isChecked());
+        m_sessionCurrent.setPrincePermuteFirstLetterCase(m_ui->checkBoxPrinceModePermuteCase->isChecked());
         if (m_ui->checkBoxPrinceModePermuteCase->isChecked())
             parameters << "--prince-case-permute";
         // Memory map
-        m_sessionCurrent.setMemoryMap(m_ui->checkBoxPrinceModeMapToMemory->isChecked());
+        m_sessionCurrent.setPrinceMemoryMap(m_ui->checkBoxPrinceModeMapToMemory->isChecked());
         if (m_ui->checkBoxPrinceModeMapToMemory->isChecked())
             parameters << "--prince-mmap";
         // Show total keyspace
-        m_sessionCurrent.setShowTotalKeyspace(m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked());
+        m_sessionCurrent.setPrinceShowTotalKeyspace(m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked());
         if (m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked())
             parameters << "--prince-keyspace";
     }
@@ -1556,24 +1556,24 @@ void MainWindow::restoreSessionOptions()
             m_ui->lineEditMarkovModeMask->setText(m_sessionCurrent.mask());
         }
         // Minimum markov level
-        if (m_sessionCurrent.minMarkovLevel() >= 0) {
+        if (m_sessionCurrent.markovMinLevel() >= 0) {
             m_ui->checkBoxMarkovModeMinLevel->setChecked(true);
-            m_ui->spinBoxMarkovModeMinLevel->setValue(m_sessionCurrent.minMarkovLevel());
+            m_ui->spinBoxMarkovModeMinLevel->setValue(m_sessionCurrent.markovMinLevel());
         }
         // Maximum markov level
-        if (m_sessionCurrent.maxMarkovLevel() >= 0) {
+        if (m_sessionCurrent.markovMaxLevel() >= 0) {
             m_ui->checkBoxMarkovModeMaxLevel->setChecked(true);
-            m_ui->spinBoxMarkovModeMaxLevel->setValue(m_sessionCurrent.maxMarkovLevel());
+            m_ui->spinBoxMarkovModeMaxLevel->setValue(m_sessionCurrent.markovMaxLevel());
         }
         // Start index
-        if (m_sessionCurrent.startIndex() >= 0) {
+        if (m_sessionCurrent.markovStartIndex() >= 0) {
             m_ui->checkBoxMarkovModeStartIndex->setChecked(true);
-            m_ui->spinBoxMarkovModeStartIndex->setValue(m_sessionCurrent.startIndex());
+            m_ui->spinBoxMarkovModeStartIndex->setValue(m_sessionCurrent.markovStartIndex());
         }
         // End index
-        if (m_sessionCurrent.endIndex() >= 0) {
+        if (m_sessionCurrent.markovEndIndex() >= 0) {
             m_ui->checkBoxMarkovModeEndIndex->setChecked(true);
-            m_ui->spinBoxMarkovModeEndIndex->setValue(m_sessionCurrent.endIndex());
+            m_ui->spinBoxMarkovModeEndIndex->setValue(m_sessionCurrent.markovEndIndex());
         }
     } else if (mode == JohnSession::PRINCE_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->princeModeTab);
@@ -1594,34 +1594,34 @@ void MainWindow::restoreSessionOptions()
             m_ui->lineEditPrinceModeMask->setText(m_sessionCurrent.mask());
         }
         // Minimum number of elements per chain
-        if (m_sessionCurrent.minElementsPerChain() >= 0) {
+        if (m_sessionCurrent.princeMinElementsPerChain() >= 0) {
             m_ui->checkBoxPrinceMinElementsPerChain->setChecked(true);
-            m_ui->spinBoxPrinceMinElementsPerChain->setValue(m_sessionCurrent.minElementsPerChain());
+            m_ui->spinBoxPrinceMinElementsPerChain->setValue(m_sessionCurrent.princeMinElementsPerChain());
         }
         // Maximum number of elements per chain
-        if (m_sessionCurrent.maxElementsPerChain() >= 0) {
+        if (m_sessionCurrent.princeMaxElementsPerChain() >= 0) {
             m_ui->checkBoxPrinceMaxElementsPerChain->setChecked(true);
-            m_ui->spinBoxPrinceMaxElementsPerChain->setValue(m_sessionCurrent.maxElementsPerChain());
+            m_ui->spinBoxPrinceMaxElementsPerChain->setValue(m_sessionCurrent.princeMaxElementsPerChain());
         }
         // Initial skip
-        if (m_sessionCurrent.initialSkip() >= 0) {
+        if (m_sessionCurrent.princeInitialSkip() >= 0) {
             m_ui->checkBoxPrinceModeInitialSkip->setChecked(true);
-            m_ui->spinBoxPrinceModeInitialSkip->setValue(m_sessionCurrent.initialSkip());
+            m_ui->spinBoxPrinceModeInitialSkip->setValue(m_sessionCurrent.princeInitialSkip());
         }
         // Load only specified number of words from input wordlist
-        if (m_sessionCurrent.limitWordsFromWordlist() >= 0) {
+        if (m_sessionCurrent.princeLimitWordsFromWordlist() >= 0) {
             m_ui->checkBoxPrinceModeLimitInputWords->setChecked(true);
-            m_ui->spinBoxPrinceModeLimitInputWords->setValue(m_sessionCurrent.limitWordsFromWordlist());
+            m_ui->spinBoxPrinceModeLimitInputWords->setValue(m_sessionCurrent.princeLimitWordsFromWordlist());
         }
         // Limit number of password candidates
-        if (m_sessionCurrent.limitNbPasswordCandidates() >= 0) {
+        if (m_sessionCurrent.princeLimitNbPasswordCandidates() >= 0) {
             m_ui->checkBoxPrinceModeLimitCandidates->setChecked(true);
-            m_ui->spinBoxPrinceModeLimitCandidates->setValue(m_sessionCurrent.limitNbPasswordCandidates());
+            m_ui->spinBoxPrinceModeLimitCandidates->setValue(m_sessionCurrent.princeLimitNbPasswordCandidates());
         }
-        m_ui->checkBoxPrinceCalculateDistributionWithWordlist->setChecked(m_sessionCurrent.useWordlistForLengthDistribution());
-        m_ui->checkBoxPrinceModePermuteCase->setChecked(m_sessionCurrent.permuteFirstLetterCase());
-        m_ui->checkBoxPrinceModeMapToMemory->setChecked(m_sessionCurrent.memoryMap());
-        m_ui->checkBoxPrinceModeShowTotalKeyspace->setChecked(m_sessionCurrent.showTotalKeyspace());
+        m_ui->checkBoxPrinceCalculateDistributionWithWordlist->setChecked(m_sessionCurrent.princeUseWordlistForLengthDistribution());
+        m_ui->checkBoxPrinceModePermuteCase->setChecked(m_sessionCurrent.princePermuteFirstLetterCase());
+        m_ui->checkBoxPrinceModeMapToMemory->setChecked(m_sessionCurrent.princeMemoryMap());
+        m_ui->checkBoxPrinceModeShowTotalKeyspace->setChecked(m_sessionCurrent.princeShowTotalKeyspace());
     } else {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }

@@ -12,19 +12,19 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_openMPThreads = 0;
     m_minPasswordCandidatesLength = -1;
     m_maxPasswordCandidatesLength = -1;
-    m_minMarkovLevel = -1;
-    m_maxMarkovLevel = -1;
-    m_startIndex = -1;
-    m_endIndex = -1;
-    m_minElementsPerChain = -1;
-    m_maxElementsPerChain = -1;
-    m_initialSkip = -1;
-    m_limitWordsFromWordlist = -1;
-    m_limitNbPasswordCandidates = -1;
-    m_useWordlistForLengthDistribution = false;
-    m_permuteFirstLetterCase = false;
-    m_memoryMap = false;
-    m_showTotalKeyspace = false;
+    m_markovMinLevel = -1;
+    m_markovMaxLevel = -1;
+    m_markovStartIndex = -1;
+    m_markovEndIndex = -1;
+    m_princeMinElementsPerChain = -1;
+    m_princeMaxElementsPerChain = -1;
+    m_princeInitialSkip = -1;
+    m_princeLimitWordsFromWordlist = -1;
+    m_princeLimitNbPasswordCandidates = -1;
+    m_princeUseWordlistForLengthDistribution = false;
+    m_princePermuteFirstLetterCase = false;
+    m_princeMemoryMap = false;
+    m_princeShowTotalKeyspace = false;
     m_loopback = false;
 }
 
@@ -120,16 +120,16 @@ bool JohnSession::load()
             m_mask = m_settings->value("mask").toString();
         }
         if (m_settings->contains("minMarkovLevel")) {
-            m_minMarkovLevel = m_settings->value("minMarkovLevel").toInt();
+            m_markovMinLevel = m_settings->value("minMarkovLevel").toInt();
         }
         if (m_settings->contains("maxMarkovLevel")) {
-            m_maxMarkovLevel = m_settings->value("maxMarkovLevel").toInt();
+            m_markovMaxLevel = m_settings->value("maxMarkovLevel").toInt();
         }
         if (m_settings->contains("startIndex")) {
-            m_startIndex = m_settings->value("startIndex").toInt();
+            m_markovStartIndex = m_settings->value("startIndex").toInt();
         }
         if (m_settings->contains("endIndex")) {
-            m_endIndex = m_settings->value("endIndex").toInt();
+            m_markovEndIndex = m_settings->value("endIndex").toInt();
         }
     } else if (mode == "prince") {
         m_mode = PRINCE_MODE;
@@ -144,25 +144,25 @@ bool JohnSession::load()
         if (m_settings->contains("mask")) {
             m_mask = m_settings->value("mask").toString();
         }
-        if (m_settings->contains("minElementsPerChain")) {
-            m_minElementsPerChain = m_settings->value("minElementsPerChain").toInt();
+        if (m_settings->contains("princeMinElementsPerChain")) {
+            m_princeMinElementsPerChain = m_settings->value("princeMinElementsPerChain").toInt();
         }
-        if (m_settings->contains("maxElementsPerChain")) {
-            m_maxElementsPerChain = m_settings->value("maxElementsPerChain").toInt();
+        if (m_settings->contains("princeMaxElementsPerChain")) {
+            m_princeMaxElementsPerChain = m_settings->value("princeMaxElementsPerChain").toInt();
         }
-        if (m_settings->contains("initialSkip")) {
-            m_initialSkip = m_settings->value("initialSkip").toInt();
+        if (m_settings->contains("princeInitialSkip")) {
+            m_princeInitialSkip = m_settings->value("princeInitialSkip").toInt();
         }
-        if (m_settings->contains("limitWordsFromWordlist")) {
-            m_limitWordsFromWordlist = m_settings->value("limitWordsFromWordlist").toInt();
+        if (m_settings->contains("princeLimitWordsFromWordlist")) {
+            m_princeLimitWordsFromWordlist = m_settings->value("princeLimitWordsFromWordlist").toInt();
         }
-        if (m_settings->contains("limitNbPasswordCandidates")) {
-            m_limitNbPasswordCandidates = m_settings->value("limitNbPasswordCandidates").toInt();
+        if (m_settings->contains("princeLimitNbPasswordCandidates")) {
+            m_princeLimitNbPasswordCandidates = m_settings->value("princeLimitNbPasswordCandidates").toInt();
         }
-        m_useWordlistForLengthDistribution = m_settings->value("useWordlistForLengthDistribution").toBool();
-        m_permuteFirstLetterCase = m_settings->value("permuteFirstLetterCase").toBool();
-        m_memoryMap = m_settings->value("memoryMap").toBool();
-        m_showTotalKeyspace = m_settings->value("showTotalKeyspace").toBool();
+        m_princeUseWordlistForLengthDistribution = m_settings->value("princeUseWordlistForLengthDistribution").toBool();
+        m_princePermuteFirstLetterCase = m_settings->value("princePermuteFirstLetterCase").toBool();
+        m_princeMemoryMap = m_settings->value("princeMemoryMap").toBool();
+        m_princeShowTotalKeyspace = m_settings->value("princeShowTotalKeyspace").toBool();
     } else if (mode == "default"){
         m_mode = DEFAULT_MODE;
     }
@@ -288,17 +288,17 @@ bool JohnSession::save()
         if (!m_mask.isNull()) {
             m_settings->setValue("mask", m_mask);
         }
-        if (m_minMarkovLevel >= 0) {
-            m_settings->setValue("minMarkovLevel", m_minMarkovLevel);
+        if (m_markovMinLevel >= 0) {
+            m_settings->setValue("markovMinLevel", m_markovMinLevel);
         }
-        if (m_maxMarkovLevel >= 0) {
-            m_settings->setValue("maxMarkovLevel", m_maxMarkovLevel);
+        if (m_markovMaxLevel >= 0) {
+            m_settings->setValue("markovMaxLevel", m_markovMaxLevel);
         }
-        if (m_startIndex >= 0) {
-            m_settings->setValue("startIndex", m_startIndex);
+        if (m_markovStartIndex >= 0) {
+            m_settings->setValue("markovStartIndex", m_markovStartIndex);
         }
-        if (m_endIndex >= 0) {
-            m_settings->setValue("endIndex", m_endIndex);
+        if (m_markovEndIndex >= 0) {
+            m_settings->setValue("markovEndIndex", m_markovEndIndex);
         }
 
     } else if (m_mode == JohnSession::PRINCE_MODE) {
@@ -314,25 +314,25 @@ bool JohnSession::save()
         if (!m_mask.isNull()) {
             m_settings->setValue("mask", m_mask);
         }
-        if (m_minElementsPerChain >= 0) {
-            m_settings->setValue("minElementsPerChain", m_minElementsPerChain);
+        if (m_princeMinElementsPerChain >= 0) {
+            m_settings->setValue("princeMinElementsPerChain", m_princeMinElementsPerChain);
         }
-        if (m_maxElementsPerChain >= 0) {
-            m_settings->setValue("maxElementsPerChain", m_maxElementsPerChain);
+        if (m_princeMaxElementsPerChain >= 0) {
+            m_settings->setValue("princeMaxElementsPerChain", m_princeMaxElementsPerChain);
         }
-        if (m_initialSkip >= 0) {
-            m_settings->setValue("initialSkip", m_initialSkip);
+        if (m_princeInitialSkip >= 0) {
+            m_settings->setValue("princeInitialSkip", m_princeInitialSkip);
         }
-        if (m_limitWordsFromWordlist >= 0) {
-            m_settings->setValue("limitWordsFromWordlist", m_limitWordsFromWordlist);
+        if (m_princeLimitWordsFromWordlist >= 0) {
+            m_settings->setValue("princeLimitWordsFromWordlist", m_princeLimitWordsFromWordlist);
         }
-        if (m_limitNbPasswordCandidates >= 0) {
-            m_settings->setValue("limitNbPasswordCandidates", m_limitNbPasswordCandidates);
+        if (m_princeLimitNbPasswordCandidates >= 0) {
+            m_settings->setValue("princeLimitNbPasswordCandidates", m_princeLimitNbPasswordCandidates);
         }
-        m_settings->setValue("useWordlistForLengthDistribution", m_useWordlistForLengthDistribution);
-        m_settings->setValue("permuteFirstLetterCase", m_permuteFirstLetterCase);
-        m_settings->setValue("memoryMap", m_memoryMap);
-        m_settings->setValue("showTotalKeyspace", m_showTotalKeyspace);
+        m_settings->setValue("princeUseWordlistForLengthDistribution", m_princeUseWordlistForLengthDistribution);
+        m_settings->setValue("princePermuteFirstLetterCase", m_princePermuteFirstLetterCase);
+        m_settings->setValue("princeMemoryMap", m_princeMemoryMap);
+        m_settings->setValue("princeShowTotalKeyspace", m_princeShowTotalKeyspace);
     } else {
         m_settings->setValue("mode", "default");
     }
@@ -559,136 +559,6 @@ void JohnSession::setMarkovMode(const QString &markovMode)
     m_markovMode = markovMode;
 }
 
-int JohnSession::minMarkovLevel() const
-{
-    return m_minMarkovLevel;
-}
-
-void JohnSession::setMinMarkovLevel(int minMarkovLevel)
-{
-    m_minMarkovLevel = minMarkovLevel;
-}
-
-int JohnSession::maxMarkovLevel() const
-{
-    return m_maxMarkovLevel;
-}
-
-void JohnSession::setMaxMarkovLevel(int maxMarkovLevel)
-{
-    m_maxMarkovLevel = maxMarkovLevel;
-}
-
-int JohnSession::startIndex() const
-{
-    return m_startIndex;
-}
-
-void JohnSession::setStartIndex(int startIndex)
-{
-    m_startIndex = startIndex;
-}
-
-int JohnSession::endIndex() const
-{
-    return m_endIndex;
-}
-
-void JohnSession::setEndIndex(int endIndex)
-{
-    m_endIndex = endIndex;
-}
-
-int JohnSession::minElementsPerChain() const
-{
-    return m_minElementsPerChain;
-}
-
-void JohnSession::setMinElementsPerChain(int minElementsPerChain)
-{
-    m_minElementsPerChain = minElementsPerChain;
-}
-
-int JohnSession::maxElementsPerChain() const
-{
-    return m_maxElementsPerChain;
-}
-
-void JohnSession::setMaxElementsPerChain(int maxElementsPerChain)
-{
-    m_maxElementsPerChain = maxElementsPerChain;
-}
-
-int JohnSession::initialSkip() const
-{
-    return m_initialSkip;
-}
-
-void JohnSession::setInitialSkip(int initialSkip)
-{
-    m_initialSkip = initialSkip;
-}
-
-int JohnSession::limitWordsFromWordlist() const
-{
-    return m_limitWordsFromWordlist;
-}
-
-void JohnSession::setLimitWordsFromWordlist(int limitWordsFromWordlist)
-{
-    m_limitWordsFromWordlist = limitWordsFromWordlist;
-}
-
-int JohnSession::limitNbPasswordCandidates() const
-{
-    return m_limitNbPasswordCandidates;
-}
-
-void JohnSession::setLimitNbPasswordCandidates(int limitNbPasswordCandidates)
-{
-    m_limitNbPasswordCandidates = limitNbPasswordCandidates;
-}
-
-bool JohnSession::useWordlistForLengthDistribution() const
-{
-    return m_useWordlistForLengthDistribution;
-}
-
-void JohnSession::setUseWordlistForLengthDistribution(bool useWordlistForLengthDistribution)
-{
-    m_useWordlistForLengthDistribution = useWordlistForLengthDistribution;
-}
-
-bool JohnSession::permuteFirstLetterCase() const
-{
-    return m_permuteFirstLetterCase;
-}
-
-void JohnSession::setPermuteFirstLetterCase(bool permuteFirstLetterCase)
-{
-    m_permuteFirstLetterCase = permuteFirstLetterCase;
-}
-
-bool JohnSession::memoryMap() const
-{
-    return m_memoryMap;
-}
-
-void JohnSession::setMemoryMap(bool memoryMap)
-{
-    m_memoryMap = memoryMap;
-}
-
-bool JohnSession::showTotalKeyspace() const
-{
-    return m_showTotalKeyspace;
-}
-
-void JohnSession::setShowTotalKeyspace(bool showTotalKeyspace)
-{
-    m_showTotalKeyspace = showTotalKeyspace;
-}
-
 int JohnSession::minPasswordCandidatesLength() const
 {
     return m_minPasswordCandidatesLength;
@@ -719,6 +589,133 @@ void JohnSession::setLoopback(bool loopback)
     m_loopback = loopback;
 }
 
+int JohnSession::princeMinElementsPerChain() const
+{
+    return m_princeMinElementsPerChain;
+}
+
+void JohnSession::setPrinceMinElementsPerChain(int princeMinElementsPerChain)
+{
+    m_princeMinElementsPerChain = princeMinElementsPerChain;
+}
+
+int JohnSession::princeMaxElementsPerChain() const
+{
+    return m_princeMaxElementsPerChain;
+}
+
+void JohnSession::setPrinceMaxElementsPerChain(int princeMaxElementsPerChain)
+{
+    m_princeMaxElementsPerChain = princeMaxElementsPerChain;
+}
+
+int JohnSession::princeInitialSkip() const
+{
+    return m_princeInitialSkip;
+}
+
+void JohnSession::setPrinceInitialSkip(int princeInitialSkip)
+{
+    m_princeInitialSkip = princeInitialSkip;
+}
+
+int JohnSession::princeLimitWordsFromWordlist() const
+{
+    return m_princeLimitWordsFromWordlist;
+}
+
+void JohnSession::setPrinceLimitWordsFromWordlist(int princeLimitWordsFromWordlist)
+{
+    m_princeLimitWordsFromWordlist = princeLimitWordsFromWordlist;
+}
+
+int JohnSession::princeLimitNbPasswordCandidates() const
+{
+    return m_princeLimitNbPasswordCandidates;
+}
+
+void JohnSession::setPrinceLimitNbPasswordCandidates(int princeLimitNbPasswordCandidates)
+{
+    m_princeLimitNbPasswordCandidates = princeLimitNbPasswordCandidates;
+}
+
+bool JohnSession::princeUseWordlistForLengthDistribution() const
+{
+    return m_princeUseWordlistForLengthDistribution;
+}
+
+void JohnSession::setPrinceUseWordlistForLengthDistribution(bool princeUseWordlistForLengthDistribution)
+{
+    m_princeUseWordlistForLengthDistribution = princeUseWordlistForLengthDistribution;
+}
+
+bool JohnSession::princePermuteFirstLetterCase() const
+{
+    return m_princePermuteFirstLetterCase;
+}
+
+void JohnSession::setPrincePermuteFirstLetterCase(bool princePermuteFirstLetterCase)
+{
+    m_princePermuteFirstLetterCase = princePermuteFirstLetterCase;
+}
+bool JohnSession::princeMemoryMap() const
+{
+    return m_princeMemoryMap;
+}
+
+void JohnSession::setPrinceMemoryMap(bool princeMemoryMap)
+{
+    m_princeMemoryMap = princeMemoryMap;
+}
+bool JohnSession::princeShowTotalKeyspace() const
+{
+    return m_princeShowTotalKeyspace;
+}
+
+void JohnSession::setPrinceShowTotalKeyspace(bool princeShowTotalKeyspace)
+{
+    m_princeShowTotalKeyspace = princeShowTotalKeyspace;
+}
+
+int JohnSession::markovEndIndex() const
+{
+    return m_markovEndIndex;
+}
+
+void JohnSession::setMarkovEndIndex(int markovEndIndex)
+{
+    m_markovEndIndex = markovEndIndex;
+}
+
+int JohnSession::markovStartIndex() const
+{
+    return m_markovStartIndex;
+}
+
+void JohnSession::setMarkovStartIndex(int markovStartIndex)
+{
+    m_markovStartIndex = markovStartIndex;
+}
+
+int JohnSession::markovMaxLevel() const
+{
+    return m_markovMaxLevel;
+}
+
+void JohnSession::setMarkovMaxLevel(int markovMaxLevel)
+{
+    m_markovMaxLevel = markovMaxLevel;
+}
+
+int JohnSession::markovMinLevel() const
+{
+    return m_markovMinLevel;
+}
+
+void JohnSession::setMarkovMinLevel(int markovMinLevel)
+{
+    m_markovMinLevel = markovMinLevel;
+}
 
 JohnSession::AttackMode JohnSession::mode()
 {

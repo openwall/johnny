@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="passwordsPageLayout">
@@ -214,7 +214,7 @@ border-bottom: 1px solid darkgrey;
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-608</y>
+             <y>0</y>
              <width>892</width>
              <height>1269</height>
             </rect>
@@ -355,7 +355,7 @@ border-bottom: 1px solid darkgrey;
                   </sizepolicy>
                  </property>
                  <property name="currentIndex">
-                  <number>7</number>
+                  <number>0</number>
                  </property>
                  <widget class="QWidget" name="defaultModeTab">
                   <attribute name="title">

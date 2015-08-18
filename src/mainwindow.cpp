@@ -1103,6 +1103,7 @@ void MainWindow::applySettings()
     // We copy settings from elements on the form to the settings
     // object with current settings.
     m_pathToJohn = newJohnPath;
+    m_openOtherFormatDialog->setJohnPath(m_pathToJohn);
     m_timeIntervalPickCracked = m_ui->spinBoxTimeIntervalPickCracked->value();
 
     // If the language changed, retranslate the UI
@@ -1593,7 +1594,7 @@ void MainWindow::actionExportToTriggered(QAction* action)
     } else {
         return;
     }
-    QString fileName = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), "*"+ fileFormat);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), QDir::homePath(), "*"+ fileFormat);
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(fileFormat)) {
             fileName.append(fileFormat);

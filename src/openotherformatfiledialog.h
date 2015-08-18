@@ -14,6 +14,7 @@ class OpenOtherFormatFileDialog : public QDialog
 
 public:
     explicit OpenOtherFormatFileDialog(QWidget *parent = 0);
+    void setJohnPath(const QString& johnPath);
     ~OpenOtherFormatFileDialog();
 
 signals:
@@ -21,12 +22,15 @@ signals:
 
 private slots:
     void convertFile();
+    void conversionFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void conversionError(QProcess::ProcessError error);
     void browseInputButtonClicked();
     void browseOutputButtonClicked();
 
 private:
     Ui::OpenOtherFormatFileDialog *m_ui;
     QProcess                       m_2johnProcess;
+    QString                        m_johnPath;
 };
 
 #endif // OPENOTHERFORMATFILEDIALOG_H

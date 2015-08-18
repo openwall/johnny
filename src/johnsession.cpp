@@ -119,14 +119,14 @@ bool JohnSession::load()
         if (m_settings->contains("mask")) {
             m_mask = m_settings->value("mask").toString();
         }
-        if (m_settings->contains("minMarkovLevel")) {
-            m_markovMinLevel = m_settings->value("minMarkovLevel").toInt();
+        if (m_settings->contains("markovMinLevel")) {
+            m_markovMinLevel = m_settings->value("markovMinLevel").toInt();
         }
-        if (m_settings->contains("maxMarkovLevel")) {
-            m_markovMaxLevel = m_settings->value("maxMarkovLevel").toInt();
+        if (m_settings->contains("markovMaxLevel")) {
+            m_markovMaxLevel = m_settings->value("markovMaxLevel").toInt();
         }
-        if (m_settings->contains("startIndex")) {
-            m_markovStartIndex = m_settings->value("startIndex").toInt();
+        if (m_settings->contains("markovStartIndex")) {
+            m_markovStartIndex = m_settings->value("markovStartIndex").toInt();
         }
         if (m_settings->contains("endIndex")) {
             m_markovEndIndex = m_settings->value("endIndex").toInt();

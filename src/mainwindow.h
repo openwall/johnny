@@ -14,6 +14,7 @@
 #include "johnsession.h"
 #include "passwordfilemodel.h"
 #include "hashsortfilterproxymodel.h"
+#include "openotherformatfiledialog.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -146,6 +147,7 @@ private:
     bool            m_isDynamicFilteringEnabled;
 
     QWidget         m_aboutWindow;
+    OpenOtherFormatFileDialog* m_openOtherFormatDialog;
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;

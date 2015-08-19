@@ -900,14 +900,16 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 void MainWindow::callJohnShow()
 {
-    QStringList args;
-    // We add current format key if it is not empty.
-    if (!m_sessionCurrent.format().isEmpty())
-        args << "--format=" + m_sessionCurrent.format();
-    args << "--show" << m_johnShowTemp->fileName();
-    m_johnShow.setJohnProgram(m_pathToJohn);
-    m_johnShow.setArgs(args);
-    m_johnShow.start();
+    if (m_johnShow.state() == QProcess::NotRunning) {
+        QStringList args;
+        // We add current format key if it is not empty.
+        if (!m_sessionCurrent.format().isEmpty())
+            args << "--format=" + m_sessionCurrent.format();
+        args << "--show" << m_johnShowTemp->fileName();
+        m_johnShow.setJohnProgram(m_pathToJohn);
+        m_johnShow.setArgs(args);
+        m_johnShow.start();
+    }
 }
 
 void MainWindow::readJohnShow()

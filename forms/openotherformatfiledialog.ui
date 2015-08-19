@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>545</width>
-    <height>327</height>
+    <width>589</width>
+    <height>662</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,33 +17,13 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Johnny can only read PASSWD format files. If your password file is in another supported format, Johnny will convert it and open it.</string>
+      <string>Johnny can only read PASSWD format files. If your password file is in another supported format, Johnny will use John The Ripper to convert it and open it.
+ Make sure that a valid JtR path is specified in the setting before using this feature.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Input password file:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEditInputHashFile"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonBrowseInput">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QLabel" name="label_4">
@@ -54,7 +34,15 @@
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QGridLayout" name="gridLayout"/>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::NoContextMenu</enum>
+     </property>
     </widget>
    </item>
    <item>
@@ -71,6 +59,27 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButtonBrowseOutput">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Input password file:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEditInputHashFile"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonBrowseInput">
        <property name="text">
         <string>Browse</string>
        </property>

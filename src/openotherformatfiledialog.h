@@ -3,6 +3,27 @@
 
 #include <QDialog>
 #include <QProcess>
+#include <QMap>
+#include <QButtonGroup>
+
+enum ScriptParameterType {FILE_PARAM, TEXT_PARAM, CHECKABLE_PARAM};
+class ConversionScriptParameters
+{
+public:
+    ConversionScriptParameters(const QString& name, ScriptParameterType type);
+    QString name;
+    ScriptParameterType type;
+};
+
+class ConversionScript
+{
+public:
+    ConversionScript(){}
+    ConversionScript(const QString &name, const QString &extension, const QList<ConversionScriptParameters> &parameters);
+    QString name;
+    QString extension;
+    QList<ConversionScriptParameters> parameters;
+};
 
 namespace Ui {
 class OpenOtherFormatFileDialog;
@@ -27,10 +48,16 @@ private slots:
     void browseInputButtonClicked();
     void browseOutputButtonClicked();
 
+protected:
+    void showEvent(QShowEvent *event);
+
 private:
+    void buildFormatUI();
     Ui::OpenOtherFormatFileDialog *m_ui;
+    QMap<QString, ConversionScript> m_scripts;
     QProcess                       m_2johnProcess;
     QString                        m_johnPath;
+    QButtonGroup*                  m_formatsButton;
 };
 
 #endif // OPENOTHERFORMATFILEDIALOG_H

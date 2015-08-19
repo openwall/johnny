@@ -27,10 +27,12 @@ OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
     setWindowTitle(tr("Open other file format (*2john)"));
     connect(m_ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(m_ui->pushButtonConvert, SIGNAL(clicked()), this, SLOT(convertFile()));
-    connect(m_ui->pushButtonBrowseInput, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
+    //connect(m_ui->pushButtonBrowseInput, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
     connect(m_ui->pushButtonBrowseOutput, SIGNAL(clicked()), this, SLOT(browseOutputButtonClicked()));
     connect(&m_2johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(conversionFinished(int, QProcess::ExitStatus)));
     connect(&m_2johnProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(conversionError(QProcess::ProcessError)));
+    connect(m_formatsButton, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(selectedFormatChanged(QAbstractButton*)));
+    m_ui->widgetParameter2->hide();
     buildFormatUI();
 }
 
@@ -74,6 +76,24 @@ void OpenOtherFormatFileDialog::buildFormatUI()
             row = 0;
             column++;
         }
+    }
+}
+
+void OpenOtherFormatFileDialog::selectedFormatChanged(QAbstractButton *button)
+{
+    // NOTE : With our current data structure, we have the possibility to handle as many parameter as we want
+    // so we could modify this code to dynamically create new text edit/ checkboxes etc.. based on the type of the parameters and the number
+    // if we decide to support script with more complicated parameters in Johnny.
+    QString name = button->text();
+    ConversionScript script = m_scripts[name];
+    if (script.parameters.size() == 1) {
+        m_ui->labelInputHashFile->setText(script.parameters[0].name);
+        m_ui->widgetParameter2->hide();
+    } else {
+        m_ui->labelInputHashFile->setText(script.parameters[0].name);
+        m_ui->widgetParameter2->show();
+            m_ui->pushButtonBrowseParameter2->setVisible(script.parameters[1].type == FILE_PARAM);
+            m_ui->labelParameter2->setText(script.parameters[1].name);
     }
 }
 
@@ -145,7 +165,7 @@ void OpenOtherFormatFileDialog::browseInputButtonClicked()
     dialog.setFileMode(QFileDialog::ExistingFile);
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
-        m_ui->lineEditInputHashFile->setText(fileName);
+       // m_ui->lineEditInputHashFile->setText(fileName);
     }
 }
 

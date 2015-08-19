@@ -47,6 +47,7 @@ private slots:
     void conversionError(QProcess::ProcessError error);
     void browseInputButtonClicked();
     void browseOutputButtonClicked();
+    void selectedFormatChanged(QAbstractButton *button);
 
 protected:
     void showEvent(QShowEvent *event);

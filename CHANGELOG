@@ -1,3 +1,17 @@
+Version 2.2
+===========
+
+What's new:
+
+* Support for the new powerful jumbo attack modes : markov, prince, mask and loopback to
+  help you get better cracking results.
+* Support for opening many new password file formats. You can now convert to john format and
+  open them in Johnny with our built-in *2john support.
+* Export the password table view to CSV and colon separated password format.
+* Validate JtR path and show JtR version.
+* Console log improvements.
+* Various bug fixes
+
 Version 2.1
 ===========
 

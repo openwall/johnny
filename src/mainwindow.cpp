@@ -179,7 +179,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
     connect(m_ui->pushButtonStatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
     connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
-    connect(m_ui->pushButtonBrowsePathToJohn,SIGNAL(clicked()),this,SLOT(buttonBrowsePathToJohnClicked()));
+    connect(m_ui->pushButtonPrinceModeBrowseFile, SIGNAL(clicked()), this, SLOT(buttonWordlistFileBrowseClicked()));
+    connect(m_ui->pushButtonBrowsePathToJohn, SIGNAL(clicked()), this, SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
@@ -300,7 +301,10 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        m_ui->lineEditWordlistFile->setText(fileName);
+        if (QObject::sender() == m_ui->pushButton_WordlistFileBrowse)
+            m_ui->lineEditWordlistFile->setText(fileName);
+        else if(QObject::sender() == m_ui->pushButtonPrinceModeBrowseFile)
+            m_ui->lineEditPrinceModeWordlistFile->setText(fileName);
     }
 }
 

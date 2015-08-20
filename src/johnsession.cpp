@@ -15,6 +15,22 @@ JohnSession::JohnSession(const QString &sessionName, QSettings* settings)
     m_limitSalts = -1;
     m_forkProcesses = 1;
     m_openMPThreads = 0;
+    m_minPasswordCandidatesLength = -1;
+    m_maxPasswordCandidatesLength = -1;
+    m_markovMinLevel = -1;
+    m_markovMaxLevel = -1;
+    m_markovStartIndex = -1;
+    m_markovEndIndex = -1;
+    m_princeMinElementsPerChain = -1;
+    m_princeMaxElementsPerChain = -1;
+    m_princeInitialSkip = -1;
+    m_princeLimitWordsFromWordlist = -1;
+    m_princeLimitNbPasswordCandidates = -1;
+    m_princeUseWordlistForLengthDistribution = false;
+    m_princePermuteFirstLetterCase = false;
+    m_princeMemoryMap = false;
+    m_princeShowTotalKeyspace = false;
+    m_loopback = false;
 }
 
 QString JohnSession::filePath()
@@ -41,43 +57,118 @@ bool JohnSession::load()
     m_settings->beginGroup(m_sessionGroup);
     m_passwordFiles = m_settings->value("passwordFiles").toStringList();
     m_format = m_settings->value("formatJohn").toString();
-    m_format.remove("--format=");
     m_formatUI = m_settings->value("formatUI").toString();
     QString mode = m_settings->value("mode").toString();
     if (mode == "single") {
         m_mode = SINGLECRACK_MODE;
         // External mode, filter
-        if (m_settings->contains("singleCrackExternalName")) {
-            m_externalName = m_settings->value("singleCrackExternalName").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
         }
     } else if (mode == "wordlist") {
         m_mode = WORDLIST_MODE;
+        m_loopback = m_settings->value("loopback").toBool();
         m_wordlistFile = m_settings->value("wordlistFile").toString();
         //Rules
-        if (m_settings->value("isUsingWordListRules").toBool() == true) {
-            m_rules = "";
-        } else if (m_settings->contains("rules")) {
+        if (m_settings->contains("rules")) {
             m_rules = m_settings->value("rules").toString();
         }
         // External mode, filter
-        if (m_settings->contains("worldListExternalName")) {
-            m_externalName = m_settings->value("worldListExternalName").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        // Hybrid mask mode
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
         }
     } else if (mode == "incremental") {
         m_mode = INCREMENTAL_MODE;
         // "Incremental" mode
         // It could be with or without name.
-        if (m_settings->contains("incrementalModeName")) {
-            m_charset = m_settings->value("incrementalModeName").toString();
+        if (m_settings->contains("charset")) {
+            m_charset = m_settings->value("charset").toString();
         }
         // External mode, filter
-        if (m_settings->contains("incrementalExternalName")) {
-            m_externalName = m_settings->value("incrementalExternalName").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        // Hybrid mask mode
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
         }
     } else if (mode == "external") {
         m_mode = EXTERNAL_MODE;
-        m_externalName = m_settings->value("externalModeName").toString();
-    } else {
+        m_externalName = m_settings->value("externalName").toString();
+        // Hybrid mask mode
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
+        }
+    } else if (mode == "mask") {
+        m_mode = MASK_MODE;
+        m_mask = m_settings->value("mask").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        if (m_settings->contains("rules")) {
+            m_rules = m_settings->value("rules").toString();
+        }
+    } else if (mode == "markov") {
+        m_mode = MARKOV_MODE;
+        m_markovMode = m_settings->value("markovMode").toString();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        if (m_settings->contains("rules")) {
+            m_rules = m_settings->value("rules").toString();
+        }
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
+        }
+        if (m_settings->contains("markovMinLevel")) {
+            m_markovMinLevel = m_settings->value("markovMinLevel").toInt();
+        }
+        if (m_settings->contains("markovMaxLevel")) {
+            m_markovMaxLevel = m_settings->value("markovMaxLevel").toInt();
+        }
+        if (m_settings->contains("markovStartIndex")) {
+            m_markovStartIndex = m_settings->value("markovStartIndex").toInt();
+        }
+        if (m_settings->contains("markovEndIndex")) {
+            m_markovEndIndex = m_settings->value("markovEndIndex").toInt();
+        }
+    } else if (mode == "prince") {
+        m_mode = PRINCE_MODE;
+        m_wordlistFile = m_settings->value("wordlistFile").toString();
+        m_loopback = m_settings->value("loopback").toBool();
+        if (m_settings->contains("externalName")) {
+            m_externalName = m_settings->value("externalName").toString();
+        }
+        if (m_settings->contains("rules")) {
+            m_rules = m_settings->value("rules").toString();
+        }
+        if (m_settings->contains("mask")) {
+            m_mask = m_settings->value("mask").toString();
+        }
+        if (m_settings->contains("princeMinElementsPerChain")) {
+            m_princeMinElementsPerChain = m_settings->value("princeMinElementsPerChain").toInt();
+        }
+        if (m_settings->contains("princeMaxElementsPerChain")) {
+            m_princeMaxElementsPerChain = m_settings->value("princeMaxElementsPerChain").toInt();
+        }
+        if (m_settings->contains("princeInitialSkip")) {
+            m_princeInitialSkip = m_settings->value("princeInitialSkip").toInt();
+        }
+        if (m_settings->contains("princeLimitWordsFromWordlist")) {
+            m_princeLimitWordsFromWordlist = m_settings->value("princeLimitWordsFromWordlist").toInt();
+        }
+        if (m_settings->contains("princeLimitNbPasswordCandidates")) {
+            m_princeLimitNbPasswordCandidates = m_settings->value("princeLimitNbPasswordCandidates").toInt();
+        }
+        m_princeUseWordlistForLengthDistribution = m_settings->value("princeUseWordlistForLengthDistribution").toBool();
+        m_princePermuteFirstLetterCase = m_settings->value("princePermuteFirstLetterCase").toBool();
+        m_princeMemoryMap = m_settings->value("princeMemoryMap").toBool();
+        m_princeShowTotalKeyspace = m_settings->value("princeShowTotalKeyspace").toBool();
+    } else if (mode == "default"){
         m_mode = DEFAULT_MODE;
     }
 
@@ -103,6 +194,13 @@ bool JohnSession::load()
     if (m_settings->contains("environmentVariables")) {
         m_environmentVariables = m_settings->value("environmentVariables").toString();
     }
+    if (m_settings->contains("minPasswordCandidatesLength")) {
+        m_minPasswordCandidatesLength = m_settings->value("minPasswordCandidatesLength").toInt();
+    }
+    if (m_settings->contains("maxPasswordCandidatesLength")) {
+        m_maxPasswordCandidatesLength = m_settings->value("maxPasswordCandidatesLength").toInt();
+    }
+
     // Unselected hashes
     m_unselectedRows.clear();
     QList<QVariant> unselectedRows = m_settings->value("unselectedRows").toList();
@@ -133,34 +231,113 @@ bool JohnSession::save()
         m_settings->setValue("mode", "single");
         // External mode, filter
         if (!m_externalName.isNull()) {
-            m_settings->setValue("singleCrackExternalName", m_externalName);
+            m_settings->setValue("externalName", m_externalName);
         }
     } else if (m_mode == WORDLIST_MODE) {
         m_settings->setValue("mode", "wordlist");
         m_settings->setValue("wordlistFile", m_wordlistFile);
-        //Rules
+        m_settings->setValue("loopback", m_loopback);
+        // External mode, filter
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        // Rules
         if (!m_rules.isNull()) {
             m_settings->setValue("rules", m_rules);
         }
-        // External mode, filter
-        if (!m_externalName.isNull()) {
-            m_settings->setValue("worldListExternalName", m_externalName);
+        // Mask
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
         }
     } else if (m_mode == INCREMENTAL_MODE) {
         m_settings->setValue("mode", "incremental");
         // "Incremental" mode
         // It could be with or without name.
         if (!m_charset.isNull()) {
-            m_settings->setValue("incrementalModeName", m_charset);
+            m_settings->setValue("charset", m_charset);
         }
         // External mode, filter
         if (!m_externalName.isNull()) {
-            m_settings->setValue("incrementalExternalName", m_externalName);
+            m_settings->setValue("externalName", m_externalName);
+        }
+        // Mask
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
         }
 
     } else if (m_mode == JohnSession::EXTERNAL_MODE) {
         m_settings->setValue("mode", "external");
-        m_settings->setValue("externalModeName", m_externalName);
+        m_settings->setValue("externalName", m_externalName);
+        // Mask
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
+    } else if (m_mode == JohnSession::MASK_MODE) {
+        m_settings->setValue("mode", "mask");
+        m_settings->setValue("mask", m_mask);
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        if (!m_rules.isNull()) {
+            m_settings->setValue("rules", m_rules);
+        }
+    } else if (m_mode == JohnSession::MARKOV_MODE) {
+        m_settings->setValue("mode", "markov");
+        m_settings->setValue("markovMode", m_markovMode);
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        if (!m_rules.isNull()) {
+            m_settings->setValue("rules", m_rules);
+        }
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
+        if (m_markovMinLevel >= 0) {
+            m_settings->setValue("markovMinLevel", m_markovMinLevel);
+        }
+        if (m_markovMaxLevel >= 0) {
+            m_settings->setValue("markovMaxLevel", m_markovMaxLevel);
+        }
+        if (m_markovStartIndex >= 0) {
+            m_settings->setValue("markovStartIndex", m_markovStartIndex);
+        }
+        if (m_markovEndIndex >= 0) {
+            m_settings->setValue("markovEndIndex", m_markovEndIndex);
+        }
+
+    } else if (m_mode == JohnSession::PRINCE_MODE) {
+        m_settings->setValue("mode", "prince");
+        m_settings->setValue("wordlistFile", m_wordlistFile);
+        m_settings->setValue("loopback", m_loopback);
+        if (!m_externalName.isNull()) {
+            m_settings->setValue("externalName", m_externalName);
+        }
+        if (!m_rules.isNull()) {
+            m_settings->setValue("rules", m_rules);
+        }
+        if (!m_mask.isNull()) {
+            m_settings->setValue("mask", m_mask);
+        }
+        if (m_princeMinElementsPerChain >= 0) {
+            m_settings->setValue("princeMinElementsPerChain", m_princeMinElementsPerChain);
+        }
+        if (m_princeMaxElementsPerChain >= 0) {
+            m_settings->setValue("princeMaxElementsPerChain", m_princeMaxElementsPerChain);
+        }
+        if (m_princeInitialSkip >= 0) {
+            m_settings->setValue("princeInitialSkip", m_princeInitialSkip);
+        }
+        if (m_princeLimitWordsFromWordlist >= 0) {
+            m_settings->setValue("princeLimitWordsFromWordlist", m_princeLimitWordsFromWordlist);
+        }
+        if (m_princeLimitNbPasswordCandidates >= 0) {
+            m_settings->setValue("princeLimitNbPasswordCandidates", m_princeLimitNbPasswordCandidates);
+        }
+        m_settings->setValue("princeUseWordlistForLengthDistribution", m_princeUseWordlistForLengthDistribution);
+        m_settings->setValue("princePermuteFirstLetterCase", m_princePermuteFirstLetterCase);
+        m_settings->setValue("princeMemoryMap", m_princeMemoryMap);
+        m_settings->setValue("princeShowTotalKeyspace", m_princeShowTotalKeyspace);
     } else {
         m_settings->setValue("mode", "default");
     }
@@ -187,6 +364,12 @@ bool JohnSession::save()
 
     if (!m_environmentVariables.isNull()) {
         m_settings->setValue("environmentVariables", m_environmentVariables);
+    }
+    if (m_minPasswordCandidatesLength >= 0) {
+        m_settings->setValue("minPasswordCandidatesLength", m_minPasswordCandidatesLength);
+    }
+    if (m_maxPasswordCandidatesLength >= 0) {
+        m_settings->setValue("maxPasswordCandidatesLength", m_maxPasswordCandidatesLength);
     }
     m_settings->endGroup();
     return true;
@@ -340,6 +523,7 @@ void JohnSession::setFormatUI(const QString &formatUI)
 {
     m_formatUI = formatUI;
 }
+
 QList<int> JohnSession::unselectedRows() const
 {
     return m_unselectedRows;
@@ -349,6 +533,7 @@ void JohnSession::setUnselectedRows(const QList<int> &unselectedRows)
 {
     m_unselectedRows = unselectedRows;
 }
+
 QString JohnSession::defaultFormat() const
 {
     return m_defaultFormat;
@@ -359,6 +544,183 @@ void JohnSession::setDefaultFormat(const QString &defaultFormat)
     m_defaultFormat = defaultFormat;
 }
 
+QString JohnSession::mask() const
+{
+    return m_mask;
+}
+
+void JohnSession::setMask(const QString &mask)
+{
+    m_mask = mask;
+}
+
+QString JohnSession::markovMode() const
+{
+    return m_markovMode;
+}
+
+void JohnSession::setMarkovMode(const QString &markovMode)
+{
+    m_markovMode = markovMode;
+}
+
+int JohnSession::minPasswordCandidatesLength() const
+{
+    return m_minPasswordCandidatesLength;
+}
+
+void JohnSession::setMinPasswordCandidatesLength(int minPasswordCandidatesLength)
+{
+    m_minPasswordCandidatesLength = minPasswordCandidatesLength;
+}
+
+int JohnSession::maxPasswordCandidatesLength() const
+{
+    return m_maxPasswordCandidatesLength;
+}
+
+void JohnSession::setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength)
+{
+    m_maxPasswordCandidatesLength = maxPasswordCandidatesLength;
+}
+
+bool JohnSession::loopback() const
+{
+    return m_loopback;
+}
+
+void JohnSession::setLoopback(bool loopback)
+{
+    m_loopback = loopback;
+}
+
+int JohnSession::princeMinElementsPerChain() const
+{
+    return m_princeMinElementsPerChain;
+}
+
+void JohnSession::setPrinceMinElementsPerChain(int princeMinElementsPerChain)
+{
+    m_princeMinElementsPerChain = princeMinElementsPerChain;
+}
+
+int JohnSession::princeMaxElementsPerChain() const
+{
+    return m_princeMaxElementsPerChain;
+}
+
+void JohnSession::setPrinceMaxElementsPerChain(int princeMaxElementsPerChain)
+{
+    m_princeMaxElementsPerChain = princeMaxElementsPerChain;
+}
+
+int JohnSession::princeInitialSkip() const
+{
+    return m_princeInitialSkip;
+}
+
+void JohnSession::setPrinceInitialSkip(int princeInitialSkip)
+{
+    m_princeInitialSkip = princeInitialSkip;
+}
+
+int JohnSession::princeLimitWordsFromWordlist() const
+{
+    return m_princeLimitWordsFromWordlist;
+}
+
+void JohnSession::setPrinceLimitWordsFromWordlist(int princeLimitWordsFromWordlist)
+{
+    m_princeLimitWordsFromWordlist = princeLimitWordsFromWordlist;
+}
+
+int JohnSession::princeLimitNbPasswordCandidates() const
+{
+    return m_princeLimitNbPasswordCandidates;
+}
+
+void JohnSession::setPrinceLimitNbPasswordCandidates(int princeLimitNbPasswordCandidates)
+{
+    m_princeLimitNbPasswordCandidates = princeLimitNbPasswordCandidates;
+}
+
+bool JohnSession::princeUseWordlistForLengthDistribution() const
+{
+    return m_princeUseWordlistForLengthDistribution;
+}
+
+void JohnSession::setPrinceUseWordlistForLengthDistribution(bool princeUseWordlistForLengthDistribution)
+{
+    m_princeUseWordlistForLengthDistribution = princeUseWordlistForLengthDistribution;
+}
+
+bool JohnSession::princePermuteFirstLetterCase() const
+{
+    return m_princePermuteFirstLetterCase;
+}
+
+void JohnSession::setPrincePermuteFirstLetterCase(bool princePermuteFirstLetterCase)
+{
+    m_princePermuteFirstLetterCase = princePermuteFirstLetterCase;
+}
+bool JohnSession::princeMemoryMap() const
+{
+    return m_princeMemoryMap;
+}
+
+void JohnSession::setPrinceMemoryMap(bool princeMemoryMap)
+{
+    m_princeMemoryMap = princeMemoryMap;
+}
+bool JohnSession::princeShowTotalKeyspace() const
+{
+    return m_princeShowTotalKeyspace;
+}
+
+void JohnSession::setPrinceShowTotalKeyspace(bool princeShowTotalKeyspace)
+{
+    m_princeShowTotalKeyspace = princeShowTotalKeyspace;
+}
+
+int JohnSession::markovEndIndex() const
+{
+    return m_markovEndIndex;
+}
+
+void JohnSession::setMarkovEndIndex(int markovEndIndex)
+{
+    m_markovEndIndex = markovEndIndex;
+}
+
+int JohnSession::markovStartIndex() const
+{
+    return m_markovStartIndex;
+}
+
+void JohnSession::setMarkovStartIndex(int markovStartIndex)
+{
+    m_markovStartIndex = markovStartIndex;
+}
+
+int JohnSession::markovMaxLevel() const
+{
+    return m_markovMaxLevel;
+}
+
+void JohnSession::setMarkovMaxLevel(int markovMaxLevel)
+{
+    m_markovMaxLevel = markovMaxLevel;
+}
+
+int JohnSession::markovMinLevel() const
+{
+    return m_markovMinLevel;
+}
+
+void JohnSession::setMarkovMinLevel(int markovMinLevel)
+{
+    m_markovMinLevel = markovMinLevel;
+}
 
 JohnSession::AttackMode JohnSession::mode()
 {

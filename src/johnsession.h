@@ -13,7 +13,7 @@
 class JohnSession
 {
 public:
-    enum AttackMode {DEFAULT_MODE, SINGLECRACK_MODE, WORDLIST_MODE, INCREMENTAL_MODE, EXTERNAL_MODE};
+    enum AttackMode {DEFAULT_MODE, SINGLECRACK_MODE, WORDLIST_MODE, INCREMENTAL_MODE, EXTERNAL_MODE, MASK_MODE, MARKOV_MODE, PRINCE_MODE};
     JohnSession(const QString &sessionName, QSettings* settings);
     ~JohnSession();
     bool load();
@@ -77,6 +77,60 @@ public:
     QString defaultFormat() const;
     void setDefaultFormat(const QString &defaultFormat);
 
+    QString mask() const;
+    void setMask(const QString &mask);
+
+    QString markovMode() const;
+    void setMarkovMode(const QString &markovMode);
+
+    int markovEndIndex() const;
+    void setMarkovEndIndex(int markovEndIndex);
+
+    int markovStartIndex() const;
+    void setMarkovStartIndex(int markovStartIndex);
+
+    int markovMaxLevel() const;
+    void setMarkovMaxLevel(int markovMaxLevel);
+
+    int markovMinLevel() const;
+    void setMarkovMinLevel(int markovMinLevel);
+
+    int minPasswordCandidatesLength() const;
+    void setMinPasswordCandidatesLength(int minPasswordCandidatesLength);
+
+    int maxPasswordCandidatesLength() const;
+    void setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength);
+
+    bool loopback() const;
+    void setLoopback(bool loopback);
+
+    int princeMinElementsPerChain() const;
+    void setPrinceMinElementsPerChain(int princeMinElementsPerChain);
+
+    int princeMaxElementsPerChain() const;
+    void setPrinceMaxElementsPerChain(int princeMaxElementsPerChain);
+
+    int princeInitialSkip() const;
+    void setPrinceInitialSkip(int princeInitialSkip);
+
+    int princeLimitWordsFromWordlist() const;
+    void setPrinceLimitWordsFromWordlist(int princeLimitWordsFromWordlist);
+
+    int princeLimitNbPasswordCandidates() const;
+    void setPrinceLimitNbPasswordCandidates(int princeLimitNbPasswordCandidates);
+
+    bool princeUseWordlistForLengthDistribution() const;
+    void setPrinceUseWordlistForLengthDistribution(bool princeUseWordlistForLengthDistribution);
+
+    bool princePermuteFirstLetterCase() const;
+    void setPrincePermuteFirstLetterCase(bool princePermuteFirstLetterCase);
+
+    bool princeMemoryMap() const;
+    void setPrinceMemoryMap(bool princeMemoryMap);
+
+    bool princeShowTotalKeyspace() const;
+    void setPrinceShowTotalKeyspace(bool princeShowTotalKeyspace);
+
 private:
     QString   m_name;
     QSettings* m_settings;
@@ -102,6 +156,30 @@ private:
     QString m_environmentVariables;
 
     QList<int> m_unselectedRows;
+
+    // JtR jumbo only fields
+    int m_minPasswordCandidatesLength;
+    int m_maxPasswordCandidatesLength;
+    QString m_mask;
+    bool m_loopback;
+
+    // Markov-related
+    QString m_markovMode;
+    int m_markovMinLevel;
+    int m_markovMaxLevel;
+    int m_markovStartIndex;
+    int m_markovEndIndex;
+
+    // Prince-related
+    int m_princeMinElementsPerChain;
+    int m_princeMaxElementsPerChain;
+    int m_princeInitialSkip;
+    int m_princeLimitWordsFromWordlist;
+    int m_princeLimitNbPasswordCandidates;
+    bool m_princeUseWordlistForLengthDistribution;
+    bool m_princePermuteFirstLetterCase;
+    bool m_princeMemoryMap;
+    bool m_princeShowTotalKeyspace;
 };
 
 #endif // JOHNSESSION_H

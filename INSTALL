@@ -36,7 +36,7 @@ FreeBSD 10.1
 
 1) pkg install git qt5-core qt5-widgets qt5-qmake qt5-buildtools
 2) git clone https://github.com/shinnok/johnny.git && cd johnny
-3) git checkout v2.1 # switch to the desired version
+3) git checkout v2.2 # switch to the desired version
 4) /usr/local/lib/qt5/bin/qmake
 5) Edit the resulted Makefile and append ",-L,/usr/local/lib" to the LFLAGS line. Somehow
 the clang++ spec of qmake ommits that on FreeBSD. The complete line should look like this:
@@ -53,7 +53,7 @@ Mint etc.
 
 1) sudo apt-get install g++ git qtbase5-dev
 2) git clone https://github.com/shinnok/johnny.git && cd johnny
-3) git checkout v2.1 # switch to the desired version
+3) git checkout v2.2 # switch to the desired version
 4) export QT_SELECT=qt5
 5) qmake && make -j$(nproc)
 6) ./johnny
@@ -64,7 +64,7 @@ Red Hat based distros
 
 1) sudo yum install gcc-c++ git qt5-qtbase-devel
 2) git clone https://github.com/shinnok/johnny.git && cd johnny
-3) git checkout v2.1 # switch to the desired version
+3) git checkout v2.2 # switch to the desired version
 4) qmake-qt5 && make -j$(nproc)
 5) ./johnny
 
@@ -89,7 +89,7 @@ Assuming you survived up until now, let's proceed to the actual steps for
 building the app for your system:
 
 1) git clone https://github.com/shinnok/johnny.git && cd johnny
-2) git checkout v2.1 # switch to the desired version
+2) git checkout v2.2 # switch to the desired version
 3) qmake # /usr/local/opt/qt5/bin/qmake for Homebrew
 4) make -j$(sysctl -n hw.ncpu)
 5) open ./johnny.app

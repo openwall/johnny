@@ -724,7 +724,11 @@ QStringList MainWindow::saveAttackParameters()
         // --markov=MODE[:LEVEL[:START[:END[:LENGTH]]]]
         // We don't use length parameter since magnum said it was deprecated, global option -min-leng and -max-len are the way to go
         markov += m_ui->lineEditMarkovMode->text() + ":";
-        markov += (m_ui->checkBoxMarkovModeMinLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMinLevel->value()) + "-") : "");
+        if (m_ui->checkBoxMarkovModeMinLevel->isChecked() && !m_ui->checkBoxMarkovModeMaxLevel->isChecked()) {
+                QMessageBox::warning(this, tr("Warning - johnny"), tr("Your specified minimum markov level will be ignored in the attack since you didn't specify a maximum markov level."
+                                                            " You can either specify a maximum markov level only or a maximum and a minimum."));
+        }
+        markov += (m_ui->checkBoxMarkovModeMinLevel->isChecked() && m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMinLevel->value()) + "-") : "");
         markov += (m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMaxLevel->value()) + ":") : ":");
         markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeStartIndex->value()) + ":") : ":");
         markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString::number(m_ui->spinBoxMarkovModeEndIndex->value()) : "");

@@ -27,7 +27,8 @@ OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
     setWindowTitle(tr("Open other file format (*2john)"));
     connect(m_ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(close()));
     connect(m_ui->pushButtonConvert, SIGNAL(clicked()), this, SLOT(convertFile()));
-    //connect(m_ui->pushButtonBrowseInput, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
+    connect(m_ui->pushButtonBrowseInput, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
+    connect(m_ui->pushButtonBrowseParameter2, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
     connect(m_ui->pushButtonBrowseOutput, SIGNAL(clicked()), this, SLOT(browseOutputButtonClicked()));
     connect(&m_2johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(conversionFinished(int, QProcess::ExitStatus)));
     connect(&m_2johnProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(conversionError(QProcess::ProcessError)));
@@ -161,11 +162,17 @@ void OpenOtherFormatFileDialog::conversionError(QProcess::ProcessError error)
 
 void OpenOtherFormatFileDialog::browseInputButtonClicked()
 {
+    QObject *input = QObject::sender();
+
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFile);
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
-       // m_ui->lineEditInputHashFile->setText(fileName);
+        if (input == m_ui->pushButtonBrowseInput) {
+            m_ui->lineEditInputHashFile->setText(fileName);
+        } else if (input == m_ui->pushButtonBrowseParameter2) {
+            m_ui->lineEditParameter2->setText(fileName);
+        }
     }
 }
 

@@ -9,7 +9,6 @@ What's new:
   open them in Johnny with our built-in *2john support.
 * Export the password table view to CSV and colon separated password format.
 * Validate JtR path and show JtR version.
-* Console log improvements.
 * Various bug fixes
 
 Version 2.1

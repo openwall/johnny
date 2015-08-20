@@ -46,7 +46,8 @@ MainWindow::MainWindow(QSettings &settings)
       m_sessionCurrent("", &settings),
       m_johnShowTemp(NULL),
       m_settings(settings),
-      m_aboutWindow(this)
+      m_aboutWindow(this),
+      m_openOtherFormatDialog(new OpenOtherFormatFileDialog(this))
 {
     // UI initializations
     m_ui->setupUi(this);
@@ -116,6 +117,18 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->actionIncludeSelectedHashes->setEnabled(false);
     m_ui->actionExcludeSelectedHashes->setEnabled(false);
 
+    // Open file menu
+    Menu *openMenu = new Menu(this);
+    QToolButton *openMenuButton = new QToolButton(this);
+    openMenuButton->setDefaultAction(m_ui->actionOpenPassword);
+    openMenuButton->setMenu(openMenu);
+    openMenuButton->setPopupMode(QToolButton::InstantPopup);
+    openMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_ui->mainToolBar->insertWidget(m_ui->actionStartAttack, openMenuButton);
+    openMenu->addAction(m_ui->actionOpenPasswdFile);
+    openMenu->addAction(m_ui->actionOpen2johnFile);
+    connect(m_ui->actionOpenPassword, SIGNAL(triggered()), openMenuButton, SLOT(showMenu()));
+
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
     QToolButton *sessionMenuButton = new QToolButton(this);
@@ -173,7 +186,8 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->comboBoxLanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
 
     // Action buttons
-    connect(m_ui->actionOpenPassword,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
+    connect(m_ui->actionOpenPasswdFile,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
+    connect(m_ui->actionOpen2johnFile, SIGNAL(triggered()), m_openOtherFormatDialog, SLOT(exec()));
     connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
     connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
     connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
@@ -1091,6 +1105,7 @@ void MainWindow::applySettings()
     // We copy settings from elements on the form to the settings
     // object with current settings.
     m_pathToJohn = newJohnPath;
+    m_openOtherFormatDialog->setJohnPath(m_pathToJohn);
     m_timeIntervalPickCracked = m_ui->spinBoxTimeIntervalPickCracked->value();
 
     // If the language changed, retranslate the UI
@@ -1581,7 +1596,7 @@ void MainWindow::actionExportToTriggered(QAction* action)
     } else {
         return;
     }
-    QString fileName = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), "*"+ fileFormat);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), QDir::homePath(), "*"+ fileFormat);
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(fileFormat)) {
             fileName.append(fileFormat);

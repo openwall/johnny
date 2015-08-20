@@ -73,7 +73,7 @@
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="passwordsPage">
           <layout class="QVBoxLayout" name="passwordsPageLayout">
@@ -1181,7 +1181,6 @@ border-bottom: 1px solid darkgrey;
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpenPassword"/>
    <addaction name="actionStartAttack"/>
    <addaction name="actionResumeAttack"/>
    <addaction name="actionPauseAttack"/>
@@ -1630,6 +1629,16 @@ border-bottom: 1px solid darkgrey;
    </property>
    <property name="toolTip">
     <string>Export to password file format (colon separated)</string>
+   </property>
+  </action>
+  <action name="actionOpen2johnFile">
+   <property name="text">
+    <string>Open other file format (*2john)</string>
+   </property>
+  </action>
+  <action name="actionOpenPasswdFile">
+   <property name="text">
+    <string>Open PASSWD file (most common case)</string>
    </property>
   </action>
  </widget>

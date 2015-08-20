@@ -198,7 +198,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
 
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
-
+    connect(m_openOtherFormatDialog, SIGNAL(conversionTerminated(QStringList)), this, SLOT(openPasswordFile(QStringList)));
     // Tableview and filtering-related signals
     m_ui->tableView_Hashes->setContextMenuPolicy(Qt::CustomContextMenu);
     m_hashTableContextMenu = new QMenu(this);
@@ -443,17 +443,22 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
     return false;
 }
 
-void MainWindow::openPasswordFile()
+void MainWindow::openPasswordFile(QStringList fileNames)
 {
     // When user asks to open password file we should read desired
     // file, parse it and present values in the table. Model and view
     // simplifies presentation. We just make and fill model and then
     // we set it to existing view.
 
-    QFileDialog dialog;
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    if (dialog.exec()) {
-        QStringList fileNames = dialog.selectedFiles();
+    if (fileNames.isEmpty()) {
+        QFileDialog dialog;
+        dialog.setFileMode(QFileDialog::ExistingFiles);
+        if (dialog.exec()) {
+            QStringList fileNames = dialog.selectedFiles();
+            readPasswdFiles(fileNames);
+            m_ui->actionResumeAttack->setEnabled(false);
+        }
+    } else {
         readPasswdFiles(fileNames);
         m_ui->actionResumeAttack->setEnabled(false);
     }

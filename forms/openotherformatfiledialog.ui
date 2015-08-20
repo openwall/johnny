@@ -67,46 +67,20 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="labelInputHashFile">
-       <property name="text">
-        <string>Input password file:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEditInputHashFile"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonBrowseInput">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QWidget" name="widgetParameter2" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QLabel" name="labelParameter2">
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEditParameter2"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButtonBrowseParameter2">
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
+    <widget class="QGroupBox" name="groupBoxParameters">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Input parameters</string>
+     </property>
+     <layout class="QVBoxLayout" name="layoutParameters">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
      </layout>
     </widget>
    </item>

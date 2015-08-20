@@ -128,8 +128,8 @@ bool JohnSession::load()
         if (m_settings->contains("markovStartIndex")) {
             m_markovStartIndex = m_settings->value("markovStartIndex").toInt();
         }
-        if (m_settings->contains("endIndex")) {
-            m_markovEndIndex = m_settings->value("endIndex").toInt();
+        if (m_settings->contains("markovEndIndex")) {
+            m_markovEndIndex = m_settings->value("markovEndIndex").toInt();
         }
     } else if (mode == "prince") {
         m_mode = PRINCE_MODE;

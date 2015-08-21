@@ -1705,6 +1705,8 @@ border-bottom: 1px solid darkgrey;
      <string>Passwords</string>
     </property>
     <addaction name="actionCopyToClipboard"/>
+    <addaction name="actionExportToCSV"/>
+    <addaction name="actionExportToColonSeparated"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -2095,8 +2097,15 @@ border-bottom: 1px solid darkgrey;
    <property name="toolTip">
     <string>Export selected fields or entire Passwords table to file</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="actionExportToCSV">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
+   </property>
    <property name="text">
     <string>Export to CSV</string>
    </property>
@@ -2105,6 +2114,10 @@ border-bottom: 1px solid darkgrey;
    </property>
   </action>
   <action name="actionExportToColonSeparated">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
+   </property>
    <property name="text">
     <string>Export to PASSWD format</string>
    </property>

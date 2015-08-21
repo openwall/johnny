@@ -159,7 +159,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QTableView" name="tableView_Hashes">
+            <widget class="QTableView" name="passwordsTable">
              <property name="contextMenuPolicy">
               <enum>Qt::CustomContextMenu</enum>
              </property>

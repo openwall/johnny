@@ -105,6 +105,7 @@ protected:
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
     bool eventFilter(QObject *watched, QEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 private:
     bool                      m_terminate;

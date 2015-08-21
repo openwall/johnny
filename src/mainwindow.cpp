@@ -53,12 +53,12 @@ MainWindow::MainWindow(QSettings &settings)
     Translator &translator = Translator::getInstance();
     m_ui->comboBoxLanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     m_ui->widgetFork->setVisible(false);
-    m_ui->tableView_Hashes->setModel(m_hashTableProxy);
-    m_ui->tableView_Hashes->setSortingEnabled(true);
+    m_ui->passwordsTable->setModel(m_hashTableProxy);
+    m_ui->passwordsTable->setSortingEnabled(true);
     m_hashTableProxy->setDynamicSortFilter(false);
     m_hashTableProxy->setShowCheckedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
     m_hashTableProxy->setShowCrackedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
-    m_ui->tableView_Hashes->sortByColumn(PasswordFileModel::USER_COL, Qt::AscendingOrder);
+    m_ui->passwordsTable->sortByColumn(PasswordFileModel::USER_COL, Qt::AscendingOrder);
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
@@ -187,11 +187,11 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
 
     // Tableview and filtering-related signals
-    m_ui->tableView_Hashes->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_ui->passwordsTable->setContextMenuPolicy(Qt::CustomContextMenu);
     m_hashTableContextMenu = new QMenu(this);
     m_hashTableContextMenu->addActions(QList<QAction*>() << m_ui->actionCopyToClipboard << m_ui->actionIncludeSelectedHashes
                                          << m_ui->actionExcludeSelectedHashes);
-    connect(m_ui->tableView_Hashes, SIGNAL(customContextMenuRequested(const QPoint&)),
+    connect(m_ui->passwordsTable, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
     connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
     connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
@@ -344,7 +344,7 @@ void MainWindow::replaceTableModel(PasswordFileModel *newTableModel)
     // We connect table view with new model.
     m_hashTableProxy->setSourceModel(newTableModel);
     // Hide formats column if not jumbo
-    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !m_isJumbo);
+    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL, !m_isJumbo);
     connect(m_hashTable, SIGNAL(rowUncheckedByUser()), m_hashTableProxy, SLOT(checkBoxHasChanged()));
     // We build hash table for fast access.
     m_showTableMap = QMultiMap<QString, int>();
@@ -499,6 +499,24 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 #endif
     return false;
 }
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_Escape:
+        if(m_ui->passwordsTable->isVisible()) {
+            if(m_ui->passwordsTable->selectionModel()->hasSelection())
+                m_ui->passwordsTable->clearSelection();
+            else
+                m_ui->lineEditFilter->setFocus();
+        }
+        break;
+    default:
+        QWidget::keyReleaseEvent(event);
+    }
+}
+
 
 void MainWindow::startAttack()
 {
@@ -1372,7 +1390,7 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         m_hashTypeChecker.setPasswordFiles(m_sessionPasswordFiles);
         m_hashTypeChecker.start();
     }
-    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
+    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
     m_ui->actionFilterFormatColumn->setEnabled(isJumbo);
     m_ui->lineEdit_WordlistRules->setVisible(isJumbo);
     m_ui->princeModeTab->setEnabled(isJumbo);
@@ -1728,7 +1746,7 @@ void MainWindow::checkForUpdates()
 
 void MainWindow::showHashesTableContextMenu(const QPoint& pos)
 {
-    QPoint globalPos = m_ui->tableView_Hashes->viewport()->mapToGlobal(pos);
+    QPoint globalPos = m_ui->passwordsTable->viewport()->mapToGlobal(pos);
     m_hashTableContextMenu->exec(globalPos);
 }
 
@@ -1740,7 +1758,7 @@ void MainWindow::filterHashesTable()
 
 void MainWindow::includeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
         if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Checked) {
             m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
@@ -1750,7 +1768,7 @@ void MainWindow::includeSelectedHashes()
 
 void MainWindow::excludeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
         if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Unchecked) {
             m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
@@ -1893,10 +1911,10 @@ void MainWindow::exportTo(char delimiter, QString fileName)
 
     bool shouldCopyToClipboard = fileName.isEmpty();
     QString out;
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     if (indexes.count() == 0) {
-        m_ui->tableView_Hashes->selectAll();
-        indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+        m_ui->passwordsTable->selectAll();
+        indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     }
 
     if (indexes.count() == 1) {

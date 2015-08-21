@@ -209,8 +209,8 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>892</width>
-             <height>1269</height>
+             <width>741</width>
+             <height>1188</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -822,62 +822,6 @@ border-bottom: 1px solid darkgrey;
                      <item row="1" column="1">
                       <widget class="QLineEdit" name="lineEditMarkovMode"/>
                      </item>
-                     <item row="5" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeMinLevel">
-                       <property name="text">
-                        <string>Minimum Markov level:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="5" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="6" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeMaxLevel">
-                       <property name="text">
-                        <string>Maximum Markov level:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="6" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="7" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeStartIndex">
-                       <property name="text">
-                        <string>Start index:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="7" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="8" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="8" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeEndIndex">
-                       <property name="text">
-                        <string>End index:</string>
-                       </property>
-                      </widget>
-                     </item>
                      <item row="2" column="0">
                       <widget class="QCheckBox" name="checkBoxMarkovModeExternalName">
                        <property name="text">
@@ -889,24 +833,70 @@ border-bottom: 1px solid darkgrey;
                       <widget class="QLineEdit" name="lineEditMarkovModeExternalName"/>
                      </item>
                      <item row="3" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeRules">
-                       <property name="text">
-                        <string>Use rules:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="3" column="1">
-                      <widget class="QLineEdit" name="lineEditMarkovModeRules"/>
-                     </item>
-                     <item row="4" column="0">
                       <widget class="QCheckBox" name="checkBoxMarkovModeMask">
                        <property name="text">
                         <string>Use Hybrid Mask mode with mask:</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="4" column="1">
+                     <item row="3" column="1">
                       <widget class="QLineEdit" name="lineEditMarkovModeMask"/>
+                     </item>
+                     <item row="4" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMinLevel">
+                       <property name="text">
+                        <string>Minimum Markov level:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="4" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMaxLevel">
+                       <property name="text">
+                        <string>Maximum Markov level:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeStartIndex">
+                       <property name="text">
+                        <string>Start index:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeEndIndex">
+                       <property name="text">
+                        <string>End index:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>

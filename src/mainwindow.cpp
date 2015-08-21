@@ -756,11 +756,7 @@ QStringList MainWindow::saveAttackParameters()
         markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeStartIndex->value()) + ":") : ":");
         markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString::number(m_ui->spinBoxMarkovModeEndIndex->value()) : "");
         parameters << ("--markov=" + markov);
-        //Rules
-        if (m_ui->checkBoxMarkovModeRules->isChecked()) {
-            m_sessionCurrent.setRules(m_ui->lineEditMarkovModeRules->text());
-            parameters << ("--rules=" + m_ui->lineEditMarkovModeRules->text());
-        }
+
         // External mode, filter
         if (m_ui->checkBoxMarkovModeExternalName->isChecked()) {
             m_sessionCurrent.setExternalName(m_ui->lineEditMarkovModeExternalName->text());
@@ -1594,11 +1590,6 @@ void MainWindow::restoreSessionOptions()
     } else if (mode == JohnSession::MARKOV_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->markovModeTab);
         m_ui->lineEditMarkovMode->setText(m_sessionCurrent.markovMode());
-        //Rules
-        if (!m_sessionCurrent.rules().isNull()) {
-            m_ui->checkBoxMarkovModeRules->setChecked(true);
-            m_ui->lineEditMarkovModeRules->setText(m_sessionCurrent.rules());
-        }
         // External mode, filter
         if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBoxMarkovModeExternalName->setChecked(true);

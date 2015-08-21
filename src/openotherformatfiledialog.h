@@ -19,7 +19,7 @@ enum ScriptParameterType {FILE_PARAM, TEXT_PARAM, CHECKABLE_PARAM, FOLDER_PARAM}
 class ConversionScriptParameter
 {
 public:
-    ConversionScriptParameter(const QString& name, ScriptParameterType type, QString commandLinePrefix = "");
+    ConversionScriptParameter(const QString &name, ScriptParameterType type, const QString &commandLinePrefix = "");
     QString name;
     ScriptParameterType type;
     QString commandLinePrefix;
@@ -62,12 +62,13 @@ signals:
     void conversionTerminated(QStringList files);
 
 private slots:
+    void declare2johnFormats(QList<ConversionScript>& scripts);
     void convertFile();
     void conversionFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void conversionError(QProcess::ProcessError error);
     void browseInputButtonClicked();
     void browseOutputButtonClicked();
-    void selectedFormatChanged(QAbstractButton *button);
+    void selectedFormatChanged(const QString& newFormat);
     void cancel();
 
 private:
@@ -76,7 +77,6 @@ private:
     QMap<QString, ConversionScript>         m_scripts;
     QProcess                                m_2johnProcess;
     QString                                 m_johnPath;
-    QButtonGroup*                           m_formatsButton;
     QList<ConversionScriptParameterWidget*> m_listParametersWidget;
 };
 

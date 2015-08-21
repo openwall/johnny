@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
+ * Copyright (c) 2011, 2015 Shinnok <admin at shinnok.com>.
  * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
  * See LICENSE for details.
  */
 
@@ -63,7 +64,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
     connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
-
+    connect(&m_johnVersionCheck, SIGNAL(error(QProcess::ProcessError)), this, SLOT(invalidJohnPathDetected()));
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
 #ifdef Q_OS_OSX
@@ -1080,7 +1081,8 @@ void MainWindow::callJohnShow()
         // We add current format key if it is not empty.
         if (!m_sessionCurrent.format().isEmpty())
             args << "--format=" + m_sessionCurrent.format();
-        args << "--show" << m_johnShowTemp->fileName();
+        if (m_johnShowTemp)
+            args << "--show" << m_johnShowTemp->fileName();
         m_johnShow.setJohnProgram(m_pathToJohn);
         m_johnShow.setArgs(args);
         m_johnShow.start();
@@ -1262,6 +1264,8 @@ void MainWindow::applySettings()
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
         m_johnVersionCheck.setJohnProgram(newJohnPath);
         m_johnVersionCheck.start();
+    } else if (newJohnPath.isEmpty()) {
+        invalidJohnPathDetected();
     }
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1430,10 +1434,32 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 void MainWindow::verifyJohnVersion()
 {
     QString output = m_johnVersionCheck.readAllStandardOutput();
-    bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
-    setAvailabilityOfFeatures(isJumbo);
-    bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
-    m_ui->widgetFork->setVisible(isForkEnabled);
+    QStringList lines = output.split('\n');
+    if (!output.contains("John the Ripper"), Qt::CaseInsensitive) {
+        invalidJohnPathDetected();
+    } else {
+        bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
+        QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]", Qt::CaseInsensitive);
+        int pos = exp.indexIn(lines[0]);
+        if (pos > -1) {
+            m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper") + exp.cap(1) + (isJumbo ? "" : " (core)"));
+        } else if (lines.size() > 0){
+            m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] + (isJumbo ? "" : " (core)"));
+        }
+        m_ui->lineEditPathToJohn->setStyleSheet("");
+        setAvailabilityOfFeatures(isJumbo);
+        bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
+        m_ui->widgetFork->setVisible(isForkEnabled);
+    }
+}
+
+void MainWindow::invalidJohnPathDetected()
+{
+    m_ui->labelJohnPathValidator->setText(tr("No valid John The Ripper executable detected at this path !"));
+    m_ui->lineEditPathToJohn->setStyleSheet("color:red");
+    // We choose to disable jumbo features if no valid john path is detected but this could we changed by removing those 2 lines
+    setAvailabilityOfFeatures(false);
+    m_ui->widgetFork->setVisible(false);
 }
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)
@@ -1876,8 +1902,10 @@ void MainWindow::johnPathChanged()
 {
     // TO DO : We could validate john path here, start a new session etc..
     applyAndSaveSettings();
-    callJohnShow();
-    getDefaultFormat();
+    if (!m_sessionPasswordFiles.isEmpty()) {
+        callJohnShow();
+        getDefaultFormat();
+    }
 }
 
 void MainWindow::actionExportToTriggered(QAction* action)

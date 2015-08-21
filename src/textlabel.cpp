@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 Shinnok <admin at shinnok.com>.
+ * See LICENSE for details.
+ */
+
 #include "textlabel.h"
 
 TextLabel::TextLabel(QWidget *parent):

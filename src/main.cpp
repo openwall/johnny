@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2011 Shinnok <raydenxy at gmail.com>.
- * Copyright © 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright (c) 2011, 2015 Shinnok <raydenxy at gmail.com>.
+ * Copyright (c) 2011,2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.  See LICENSE.
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
  */
 
 #include "mainwindow.h"

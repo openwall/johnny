@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 Shinnok <admin at shinnok.com>.
+ * See LICENSE for details.
+ */
+
 #ifndef JOHNATTACK_H
 #define JOHNATTACK_H
 

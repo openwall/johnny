@@ -1417,24 +1417,31 @@ void MainWindow::verifyJohnVersion()
 {
     QString output = m_johnVersionCheck.readAllStandardOutput();
     QStringList lines = output.split('\n');
-    bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
     if (!output.contains("John the Ripper"), Qt::CaseInsensitive) {
         invalidJohnPathDetected();
     } else {
-        if (lines.size() > 0) {
+        bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
+        QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]", Qt::CaseInsensitive);
+        int pos = exp.indexIn(lines[0]);
+        if (pos > -1) {
+            m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper") + exp.cap(1) + (isJumbo ? "" : " (core)"));
+        } else if (lines.size() > 0){
             m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] + (isJumbo ? "" : " (core)"));
         }
         m_ui->lineEditPathToJohn->setStyleSheet("");
+        setAvailabilityOfFeatures(isJumbo);
+        bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
+        m_ui->widgetFork->setVisible(isForkEnabled);
     }
-    setAvailabilityOfFeatures(isJumbo);
-    bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
-    m_ui->widgetFork->setVisible(isForkEnabled);
 }
 
 void MainWindow::invalidJohnPathDetected()
 {
     m_ui->labelJohnPathValidator->setText(tr("No valid John The Ripper executable detected at this path !"));
     m_ui->lineEditPathToJohn->setStyleSheet("color:red");
+    // We choose to disable jumbo features if no valid john path is detected but this could we changed by removing those 2 lines
+    setAvailabilityOfFeatures(false);
+    m_ui->widgetFork->setVisible(false);
 }
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)

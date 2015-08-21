@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
-    <height>655</height>
+    <width>872</width>
+    <height>654</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -159,6 +159,21 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="label_21">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>Tip :If you change attack options or the selected hashes, you need to Start a new attack for them to come into effect.</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QTableView" name="passwordsTable">
              <property name="contextMenuPolicy">
               <enum>Qt::CustomContextMenu</enum>
@@ -209,7 +224,7 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>741</width>
+             <width>714</width>
              <height>1188</height>
             </rect>
            </property>
@@ -1672,7 +1687,7 @@ border-bottom: 1px solid darkgrey;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
+     <width>872</width>
      <height>25</height>
     </rect>
    </property>

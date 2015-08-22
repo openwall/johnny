@@ -197,13 +197,19 @@ border-bottom: 1px solid darkgrey;
               <enum>QAbstractItemView::ScrollPerPixel</enum>
              </property>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>130</number>
+              <number>150</number>
              </attribute>
              <attribute name="horizontalHeaderMinimumSectionSize">
               <number>50</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>25</number>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>20</number>
              </attribute>
             </widget>
            </item>

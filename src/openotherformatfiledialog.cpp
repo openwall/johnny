@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
+ * See LICENSE for details.
+ */
+
 #include "openotherformatfiledialog.h"
 #include "ui_openotherformatfiledialog.h"
 #include <string>
@@ -5,139 +10,333 @@
 #include <QtDebug>
 #include <QRadioButton>
 
-ConversionScript::ConversionScript(const QString &name, const QString &extension, const QList<ConversionScriptParameters> &parameters)
+ConversionScript::ConversionScript(const QString &name, const QString &extension, const QList<ConversionScriptParameter> &parameters)
 {
     this->name = name;
     this->extension = extension;
     this->parameters = parameters;
 }
 
-ConversionScriptParameters::ConversionScriptParameters(const QString& name, ScriptParameterType type)
+ConversionScriptParameter::ConversionScriptParameter(const QString &name, ScriptParameterType type, const QString &commandLinePrefix)
 {
     this->name = name;
     this->type = type;
+    this->commandLinePrefix = commandLinePrefix;
+}
+
+ConversionScriptParameterWidget::ConversionScriptParameterWidget(QWidget *parent)
+    :QWidget(parent)
+{
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
+    setLayout(layout);
+    label.setWordWrap(true);
+    browseButton.setText(tr("Browse"));
+    layout->addWidget(&label);
+    layout->addWidget(&lineEdit);
+    layout->addWidget(&checkBox);
+    layout->addWidget(&browseButton);
 }
 
 OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
     QDialog(parent),
-    m_ui(new Ui::OpenOtherFormatFileDialog),
-    m_formatsButton(new QButtonGroup(this))
+    m_ui(new Ui::OpenOtherFormatFileDialog)
 {
     m_ui->setupUi(this);
     setWindowTitle(tr("Open other file format (*2john)"));
-    connect(m_ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(close()));
+    buildFormatUI();
+    m_ui->comboBoxFormats->setCurrentIndex(-1);
+    connect(m_ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(cancel()));
     connect(m_ui->pushButtonConvert, SIGNAL(clicked()), this, SLOT(convertFile()));
-    connect(m_ui->pushButtonBrowseInput, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
-    connect(m_ui->pushButtonBrowseParameter2, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
     connect(m_ui->pushButtonBrowseOutput, SIGNAL(clicked()), this, SLOT(browseOutputButtonClicked()));
     connect(&m_2johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(conversionFinished(int, QProcess::ExitStatus)));
     connect(&m_2johnProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(conversionError(QProcess::ProcessError)));
-    connect(m_formatsButton, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(selectedFormatChanged(QAbstractButton*)));
-    m_ui->widgetParameter2->hide();
-    buildFormatUI();
-}
-
-void OpenOtherFormatFileDialog::buildFormatUI()
-{
-    QList<ConversionScript> scripts;
-    scripts << ConversionScript("unafs","", QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("DATABASE-FILE",FILE_PARAM) << ConversionScriptParameters("CELL-NAME", TEXT_PARAM))
-            << ConversionScript("unshadow", "",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("PASSWORD-FILE",FILE_PARAM) << ConversionScriptParameters("SHADOW-FILE", FILE_PARAM))
-            << ConversionScript("1password2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("1Password Agile Keychain(s)",FILE_PARAM))
-            << ConversionScript("7z2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("encrypted 7-Zip files",FILE_PARAM))
-            << ConversionScript("aix2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("AIX passwd file(s) (/etc/security/passwd)",FILE_PARAM))
-            << ConversionScript("androidfde2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("data partition / image",FILE_PARAM) << ConversionScriptParameters("footer partition / image", FILE_PARAM))
-            << ConversionScript("apex2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("apex-hashes.txt file(s)",FILE_PARAM))
-            << ConversionScript("bitcoin2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("bitcon wallet files",FILE_PARAM))
-            << ConversionScript("blockchain2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("blockchain wallet files",FILE_PARAM))
-            << ConversionScript("cracf2john", ".py",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("CRACF.TXT",FILE_PARAM))
-            << ConversionScript("dmg2john", "",  QList<ConversionScriptParameters>()
-                                << ConversionScriptParameters("DMG files",FILE_PARAM));
-    QGridLayout* a = new QGridLayout();
-    m_ui->widget->setLayout(a);
-    int row = 0, column = 0;
-    foreach(ConversionScript s, scripts) {
-        QString name = s.name;
-        name.replace(QRegExp("2john|.py|.pl"),"");
-        m_scripts.insert(name, s);
-        QRadioButton* button = new QRadioButton(name);
-        m_formatsButton->addButton(button);
-        a->addWidget(button, row%10,column);
-        row++;
-        if(row == 10) {
-            row = 0;
-            column++;
-        }
-    }
-}
-
-void OpenOtherFormatFileDialog::selectedFormatChanged(QAbstractButton *button)
-{
-    // NOTE : With our current data structure, we have the possibility to handle as many parameter as we want
-    // so we could modify this code to dynamically create new text edit/ checkboxes etc.. based on the type of the parameters and the number
-    // if we decide to support script with more complicated parameters in Johnny.
-    QString name = button->text();
-    ConversionScript script = m_scripts[name];
-    if (script.parameters.size() == 1) {
-        m_ui->labelInputHashFile->setText(script.parameters[0].name);
-        m_ui->widgetParameter2->hide();
-    } else {
-        m_ui->labelInputHashFile->setText(script.parameters[0].name);
-        m_ui->widgetParameter2->show();
-            m_ui->pushButtonBrowseParameter2->setVisible(script.parameters[1].type == FILE_PARAM);
-            m_ui->labelParameter2->setText(script.parameters[1].name);
-    }
+    connect(m_ui->comboBoxFormats, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedFormatChanged(QString)));
 }
 
 OpenOtherFormatFileDialog::~OpenOtherFormatFileDialog()
 {
     delete m_ui;
 }
-void OpenOtherFormatFileDialog::showEvent(QShowEvent *event)
+
+/* To add any new *2john script, simply add a row in the scripts QList, the rest will be handled automatically.
+ * Define the parameters in the same order as the script need it.
+*/
+void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scripts)
 {
-    QFileInfo johnInfo(m_johnPath);
-    QDir runDir = johnInfo.absoluteDir();
-    runDir.setNameFilters(QStringList() << "*2john*" << "unafs" << "unshadow");
-    for (int i=0; i < runDir.count(); i++) {
-       // qDebug() << runDir[i];
+    // *2JOHN SCRIPTS DECLARATION
 
+    scripts << ConversionScript("unafs","", QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("DATABASE-FILE",FILE_PARAM) << ConversionScriptParameter("CELL-NAME", TEXT_PARAM))
+
+            << ConversionScript("unshadow", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("PASSWORD-FILE",FILE_PARAM) << ConversionScriptParameter("SHADOW-FILE", FILE_PARAM))
+
+            << ConversionScript("1password2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("1Password Agile Keychain(s)",FILE_PARAM))
+
+            << ConversionScript("7z2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("encrypted 7-Zip files",FILE_PARAM))
+
+            << ConversionScript("aix2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("AIX passwd file(s) (/etc/security/passwd)",FILE_PARAM))
+
+            << ConversionScript("androidfde2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("data partition / image", FILE_PARAM) << ConversionScriptParameter("footer partition / image", FILE_PARAM))
+
+            << ConversionScript("apex2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("apex-hashes.txt file(s)", FILE_PARAM))
+
+            << ConversionScript("bitcoin2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("bitcon wallet files", FILE_PARAM))
+
+            << ConversionScript("blockchain2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) is input in base64 format?", CHECKABLE_PARAM, "--json") << ConversionScriptParameter("blockchain wallet files", FILE_PARAM))
+
+            << ConversionScript("cracf2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("CRACF.TXT",FILE_PARAM))
+
+            << ConversionScript("dmg2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("DMG files", FILE_PARAM))
+
+            << ConversionScript("ecryptfs2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("wrapped-passphrase", FILE_PARAM) << ConversionScriptParameter("(Optional) .ecryptfsrc", FILE_PARAM))
+
+            << ConversionScript("encfs2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("EncFS folder",FOLDER_PARAM))
+
+            << ConversionScript("gpg2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("GPG Secret Key File(s)", FILE_PARAM))
+
+            << ConversionScript("hccap2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("hccap file[s]", FILE_PARAM))
+
+            << ConversionScript("htdigest2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("htdigest file(s)", FILE_PARAM))
+
+            << ConversionScript("ikescan2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("psk-parameters-file", FILE_PARAM) << ConversionScriptParameter("(Optional) norteluser", TEXT_PARAM))
+
+            << ConversionScript("kdcdump2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("dump", FILE_PARAM))
+
+            << ConversionScript("keepass2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
+                                << ConversionScriptParameter("(Optional) keyfile", FILE_PARAM, "-k") << ConversionScriptParameter("kdbx database(s)", FILE_PARAM))
+
+            << ConversionScript("keychain2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("keychain files", FILE_PARAM))
+
+            << ConversionScript("keyring2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("GNOME Keyring file(s)", FILE_PARAM))
+
+            << ConversionScript("keystore2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter(".keystore / .jks file(s)", FILE_PARAM))
+
+            << ConversionScript("known_hosts2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("known_hosts files", FILE_PARAM))
+
+            << ConversionScript("krbpa2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter(".pdml files", FILE_PARAM))
+
+            << ConversionScript("kwallet2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter(".kwl file(s)", FILE_PARAM))
+
+            << ConversionScript("lastpass2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("email address", TEXT_PARAM) << ConversionScriptParameter("LastPass *._lpall.slps file", FILE_PARAM))
+
+            << ConversionScript("lion2john", ".pl",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("PLIST-FILES", FILE_PARAM) << ConversionScriptParameter("PASSWORD-FILE", FILE_PARAM))
+
+            << ConversionScript("lotus2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("Lotus Notes ID file(s)", FILE_PARAM))
+
+            << ConversionScript("luks2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
+                                << ConversionScriptParameter("LUKS file(s) / disk(s)", FILE_PARAM))
+
+            << ConversionScript("mcafee_epo2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("dbo.OrionUsers CSV extracts", FILE_PARAM))
+
+            << ConversionScript("ml2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("Mountain Lion .plist files", FILE_PARAM))
+
+            << ConversionScript("mozilla2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("key3.db file(s)", FILE_PARAM))
+
+            << ConversionScript("odf2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("ODF files", FILE_PARAM))
+
+            << ConversionScript("office2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("encrypted Office file(s)", FILE_PARAM))
+
+            << ConversionScript("openbsd_softraid2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("disk image", FILE_PARAM))
+
+            << ConversionScript("openssl2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) cipher", TEXT_PARAM, "-c")
+                                << ConversionScriptParameter("(Optional) md", TEXT_PARAM, "-m")
+                                << ConversionScriptParameter("(Optional) plaintext", TEXT_PARAM, "-p")
+                                << ConversionScriptParameter("OpenSSL encrypted files", FILE_PARAM))
+
+            << ConversionScript("pdf2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("PDF file(s)", FILE_PARAM))
+
+            << ConversionScript("pfx2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter(".pfx / .p12 file(s)", FILE_PARAM))
+
+            << ConversionScript("putty2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter(".ppk PuTTY-Private-Key-File(s)", FILE_PARAM))
+
+            << ConversionScript("pwsafe2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter(".psafe3 files", FILE_PARAM))
+
+            << ConversionScript("racf2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("RACF binary files", FILE_PARAM))
+
+            << ConversionScript("rar2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
+                                << ConversionScriptParameter("rar file(s)", FILE_PARAM))
+
+            << ConversionScript("sap2john", ".pl",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("input-file", FILE_PARAM)
+                                << ConversionScriptParameter("extract the SAP CODVN(A|B|D|E|F|H) hashes :  default is BFE", TEXT_PARAM))
+
+            << ConversionScript("sipdump2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("sipdump dump files", FILE_PARAM))
+
+            << ConversionScript("ssh2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("key file(s)", FILE_PARAM))
+
+            << ConversionScript("sshng2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("RSA/DSA private key files", FILE_PARAM))
+
+            << ConversionScript("strip2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("STRIP files", FILE_PARAM))
+
+            << ConversionScript("sxc2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("SXC files", FILE_PARAM))
+
+            << ConversionScript("truecrypt2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("volume_filename", TEXT_PARAM) << ConversionScriptParameter("keyfiles(s)", FILE_PARAM))
+
+            << ConversionScript("uaf2john", ".",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("uaf_file", FILE_PARAM))
+
+            << ConversionScript("vncpcap2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("pcapfiles", FILE_PARAM))
+
+            << ConversionScript("wpapcap2john", ".py",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("Show only complete auths (incomplete ones might be wrong passwords but we can crack what passwords were tried)", CHECKABLE_PARAM, "-c")
+                                << ConversionScriptParameter("file[s]", FILE_PARAM))
+
+            << ConversionScript("zip2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
+                                << ConversionScriptParameter("('old' PKZIP only) Use ASCII mode with filename", FILE_PARAM, "-a")
+                                << ConversionScriptParameter("('old' PKZIP only) Only use this file from the .zip file", FILE_PARAM, "-o")
+                                << ConversionScriptParameter("('old' PKZIP only) Create a 'checksum only' hash", CHECKABLE_PARAM, "-c")
+                                << ConversionScriptParameter("('old' PKZIP only) Do not look for any magic file types", CHECKABLE_PARAM, "-n")
+                                << ConversionScriptParameter("('old' PKZIP only) Force 2 byte checksum computation", CHECKABLE_PARAM, "-2")
+                                << ConversionScriptParameter("zip files", FILE_PARAM));
+}
+
+void OpenOtherFormatFileDialog::buildFormatUI()
+{
+    int numberOfParameterWidget = 0;
+    QList<ConversionScript> scripts;
+    declare2johnFormats(scripts);
+
+    QStringList allScriptNames;
+    foreach (ConversionScript s, scripts) {
+        QString name = s.name;
+        name.replace(QRegExp("2john|.py|.pl"),"");
+        m_scripts.insert(name, s);
+        numberOfParameterWidget = std::max(numberOfParameterWidget, s.parameters.size());
+        allScriptNames.append(name);
     }
-   // QVector<ConversionScript> s;
-   /* QList<ConversionScriptParameters>a;
-    a  {"a",2};
- ConversionScript a = {"unshadow","", QList<ConversionScriptParameters>() };
-    qDebug() << runDir.count();*/
+    qSort(allScriptNames); // sort alphabetically script names to make the UI better
+    m_ui->comboBoxFormats->addItems(allScriptNames);
+    for (int i = 0; i < numberOfParameterWidget; i++) {
+        ConversionScriptParameterWidget *widget = new ConversionScriptParameterWidget(this);
+        m_ui->layoutParameters->addWidget(widget);
+        widget->hide();
+        connect(&widget->browseButton, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
+        m_listParametersWidget.append(widget);
+    }
+}
 
+void OpenOtherFormatFileDialog::cancel()
+{
+    m_2johnProcess.kill();
+    close();
+}
+
+void OpenOtherFormatFileDialog::selectedFormatChanged(const QString &newFormat)
+{
+    ConversionScript script = m_scripts[newFormat];
+    for (int i = 0; i < m_listParametersWidget.size(); i++) {
+        ConversionScriptParameterWidget* current = m_listParametersWidget[i];
+        if (i < script.parameters.size()) {
+            current->lineEdit.clear();
+            current->checkBox.setChecked(false);
+            current->show();
+            ScriptParameterType type = script.parameters[i].type;
+            current->lineEdit.setVisible((type == FILE_PARAM) || (type == TEXT_PARAM) || (type == FOLDER_PARAM));
+            current->label.setVisible(true);
+            current->checkBox.setVisible(type == CHECKABLE_PARAM);
+            current->browseButton.setVisible(type == FILE_PARAM || (type == FOLDER_PARAM));
+            current->browseButton.setProperty("type", type); // to handler File vs Folder in the file browser
+            current->label.setText(script.parameters[i].name);
+        } else {
+            current->hide();
+        }
+    }
 }
 
 void OpenOtherFormatFileDialog::convertFile()
 {
     m_ui->textEditErrors->clear();
-    if (m_ui->lineEditInputHashFile->text().isEmpty() || m_ui->lineEditOutputHashFile->text().isEmpty() || m_formatsButton->checkedButton() == 0) {
-        m_ui->textEditErrors->setText(tr("You must fill all required fields : an input file, an output file and a format."));
+    if ((m_ui->comboBoxFormats->currentIndex() == -1) || m_ui->lineEditOutputHashFile->text().isEmpty()) {
+        m_ui->textEditErrors->setText(tr("You must fill all required fields : an output file and a format."));
     } else if (m_johnPath.isEmpty()) {
-
-
+        m_ui->textEditErrors->setText(tr("You must have a valid path to john specified in the settings!"));
     } else {
         QFileInfo johnInfo(m_johnPath);
         QString runDir = johnInfo.absolutePath();
-        QString name = m_scripts[m_formatsButton->checkedButton()->text()].name + m_scripts[m_formatsButton->checkedButton()->text()].extension;
-        m_2johnProcess.start("python", QStringList() << runDir + "/"  + name << m_ui->lineEditInputHashFile->text());
+        ConversionScript currentScript = m_scripts[m_ui->comboBoxFormats->currentText()];
+        QString scriptFullName = currentScript.name + currentScript.extension;
+        QString program;
+        QStringList parameters;
+        // Find the right program to use
+        if (currentScript.extension == ".py") {
+            program = "python";
+            parameters << runDir + "/"  + scriptFullName;
+        } else if (currentScript.extension == ".pl") {
+            program = "perl";
+            parameters << runDir + "/"  + scriptFullName;
+        } else {
+            program = runDir + "/"  + scriptFullName;
+        }
+        // Add the arguments
+        for (int i = 0; i < currentScript.parameters.size(); i++) {
+            if ((currentScript.parameters[i].type == FILE_PARAM) || (currentScript.parameters[i].type == TEXT_PARAM) || (currentScript.parameters[i].type == FOLDER_PARAM)) {
+                if (!m_listParametersWidget[i]->lineEdit.text().isEmpty()) {
+                    if (!currentScript.parameters[i].commandLinePrefix.isEmpty())
+                        parameters << currentScript.parameters[i].commandLinePrefix;
+                    parameters << m_listParametersWidget[i]->lineEdit.text();
+                }
+            } else if (currentScript.parameters[i].type == CHECKABLE_PARAM && m_listParametersWidget[i]->checkBox.isChecked()) {
+                parameters << currentScript.parameters[i].commandLinePrefix;
+            }
+        }
+        m_2johnProcess.start(program, parameters);
         m_ui->textEditErrors->setText(tr("Conversion in progress..."));
     }
 }
 
 void OpenOtherFormatFileDialog::conversionFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+    Q_UNUSED(exitStatus);
     QString convertedFile = m_2johnProcess.readAllStandardOutput();
     QString fileName = m_ui->lineEditOutputHashFile->text();
     if ((exitCode == 0) && !convertedFile.isEmpty()) {
@@ -146,7 +345,8 @@ void OpenOtherFormatFileDialog::conversionFinished(int exitCode, QProcess::ExitS
             QTextStream outStream(&file);
             outStream << convertedFile;
             file.close();
-            emit conversionTerminated(fileName);
+            emit conversionTerminated(QStringList() << fileName);
+            this->close();
         }
         m_ui->textEditErrors->setText(tr("Success!\n") + m_2johnProcess.readAllStandardError());
 
@@ -157,22 +357,25 @@ void OpenOtherFormatFileDialog::conversionFinished(int exitCode, QProcess::ExitS
 
 void OpenOtherFormatFileDialog::conversionError(QProcess::ProcessError error)
 {
+    Q_UNUSED(error);
     m_ui->textEditErrors->setText(tr("Conversion crashed\n") + m_2johnProcess.readAllStandardError());
 }
 
 void OpenOtherFormatFileDialog::browseInputButtonClicked()
 {
     QObject *input = QObject::sender();
-
+    ConversionScriptParameterWidget* parent = dynamic_cast<ConversionScriptParameterWidget*>(input->parent());
+    QFileDialog::FileMode fileMode;
+    if (parent->browseButton.property("type") == FOLDER_PARAM)
+        fileMode = QFileDialog::Directory;
+    else
+        fileMode = QFileDialog::ExistingFile;
     QFileDialog dialog;
-    dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setFileMode(fileMode);
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];
-        if (input == m_ui->pushButtonBrowseInput) {
-            m_ui->lineEditInputHashFile->setText(fileName);
-        } else if (input == m_ui->pushButtonBrowseParameter2) {
-            m_ui->lineEditParameter2->setText(fileName);
-        }
+        if (parent)
+            parent->lineEdit.setText(fileName);
     }
 }
 

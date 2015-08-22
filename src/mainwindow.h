@@ -50,7 +50,7 @@ private slots:
     void pauseAttack();
     void actionCopyToClipboardTriggered();
     void actionOpenSessionTriggered(QAction* action);
-    void openPasswordFile();
+    void openPasswordFile(QStringList fileNames = QStringList());
     void openLastSession();
     void tabsSelectionChanged(QAction *action);
     void buttonWordlistFileBrowseClicked();

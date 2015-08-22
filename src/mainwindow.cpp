@@ -324,6 +324,7 @@ void MainWindow::tabsSelectionChanged(QAction* action)
         index = TAB_CONSOLE_LOG;
     }
     m_ui->actionCopyToClipboard->setEnabled(index == TAB_PASSWORDS);
+    m_ui->actionExport->setEnabled(index == TAB_PASSWORDS);
     m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 
@@ -397,7 +398,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
-        m_ui->actionExport->setEnabled(true);
+        m_ui->actionExport->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         m_ui->actionIncludeSelectedHashes->setEnabled(true);

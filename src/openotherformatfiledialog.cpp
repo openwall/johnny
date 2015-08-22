@@ -174,7 +174,10 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
                                 << ConversionScriptParameter("disk image", FILE_PARAM))
 
             << ConversionScript("openssl2john", ".py",  QList<ConversionScriptParameter>()
-                                << ConversionScriptParameter("Lotus Notes ID file(s)", FILE_PARAM))/********************************** TODOOOOOOOOOOOOOOOOOOOOOOOOOO*/
+                                << ConversionScriptParameter("(Optional) cipher", TEXT_PARAM, "-c")
+                                << ConversionScriptParameter("(Optional) md", TEXT_PARAM, "-m")
+                                << ConversionScriptParameter("(Optional) plaintext", TEXT_PARAM, "-p")
+                                << ConversionScriptParameter("OpenSSL encrypted files", FILE_PARAM))
 
             << ConversionScript("pdf2john", ".py",  QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter("PDF file(s)", FILE_PARAM))
@@ -227,8 +230,14 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
                                 << ConversionScriptParameter("Show only complete auths (incomplete ones might be wrong passwords but we can crack what passwords were tried)", CHECKABLE_PARAM, "-c")
                                 << ConversionScriptParameter("file[s]", FILE_PARAM))
 
-            << ConversionScript("zip2john", "",  QList<ConversionScriptParameter>() /************************* TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO */
-                                << ConversionScriptParameter("key file(s)", FILE_PARAM));
+            << ConversionScript("zip2john", "",  QList<ConversionScriptParameter>()
+                                << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
+                                << ConversionScriptParameter("('old' PKZIP only) Use ASCII mode with filename", FILE_PARAM, "-a")
+                                << ConversionScriptParameter("('old' PKZIP only) Only use this file from the .zip file", FILE_PARAM, "-o")
+                                << ConversionScriptParameter("('old' PKZIP only) Create a 'checksum only' hash", CHECKABLE_PARAM, "-c")
+                                << ConversionScriptParameter("('old' PKZIP only) Do not look for any magic file types", CHECKABLE_PARAM, "-n")
+                                << ConversionScriptParameter("('old' PKZIP only) Force 2 byte checksum computation", CHECKABLE_PARAM, "-2")
+                                << ConversionScriptParameter("zip files", FILE_PARAM));
 }
 
 void OpenOtherFormatFileDialog::buildFormatUI()
@@ -268,6 +277,8 @@ void OpenOtherFormatFileDialog::selectedFormatChanged(const QString &newFormat)
     for (int i = 0; i < m_listParametersWidget.size(); i++) {
         ConversionScriptParameterWidget* current = m_listParametersWidget[i];
         if (i < script.parameters.size()) {
+            current->lineEdit.clear();
+            current->checkBox.setChecked(false);
             current->show();
             ScriptParameterType type = script.parameters[i].type;
             current->lineEdit.setVisible((type == FILE_PARAM) || (type == TEXT_PARAM) || (type == FOLDER_PARAM));
@@ -309,10 +320,11 @@ void OpenOtherFormatFileDialog::convertFile()
         // Add the arguments
         for (int i = 0; i < currentScript.parameters.size(); i++) {
             if ((currentScript.parameters[i].type == FILE_PARAM) || (currentScript.parameters[i].type == TEXT_PARAM) || (currentScript.parameters[i].type == FOLDER_PARAM)) {
-                if (!m_listParametersWidget[i]->lineEdit.text().isEmpty() && !currentScript.parameters[i].commandLinePrefix.isEmpty())
-                    parameters << currentScript.parameters[i].commandLinePrefix;
-
-                parameters << m_listParametersWidget[i]->lineEdit.text();
+                if (!m_listParametersWidget[i]->lineEdit.text().isEmpty()) {
+                    if (!currentScript.parameters[i].commandLinePrefix.isEmpty())
+                        parameters << currentScript.parameters[i].commandLinePrefix;
+                    parameters << m_listParametersWidget[i]->lineEdit.text();
+                }
             } else if (currentScript.parameters[i].type == CHECKABLE_PARAM && m_listParametersWidget[i]->checkBox.isChecked()) {
                 parameters << currentScript.parameters[i].commandLinePrefix;
             }

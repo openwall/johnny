@@ -25,17 +25,21 @@ ConversionScriptParameter::ConversionScriptParameter(const QString &name, Script
 }
 
 ConversionScriptParameterWidget::ConversionScriptParameterWidget(QWidget *parent)
-    :QWidget(parent)
+    :QWidget(parent), lineEdit(this), checkBox(this), label(this), browseButton(this)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     setLayout(layout);
-    label.setWordWrap(true);
+    label.setElide(Qt::ElideRight);
+    label.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    label.setMinimumWidth(100);
+    lineEdit.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     browseButton.setText(tr("Browse"));
     layout->addWidget(&label);
     layout->addWidget(&lineEdit);
     layout->addWidget(&checkBox);
     layout->addWidget(&browseButton);
+    layout->addSpacerItem(new QSpacerItem(6, 20, QSizePolicy::Maximum, QSizePolicy::Minimum));
 }
 
 OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
@@ -45,13 +49,13 @@ OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
     m_ui->setupUi(this);
     setWindowTitle(tr("Open other file format (*2john)"));
     buildFormatUI();
-    m_ui->comboBoxFormats->setCurrentIndex(-1);
-    connect(m_ui->pushButtonCancel, SIGNAL(clicked()), this, SLOT(cancel()));
     connect(m_ui->pushButtonConvert, SIGNAL(clicked()), this, SLOT(convertFile()));
     connect(m_ui->pushButtonBrowseOutput, SIGNAL(clicked()), this, SLOT(browseOutputButtonClicked()));
     connect(&m_2johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(conversionFinished(int, QProcess::ExitStatus)));
     connect(&m_2johnProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(conversionError(QProcess::ProcessError)));
-    connect(m_ui->comboBoxFormats, SIGNAL(currentIndexChanged(QString)), this, SLOT(selectedFormatChanged(QString)));
+    connect(m_ui->comboBoxFormats, SIGNAL(currentTextChanged(QString)), this, SLOT(selectedFormatChanged(QString)));
+    m_ui->comboBoxFormats->setCurrentText(m_ui->comboBoxFormats->itemText(0));
+    selectedFormatChanged(m_ui->comboBoxFormats->itemText(0)); // is not called by the signal for some reason
 }
 
 OpenOtherFormatFileDialog::~OpenOtherFormatFileDialog()
@@ -258,7 +262,7 @@ void OpenOtherFormatFileDialog::buildFormatUI()
     m_ui->comboBoxFormats->addItems(allScriptNames);
     for (int i = 0; i < numberOfParameterWidget; i++) {
         ConversionScriptParameterWidget *widget = new ConversionScriptParameterWidget(this);
-        m_ui->layoutParameters->addWidget(widget);
+        m_ui->layoutParameters->insertWidget(0, widget);
         widget->hide();
         connect(&widget->browseButton, SIGNAL(clicked()), this, SLOT(browseInputButtonClicked()));
         m_listParametersWidget.append(widget);
@@ -381,7 +385,7 @@ void OpenOtherFormatFileDialog::browseInputButtonClicked()
 
 void OpenOtherFormatFileDialog::browseOutputButtonClicked()
 {
-    QString fileFormat = ".pwd";
+    QString fileFormat = ".lst";
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), QDir::homePath(), "*" + fileFormat);
     if (!fileName.isEmpty()) {
         if (!fileName.endsWith(fileFormat)) {

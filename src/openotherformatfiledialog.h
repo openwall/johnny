@@ -6,6 +6,8 @@
 #ifndef OPENOTHERFORMATFILEDIALOG_H
 #define OPENOTHERFORMATFILEDIALOG_H
 
+#include "textlabel.h"
+
 #include <QDialog>
 #include <QProcess>
 #include <QMap>
@@ -41,7 +43,7 @@ public:
     ConversionScriptParameterWidget(QWidget *parent = 0);
     QLineEdit   lineEdit;
     QCheckBox   checkBox;
-    QLabel      label;
+    TextLabel   label;
     QPushButton browseButton;
 };
 

@@ -198,7 +198,7 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
             << ConversionScript("racf2john", "",  QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter("RACF binary files", FILE_PARAM))
 
-            << ConversionScript("rar2john", ".py",  QList<ConversionScriptParameter>()
+            << ConversionScript("rar2john", "",  QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
                                 << ConversionScriptParameter("rar file(s)", FILE_PARAM))
 
@@ -251,11 +251,11 @@ void OpenOtherFormatFileDialog::buildFormatUI()
     declare2johnFormats(scripts);
 
     QStringList allScriptNames;
-    foreach (ConversionScript s, scripts) {
-        QString name = s.name;
+    foreach (ConversionScript script, scripts) {
+        QString name = script.name;
         name.replace(QRegExp("2john|.py|.pl"),"");
-        m_scripts.insert(name, s);
-        numberOfParameterWidget = std::max(numberOfParameterWidget, s.parameters.size());
+        m_scripts.insert(name, script);
+        numberOfParameterWidget = std::max(numberOfParameterWidget, script.parameters.size());
         allScriptNames.append(name);
     }
     qSort(allScriptNames); // sort alphabetically script names to make the UI better
@@ -301,9 +301,9 @@ void OpenOtherFormatFileDialog::convertFile()
 {
     m_ui->textEditErrors->clear();
     if ((m_ui->comboBoxFormats->currentIndex() == -1) || m_ui->lineEditOutputHashFile->text().isEmpty()) {
-        m_ui->textEditErrors->setText(tr("You must fill all required fields : an output file and a format."));
+        m_ui->textEditErrors->setText(tr("You must fill out all required fields: an output file and a format."));
     } else if (m_johnPath.isEmpty()) {
-        m_ui->textEditErrors->setText(tr("You must have a valid path to john specified in the settings!"));
+        m_ui->textEditErrors->setText(tr("You must have a valid path to John the Ripper specified in the Settings."));
     } else {
         QFileInfo johnInfo(m_johnPath);
         QString runDir = johnInfo.absolutePath();

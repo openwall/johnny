@@ -1503,39 +1503,58 @@ border-bottom: 1px solid darkgrey;
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Johnny relies on John the Ripper for the actual work. Set the path to John main executable below, it can be either core John or jumbo John. Jumbo is the recommended option, since it supports many more features, attack modes and hash types than core (also called proper) John.</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <layout class="QFormLayout" name="formLayout_6">
               <property name="fieldGrowthPolicy">
                <enum>QFormLayout::ExpandingFieldsGrow</enum>
               </property>
-              <property name="formAlignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label">
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_10">
                 <property name="text">
-                 <string>Path to John the Ripper:</string>
+                 <string>Johnny relies on John the Ripper for the actual work. Set the path to John's main executable below, it can be either core John or jumbo John. Jumbo is the recommended option, since it supports many more features, attack modes and hash types than core (also called proper) John.</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
-                <item>
-                 <widget class="QLineEdit" name="lineEditPathToJohn"/>
-                </item>
-                <item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>John the Ripper executable:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="0" column="2">
                  <widget class="QPushButton" name="pushButtonBrowsePathToJohn">
                   <property name="text">
                    <string>Browse</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="lineEditPathToJohn"/>
+                </item>
+                <item row="1" column="1" colspan="2">
+                 <widget class="TextLabel" name="labelJohnPathValidator">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
                   </property>
                  </widget>
                 </item>
@@ -1544,10 +1563,10 @@ border-bottom: 1px solid darkgrey;
               <item row="2" column="0">
                <widget class="QLabel" name="label_9">
                 <property name="toolTip">
-                 <string>John --show is invoked at that interval to pick the cracked passwords.</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;John --show is invoked at that interval to pick the cracked passwords during an attack.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Interval in seconds between attack updates:</string>
+                 <string>Update interval (in seconds):</string>
                 </property>
                </widget>
               </item>
@@ -1571,27 +1590,7 @@ border-bottom: 1px solid darkgrey;
               <item row="3" column="1">
                <widget class="QComboBox" name="comboBoxLanguageSelection"/>
               </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="labelJohnPathValidator">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
              </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
@@ -1970,7 +1969,7 @@ border-bottom: 1px solid darkgrey;
     <string>Settings</string>
    </property>
    <property name="toolTip">
-    <string>Global settings</string>
+    <string>Application settings</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+4</string>

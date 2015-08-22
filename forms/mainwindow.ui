@@ -1733,8 +1733,8 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpenPassword"/>
-    <addaction name="actionOpenSession"/>
+    <addaction name="actionOpenPasswdFile"/>
+    <addaction name="actionOpen2johnFile"/>
    </widget>
    <widget class="QMenu" name="menuAttack">
     <property name="title">
@@ -2144,6 +2144,10 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
    </property>
   </action>
   <action name="actionExportToCSV">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
+   </property>
    <property name="text">
     <string>Export to CSV</string>
    </property>
@@ -2152,6 +2156,10 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
    </property>
   </action>
   <action name="actionExportToColonSeparated">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/export.png</normaloff>:/icons/export.png</iconset>
+   </property>
    <property name="text">
     <string>Export to PASSWD format</string>
    </property>
@@ -2160,13 +2168,27 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
    </property>
   </action>
   <action name="actionOpen2johnFile">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fileopen.png</normaloff>:/icons/fileopen.png</iconset>
+   </property>
    <property name="text">
     <string>Open other file format (*2john)</string>
    </property>
+   <property name="toolTip">
+    <string>Open other file formats via *2john</string>
+   </property>
   </action>
   <action name="actionOpenPasswdFile">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fileopen.png</normaloff>:/icons/fileopen.png</iconset>
+   </property>
    <property name="text">
-    <string>Open PASSWD file (most common case)</string>
+    <string>Open password file (PASSWD format)</string>
+   </property>
+   <property name="toolTip">
+    <string>Open PASSWD format file (classic John format)</string>
    </property>
   </action>
  </widget>

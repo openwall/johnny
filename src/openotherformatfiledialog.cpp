@@ -31,15 +31,15 @@ ConversionScriptParameterWidget::ConversionScriptParameterWidget(QWidget *parent
     layout->setContentsMargins(0,0,0,0);
     setLayout(layout);
     label.setElide(Qt::ElideRight);
-    label.setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    label.setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     label.setMinimumWidth(100);
     lineEdit.setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     browseButton.setText(tr("Browse"));
-    layout->addWidget(&label);
-    layout->addWidget(&lineEdit);
     layout->addWidget(&checkBox);
+    layout->addWidget(&label, 1);
+    layout->addWidget(&lineEdit, 2);
     layout->addWidget(&browseButton);
-    layout->addSpacerItem(new QSpacerItem(6, 20, QSizePolicy::Maximum, QSizePolicy::Minimum));
+//    layout->addSpacerItem(new QSpacerItem(6, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum));
 }
 
 OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
@@ -236,11 +236,11 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
 
             << ConversionScript("zip2john", "",  QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter("(Optional) inline threshold (default=1024)", TEXT_PARAM,"-i")
-                                << ConversionScriptParameter("('old' PKZIP only) Use ASCII mode with filename", FILE_PARAM, "-a")
-                                << ConversionScriptParameter("('old' PKZIP only) Only use this file from the .zip file", FILE_PARAM, "-o")
-                                << ConversionScriptParameter("('old' PKZIP only) Create a 'checksum only' hash", CHECKABLE_PARAM, "-c")
-                                << ConversionScriptParameter("('old' PKZIP only) Do not look for any magic file types", CHECKABLE_PARAM, "-n")
-                                << ConversionScriptParameter("('old' PKZIP only) Force 2 byte checksum computation", CHECKABLE_PARAM, "-2")
+                                << ConversionScriptParameter("Use ASCII mode with filename ('old' PKZIP only) ", FILE_PARAM, "-a")
+                                << ConversionScriptParameter("Only use this file from the .zip file ('old' PKZIP only) ", FILE_PARAM, "-o")
+                                << ConversionScriptParameter("Create a 'checksum only' hash ('old' PKZIP only) ", CHECKABLE_PARAM, "-c")
+                                << ConversionScriptParameter("Do not look for any magic file types ('old' PKZIP only) ", CHECKABLE_PARAM, "-n")
+                                << ConversionScriptParameter("Force 2 byte checksum computation ('old' PKZIP only) ", CHECKABLE_PARAM, "-2")
                                 << ConversionScriptParameter("zip files", FILE_PARAM));
 }
 

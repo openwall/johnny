@@ -53,8 +53,8 @@ OpenOtherFormatFileDialog::OpenOtherFormatFileDialog(QWidget *parent) :
     connect(m_ui->pushButtonBrowseOutput, SIGNAL(clicked()), this, SLOT(browseOutputButtonClicked()));
     connect(&m_2johnProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(conversionFinished(int, QProcess::ExitStatus)));
     connect(&m_2johnProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(conversionError(QProcess::ProcessError)));
-    connect(m_ui->comboBoxFormats, SIGNAL(currentTextChanged(QString)), this, SLOT(selectedFormatChanged(QString)));
-    m_ui->comboBoxFormats->setCurrentText(m_ui->comboBoxFormats->itemText(0));
+    connect(m_ui->comboBoxFormats, SIGNAL(editTextChanged(QString)), this, SLOT(selectedFormatChanged(QString)));
+    m_ui->comboBoxFormats->setCurrentIndex(0);
     selectedFormatChanged(m_ui->comboBoxFormats->itemText(0)); // is not called by the signal for some reason
 }
 

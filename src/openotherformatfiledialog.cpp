@@ -278,6 +278,12 @@ void OpenOtherFormatFileDialog::cancel()
 void OpenOtherFormatFileDialog::selectedFormatChanged(const QString &newFormat)
 {
     ConversionScript script = m_scripts[newFormat];
+    m_ui->pushButtonConvert->setEnabled(!script.name.isEmpty());
+    if (script.name.isEmpty()) {
+        m_ui->comboBoxFormats->setStyleSheet("color:red");
+    } else {
+        m_ui->comboBoxFormats->setStyleSheet("");
+    }
     for (int i = 0; i < m_listParametersWidget.size(); i++) {
         ConversionScriptParameterWidget* current = m_listParametersWidget[i];
         if (i < script.parameters.size()) {

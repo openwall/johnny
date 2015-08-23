@@ -499,7 +499,7 @@ bool MainWindow::checkSettings()
         QMessageBox::critical(
             this,
             tr("Johnny"),
-            tr("Please specify the path to JohntheRipper in settings."));
+            tr("Please specify the path to John the Ripper in settings."));
         return false;
     }
     return true;
@@ -1459,7 +1459,7 @@ void MainWindow::verifyJohnVersion()
         QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]", Qt::CaseInsensitive);
         int pos = exp.indexIn(lines[0]);
         if (pos > -1) {
-            m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper") + exp.cap(1) + (isJumbo ? "" : " (core)"));
+            m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper ") + exp.cap(1) + (isJumbo ? "" : " (core)"));
         } else if (lines.size() > 0){
             m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] + (isJumbo ? "" : " (core)"));
         }

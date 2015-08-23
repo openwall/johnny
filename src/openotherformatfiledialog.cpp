@@ -280,9 +280,9 @@ void OpenOtherFormatFileDialog::selectedFormatChanged(const QString &newFormat)
     ConversionScript script = m_scripts[newFormat];
     m_ui->pushButtonConvert->setEnabled(!script.name.isEmpty());
     if (script.name.isEmpty()) {
-        m_ui->comboBoxFormats->setStyleSheet("color:red");
+        m_ui->comboBoxFormats->lineEdit()->setStyleSheet("color:red");
     } else {
-        m_ui->comboBoxFormats->setStyleSheet("");
+        m_ui->comboBoxFormats->lineEdit()->setStyleSheet("");
     }
     for (int i = 0; i < m_listParametersWidget.size(); i++) {
         ConversionScriptParameterWidget* current = m_listParametersWidget[i];

@@ -1,6 +1,7 @@
 /*
- * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
+ * Copyright (c) 2011, 2015 Shinnok <admin at shinnok.com>.
  * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
  * See LICENSE for details.
  */
 
@@ -54,17 +55,17 @@ MainWindow::MainWindow(QSettings &settings)
     Translator &translator = Translator::getInstance();
     m_ui->comboBoxLanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
     m_ui->widgetFork->setVisible(false);
-    m_ui->tableView_Hashes->setModel(m_hashTableProxy);
-    m_ui->tableView_Hashes->setSortingEnabled(true);
+    m_ui->passwordsTable->setModel(m_hashTableProxy);
+    m_ui->passwordsTable->setSortingEnabled(true);
     m_hashTableProxy->setDynamicSortFilter(false);
     m_hashTableProxy->setShowCheckedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
     m_hashTableProxy->setShowCrackedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
-    m_ui->tableView_Hashes->sortByColumn(PasswordFileModel::USER_COL, Qt::AscendingOrder);
+    m_ui->passwordsTable->sortByColumn(PasswordFileModel::USER_COL, Qt::AscendingOrder);
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
     connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
-
+    connect(&m_johnVersionCheck, SIGNAL(error(QProcess::ProcessError)), this, SLOT(invalidJohnPathDetected()));
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
 #ifdef Q_OS_OSX
@@ -201,11 +202,11 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
     connect(m_openOtherFormatDialog, SIGNAL(conversionTerminated(QStringList)), this, SLOT(openPasswordFile(QStringList)));
     // Tableview and filtering-related signals
-    m_ui->tableView_Hashes->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_ui->passwordsTable->setContextMenuPolicy(Qt::CustomContextMenu);
     m_hashTableContextMenu = new QMenu(this);
     m_hashTableContextMenu->addActions(QList<QAction*>() << m_ui->actionCopyToClipboard << m_ui->actionIncludeSelectedHashes
                                          << m_ui->actionExcludeSelectedHashes);
-    connect(m_ui->tableView_Hashes, SIGNAL(customContextMenuRequested(const QPoint&)),
+    connect(m_ui->passwordsTable, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
     connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
     connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
@@ -337,6 +338,7 @@ void MainWindow::tabsSelectionChanged(QAction* action)
         index = TAB_CONSOLE_LOG;
     }
     m_ui->actionCopyToClipboard->setEnabled(index == TAB_PASSWORDS);
+    m_ui->actionExport->setEnabled(index == TAB_PASSWORDS);
     m_ui->contentStackedWidget->setCurrentIndex(index);
 }
 
@@ -358,7 +360,7 @@ void MainWindow::replaceTableModel(PasswordFileModel *newTableModel)
     // We connect table view with new model.
     m_hashTableProxy->setSourceModel(newTableModel);
     // Hide formats column if not jumbo
-    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !m_isJumbo);
+    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL, !m_isJumbo);
     connect(m_hashTable, SIGNAL(rowUncheckedByUser()), m_hashTableProxy, SLOT(checkBoxHasChanged()));
     // We build hash table for fast access.
     m_showTableMap = QMultiMap<QString, int>();
@@ -410,7 +412,7 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
         m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
-        m_ui->actionExport->setEnabled(true);
+        m_ui->actionExport->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         m_ui->actionIncludeSelectedHashes->setEnabled(true);
@@ -518,6 +520,24 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 #endif
     return false;
 }
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+    case Qt::Key_Escape:
+        if(m_ui->passwordsTable->isVisible()) {
+            if(m_ui->passwordsTable->selectionModel()->hasSelection())
+                m_ui->passwordsTable->clearSelection();
+            else
+                m_ui->lineEditFilter->setFocus();
+        }
+        break;
+    default:
+        QWidget::keyReleaseEvent(event);
+    }
+}
+
 
 void MainWindow::startAttack()
 {
@@ -756,11 +776,7 @@ QStringList MainWindow::saveAttackParameters()
         markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeStartIndex->value()) + ":") : ":");
         markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString::number(m_ui->spinBoxMarkovModeEndIndex->value()) : "");
         parameters << ("--markov=" + markov);
-        //Rules
-        if (m_ui->checkBoxMarkovModeRules->isChecked()) {
-            m_sessionCurrent.setRules(m_ui->lineEditMarkovModeRules->text());
-            parameters << ("--rules=" + m_ui->lineEditMarkovModeRules->text());
-        }
+
         // External mode, filter
         if (m_ui->checkBoxMarkovModeExternalName->isChecked()) {
             m_sessionCurrent.setExternalName(m_ui->lineEditMarkovModeExternalName->text());
@@ -1081,7 +1097,8 @@ void MainWindow::callJohnShow()
         // We add current format key if it is not empty.
         if (!m_sessionCurrent.format().isEmpty())
             args << "--format=" + m_sessionCurrent.format();
-        args << "--show" << m_johnShowTemp->fileName();
+        if (m_johnShowTemp)
+            args << "--show" << m_johnShowTemp->fileName();
         m_johnShow.setJohnProgram(m_pathToJohn);
         m_johnShow.setArgs(args);
         m_johnShow.start();
@@ -1263,6 +1280,8 @@ void MainWindow::applySettings()
     if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
         m_johnVersionCheck.setJohnProgram(newJohnPath);
         m_johnVersionCheck.start();
+    } else if (newJohnPath.isEmpty()) {
+        invalidJohnPathDetected();
     }
     // We copy settings from elements on the form to the settings
     // object with current settings.
@@ -1392,7 +1411,7 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
         m_hashTypeChecker.setPasswordFiles(m_sessionPasswordFiles);
         m_hashTypeChecker.start();
     }
-    m_ui->tableView_Hashes->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
+    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
     m_ui->actionFilterFormatColumn->setEnabled(isJumbo);
     m_ui->lineEdit_WordlistRules->setVisible(isJumbo);
     m_ui->princeModeTab->setEnabled(isJumbo);
@@ -1432,10 +1451,32 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 void MainWindow::verifyJohnVersion()
 {
     QString output = m_johnVersionCheck.readAllStandardOutput();
-    bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
-    setAvailabilityOfFeatures(isJumbo);
-    bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
-    m_ui->widgetFork->setVisible(isForkEnabled);
+    QStringList lines = output.split('\n');
+    if (!output.contains("John the Ripper"), Qt::CaseInsensitive) {
+        invalidJohnPathDetected();
+    } else {
+        bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
+        QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]", Qt::CaseInsensitive);
+        int pos = exp.indexIn(lines[0]);
+        if (pos > -1) {
+            m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper") + exp.cap(1) + (isJumbo ? "" : " (core)"));
+        } else if (lines.size() > 0){
+            m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] + (isJumbo ? "" : " (core)"));
+        }
+        m_ui->lineEditPathToJohn->setStyleSheet("");
+        setAvailabilityOfFeatures(isJumbo);
+        bool isForkEnabled = output.contains("fork", Qt::CaseInsensitive);
+        m_ui->widgetFork->setVisible(isForkEnabled);
+    }
+}
+
+void MainWindow::invalidJohnPathDetected()
+{
+    m_ui->labelJohnPathValidator->setText(tr("No valid John The Ripper executable detected at this path !"));
+    m_ui->lineEditPathToJohn->setStyleSheet("color:red");
+    // We choose to disable jumbo features if no valid john path is detected but this could we changed by removing those 2 lines
+    setAvailabilityOfFeatures(false);
+    m_ui->widgetFork->setVisible(false);
 }
 
 void MainWindow::actionOpenSessionTriggered(QAction* action)
@@ -1570,11 +1611,6 @@ void MainWindow::restoreSessionOptions()
     } else if (mode == JohnSession::MARKOV_MODE) {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->markovModeTab);
         m_ui->lineEditMarkovMode->setText(m_sessionCurrent.markovMode());
-        //Rules
-        if (!m_sessionCurrent.rules().isNull()) {
-            m_ui->checkBoxMarkovModeRules->setChecked(true);
-            m_ui->lineEditMarkovModeRules->setText(m_sessionCurrent.rules());
-        }
         // External mode, filter
         if (!m_sessionCurrent.externalName().isNull()) {
             m_ui->checkBoxMarkovModeExternalName->setChecked(true);
@@ -1748,7 +1784,7 @@ void MainWindow::checkForUpdates()
 
 void MainWindow::showHashesTableContextMenu(const QPoint& pos)
 {
-    QPoint globalPos = m_ui->tableView_Hashes->viewport()->mapToGlobal(pos);
+    QPoint globalPos = m_ui->passwordsTable->viewport()->mapToGlobal(pos);
     m_hashTableContextMenu->exec(globalPos);
 }
 
@@ -1760,7 +1796,7 @@ void MainWindow::filterHashesTable()
 
 void MainWindow::includeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
         if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Checked) {
             m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
@@ -1770,7 +1806,7 @@ void MainWindow::includeSelectedHashes()
 
 void MainWindow::excludeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     for (int i = 0; i < indexes.count(); i++) {
         if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Unchecked) {
             m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
@@ -1878,8 +1914,10 @@ void MainWindow::johnPathChanged()
 {
     // TO DO : We could validate john path here, start a new session etc..
     applyAndSaveSettings();
-    callJohnShow();
-    getDefaultFormat();
+    if (!m_sessionPasswordFiles.isEmpty()) {
+        callJohnShow();
+        getDefaultFormat();
+    }
 }
 
 void MainWindow::actionExportToTriggered(QAction* action)
@@ -1913,10 +1951,10 @@ void MainWindow::exportTo(char delimiter, QString fileName)
 
     bool shouldCopyToClipboard = fileName.isEmpty();
     QString out;
-    QModelIndexList indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     if (indexes.count() == 0) {
-        m_ui->tableView_Hashes->selectAll();
-        indexes = m_ui->tableView_Hashes->selectionModel()->selectedIndexes();
+        m_ui->passwordsTable->selectAll();
+        indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     }
 
     if (indexes.count() == 1) {

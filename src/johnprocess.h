@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
+ * Copyright (c) 2015 Shinnok <admin at shinnok.com>.
+ * See LICENSE for details.
+ */
+
 #ifndef JOHNPROCESS_H
 #define JOHNPROCESS_H
 

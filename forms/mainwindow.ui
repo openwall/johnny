@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>853</width>
-    <height>655</height>
+    <width>872</width>
+    <height>654</height>
    </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Johnny</string>
@@ -165,7 +159,22 @@
             </widget>
            </item>
            <item>
-            <widget class="QTableView" name="tableView_Hashes">
+            <widget class="QLabel" name="label_21">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>Tip :If you change attack options or the selected hashes, you need to Start a new attack for them to come into effect.</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableView" name="passwordsTable">
              <property name="contextMenuPolicy">
               <enum>Qt::CustomContextMenu</enum>
              </property>
@@ -188,13 +197,19 @@ border-bottom: 1px solid darkgrey;
               <enum>QAbstractItemView::ScrollPerPixel</enum>
              </property>
              <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>130</number>
+              <number>150</number>
              </attribute>
              <attribute name="horizontalHeaderMinimumSectionSize">
               <number>50</number>
              </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>25</number>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>20</number>
              </attribute>
             </widget>
            </item>
@@ -215,8 +230,8 @@ border-bottom: 1px solid darkgrey;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>892</width>
-             <height>1269</height>
+             <width>714</width>
+             <height>1188</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -359,7 +374,7 @@ border-bottom: 1px solid darkgrey;
                  </property>
                  <widget class="QWidget" name="defaultModeTab">
                   <attribute name="title">
-                   <string>Default mode</string>
+                   <string>Default</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
                    <property name="leftMargin">
@@ -377,10 +392,10 @@ border-bottom: 1px solid darkgrey;
                    <item>
                     <widget class="QLabel" name="label_2">
                      <property name="text">
-                      <string>With default behaviour John the Ripper will run single crack mode, then wordlist mode, then incremental mode. All attacks will be run with default John settings.</string>
+                      <string>With default behaviour John the Ripper will run single crack mode, then wordlist mode, then incremental mode. All attacks will execute with default John options. For optimized attacks and better chance of yield choose a specific mode from above.</string>
                      </property>
                      <property name="alignment">
-                      <set>Qt::AlignCenter</set>
+                      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
@@ -407,7 +422,7 @@ border-bottom: 1px solid darkgrey;
                  </widget>
                  <widget class="QWidget" name="singleModeTab">
                   <attribute name="title">
-                   <string>Single crack mode</string>
+                   <string>Single crack</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_3">
                    <property name="spacing">
@@ -466,7 +481,7 @@ border-bottom: 1px solid darkgrey;
                  </widget>
                  <widget class="QWidget" name="wordlistModeTab">
                   <attribute name="title">
-                   <string>Wordlist mode</string>
+                   <string>Wordlist</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_2">
                    <item>
@@ -586,89 +601,75 @@ border-bottom: 1px solid darkgrey;
                  </widget>
                  <widget class="QWidget" name="incrementalModeTab">
                   <attribute name="title">
-                   <string>Incremental mode</string>
+                   <string>Incremental</string>
                   </attribute>
-                  <layout class="QVBoxLayout" name="verticalLayout_4">
-                   <item>
+                  <layout class="QFormLayout" name="formLayout_4">
+                   <property name="fieldGrowthPolicy">
+                    <enum>QFormLayout::ExpandingFieldsGrow</enum>
+                   </property>
+                   <property name="labelAlignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                   <item row="0" column="0" colspan="2">
                     <widget class="QLabel" name="label_5">
                      <property name="text">
                       <string>Incremental mode is the most exhaustive attack because it will try all possible combinations under the specified rules. Order of tries is based on frequencies of single characters, pairs and trigraphs. This attack can potentially run for a long time, so it should be used after all other modes have been exhausted. Information about frequencies is taken from file called charset. Such files are listed with names in configuration file. To specify a different charset from the default toggle the afferent checkbox on and specify name of desired charset.</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
                      </property>
                     </widget>
                    </item>
-                   <item>
-                    <layout class="QFormLayout" name="formLayout_4">
-                     <property name="fieldGrowthPolicy">
-                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                   <item row="1" column="0">
+                    <widget class="QCheckBox" name="checkBox_IncrementalModeName">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
                      </property>
-                     <property name="labelAlignment">
-                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                     <property name="text">
+                      <string>Charset name:</string>
                      </property>
-                     <item row="0" column="0">
-                      <widget class="QCheckBox" name="checkBox_IncrementalModeName">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Charset name:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QCheckBox" name="checkBox_IncrementalModeExternalName">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="text">
-                        <string>Use external mode, filter name:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QLineEdit" name="lineEditIncrementalModeName"/>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QLineEdit" name="lineEditIncrementalModeExternalName"/>
-                     </item>
-                     <item row="3" column="0">
-                      <widget class="QCheckBox" name="checkBoxIncrementalModeMask">
-                       <property name="text">
-                        <string>Use Hybrid Mask mode with mask :</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="3" column="1">
-                      <widget class="QLineEdit" name="lineEditIncrementalModeMask"/>
-                     </item>
-                    </layout>
+                    </widget>
                    </item>
-                   <item>
-                    <spacer name="verticalSpacer_7">
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="lineEditIncrementalModeName"/>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QCheckBox" name="checkBox_IncrementalModeExternalName">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
                      </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>20</width>
-                       <height>40</height>
-                      </size>
+                     <property name="text">
+                      <string>Use external mode, filter name:</string>
                      </property>
-                    </spacer>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="lineEditIncrementalModeExternalName"/>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QCheckBox" name="checkBoxIncrementalModeMask">
+                     <property name="text">
+                      <string>Use Hybrid Mask mode with mask:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLineEdit" name="lineEditIncrementalModeMask"/>
                    </item>
                   </layout>
                  </widget>
                  <widget class="QWidget" name="externalModeTab">
                   <attribute name="title">
-                   <string>External mode</string>
+                   <string>External</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_19">
                    <item>
@@ -677,6 +678,9 @@ border-bottom: 1px solid darkgrey;
                       <widget class="QLabel" name="label_11">
                        <property name="text">
                         <string>External mode is the most flexible one because you can define your own code to generate candidates. Also you can create filters to reduce amount of candidates to try (said filters are available for use with other modes). There are predefined external routines in John's configuration file.</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                        </property>
                        <property name="wordWrap">
                         <bool>true</bool>
@@ -694,7 +698,7 @@ border-bottom: 1px solid darkgrey;
                        <item row="0" column="0">
                         <widget class="QLabel" name="label_ExternalModeName">
                          <property name="text">
-                          <string>Name:</string>
+                          <string>Mode name:</string>
                          </property>
                         </widget>
                        </item>
@@ -704,7 +708,7 @@ border-bottom: 1px solid darkgrey;
                        <item row="1" column="0">
                         <widget class="QCheckBox" name="checkBoxExternalModeMask">
                          <property name="text">
-                          <string>Use Hybrid Mask mode with mask :</string>
+                          <string>Use Hybrid Mask mode with mask:</string>
                          </property>
                         </widget>
                        </item>
@@ -732,14 +736,16 @@ border-bottom: 1px solid darkgrey;
                  </widget>
                  <widget class="QWidget" name="maskModeTab">
                   <attribute name="title">
-                   <string>Mask mode</string>
+                   <string>Mask</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_7">
                    <item>
                     <widget class="QLabel" name="label_14">
                      <property name="text">
-                      <string>(Require JtR jumbo)
-Mask mode is a fast way to produce password candidates given a &quot;mask&quot; that describes what the words should look like. For example, the mask ?u?l?l will generate all possible three-letter words, with first character uppercased and the remaining in lowercase.  To see the right syntax to build your mask, refer to the file called MASK in JtR jumbo doc folder.</string>
+                      <string>Mask mode is a fast way to produce password candidates given a &quot;mask&quot; that describes what the words should look like. For example, the mask ?u?l?l will generate all possible three-letter words, with first character uppercased and the remaining in lowercase.  To see the right syntax to build your mask, refer to the file called MASK in JtR jumbo doc folder.</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
@@ -751,6 +757,9 @@ Mask mode is a fast way to produce password candidates given a &quot;mask&quot; 
                      <property name="fieldGrowthPolicy">
                       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                      </property>
+                     <property name="labelAlignment">
+                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                     </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_16">
                        <property name="text">
@@ -761,24 +770,24 @@ Mask mode is a fast way to produce password candidates given a &quot;mask&quot; 
                      <item row="0" column="1">
                       <widget class="QLineEdit" name="lineEditMaskModeMask"/>
                      </item>
-                     <item row="2" column="0">
+                     <item row="1" column="0">
                       <widget class="QCheckBox" name="checkBoxMaskModeExternalName">
                        <property name="text">
                         <string>Use external mode, filter name:</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="2" column="1">
+                     <item row="1" column="1">
                       <widget class="QLineEdit" name="lineEditMaskModeExternalName"/>
                      </item>
-                     <item row="3" column="0">
+                     <item row="2" column="0">
                       <widget class="QCheckBox" name="checkBoxMaskModeRules">
                        <property name="text">
                         <string>Use rules:</string>
                        </property>
                       </widget>
                      </item>
-                     <item row="3" column="1">
+                     <item row="2" column="1">
                       <widget class="QLineEdit" name="lineEditMaskModeRules"/>
                      </item>
                     </layout>
@@ -800,14 +809,16 @@ Mask mode is a fast way to produce password candidates given a &quot;mask&quot; 
                  </widget>
                  <widget class="QWidget" name="markovModeTab">
                   <attribute name="title">
-                   <string>Markov mode</string>
+                   <string>Markov</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
                    <item>
                     <widget class="QLabel" name="label_17">
                      <property name="text">
-                      <string>(Require JtR jumbo)
-This is a stand alone mode, where word-like strings are created based upon a complex algorithm based upon 'weights' or likeliness of characters following characters. A full description of this mode, and its usage is found in the JtR /doc/MARKOV document.</string>
+                      <string>This is a stand alone mode, where word-like strings are created based upon a complex algorithm based upon 'weights' or likeliness of characters following characters. A full description of this mode and its usage is found in the JtR jumbo doc folder MARKOV document.</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
@@ -817,73 +828,20 @@ This is a stand alone mode, where word-like strings are created based upon a com
                    <item>
                     <layout class="QFormLayout" name="formLayout_9">
                      <property name="fieldGrowthPolicy">
-                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+                     </property>
+                     <property name="labelAlignment">
+                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                      </property>
                      <item row="1" column="0">
                       <widget class="QLabel" name="label_18">
                        <property name="text">
-                        <string>Mode (leave field empty to use default mode):</string>
+                        <string>Mode (leave empty for default mode):</string>
                        </property>
                       </widget>
                      </item>
                      <item row="1" column="1">
                       <widget class="QLineEdit" name="lineEditMarkovMode"/>
-                     </item>
-                     <item row="5" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeMinLevel">
-                       <property name="text">
-                        <string>Minimum Markov level:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="5" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="6" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeMaxLevel">
-                       <property name="text">
-                        <string>Maximum Markov level:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="6" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="7" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeStartIndex">
-                       <property name="text">
-                        <string>Start index:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="7" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="8" column="1">
-                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="8" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeEndIndex">
-                       <property name="text">
-                        <string>End index:</string>
-                       </property>
-                      </widget>
                      </item>
                      <item row="2" column="0">
                       <widget class="QCheckBox" name="checkBoxMarkovModeExternalName">
@@ -896,24 +854,70 @@ This is a stand alone mode, where word-like strings are created based upon a com
                       <widget class="QLineEdit" name="lineEditMarkovModeExternalName"/>
                      </item>
                      <item row="3" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeRules">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMask">
                        <property name="text">
-                        <string>Use rules:</string>
+                        <string>Use Hybrid Mask mode with mask:</string>
                        </property>
                       </widget>
                      </item>
                      <item row="3" column="1">
-                      <widget class="QLineEdit" name="lineEditMarkovModeRules"/>
+                      <widget class="QLineEdit" name="lineEditMarkovModeMask"/>
                      </item>
                      <item row="4" column="0">
-                      <widget class="QCheckBox" name="checkBoxMarkovModeMask">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMinLevel">
                        <property name="text">
-                        <string>Use Hybrid Mask mode with mask :</string>
+                        <string>Minimum Markov level:</string>
                        </property>
                       </widget>
                      </item>
                      <item row="4" column="1">
-                      <widget class="QLineEdit" name="lineEditMarkovModeMask"/>
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMinLevel">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeMaxLevel">
+                       <property name="text">
+                        <string>Maximum Markov level:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="5" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeMaxLevel">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeStartIndex">
+                       <property name="text">
+                        <string>Start index:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="6" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeStartIndex">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="0">
+                      <widget class="QCheckBox" name="checkBoxMarkovModeEndIndex">
+                       <property name="text">
+                        <string>End index:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="7" column="1">
+                      <widget class="QSpinBox" name="spinBoxMarkovModeEndIndex">
+                       <property name="maximum">
+                        <number>999999999</number>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -934,14 +938,16 @@ This is a stand alone mode, where word-like strings are created based upon a com
                  </widget>
                  <widget class="QWidget" name="princeModeTab">
                   <attribute name="title">
-                   <string>Prince mode</string>
+                   <string>Prince</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout_17">
                    <item>
                     <widget class="QLabel" name="label_19">
                      <property name="text">
-                      <string>(Require JtR jumbo)
-Prince mode is a modern password guessing algorithm. Rather than taking as input two different dictionaries and then outputting all the possible two word combinations though, PRINCE only has one input dictionary and builds &quot;chains&quot; of combined words. These chains can have 1 to N words from the input dictionary concatenated together. So for example if it is outputting guesses of length four, it could generate them using combinations from the input dictionary such as: 4 letter word or 2 letter word + 2 letter word or 1 letter word + 3 letter word  or 1 letter word + 1 letter word + 2 letter word etc...</string>
+                      <string>Prince mode is a modern password guessing algorithm. Rather than taking as input two different dictionaries and then outputting all the possible two word combinations though, PRINCE only has one input dictionary and builds &quot;chains&quot; of combined words. These chains can have 1 to N words from the input dictionary concatenated together.</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
                      <property name="wordWrap">
                       <bool>true</bool>
@@ -951,7 +957,10 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                    <item>
                     <layout class="QFormLayout" name="formLayout_10">
                      <property name="fieldGrowthPolicy">
-                      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                      <enum>QFormLayout::ExpandingFieldsGrow</enum>
+                     </property>
+                     <property name="labelAlignment">
+                      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                      </property>
                      <item row="0" column="0">
                       <widget class="QLabel" name="label_20">
@@ -1007,7 +1016,7 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                      <item row="3" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeMask">
                        <property name="text">
-                        <string>Use Hybrid Mask mode with mask :</string>
+                        <string>Use Hybrid Mask mode with mask:</string>
                        </property>
                       </widget>
                      </item>
@@ -1059,7 +1068,7 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                      <item row="7" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeLimitInputWords">
                        <property name="text">
-                        <string>Load only specified number of words from input wordlist:</string>
+                        <string>Load only specified number of words from wordlist:</string>
                        </property>
                       </widget>
                      </item>
@@ -1086,8 +1095,11 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                      </item>
                      <item row="9" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceCalculateDistributionWithWordlist">
+                       <property name="toolTip">
+                        <string>(instead of using built-in table)</string>
+                       </property>
                        <property name="text">
-                        <string> Calculate length distribution from wordlist instead of using built-in table</string>
+                        <string>Calculate length distribution from wordlist</string>
                        </property>
                       </widget>
                      </item>
@@ -1100,15 +1112,21 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                      </item>
                      <item row="11" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeMapToMemory">
+                       <property name="toolTip">
+                        <string>(not available when permuting case)</string>
+                       </property>
                        <property name="text">
-                        <string>Memory-map infile (not available when permuting case)</string>
+                        <string>Memory-map infile</string>
                        </property>
                       </widget>
                      </item>
                      <item row="12" column="0">
                       <widget class="QCheckBox" name="checkBoxPrinceModeShowTotalKeyspace">
+                       <property name="toolTip">
+                        <string>(disregarding skip and limit)</string>
+                       </property>
                        <property name="text">
-                        <string>Just show total keyspace that would be produced (disregarding skip and limit)</string>
+                        <string>Just show total keyspace that would be produced</string>
                        </property>
                       </widget>
                      </item>
@@ -1126,8 +1144,14 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
               <property name="title">
                <string>Input selectors</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_8">
-               <item>
+              <layout class="QFormLayout" name="formLayout_11">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::ExpandingFieldsGrow</enum>
+               </property>
+               <property name="labelAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+               <item row="0" column="0" colspan="2">
                 <widget class="QLabel" name="label_15">
                  <property name="text">
                   <string>Use comma ',' as list separator between items. Use dash '-' at the beginning to invert selection.</string>
@@ -1137,120 +1161,79 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                  </property>
                 </widget>
                </item>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_20">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_16">
-                   <item>
-                    <widget class="QCheckBox" name="checkBox_LimitUsers">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Load only listed users:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="lineEditLimitUsers">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_17">
-                   <item>
-                    <widget class="QCheckBox" name="checkBox_LimitGroups">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Load only listed groups:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="lineEditLimitGroups">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_18">
-                   <item>
-                    <widget class="QCheckBox" name="checkBox_LimitShells">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Load only listed shells:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLineEdit" name="lineEditLimitShells">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_19">
-                   <item>
-                    <widget class="QCheckBox" name="checkBox_LimitSalts">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Load only hashes with number of same salts greator or equal to:</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QSpinBox" name="spinBox_LimitSalts">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="maximum">
-                      <number>999999999</number>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="checkBox_LimitUsers">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Load only listed users:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="lineEditLimitUsers"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QCheckBox" name="checkBox_LimitGroups">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Load only listed groups:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="lineEditLimitGroups"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="checkBox_LimitShells">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Load only listed shells:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="lineEditLimitShells"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QCheckBox" name="checkBox_LimitSalts">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="toolTip">
+                  <string>Load only hashes with number of same salts greater or equal to</string>
+                 </property>
+                 <property name="text">
+                  <string>Number of same salts (&gt;=):</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QSpinBox" name="spinBox_LimitSalts">
+                 <property name="toolTip">
+                  <string>Load only hashes with number of same salts greater or equal to</string>
+                 </property>
+                 <property name="maximum">
+                  <number>999999999</number>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -1261,61 +1244,8 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                <string>Parallelization</string>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_12">
-               <property name="spacing">
-                <number>9</number>
-               </property>
-               <property name="leftMargin">
-                <number>0</number>
-               </property>
-               <property name="bottomMargin">
-                <number>11</number>
-               </property>
                <item>
                 <widget class="QWidget" name="widgetFork" native="true">
-                 <layout class="QHBoxLayout" name="horizontalLayout_15">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QCheckBox" name="checkBox_UseFork">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Use multiple processes (--fork):</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QSpinBox" name="spinBox_nbOfProcess">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimum">
-                     <number>1</number>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QWidget" name="widgetOpenMP" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_6">
                   <property name="leftMargin">
                    <number>0</number>
@@ -1330,13 +1260,52 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QLabel" name="label_openMP">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
+                   <widget class="QCheckBox" name="checkBox_UseFork">
+                    <property name="text">
+                     <string>Use multiple processes (fork mode):</string>
                     </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinBox_nbOfProcess">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widgetOpenMP" native="true">
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_openMP">
                     <property name="toolTip">
                      <string>If using OpenMP capable JtR, you can specify the number of threads to use</string>
                     </property>
@@ -1347,12 +1316,6 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                   </item>
                   <item>
                    <widget class="QSpinBox" name="spinBox_openMPThreads">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
                     <property name="specialValueText">
                      <string>default</string>
                     </property>
@@ -1360,6 +1323,19 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                      <number>999999999</number>
                     </property>
                    </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
                   </item>
                  </layout>
                 </widget>
@@ -1372,8 +1348,14 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
               <property name="title">
                <string>Other options</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_13">
-               <item>
+              <layout class="QFormLayout" name="formLayout_8">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::ExpandingFieldsGrow</enum>
+               </property>
+               <property name="labelAlignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+               <item row="0" column="0" colspan="2">
                 <widget class="QLabel" name="label_instructionEnvironmentVar">
                  <property name="text">
                   <string>Format for listing environment variables is &quot;varName1=value1, varName2=value2, ...&quot;.</string>
@@ -1383,68 +1365,49 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                  </property>
                 </widget>
                </item>
-               <item>
-                <widget class="QWidget" name="widget_EnvironmentVar" native="true">
-                 <layout class="QFormLayout" name="formLayout_8">
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <item row="0" column="0">
-                   <widget class="QCheckBox" name="checkBox_EnvironmentVar">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Use environment variables:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QLineEdit" name="lineEdit_EnvironmentVar">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="0">
-                   <widget class="QCheckBox" name="checkBoxMinCandidateLength">
-                    <property name="text">
-                     <string>Minimum password candidate length:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QSpinBox" name="spinBoxMinCandidateLength">
-                    <property name="maximum">
-                     <number>999999999</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="0">
-                   <widget class="QCheckBox" name="checkBoxMaxCandidateLength">
-                    <property name="text">
-                     <string>Maximum password candidate length:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QSpinBox" name="spinBoxMaxCandidateLength">
-                    <property name="maximum">
-                     <number>999999999</number>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="checkBoxMinCandidateLength">
+                 <property name="text">
+                  <string>Minimum password candidate length:</string>
+                 </property>
                 </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="spinBoxMinCandidateLength">
+                 <property name="maximum">
+                  <number>999999999</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QCheckBox" name="checkBoxMaxCandidateLength">
+                 <property name="text">
+                  <string>Maximum password candidate length:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QSpinBox" name="spinBoxMaxCandidateLength">
+                 <property name="maximum">
+                  <number>999999999</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="checkBox_EnvironmentVar">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Use environment variables:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="lineEdit_EnvironmentVar"/>
                </item>
               </layout>
              </widget>
@@ -1541,60 +1504,79 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
              <x>0</x>
              <y>0</y>
              <width>477</width>
-             <height>252</height>
+             <height>275</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_10">
             <item>
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Johnny relies on John the Ripper for the actual work. Set the path to John main executable below, it can be either core John or jumbo John. Jumbo is the recommended option, since it supports many more features, attack modes and hash types than core (also called proper) John.</string>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <layout class="QFormLayout" name="formLayout_6">
               <property name="fieldGrowthPolicy">
-               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               <enum>QFormLayout::ExpandingFieldsGrow</enum>
               </property>
-              <property name="formAlignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label">
+              <item row="0" column="0" colspan="2">
+               <widget class="QLabel" name="label_10">
                 <property name="text">
-                 <string>Path to John the Ripper:</string>
+                 <string>Johnny relies on John the Ripper for the actual work. Set the path to John's main executable below, it can be either core John or jumbo John. Jumbo is the recommended option, since it supports many more features, attack modes and hash types than core (also called proper) John.</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
-                <item>
-                 <widget class="QLineEdit" name="lineEditPathToJohn"/>
-                </item>
-                <item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>John the Ripper executable:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="0" column="2">
                  <widget class="QPushButton" name="pushButtonBrowsePathToJohn">
                   <property name="text">
                    <string>Browse</string>
                   </property>
                  </widget>
                 </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="lineEditPathToJohn"/>
+                </item>
+                <item row="1" column="1" colspan="2">
+                 <widget class="TextLabel" name="labelJohnPathValidator">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                  <property name="textInteractionFlags">
+                   <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_9">
                 <property name="toolTip">
-                 <string>John --show is invoked at that interval to pick the cracked passwords.</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;John --show is invoked at that interval to pick the cracked passwords during an attack.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
-                 <string>Interval in seconds between attack updates:</string>
+                 <string>Update interval (in seconds):</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QSpinBox" name="spinBoxTimeIntervalPickCracked">
                 <property name="minimum">
                  <number>1</number>
@@ -1604,30 +1586,17 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="labelLanguage">
                 <property name="text">
                  <string>Interface language:</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="3" column="1">
                <widget class="QComboBox" name="comboBoxLanguageSelection"/>
               </item>
              </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
@@ -1722,7 +1691,7 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>853</width>
+     <width>872</width>
      <height>25</height>
     </rect>
    </property>
@@ -1752,6 +1721,8 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
      <string>Passwords</string>
     </property>
     <addaction name="actionCopyToClipboard"/>
+    <addaction name="actionExportToCSV"/>
+    <addaction name="actionExportToColonSeparated"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -2003,7 +1974,7 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
     <string>Settings</string>
    </property>
    <property name="toolTip">
-    <string>Global settings</string>
+    <string>Application settings</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+4</string>
@@ -2141,6 +2112,9 @@ Prince mode is a modern password guessing algorithm. Rather than taking as input
    </property>
    <property name="toolTip">
     <string>Export selected fields or entire Passwords table to file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="actionExportToCSV">

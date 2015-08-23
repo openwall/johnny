@@ -1,6 +1,7 @@
 ﻿/*
- * Copyright (c) 2011 Shinnok <admin at shinnok.com>.
+ * Copyright (c) 2011, 2015 Shinnok <admin at shinnok.com>.
  * Copyright (c) 2011, 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>.
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
  * See LICENSE for details.
  */
 
@@ -86,7 +87,6 @@ private slots:
     void verifyJohnVersion();
     void getDefaultFormat();
     void getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    void johnPathChanged();
 
     // Settings related
     void fillSettingsWithDefaults();
@@ -96,6 +96,8 @@ private slots:
     void warnAboutDefaultPathToJohn();
     bool readPasswdFiles(const QStringList &fileNames);
     bool checkSettings();
+    void johnPathChanged();
+    void invalidJohnPathDetected();
 
     // Helpers
     void appendLog(const QString& text);
@@ -106,6 +108,7 @@ protected:
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
     bool eventFilter(QObject *watched, QEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 private:
     bool                      m_terminate;

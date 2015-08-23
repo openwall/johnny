@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
+ * See LICENSE for details.
+ */
+
 #include "tabwidget.h"
 
 #include <QTabBar>
@@ -21,8 +26,7 @@ bool TabWidget::eventFilter(QObject *watched, QEvent *event)
     switch (event->type())
     {
     case QEvent::Wheel:
-        if (widget == tabBar())
-        {
+        if (widget == tabBar()) {
             event->ignore();
             return true;
         }

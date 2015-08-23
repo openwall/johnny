@@ -29,7 +29,8 @@ SOURCES +=  src/main.cpp\
             src/tabwidget.cpp \
             src/johnsession.cpp \
             src/hashsortfilterproxymodel.cpp \
-            src/passwordfilemodel.cpp
+            src/passwordfilemodel.cpp \
+            src/openotherformatfiledialog.cpp
 
 HEADERS  += src/mainwindow.h \
             src/translator.h \
@@ -42,12 +43,14 @@ HEADERS  += src/mainwindow.h \
             src/tabwidget.h \
             src/johnsession.h \
             src/hashsortfilterproxymodel.h \
-            src/passwordfilemodel.h
+            src/passwordfilemodel.h \
+            src/openotherformatfiledialog.h
 
 INCLUDEPATH += src/
 
 FORMS    += forms/mainwindow.ui \
-            forms/aboutwidget.ui
+            forms/aboutwidget.ui \
+            forms/openotherformatfiledialog.ui
 
 TRANSLATIONS    = translations/johnny_fr.ts
 CODECFORTR      = UTF-8

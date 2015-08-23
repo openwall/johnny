@@ -15,6 +15,7 @@
 #include "johnsession.h"
 #include "passwordfilemodel.h"
 #include "hashsortfilterproxymodel.h"
+#include "openotherformatfiledialog.h"
 
 #include <QMainWindow>
 #include <QListWidgetItem>
@@ -50,7 +51,7 @@ private slots:
     void pauseAttack();
     void actionCopyToClipboardTriggered();
     void actionOpenSessionTriggered(QAction* action);
-    void openPasswordFile();
+    void openPasswordFile(QStringList fileNames = QStringList());
     void openLastSession();
     void tabsSelectionChanged(QAction *action);
     void buttonWordlistFileBrowseClicked();
@@ -149,6 +150,7 @@ private:
     bool            m_isDynamicFilteringEnabled;
 
     QWidget         m_aboutWindow;
+    OpenOtherFormatFileDialog* m_openOtherFormatDialog;
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;

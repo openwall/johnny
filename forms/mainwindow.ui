@@ -1678,7 +1678,6 @@ border-bottom: 1px solid darkgrey;
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionOpenPassword"/>
    <addaction name="actionStartAttack"/>
    <addaction name="actionResumeAttack"/>
    <addaction name="actionPauseAttack"/>
@@ -1703,8 +1702,8 @@ border-bottom: 1px solid darkgrey;
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpenPassword"/>
-    <addaction name="actionOpenSession"/>
+    <addaction name="actionOpenPasswdFile"/>
+    <addaction name="actionOpen2johnFile"/>
    </widget>
    <widget class="QMenu" name="menuAttack">
     <property name="title">
@@ -2140,6 +2139,30 @@ border-bottom: 1px solid darkgrey;
    </property>
    <property name="toolTip">
     <string>Export to password file format (colon separated)</string>
+   </property>
+  </action>
+  <action name="actionOpen2johnFile">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fileopen.png</normaloff>:/icons/fileopen.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open other file format (*2john)</string>
+   </property>
+   <property name="toolTip">
+    <string>Open other file formats via *2john</string>
+   </property>
+  </action>
+  <action name="actionOpenPasswdFile">
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/fileopen.png</normaloff>:/icons/fileopen.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open password file (PASSWD format)</string>
+   </property>
+   <property name="toolTip">
+    <string>Open PASSWD format file (classic John format)</string>
    </property>
   </action>
  </widget>

@@ -1,7 +1,8 @@
 /*
- * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
- * Copyright (c) 2015 Shinnok <admin at shinnok.com>.
- * See LICENSE for details.
+ * Copyright (c) 2011-2015 Shinnok <admin at shinnok.com>
+ * Parts Copyright (c) 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>
+ * Parts Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>
+ * See LICENSE dist-file for details.
  */
 
 #ifndef JOHNPROCESS_H
@@ -19,7 +20,7 @@
 class JohnProcess : public QProcess
 {
     Q_OBJECT
-    
+
 public:
     JohnProcess();
     ~JohnProcess();

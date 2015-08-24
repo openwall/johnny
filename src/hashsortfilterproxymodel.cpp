@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>.
- * See LICENSE for details.
+ * Copyright (c) 2011-2015 Shinnok <admin at shinnok.com>
+ * Parts Copyright (c) 2012 Aleksey Cherepanov <aleksey.4erepanov@gmail.com>
+ * Parts Copyright (c) 2015 Mathieu Laprise <mathieu.laprise@polymtl.ca>
+ * See LICENSE dist-file for details.
  */
 
 #include "hashsortfilterproxymodel.h"
@@ -75,8 +77,8 @@ bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
     while ((isAccepted == false) && (currentColumn < m_filteredColumns.count())) {
         index = sourceModel()->index(sourceRow, m_filteredColumns[currentColumn], sourceParent);
         if (sourceModel()->data(index).toString().contains(filterRegExp())) {
-		isAccepted = true;
-	}
+        isAccepted = true;
+    }
         currentColumn++;
     }
     return isAccepted;

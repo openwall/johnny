@@ -36,6 +36,7 @@
 #define TAB_SETTINGS    3
 #define TAB_CONSOLE_LOG 4
 #define DYNAMIC_FILTERING_HASH_LIMIT 25000
+#define LABEL_SELECTION_DURATION 5000
 #define CONSOLE_LOG_SEPARATOR "-------------------------------------\n"
 
 MainWindow::MainWindow(QSettings &settings)
@@ -61,11 +62,16 @@ MainWindow::MainWindow(QSettings &settings)
     m_hashTableProxy->setShowCheckedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
     m_hashTableProxy->setShowCrackedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
     m_ui->passwordsTable->sortByColumn(PasswordFileModel::USER_COL, Qt::AscendingOrder);
+    m_ui->labelSelectionTip->hide();
+    connect(&m_labelSelectionHide, SIGNAL(timeout()), m_ui->labelSelectionTip, SLOT(hide()));
+
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
     connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
     connect(&m_johnVersionCheck, SIGNAL(error(QProcess::ProcessError)), this, SLOT(invalidJohnPathDetected()));
+
+
     // For the OS X QProgressBar issue
     // https://github.com/shinnok/johnny/issues/11
 #ifdef Q_OS_OSX
@@ -198,6 +204,7 @@ MainWindow::MainWindow(QSettings &settings)
     connect(m_ui->pushButtonBrowsePathToJohn, SIGNAL(clicked()), this, SLOT(buttonBrowsePathToJohnClicked()));
     connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
     connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
+    connect(m_ui->actionFocusFilter, SIGNAL(triggered()), m_ui->lineEditFilter, SLOT(setFocus()));
 
     connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
     connect(m_openOtherFormatDialog, SIGNAL(conversionTerminated(QStringList)), this, SLOT(openPasswordFile(QStringList)));
@@ -1802,6 +1809,8 @@ void MainWindow::includeSelectedHashes()
             m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
         }
     }
+    m_ui->labelSelectionTip->show();
+    m_labelSelectionHide.start(LABEL_SELECTION_DURATION);
 }
 
 void MainWindow::excludeSelectedHashes()
@@ -1813,6 +1822,8 @@ void MainWindow::excludeSelectedHashes()
         }
     }
     m_hashTableProxy->checkBoxHasChanged();
+    m_ui->labelSelectionTip->show();
+    m_labelSelectionHide.start(LABEL_SELECTION_DURATION);
 }
 
 void MainWindow::setFilteringColumns()

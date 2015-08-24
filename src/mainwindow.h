@@ -151,6 +151,7 @@ private:
 
     QWidget         m_aboutWindow;
     OpenOtherFormatFileDialog* m_openOtherFormatDialog;
+    QTimer          m_labelSelectionHide;
 
 #ifdef Q_OS_OSX
     QLabel         *m_progressStatsLabel;

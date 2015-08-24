@@ -159,14 +159,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_21">
+            <widget class="QLabel" name="labelSelectionTip">
              <property name="font">
               <font>
                <italic>true</italic>
               </font>
              </property>
              <property name="text">
-              <string>Tip :If you change attack options or the selected hashes, you need to Start a new attack for them to come into effect.</string>
+              <string>Tip: Your selection of hashes only takes effect with a new attack</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -333,7 +333,7 @@ border-bottom: 1px solid darkgrey;
                   </font>
                  </property>
                  <property name="text">
-                  <string>Tip: If you change attack options, you need to Start a new attack for them to come into effect.</string>
+                  <string>Tip: Modified attack options come into effect only when starting a new attack</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>
@@ -1713,13 +1713,15 @@ border-bottom: 1px solid darkgrey;
     <addaction name="actionResumeAttack"/>
     <addaction name="actionPauseAttack"/>
     <addaction name="actionGuessPassword"/>
-    <addaction name="actionIncludeSelectedHashes"/>
-    <addaction name="actionExcludeSelectedHashes"/>
    </widget>
    <widget class="QMenu" name="menuPasswords">
     <property name="title">
      <string>Passwords</string>
     </property>
+    <addaction name="actionFocusFilter"/>
+    <addaction name="actionIncludeSelectedHashes"/>
+    <addaction name="actionExcludeSelectedHashes"/>
+    <addaction name="separator"/>
     <addaction name="actionCopyToClipboard"/>
     <addaction name="actionExportToCSV"/>
     <addaction name="actionExportToColonSeparated"/>
@@ -2012,10 +2014,22 @@ border-bottom: 1px solid darkgrey;
    <property name="text">
     <string>Include in attack</string>
    </property>
+   <property name="toolTip">
+    <string>If you change selected hashes, you need to Start a new attack.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
   </action>
   <action name="actionExcludeSelectedHashes">
    <property name="text">
     <string>Exclude from attack</string>
+   </property>
+   <property name="toolTip">
+    <string>If you change selected hashes, you need to Start a new attack.</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
    </property>
   </action>
   <action name="actionFilterUserColumn">
@@ -2163,6 +2177,17 @@ border-bottom: 1px solid darkgrey;
    </property>
    <property name="toolTip">
     <string>Open PASSWD format file (classic John format)</string>
+   </property>
+  </action>
+  <action name="actionFocusFilter">
+   <property name="text">
+    <string>Focus Filter</string>
+   </property>
+   <property name="toolTip">
+    <string>Go to Filter line</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

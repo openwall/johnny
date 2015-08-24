@@ -326,6 +326,10 @@ void OpenOtherFormatFileDialog::convertFile()
             parameters << runDir + "/"  + scriptFullName;
         } else {
             program = runDir + "/"  + scriptFullName;
+#ifdef Q_OS_WIN
+            if (currentScript.extension.isEmpty())
+                program += ".exe";
+#endif
         }
         // Add the arguments
         for (int i = 0; i < currentScript.parameters.size(); i++) {

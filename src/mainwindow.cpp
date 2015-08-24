@@ -1464,7 +1464,7 @@ void MainWindow::verifyJohnVersion()
     } else {
         bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
         QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]", Qt::CaseInsensitive);
-        int pos = exp.indexIn(lines[0]);
+        int pos = exp.indexIn(output);
         if (pos > -1) {
             m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper ") + exp.cap(1) + (isJumbo ? "" : " (core)"));
         } else if (lines.size() > 0){

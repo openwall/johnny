@@ -60,7 +60,8 @@ RESOURCES += resources/resources.qrc
 OTHER_FILES += README \
                LICENSE \
                INSTALL \
-               CHANGELOG
+               CHANGELOG \
+               DEVELOPMENT
 
 osx {
 TARGET  = Johnny

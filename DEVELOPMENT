@@ -1,4 +1,9 @@
 Notes for developers
+====================
+
+Development is taking place at Github:
+https://github.com/shinnok/johnny
+
 
 To extract format list from John's ouput:
 run/john | perl -ne '$f = 1 if /^--format/; $f = 0 if /^--[^f]/; print "$1\n" while m!([-\w\(\)]+)(/|$)!g and $f; ' > format-list

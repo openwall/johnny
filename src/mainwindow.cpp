@@ -215,6 +215,12 @@ MainWindow::MainWindow(QSettings &settings)
                                          << m_ui->actionExcludeSelectedHashes);
     connect(m_ui->passwordsTable, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
+    m_ui->consoleLogTextEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_consoleLogContextMenu = m_ui->consoleLogTextEdit->createStandardContextMenu();
+    QAction* actionClearConsoleLog = new QAction(tr("Clear"), this);
+    connect(m_ui->consoleLogTextEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showConsoleLogContextMenu(QPoint)));
+    m_consoleLogContextMenu->addAction(actionClearConsoleLog);
+    connect(actionClearConsoleLog, SIGNAL(triggered(bool)), m_ui->consoleLogTextEdit, SLOT(clear()));
     connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
     connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
     connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
@@ -1797,6 +1803,12 @@ void MainWindow::showHashesTableContextMenu(const QPoint& pos)
 {
     QPoint globalPos = m_ui->passwordsTable->viewport()->mapToGlobal(pos);
     m_hashTableContextMenu->exec(globalPos);
+}
+
+void MainWindow::showConsoleLogContextMenu(const QPoint& pos)
+{
+    QPoint globalPos = m_ui->consoleLogTextEdit->viewport()->mapToGlobal(pos);
+    m_consoleLogContextMenu->exec(globalPos);
 }
 
 void MainWindow::filterHashesTable()

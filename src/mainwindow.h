@@ -98,6 +98,7 @@ private slots:
     bool checkSettings();
     void johnPathChanged();
     void invalidJohnPathDetected();
+    bool validateJohnPath(QString path);
 
     // Helpers
     void appendLog(const QString& text);

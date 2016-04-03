@@ -322,7 +322,7 @@ MainWindow::~MainWindow()
 void MainWindow::buttonWordlistFileBrowseClicked()
 {
     // We pop a dialog to choose a file to open.
-    QFileDialog dialog;
+    QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setNameFilter(tr("World list files (*.lst) ;; Dict files (*.dict);; Any files (*)"));
 
@@ -470,7 +470,7 @@ void MainWindow::openPasswordFile(QStringList fileNames)
     // we set it to existing view.
 
     if (fileNames.isEmpty()) {
-        QFileDialog dialog;
+        QFileDialog dialog(this);
         dialog.setFileMode(QFileDialog::ExistingFiles);
         if (dialog.exec()) {
             QStringList fileNames = dialog.selectedFiles();
@@ -1274,7 +1274,7 @@ void MainWindow::fillSettingsWithDefaults()
 
 void MainWindow::buttonBrowsePathToJohnClicked()
 {
-    QFileDialog dialog;
+    QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
     if (dialog.exec()) {
         QString fileName = dialog.selectedFiles()[0];

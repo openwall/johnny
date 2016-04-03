@@ -215,6 +215,12 @@ MainWindow::MainWindow(QSettings &settings)
                                          << m_ui->actionExcludeSelectedHashes);
     connect(m_ui->passwordsTable, SIGNAL(customContextMenuRequested(const QPoint&)),
         this, SLOT(showHashesTableContextMenu(const QPoint&)));
+    m_ui->consoleLogTextEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+    m_consoleLogContextMenu = m_ui->consoleLogTextEdit->createStandardContextMenu();
+    QAction* actionClearConsoleLog = new QAction(tr("Clear"), this);
+    connect(m_ui->consoleLogTextEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showConsoleLogContextMenu(QPoint)));
+    m_consoleLogContextMenu->addAction(actionClearConsoleLog);
+    connect(actionClearConsoleLog, SIGNAL(triggered(bool)), m_ui->consoleLogTextEdit, SLOT(clear()));
     connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
     connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
     connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
@@ -1320,10 +1326,14 @@ void MainWindow::restoreSavedSettings()
     m_ui->spinBoxTimeIntervalPickCracked->blockSignals(true);
     m_ui->comboBoxLanguageSelection->blockSignals(true);
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
-    m_ui->lineEditPathToJohn->setText(
-        settingsPathToJohn == ""
+    if (!validateJohnPath(settingsPathToJohn)) {
+        m_ui->lineEditPathToJohn->setText("");
+    } else {
+        m_ui->lineEditPathToJohn->setText(
+            settingsPathToJohn == ""
         ? m_ui->lineEditPathToJohn->text()
         : settingsPathToJohn);
+    }
     m_ui->spinBoxTimeIntervalPickCracked->setValue(
         m_settings.value("TimeIntervalPickCracked").toString() == ""
         ? m_ui->spinBoxTimeIntervalPickCracked->value()
@@ -1481,7 +1491,7 @@ void MainWindow::invalidJohnPathDetected()
 {
     m_ui->labelJohnPathValidator->setText(tr("No valid John The Ripper executable detected at this path !"));
     m_ui->lineEditPathToJohn->setStyleSheet("color:red");
-    // We choose to disable jumbo features if no valid john path is detected but this could we changed by removing those 2 lines
+    // We choose to disable jumbo features if no valid john path is detected but this could be changed by removing those 2 lines
     setAvailabilityOfFeatures(false);
     m_ui->widgetFork->setVisible(false);
 }
@@ -1795,6 +1805,12 @@ void MainWindow::showHashesTableContextMenu(const QPoint& pos)
     m_hashTableContextMenu->exec(globalPos);
 }
 
+void MainWindow::showConsoleLogContextMenu(const QPoint& pos)
+{
+    QPoint globalPos = m_ui->consoleLogTextEdit->viewport()->mapToGlobal(pos);
+    m_consoleLogContextMenu->exec(globalPos);
+}
+
 void MainWindow::filterHashesTable()
 {
     QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()), Qt::CaseInsensitive);
@@ -1923,11 +1939,25 @@ void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exi
 
 void MainWindow::johnPathChanged()
 {
-    // TO DO : We could validate john path here, start a new session etc..
-    applyAndSaveSettings();
-    if (!m_sessionPasswordFiles.isEmpty()) {
-        callJohnShow();
-        getDefaultFormat();
+    if (validateJohnPath(m_ui->lineEditPathToJohn->text())) {
+        applyAndSaveSettings();
+        if (!m_sessionPasswordFiles.isEmpty()) {
+            callJohnShow();
+            getDefaultFormat();
+        }
+    }
+}
+
+bool MainWindow::validateJohnPath(QString path)
+{
+    // Check if user entered johnny as a JtR path
+    QFileInfo userSelectedFile(path);
+    QFileInfo johnnyFile(QCoreApplication::applicationFilePath());
+    if (userSelectedFile == johnnyFile) {
+        invalidJohnPathDetected();
+        return false;
+    } else {
+        return true;
     }
 }
 

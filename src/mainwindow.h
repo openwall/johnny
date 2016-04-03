@@ -62,6 +62,7 @@ private slots:
     void checkForUpdates();
     void filterHashesTable();
     void showHashesTableContextMenu(const QPoint& pos);
+    void showConsoleLogContextMenu(const QPoint& pos);
     void includeSelectedHashes();
     void excludeSelectedHashes();
     void setFilteringColumns();
@@ -98,6 +99,7 @@ private slots:
     bool checkSettings();
     void johnPathChanged();
     void invalidJohnPathDetected();
+    bool validateJohnPath(QString path);
 
     // Helpers
     void appendLog(const QString& text);
@@ -115,6 +117,7 @@ private:
     Ui::MainWindow           *m_ui;
     Menu                     *m_sessionMenu;
     QMenu                    *m_hashTableContextMenu;
+    QMenu                    *m_consoleLogContextMenu;
     PasswordFileModel        *m_hashTable;
     HashSortFilterProxyModel *m_hashTableProxy;
 

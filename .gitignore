@@ -7,5 +7,7 @@ Makefile
 ui_*.h
 moc_*.cpp
 qrc_resources.cpp
+.qmake.stash
 # compiled executable
 johnny
+Johnny.app

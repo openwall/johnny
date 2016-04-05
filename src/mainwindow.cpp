@@ -1469,7 +1469,7 @@ void MainWindow::verifyJohnVersion()
 {
     QString output = m_johnVersionCheck.readAllStandardOutput();
     QStringList lines = output.split('\n');
-    if (!output.contains("John the Ripper"), Qt::CaseInsensitive) {
+    if (!output.contains("John the Ripper", Qt::CaseInsensitive)) {
         invalidJohnPathDetected();
     } else {
         bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);

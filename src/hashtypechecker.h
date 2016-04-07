@@ -16,23 +16,23 @@
 struct HashFormat
 {
     // For each valid hash
-    QString label;
-    bool isFormatDisabled;
-    bool isFormatDynamic;
-    bool isUsingCypherTextAsIs;
+    QString     label;
+    bool        isFormatDisabled;
+    bool        isFormatDynamic;
+    bool        isUsingCypherTextAsIs;
     QStringList canonicalHashes;
 };
 
 struct Hash
 {
     // For each hash than can be loaded
-    QString login;
-    QString ciphertext;
-    QString uid;
-    QString gid;
-    QString gecos;
-    QString home;
-    QString shell;
+    QString           login;
+    QString           ciphertext;
+    QString           uid;
+    QString           gid;
+    QString           gecos;
+    QString           home;
+    QString           shell;
     QList<HashFormat> listFormats;
 };
 

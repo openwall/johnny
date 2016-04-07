@@ -10,32 +10,40 @@
 
 #include "textlabel.h"
 
-#include <QDialog>
-#include <QProcess>
-#include <QMap>
 #include <QButtonGroup>
-#include <QLineEdit>
 #include <QCheckBox>
+#include <QDialog>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMap>
+#include <QProcess>
 #include <QPushButton>
 
-enum ScriptParameterType {FILE_PARAM, TEXT_PARAM, CHECKABLE_PARAM, FOLDER_PARAM};
+enum ScriptParameterType
+{
+    FILE_PARAM,
+    TEXT_PARAM,
+    CHECKABLE_PARAM,
+    FOLDER_PARAM
+};
 class ConversionScriptParameter
 {
 public:
-    ConversionScriptParameter(const QString &name, ScriptParameterType type, const QString &commandLinePrefix = "");
-    QString name;
+    ConversionScriptParameter(const QString &name, ScriptParameterType type,
+                              const QString &commandLinePrefix = "");
+    QString             name;
     ScriptParameterType type;
-    QString commandLinePrefix;
+    QString             commandLinePrefix;
 };
 
 class ConversionScript
 {
 public:
-    ConversionScript(){}
-    ConversionScript(const QString &name, const QString &extension, const QList<ConversionScriptParameter> &parameters);
-    QString name;
-    QString extension;
+    ConversionScript() {}
+    ConversionScript(const QString &name, const QString &extension,
+                     const QList<ConversionScriptParameter> &parameters);
+    QString                          name;
+    QString                          extension;
     QList<ConversionScriptParameter> parameters;
 };
 
@@ -49,7 +57,8 @@ public:
     QPushButton browseButton;
 };
 
-namespace Ui {
+namespace Ui
+{
 class OpenOtherFormatFileDialog;
 }
 
@@ -59,29 +68,29 @@ class OpenOtherFormatFileDialog : public QDialog
 
 public:
     explicit OpenOtherFormatFileDialog(QWidget *parent = 0);
-    void setJohnPath(const QString& johnPath);
+    void setJohnPath(const QString &johnPath);
     ~OpenOtherFormatFileDialog();
 
 signals:
     void conversionTerminated(QStringList files);
 
 private slots:
-    void declare2johnFormats(QList<ConversionScript>& scripts);
+    void declare2johnFormats(QList<ConversionScript> &scripts);
     void convertFile();
     void conversionFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void conversionError(QProcess::ProcessError error);
     void browseInputButtonClicked();
     void browseOutputButtonClicked();
-    void selectedFormatChanged(const QString& newFormat);
+    void selectedFormatChanged(const QString &newFormat);
     void cancel();
 
 private:
     void buildFormatUI();
-    Ui::OpenOtherFormatFileDialog          *m_ui;
-    QMap<QString, ConversionScript>         m_scripts;
-    QProcess                                m_2johnProcess;
-    QString                                 m_johnPath;
-    QList<ConversionScriptParameterWidget*> m_listParametersWidget;
+    Ui::OpenOtherFormatFileDialog           *m_ui;
+    QMap<QString, ConversionScript>          m_scripts;
+    QProcess                                 m_2johnProcess;
+    QString                                  m_johnPath;
+    QList<ConversionScriptParameterWidget *> m_listParametersWidget;
 };
 
 #endif // OPENOTHERFORMATFILEDIALOG_H

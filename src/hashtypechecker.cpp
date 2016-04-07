@@ -7,13 +7,15 @@
 
 #include "hashtypechecker.h"
 
-#include <QtDebug>
 #include <QMetaType>
+#include <QtDebug>
 
 HashTypeChecker::HashTypeChecker()
 {
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
-    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(parseJohnAnswer(int, QProcess::ExitStatus)), Qt::QueuedConnection);
+    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(parseJohnAnswer(int, QProcess::ExitStatus)),
+            Qt::QueuedConnection);
 }
 
 HashTypeChecker::~HashTypeChecker()
@@ -39,63 +41,82 @@ void HashTypeChecker::setPasswordFiles(const QStringList &passwordFiles)
     m_passwordFiles = passwordFiles;
 }
 
-void HashTypeChecker::parseJohnAnswer(int exitCode, QProcess::ExitStatus exitStatus)
+void HashTypeChecker::parseJohnAnswer(int                  exitCode,
+                                      QProcess::ExitStatus exitStatus)
 {
-    // John --show=types didn't terminate successfully, so the input is probably incorrect(and not properly formatted)
-    // or useless ! We might have terminated the process because the user changed session file or maybe it crashed.
+    // John --show=types didn't terminate successfully, so the input is probably
+    // incorrect(and not properly formatted)
+    // or useless ! We might have terminated the process because the user
+    // changed session file or maybe it crashed.
     // We shouldn't parse the input in those cases to avoid errors.
-    if ((exitStatus != QProcess::NormalExit) || (exitCode != 0)) {
+    if((exitStatus != QProcess::NormalExit) || (exitCode != 0))
+    {
         return;
     }
 
     // Parse John's output when process finished it's work
-    QString johnOutput = readAllStandardOutput();
+    QString     johnOutput = readAllStandardOutput();
     QStringList uniqueTypesInFile;
     QStringList detailedTypesPerRow;
     QList<Hash> hashesAllInfos;
-    QStringList lines = johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
-    for (int i = 0; i < lines.size(); i++) {
+    QStringList lines =
+        johnOutput.split(QRegExp("\\r?\\n"), QString::SkipEmptyParts);
+    for(int i = 0; i < lines.size(); i++)
+    {
         QString currentLine = lines[i];
-        if (currentLine.length() >= 3) {
+        if(currentLine.length() >= 3)
+        {
             // Field_separator can be set by john and the right way to find
             // it is by looking at the last character of the line
-            QChar field_separator = currentLine[currentLine.length()-1];
-            currentLine.remove(currentLine.length()-3, 3);
-            QStringList fields = currentLine.split(field_separator, QString::KeepEmptyParts);
+            QChar field_separator = currentLine[currentLine.length() - 1];
+            currentLine.remove(currentLine.length() - 3, 3);
+            QStringList fields =
+                currentLine.split(field_separator, QString::KeepEmptyParts);
             // Each valid line from john is gonna have at least 7 fields
-            if (fields.length() >= 7) {
+            if(fields.length() >= 7)
+            {
                 Hash hash;
-                int currentIndex = 0;
-                hash.login = fields[currentIndex++];
-                hash.ciphertext = fields[currentIndex++];
-                hash.uid = fields[currentIndex++];
-                hash.gid = fields[currentIndex++];
-                hash.gecos = fields[currentIndex++];
-                hash.home = fields[currentIndex++];
-                hash.shell = fields[currentIndex++];
+                int  currentIndex = 0;
+                hash.login        = fields[currentIndex++];
+                hash.ciphertext   = fields[currentIndex++];
+                hash.uid          = fields[currentIndex++];
+                hash.gid          = fields[currentIndex++];
+                hash.gecos        = fields[currentIndex++];
+                hash.home         = fields[currentIndex++];
+                hash.shell        = fields[currentIndex++];
 
                 int nbOfFieldsForValidFormats = 4;
-                // For each valid formats, which are separated by separator, empty string
+                // For each valid formats, which are separated by separator,
+                // empty string
                 // separator (ex: '::')
                 QStringList typesOnly;
-                while ((currentIndex + nbOfFieldsForValidFormats) < fields.length()) {
+                while((currentIndex + nbOfFieldsForValidFormats) < fields.length())
+                {
                     HashFormat format;
                     format.label = fields[currentIndex++];
                     typesOnly.append(format.label);
                     // Keep track of non-duplicate formats's label in the file
-                    if (!uniqueTypesInFile.contains(format.label)) {
+                    if(!uniqueTypesInFile.contains(format.label))
+                    {
                         uniqueTypesInFile.append(format.label);
                     }
 
-                    format.isFormatDisabled = (fields[currentIndex++] == "0" ? false : true);
-                    format.isFormatDynamic = (fields[currentIndex++] == "0" ? false : true);
-                    format.isUsingCypherTextAsIs = (fields[currentIndex++] == "0" ? false : true);
+                    format.isFormatDisabled =
+                        (fields[currentIndex++] == "0" ? false : true);
+                    format.isFormatDynamic =
+                        (fields[currentIndex++] == "0" ? false : true);
+                    format.isUsingCypherTextAsIs =
+                        (fields[currentIndex++] == "0" ? false : true);
 
                     // Canonical hash(es) fields
-                    for (; currentIndex < fields.length(); currentIndex++) {
-                        if (!fields[currentIndex].isEmpty()) {
+                    for(; currentIndex < fields.length(); currentIndex++)
+                    {
+                        if(!fields[currentIndex].isEmpty())
+                        {
                             format.canonicalHashes.append(fields[currentIndex]);
-                        } else {
+                        }
+                        else
+                        {
                             currentIndex++;
                             break;
                         }
@@ -111,5 +132,5 @@ void HashTypeChecker::parseJohnAnswer(int exitCode, QProcess::ExitStatus exitSta
     }
     // We emit signal to view(s) that are listening that something changed
     // (ex : MainWindow)
-    emit updateHashTypes(m_passwordFiles,uniqueTypesInFile,detailedTypesPerRow);
+    emit updateHashTypes(m_passwordFiles, uniqueTypesInFile, detailedTypesPerRow);
 }

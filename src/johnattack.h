@@ -10,8 +10,8 @@
 
 #include "johnhandler.h"
 
-#include <QObject>
 #include <QDateTime>
+#include <QObject>
 
 class JohnAttack : public JohnHandler
 {

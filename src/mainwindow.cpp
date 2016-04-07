@@ -6,25 +6,25 @@
  */
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "translator.h"
 #include "ui_aboutwidget.h"
+#include "ui_mainwindow.h"
 
-#include <QToolButton>
-#include <QStringListModel>
-#include <QFileDialog>
-#include <QFile>
 #include <QByteArray>
-#include <QTextStream>
-#include <QMessageBox>
 #include <QClipboard>
-#include <QThread>
-#include <QTextCursor>
 #include <QDesktopServices>
-#include <QInputDialog>
-#include <QtDebug>
 #include <QDesktopWidget>
+#include <QFile>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QStringListModel>
+#include <QTextCursor>
+#include <QTextStream>
+#include <QThread>
+#include <QToolButton>
 #include <QUrl>
+#include <QtDebug>
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QStandardPaths>
 #endif
@@ -54,26 +54,32 @@ MainWindow::MainWindow(QSettings &settings)
     // UI initializations
     m_ui->setupUi(this);
     Translator &translator = Translator::getInstance();
-    m_ui->comboBoxLanguageSelection->insertItems(0, translator.getListOfAvailableLanguages());
+    m_ui->comboBoxLanguageSelection->insertItems(
+        0, translator.getListOfAvailableLanguages());
     m_ui->widgetFork->setVisible(false);
     m_ui->passwordsTable->setModel(m_hashTableProxy);
     m_ui->passwordsTable->setSortingEnabled(true);
     m_hashTableProxy->setDynamicSortFilter(false);
-    m_hashTableProxy->setShowCheckedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
-    m_hashTableProxy->setShowCrackedRowsOnly(m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
-    m_ui->passwordsTable->sortByColumn(PasswordFileModel::USER_COL, Qt::AscendingOrder);
+    m_hashTableProxy->setShowCheckedRowsOnly(
+        m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
+    m_hashTableProxy->setShowCrackedRowsOnly(
+        m_ui->checkBoxShowOnlyCheckedHashes->isChecked());
+    m_ui->passwordsTable->sortByColumn(PasswordFileModel::USER_COL,
+                                       Qt::AscendingOrder);
     m_ui->labelSelectionTip->hide();
-    connect(&m_labelSelectionHide, SIGNAL(timeout()), m_ui->labelSelectionTip, SLOT(hide()));
+    connect(&m_labelSelectionHide, SIGNAL(timeout()), m_ui->labelSelectionTip,
+            SLOT(hide()));
 
     // Until we get a result from john, we disable jumbo features
     m_isJumbo = false;
     setAvailabilityOfFeatures(false);
-    connect(&m_johnVersionCheck, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(verifyJohnVersion()));
-    connect(&m_johnVersionCheck, SIGNAL(error(QProcess::ProcessError)), this, SLOT(invalidJohnPathDetected()));
+    connect(&m_johnVersionCheck, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SLOT(verifyJohnVersion()));
+    connect(&m_johnVersionCheck, SIGNAL(error(QProcess::ProcessError)), this,
+            SLOT(invalidJohnPathDetected()));
 
-
-    // For the OS X QProgressBar issue
-    // https://github.com/shinnok/johnny/issues/11
+// For the OS X QProgressBar issue
+// https://github.com/shinnok/johnny/issues/11
 #ifdef Q_OS_OSX
     m_ui->progressBar->installEventFilter(this);
 
@@ -88,7 +94,8 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->contentStackedWidget->setCurrentIndex(TAB_PASSWORDS);
     QActionGroup *tabSelectionGroup = new QActionGroup(this);
     tabSelectionGroup->setExclusive(true);
-    foreach(QAction* actions, m_ui->tabSelectionToolBar->actions()) {
+    foreach(QAction *actions, m_ui->tabSelectionToolBar->actions())
+    {
         tabSelectionGroup->addAction(actions);
     }
     m_ui->actionPasswordsTabClicked->setChecked(true);
@@ -101,17 +108,21 @@ MainWindow::MainWindow(QSettings &settings)
     filterMenu->addAction(m_ui->actionFilterFormatColumn);
     filterMenu->addAction(m_ui->actionFilterGECOSColumn);
     m_ui->filterMenuPushButton->setMenu(filterMenu);
-    m_ui->lineEditFilter->setToolTip(tr("Filter/Search inside the Passwords table using keywords. For large tables (> %1) press Enter/Return key to apply the filter.")
-                                     .arg(DYNAMIC_FILTERING_HASH_LIMIT));
-    connect(filterMenu, SIGNAL(triggered(QAction*)), this, SLOT(setFilteringColumns()));
+    m_ui->lineEditFilter->setToolTip(
+        tr("Filter/Search inside the Passwords table using keywords. For large "
+           "tables (> %1) press Enter/Return key to apply the filter.")
+            .arg(DYNAMIC_FILTERING_HASH_LIMIT));
+    connect(filterMenu, SIGNAL(triggered(QAction *)), this,
+            SLOT(setFilteringColumns()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 2, 0)
-        m_ui->lineEditFilter->setClearButtonEnabled(true);
-#elif QT_VERSION < QT_VERSION_CHECK(4,7,0)
-        m_filterDirectivesLabel = new QLabel(this);
-        m_filterDirectivesLabel->setText(tr("Press Enter/Return key to apply filter"));
-        m_ui->passwordsPageLayout->insertWidget(1, m_filterDirectivesLabel);
-        m_filterDirectivesLabel->hide();
+    m_ui->lineEditFilter->setClearButtonEnabled(true);
+#elif QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
+    m_filterDirectivesLabel = new QLabel(this);
+    m_filterDirectivesLabel->setText(
+        tr("Press Enter/Return key to apply filter"));
+    m_ui->passwordsPageLayout->insertWidget(1, m_filterDirectivesLabel);
+    m_filterDirectivesLabel->hide();
 #endif
 
     m_ui->widgetFilterOptions->setEnabled(false);
@@ -125,7 +136,7 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->actionExcludeSelectedHashes->setEnabled(false);
 
     // Open file menu
-    Menu *openMenu = new Menu(this);
+    Menu        *openMenu       = new Menu(this);
     QToolButton *openMenuButton = new QToolButton(this);
     openMenuButton->setDefaultAction(m_ui->actionOpenPassword);
     openMenuButton->setMenu(openMenu);
@@ -134,7 +145,8 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->insertWidget(m_ui->actionStartAttack, openMenuButton);
     openMenu->addAction(m_ui->actionOpenPasswdFile);
     openMenu->addAction(m_ui->actionOpen2johnFile);
-    connect(m_ui->actionOpenPassword, SIGNAL(triggered()), openMenuButton, SLOT(showMenu()));
+    connect(m_ui->actionOpenPassword, SIGNAL(triggered()), openMenuButton,
+            SLOT(showMenu()));
 
     // Multiple sessions management menu
     m_sessionMenu = new Menu(this);
@@ -145,11 +157,13 @@ MainWindow::MainWindow(QSettings &settings)
     sessionMenuButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_ui->mainToolBar->insertWidget(m_ui->actionStartAttack, sessionMenuButton);
     m_ui->mainToolBar->insertSeparator(m_ui->actionStartAttack);
-    connect(m_ui->actionOpenSession, SIGNAL(triggered()), sessionMenuButton, SLOT(showMenu()));
-    connect(m_sessionMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionOpenSessionTriggered(QAction*)));
+    connect(m_ui->actionOpenSession, SIGNAL(triggered()), sessionMenuButton,
+            SLOT(showMenu()));
+    connect(m_sessionMenu, SIGNAL(triggered(QAction *)), this,
+            SLOT(actionOpenSessionTriggered(QAction *)));
 
     // Export menu
-    Menu *exportMenu = new Menu(this);
+    Menu        *exportMenu       = new Menu(this);
     QToolButton *exportMenuButton = new QToolButton(this);
     exportMenuButton->setDefaultAction(m_ui->actionExport);
     exportMenuButton->setMenu(exportMenu);
@@ -158,13 +172,16 @@ MainWindow::MainWindow(QSettings &settings)
     m_ui->mainToolBar->addWidget(exportMenuButton);
     exportMenu->addAction(m_ui->actionExportToCSV);
     exportMenu->addAction(m_ui->actionExportToColonSeparated);
-    connect(m_ui->actionExport, SIGNAL(triggered()), exportMenuButton, SLOT(showMenu()));
-    connect(exportMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionExportToTriggered(QAction*)));
+    connect(m_ui->actionExport, SIGNAL(triggered()), exportMenuButton,
+            SLOT(showMenu()));
+    connect(exportMenu, SIGNAL(triggered(QAction *)), this,
+            SLOT(actionExportToTriggered(QAction *)));
 
     connect(&m_johnAttack, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-            SLOT(showJohnFinished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
-    connect(&m_johnAttack, SIGNAL(started()), this,
-            SLOT(showJohnStarted()), Qt::QueuedConnection);
+            SLOT(showJohnFinished(int, QProcess::ExitStatus)),
+            Qt::QueuedConnection);
+    connect(&m_johnAttack, SIGNAL(started()), this, SLOT(showJohnStarted()),
+            Qt::QueuedConnection);
     connect(&m_johnAttack, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
     connect(&m_johnAttack, SIGNAL(readyReadStandardOutput()), this,
@@ -173,79 +190,121 @@ MainWindow::MainWindow(QSettings &settings)
             SLOT(updateJohnOutput()), Qt::QueuedConnection);
 
     // We connect timer with calling for john to show us status.
-    connect(&m_showTimer, SIGNAL(timeout()),
-            this, SLOT(callJohnShow()));
+    connect(&m_showTimer, SIGNAL(timeout()), this, SLOT(callJohnShow()));
     // We connect 'john --show' process with our object.
-    connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)),
-            this, SLOT(readJohnShow()));
+    connect(&m_johnShow, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(readJohnShow()));
 
-    connect(&m_hashTypeChecker,SIGNAL(updateHashTypes(const QStringList&, const QStringList& ,const QStringList&)), this,
-            SLOT(updateHashTypes(const QStringList&,const QStringList&, const QStringList&)),Qt::QueuedConnection);
-    connect(&m_johnGuess, SIGNAL(finished(int,QProcess::ExitStatus)), this,
-            SLOT(guessPasswordFinished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
+    connect(&m_hashTypeChecker,
+            SIGNAL(updateHashTypes(QStringList, QStringList, QStringList)),
+            this, SLOT(updateHashTypes(QStringList, QStringList, QStringList)),
+            Qt::QueuedConnection);
+    connect(&m_johnGuess, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SLOT(guessPasswordFinished(int, QProcess::ExitStatus)),
+            Qt::QueuedConnection);
     connect(&m_johnGuess, SIGNAL(error(QProcess::ProcessError)), this,
             SLOT(showJohnError(QProcess::ProcessError)), Qt::QueuedConnection);
-    connect(&m_johnDefaultFormat, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(getDefaultFormatFinished(int,QProcess::ExitStatus)));
+    connect(&m_johnDefaultFormat, SIGNAL(finished(int, QProcess::ExitStatus)),
+            this, SLOT(getDefaultFormatFinished(int, QProcess::ExitStatus)));
 
     // Settings changed by user
-    connect(m_ui->spinBoxTimeIntervalPickCracked,SIGNAL(valueChanged(int)),this,SLOT(applyAndSaveSettings()));
-    connect(m_ui->lineEditPathToJohn,SIGNAL(textEdited(QString)),this,SLOT(johnPathChanged()));
-    connect(m_ui->comboBoxLanguageSelection,SIGNAL(currentIndexChanged(int)),this,SLOT(applyAndSaveSettings()));
+    connect(m_ui->spinBoxTimeIntervalPickCracked, SIGNAL(valueChanged(int)),
+            this, SLOT(applyAndSaveSettings()));
+    connect(m_ui->lineEditPathToJohn, SIGNAL(textEdited(QString)), this,
+            SLOT(johnPathChanged()));
+    connect(m_ui->comboBoxLanguageSelection, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(applyAndSaveSettings()));
 
     // Action buttons
-    connect(m_ui->actionOpenPasswdFile,SIGNAL(triggered()),this,SLOT(openPasswordFile()));
-    connect(m_ui->actionOpen2johnFile, SIGNAL(triggered()), m_openOtherFormatDialog, SLOT(exec()));
-    connect(m_ui->actionPauseAttack,SIGNAL(triggered()),this,SLOT(pauseAttack()));
-    connect(m_ui->actionResumeAttack,SIGNAL(triggered()),this,SLOT(resumeAttack()));
-    connect(m_ui->actionStartAttack,SIGNAL(triggered()),this,SLOT(startAttack()));
-    connect(m_ui->pushButtonStatisticsUpdateStatus,SIGNAL(clicked()),this,SLOT(updateStatistics()));
-    connect(m_ui->pushButton_WordlistFileBrowse,SIGNAL(clicked()),this,SLOT(buttonWordlistFileBrowseClicked()));
-    connect(m_ui->pushButtonPrinceModeBrowseFile, SIGNAL(clicked()), this, SLOT(buttonWordlistFileBrowseClicked()));
-    connect(m_ui->pushButtonBrowsePathToJohn, SIGNAL(clicked()), this, SLOT(buttonBrowsePathToJohnClicked()));
-    connect(m_ui->actionCopyToClipboard,SIGNAL(triggered()),this,SLOT(actionCopyToClipboardTriggered()));
-    connect(m_ui->actionGuessPassword,SIGNAL(triggered()), this, SLOT(guessPassword()));
-    connect(m_ui->actionFocusFilter, SIGNAL(triggered()), m_ui->lineEditFilter, SLOT(setFocus()));
+    connect(m_ui->actionOpenPasswdFile, SIGNAL(triggered()), this,
+            SLOT(openPasswordFile()));
+    connect(m_ui->actionOpen2johnFile, SIGNAL(triggered()),
+            m_openOtherFormatDialog, SLOT(exec()));
+    connect(m_ui->actionPauseAttack, SIGNAL(triggered()), this,
+            SLOT(pauseAttack()));
+    connect(m_ui->actionResumeAttack, SIGNAL(triggered()), this,
+            SLOT(resumeAttack()));
+    connect(m_ui->actionStartAttack, SIGNAL(triggered()), this,
+            SLOT(startAttack()));
+    connect(m_ui->pushButtonStatisticsUpdateStatus, SIGNAL(clicked()), this,
+            SLOT(updateStatistics()));
+    connect(m_ui->pushButton_WordlistFileBrowse, SIGNAL(clicked()), this,
+            SLOT(buttonWordlistFileBrowseClicked()));
+    connect(m_ui->pushButtonPrinceModeBrowseFile, SIGNAL(clicked()), this,
+            SLOT(buttonWordlistFileBrowseClicked()));
+    connect(m_ui->pushButtonBrowsePathToJohn, SIGNAL(clicked()), this,
+            SLOT(buttonBrowsePathToJohnClicked()));
+    connect(m_ui->actionCopyToClipboard, SIGNAL(triggered()), this,
+            SLOT(actionCopyToClipboardTriggered()));
+    connect(m_ui->actionGuessPassword, SIGNAL(triggered()), this,
+            SLOT(guessPassword()));
+    connect(m_ui->actionFocusFilter, SIGNAL(triggered()), m_ui->lineEditFilter,
+            SLOT(setFocus()));
 
-    connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(tabsSelectionChanged(QAction*)));
-    connect(m_openOtherFormatDialog, SIGNAL(conversionTerminated(QStringList)), this, SLOT(openPasswordFile(QStringList)));
+    connect(m_ui->tabSelectionToolBar, SIGNAL(actionTriggered(QAction *)), this,
+            SLOT(tabsSelectionChanged(QAction *)));
+    connect(m_openOtherFormatDialog, SIGNAL(conversionTerminated(QStringList)),
+            this, SLOT(openPasswordFile(QStringList)));
     // Tableview and filtering-related signals
     m_ui->passwordsTable->setContextMenuPolicy(Qt::CustomContextMenu);
     m_hashTableContextMenu = new QMenu(this);
-    m_hashTableContextMenu->addActions(QList<QAction*>() << m_ui->actionCopyToClipboard << m_ui->actionIncludeSelectedHashes
-                                         << m_ui->actionExcludeSelectedHashes);
-    connect(m_ui->passwordsTable, SIGNAL(customContextMenuRequested(const QPoint&)),
-        this, SLOT(showHashesTableContextMenu(const QPoint&)));
+    m_hashTableContextMenu->addActions(QList<QAction *>()
+                                       << m_ui->actionCopyToClipboard
+                                       << m_ui->actionIncludeSelectedHashes
+                                       << m_ui->actionExcludeSelectedHashes);
+    connect(m_ui->passwordsTable,
+            SIGNAL(customContextMenuRequested(const QPoint &)), this,
+            SLOT(showHashesTableContextMenu(const QPoint &)));
     m_ui->consoleLogTextEdit->setContextMenuPolicy(Qt::CustomContextMenu);
-    m_consoleLogContextMenu = m_ui->consoleLogTextEdit->createStandardContextMenu();
-    QAction* actionClearConsoleLog = new QAction(tr("Clear"), this);
-    connect(m_ui->consoleLogTextEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showConsoleLogContextMenu(QPoint)));
+    m_consoleLogContextMenu =
+        m_ui->consoleLogTextEdit->createStandardContextMenu();
+    QAction *actionClearConsoleLog = new QAction(tr("Clear"), this);
+    connect(m_ui->consoleLogTextEdit, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(showConsoleLogContextMenu(QPoint)));
     m_consoleLogContextMenu->addAction(actionClearConsoleLog);
-    connect(actionClearConsoleLog, SIGNAL(triggered(bool)), m_ui->consoleLogTextEdit, SLOT(clear()));
-    connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this, SLOT(includeSelectedHashes()));
-    connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this, SLOT(excludeSelectedHashes()));
-    connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
-    connect(m_ui->checkBoxShowOnlyCrackedHashes, SIGNAL(toggled(bool)), m_hashTableProxy, SLOT(setShowCrackedRowsOnly(bool)));
+    connect(actionClearConsoleLog, SIGNAL(triggered(bool)),
+            m_ui->consoleLogTextEdit, SLOT(clear()));
+    connect(m_ui->actionIncludeSelectedHashes, SIGNAL(triggered()), this,
+            SLOT(includeSelectedHashes()));
+    connect(m_ui->actionExcludeSelectedHashes, SIGNAL(triggered()), this,
+            SLOT(excludeSelectedHashes()));
+    connect(m_ui->checkBoxShowOnlyCheckedHashes, SIGNAL(toggled(bool)),
+            m_hashTableProxy, SLOT(setShowCheckedRowsOnly(bool)));
+    connect(m_ui->checkBoxShowOnlyCrackedHashes, SIGNAL(toggled(bool)),
+            m_hashTableProxy, SLOT(setShowCrackedRowsOnly(bool)));
     // We create the app sessions data directory in $HOME if it does not exist
-    if (!QDir().mkpath(JohnSession::sessionDir())) {
+    if(!QDir().mkpath(JohnSession::sessionDir()))
+    {
         QMessageBox::critical(this, tr("Johnny"),
-            tr("Could not create sessions data director y(%1).\nCheck your permissions, disk space and restart Johnny.").arg(JohnSession::sessionDir()));
+                              tr("Could not create sessions data directory "
+                                 "(%1).\nCheck your permissions, disk space "
+                                 "and restart Johnny.")
+                                  .arg(JohnSession::sessionDir()));
         qApp->quit();
     }
 
     // Load sessions
     m_settings.beginGroup("Sessions");
     QStringList sessionsList = m_settings.childGroups();
-    for (int i = sessionsList.size()-1; i >= 0; i--) {
+    for(int i = sessionsList.size() - 1; i >= 0; i--)
+    {
         QString sessionName = sessionsList[i];
-        QString completePath = QDir(JohnSession::sessionDir()).filePath(sessionName);
-        if (QFileInfo(completePath + ".rec").isReadable()) {
+        QString completePath =
+            QDir(JohnSession::sessionDir()).filePath(sessionName);
+        if(QFileInfo(completePath + ".rec").isReadable())
+        {
             QAction *fileAction = m_sessionMenu->addAction(sessionName);
             fileAction->setData(sessionName);
             m_sessionHistory.append(sessionName);
-            QString fileNames = m_settings.value(sessionName + "/passwordFiles").toStringList().join(" ");
+            QString fileNames = m_settings.value(sessionName + "/passwordFiles")
+                                    .toStringList()
+                                    .join(" ");
             fileAction->setToolTip(fileNames);
-        } else {
-            // The .rec may have been deleted manually by user, let's clean our settings
+        }
+        else
+        {
+            // The .rec may have been deleted manually by user, let's clean our
+            // settings
             m_settings.remove(sessionName);
         }
     }
@@ -270,31 +329,42 @@ MainWindow::MainWindow(QSettings &settings)
     restoreSavedSettings();
 
     // Automatically open last session by default
-    if (!m_sessionHistory.isEmpty()) {
+    if(!m_sessionHistory.isEmpty())
+    {
         m_sessionCurrent = JohnSession(m_sessionHistory.first(), &m_settings);
         openLastSession();
-    } else {
+    }
+    else
+    {
         restoreDefaultAttackOptions(false);
     }
 
-    m_aboutWindow.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint | Qt::WindowCloseButtonHint);
+    m_aboutWindow.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint |
+                                 Qt::WindowCloseButtonHint);
     Ui::aboutWidget aboutUi;
     aboutUi.setupUi(&m_aboutWindow);
-    aboutUi.versionLabel->setText(tr("version ") + QCoreApplication::applicationVersion());
-    connect(m_ui->actionAboutJohnny, SIGNAL(triggered()), &m_aboutWindow, SLOT(show()));
-    connect(m_ui->actionCheckForUpdates, SIGNAL(triggered()), this, SLOT(checkForUpdates()));
-    connect(aboutUi.checkUpdateButton, SIGNAL(clicked()), this, SLOT(checkForUpdates()));
+    aboutUi.versionLabel->setText(tr("version ") +
+                                  QCoreApplication::applicationVersion());
+    connect(m_ui->actionAboutJohnny, SIGNAL(triggered()), &m_aboutWindow,
+            SLOT(show()));
+    connect(m_ui->actionCheckForUpdates, SIGNAL(triggered()), this,
+            SLOT(checkForUpdates()));
+    connect(aboutUi.checkUpdateButton, SIGNAL(clicked()), this,
+            SLOT(checkForUpdates()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (!m_terminate && (m_johnAttack.state() != QProcess::NotRunning)) {
-        int answer = QMessageBox::question(
-            this,
-            tr("Johnny"),
-            tr("An attack session is running, it will be terminated if you proceed. Do you really want to quit?"),
-            QMessageBox::Yes | QMessageBox::No);
-        if (answer == QMessageBox::No) {
+    if(!m_terminate && (m_johnAttack.state() != QProcess::NotRunning))
+    {
+        int answer =
+            QMessageBox::question(this, tr("Johnny"),
+                                  tr("An attack session is running, it will be "
+                                     "terminated if you proceed. Do you really "
+                                     "want to quit?"),
+                                  QMessageBox::Yes | QMessageBox::No);
+        if(answer == QMessageBox::No)
+        {
             event->ignore();
             return;
         }
@@ -324,30 +394,41 @@ void MainWindow::buttonWordlistFileBrowseClicked()
     // We pop a dialog to choose a file to open.
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
-    dialog.setNameFilter(tr("World list files (*.lst) ;; Dict files (*.dict);; Any files (*)"));
+    dialog.setNameFilter(
+        tr("World list files (*.lst) ;; Dict files (*.dict);; Any files (*)"));
 
-    if (dialog.exec()) {
+    if(dialog.exec())
+    {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        if (QObject::sender() == m_ui->pushButton_WordlistFileBrowse)
+        if(QObject::sender() == m_ui->pushButton_WordlistFileBrowse)
             m_ui->lineEditWordlistFile->setText(fileName);
         else if(QObject::sender() == m_ui->pushButtonPrinceModeBrowseFile)
             m_ui->lineEditPrinceModeWordlistFile->setText(fileName);
     }
 }
 
-void MainWindow::tabsSelectionChanged(QAction* action)
+void MainWindow::tabsSelectionChanged(QAction *action)
 {
     int index = 0;
-    if (action == m_ui->actionPasswordsTabClicked) {
+    if(action == m_ui->actionPasswordsTabClicked)
+    {
         index = TAB_PASSWORDS;
-    } else if (action == m_ui->actionOptionsTabClicked) {
+    }
+    else if(action == m_ui->actionOptionsTabClicked)
+    {
         index = TAB_OPTIONS;
-    } else if (action == m_ui->actionStatisticsTabClicked) {
+    }
+    else if(action == m_ui->actionStatisticsTabClicked)
+    {
         index = TAB_STATISTICS;
-    } else if (action == m_ui->actionSettingsTabClicked) {
+    }
+    else if(action == m_ui->actionSettingsTabClicked)
+    {
         index = TAB_SETTINGS;
-    } else if (action ==  m_ui->actionConsoleLogTabClicked) {
+    }
+    else if(action == m_ui->actionConsoleLogTabClicked)
+    {
         index = TAB_CONSOLE_LOG;
     }
     m_ui->actionCopyToClipboard->setEnabled(index == TAB_PASSWORDS);
@@ -358,13 +439,15 @@ void MainWindow::tabsSelectionChanged(QAction* action)
 void MainWindow::replaceTableModel(PasswordFileModel *newTableModel)
 {
     // Remove temporary file is exist
-    if (m_johnShowTemp != NULL) {
+    if(m_johnShowTemp != NULL)
+    {
         delete m_johnShowTemp;
         m_johnShowTemp = NULL;
     }
 
     // We delete existing model if any.
-    if (m_hashTable != NULL) {
+    if(m_hashTable != NULL)
+    {
         delete m_hashTable;
         m_hashTable = NULL;
     }
@@ -373,16 +456,19 @@ void MainWindow::replaceTableModel(PasswordFileModel *newTableModel)
     // We connect table view with new model.
     m_hashTableProxy->setSourceModel(newTableModel);
     // Hide formats column if not jumbo
-    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL, !m_isJumbo);
-    connect(m_hashTable, SIGNAL(rowUncheckedByUser()), m_hashTableProxy, SLOT(checkBoxHasChanged()));
+    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL,
+                                          !m_isJumbo);
+    connect(m_hashTable, SIGNAL(rowUncheckedByUser()), m_hashTableProxy,
+            SLOT(checkBoxHasChanged()));
     // We build hash table for fast access.
     m_showTableMap = QMultiMap<QString, int>();
     // In case a newTableModel == NULL parameter is passed
-    if(m_hashTable != NULL){
-        for (int i = 0; i < m_hashTable->rowCount(); i++) {
+    if(m_hashTable != NULL)
+    {
+        for(int i = 0; i < m_hashTable->rowCount(); i++)
+        {
             m_showTableMap.insert(
-                m_hashTable->data(m_hashTable->index(i, 2)).toString(),
-                i);
+                m_hashTable->data(m_hashTable->index(i, 2)).toString(), i);
         }
     }
 }
@@ -390,7 +476,8 @@ void MainWindow::replaceTableModel(PasswordFileModel *newTableModel)
 bool MainWindow::readPasswdFiles(const QStringList &fileNames)
 {
     PasswordFileModel *model = new PasswordFileModel(this);
-    if (model->readFiles(fileNames)) {
+    if(model->readFiles(fileNames))
+    {
         resetFilters();
         // We replace existing model with new one.
         replaceTableModel(model);
@@ -399,66 +486,82 @@ bool MainWindow::readPasswdFiles(const QStringList &fileNames)
         m_ui->passwordFilesLabel->setText(m_sessionPasswordFiles.join("; "));
         m_ui->progressBar->reset();
 #ifdef Q_OS_OSX
-            if(m_progressStatsLabel)
-                m_progressStatsLabel->setText("");
+        if(m_progressStatsLabel)
+            m_progressStatsLabel->setText("");
 #endif
         // We make a file with original hash in gecos to connect password
         // with original hash during `john --show`.
-        if (!m_johnShowTemp) {
+        if(!m_johnShowTemp)
+        {
             m_johnShowTemp = new QTemporaryFile();
-            if (m_johnShowTemp->open()) {
+            if(m_johnShowTemp->open())
+            {
                 QTextStream temp(m_johnShowTemp);
-                for (int i = 0; i < m_hashTable->rowCount(); i++) {
-                    QString user = m_hashTable->data(m_hashTable->index(i, 0)).toString();
-                    QString hash = m_hashTable->data(m_hashTable->index(i, 2)).toString();
+                for(int i = 0; i < m_hashTable->rowCount(); i++)
+                {
+                    QString user =
+                        m_hashTable->data(m_hashTable->index(i, 0)).toString();
+                    QString hash =
+                        m_hashTable->data(m_hashTable->index(i, 2)).toString();
                     temp << user << ":" << hash << "::" << hash << '\n';
                 }
                 m_johnShowTemp->close();
-            } else {
-                QMessageBox::critical(
-                    this,
-                    tr("Johnny"),
-                    tr("Can't open a temporary file. Your disk might be full."));
+            }
+            else
+            {
+                QMessageBox::critical(this, tr("Johnny"),
+                                      tr("Can't open a temporary file. Your "
+                                         "disk might be full."));
             }
         }
         callJohnShow();
         getDefaultFormat();
         m_ui->widgetFilterOptions->setEnabled(true);
-        m_ui->actionCopyToClipboard->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
-        m_ui->actionExport->setEnabled(m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
+        m_ui->actionCopyToClipboard->setEnabled(
+            m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
+        m_ui->actionExport->setEnabled(
+            m_ui->contentStackedWidget->currentIndex() == TAB_PASSWORDS);
         m_ui->actionStartAttack->setEnabled(true);
         m_ui->actionGuessPassword->setEnabled(true);
         m_ui->actionIncludeSelectedHashes->setEnabled(true);
         m_ui->actionExcludeSelectedHashes->setEnabled(true);
-        if (m_isJumbo) {
+        if(m_isJumbo)
+        {
             m_hashTypeChecker.setJohnProgram(m_pathToJohn);
             m_hashTypeChecker.setPasswordFiles(fileNames);
             m_hashTypeChecker.start();
         }
-        // QSortFilterProxyModel isn't optimized for fast for dynamic filtering on big files
-        if (model->rowCount() > DYNAMIC_FILTERING_HASH_LIMIT) {
+        // QSortFilterProxyModel isn't optimized for fast for dynamic filtering
+        // on big files
+        if(model->rowCount() > DYNAMIC_FILTERING_HASH_LIMIT)
+        {
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
             m_filterDirectivesLabel->show();
 #else
-            m_ui->lineEditFilter->setPlaceholderText(tr("Press Enter/Return key to apply filter"));
+            m_ui->lineEditFilter->setPlaceholderText(
+                tr("Press Enter/Return key to apply filter"));
 #endif
-            disconnect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
-            connect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
-        } else {
+            disconnect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this,
+                       SLOT(filterHashesTable()));
+            connect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this,
+                    SLOT(filterHashesTable()));
+        }
+        else
+        {
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
             m_filterDirectivesLabel->hide();
 #else
             m_ui->lineEditFilter->setPlaceholderText("");
 #endif
-            disconnect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this, SLOT(filterHashesTable()));
-            connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this, SLOT(filterHashesTable()));
+            disconnect(m_ui->lineEditFilter, SIGNAL(editingFinished()), this,
+                       SLOT(filterHashesTable()));
+            connect(m_ui->lineEditFilter, SIGNAL(textEdited(QString)), this,
+                    SLOT(filterHashesTable()));
         }
         return true;
     }
-    QMessageBox::warning(
-            this,
-            tr("Johnny"),
-            tr("Could not read desired password file(s)."));
+    QMessageBox::warning(this, tr("Johnny"),
+                         tr("Could not read desired password file(s)."));
     return false;
 }
 
@@ -469,15 +572,19 @@ void MainWindow::openPasswordFile(QStringList fileNames)
     // simplifies presentation. We just make and fill model and then
     // we set it to existing view.
 
-    if (fileNames.isEmpty()) {
+    if(fileNames.isEmpty())
+    {
         QFileDialog dialog(this);
         dialog.setFileMode(QFileDialog::ExistingFiles);
-        if (dialog.exec()) {
+        if(dialog.exec())
+        {
             QStringList fileNames = dialog.selectedFiles();
             readPasswdFiles(fileNames);
             m_ui->actionResumeAttack->setEnabled(false);
         }
-    } else {
+    }
+    else
+    {
         readPasswdFiles(fileNames);
         m_ui->actionResumeAttack->setEnabled(false);
     }
@@ -486,17 +593,19 @@ void MainWindow::openPasswordFile(QStringList fileNames)
 void MainWindow::openLastSession()
 {
     m_sessionCurrent.load();
-    QStringList passwordFiles= m_sessionCurrent.passwordFiles();
+    QStringList passwordFiles = m_sessionCurrent.passwordFiles();
 
-    if (readPasswdFiles(passwordFiles))
+    if(readPasswdFiles(passwordFiles))
     {
         restoreSessionOptions();
         m_ui->actionResumeAttack->setEnabled(true);
     }
     else
     {
-        QMessageBox::critical(this, "Johnny",
-                              tr("Could not open the session password files. (%1)").arg(passwordFiles.join("; ")));
+        QMessageBox::critical(
+            this, "Johnny",
+            tr("Could not open the session password files. (%1)")
+                .arg(passwordFiles.join("; ")));
     }
 }
 
@@ -508,10 +617,10 @@ void MainWindow::actionCopyToClipboardTriggered()
 
 bool MainWindow::checkSettings()
 {
-    if (m_pathToJohn.isEmpty()) {
+    if(m_pathToJohn.isEmpty())
+    {
         QMessageBox::critical(
-            this,
-            tr("Johnny"),
+            this, tr("Johnny"),
             tr("Please specify the path to John the Ripper in settings."));
         return false;
     }
@@ -521,13 +630,13 @@ bool MainWindow::checkSettings()
 bool MainWindow::eventFilter(QObject *watched, QEvent *event)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-    if (!event || !watched || !watched->isWidgetType())
+    if(!event || !watched || !watched->isWidgetType())
         return false;
 
     if(event->type() == QEvent::StyleAnimationUpdate)
     {
-        QWidget *widget = (QWidget*) watched;
-        if (widget->inherits("QProgressBar"))
+        QWidget *widget = (QWidget *)watched;
+        if(widget->inherits("QProgressBar"))
             return true;
     }
 #endif
@@ -539,7 +648,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     switch(event->key())
     {
     case Qt::Key_Escape:
-        if(m_ui->passwordsTable->isVisible()) {
+        if(m_ui->passwordsTable->isVisible())
+        {
             if(m_ui->passwordsTable->selectionModel()->hasSelection())
                 m_ui->passwordsTable->clearSelection();
             else
@@ -551,34 +661,35 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-
 void MainWindow::startAttack()
 {
-    if (!checkSettings())
+    if(!checkSettings())
         return;
 
     // Session for johnny
     QString date = QDateTime::currentDateTime().toString("MM-dd-yy-hh-mm-ss");
     QString defaultFormat = m_sessionCurrent.defaultFormat();
-    m_sessionCurrent = JohnSession(date, &m_settings);
+    m_sessionCurrent      = JohnSession(date, &m_settings);
     m_sessionCurrent.setDefaultFormat(defaultFormat);
 
     QString sessionFile = m_sessionCurrent.filePath() + ".rec";
 
-    if (QFileInfo(sessionFile).isReadable())
+    if(QFileInfo(sessionFile).isReadable())
     {
         QMessageBox::StandardButton button =
-                QMessageBox::question(this,
-                tr("Johnny"),
-                tr("A session file already exists with this name (%1). Do you want to overwrite?").arg(sessionFile),
-                QMessageBox::Yes | QMessageBox::No);
-        if (button == QMessageBox::Yes)
+            QMessageBox::question(this, tr("Johnny"),
+                                  tr("A session file already exists with this "
+                                     "name (%1). Do you want to overwrite?")
+                                      .arg(sessionFile),
+                                  QMessageBox::Yes | QMessageBox::No);
+        if(button == QMessageBox::Yes)
         {
             // Remove existing session .rec file to avoid issues with JtR
             if(!QFile(sessionFile).remove())
             {
-                QMessageBox::warning(this, tr("Warning"),
-                                     tr("Unable to remove file session file %1").arg(sessionFile));
+                QMessageBox::warning(
+                    this, tr("Warning"),
+                    tr("Unable to remove file session file %1").arg(sessionFile));
             }
         }
     }
@@ -588,23 +699,35 @@ void MainWindow::startAttack()
     parameters << QString("--session=%1").arg(m_sessionCurrent.filePath());
 
     // We check that we have file name.
-    if (!m_sessionPasswordFiles.isEmpty()) {
+    if(!m_sessionPasswordFiles.isEmpty())
+    {
         QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
-        // If some hashes are unselected, write a new file with only selected hashes
-        if (unselectedRows.size() > 0) {
+        // If some hashes are unselected, write a new file with only selected
+        // hashes
+        if(unselectedRows.size() > 0)
+        {
             QString newFilePath = m_sessionCurrent.filePath() + ".pw";
-            int currentRow = 0;
-            for (int fileCount = 0; fileCount < m_sessionPasswordFiles.size(); fileCount++) {
+            int     currentRow  = 0;
+            for(int fileCount = 0; fileCount < m_sessionPasswordFiles.size();
+                fileCount++)
+            {
                 QFile file(m_sessionPasswordFiles[fileCount]);
                 QFile newFile(newFilePath);
-                if (file.open(QIODevice::ReadOnly | QIODevice::Text)
-                        && newFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+                if(file.open(QIODevice::ReadOnly | QIODevice::Text) &&
+                   newFile.open(QIODevice::WriteOnly | QIODevice::Text |
+                                QIODevice::Truncate))
+                {
                     QTextStream out(&newFile);
-                    while (!file.atEnd()) {
+                    while(!file.atEnd())
+                    {
                         QString line = file.readLine();
-                        if (unselectedRows.isEmpty() || unselectedRows.first() != currentRow) {
+                        if(unselectedRows.isEmpty() ||
+                           (unselectedRows.first() != currentRow))
+                        {
                             out << line;
-                        } else if(!unselectedRows.isEmpty()) {
+                        }
+                        else if(!unselectedRows.isEmpty())
+                        {
                             unselectedRows.removeFirst();
                         }
                         currentRow++;
@@ -613,15 +736,17 @@ void MainWindow::startAttack()
                 }
             }
             // Else, pass the file AS IS to john
-        } else {
+        }
+        else
+        {
             parameters << m_sessionPasswordFiles;
         }
         startJohn(parameters);
-    } else {
-        QMessageBox::warning(
-            this,
-            tr("Johnny"),
-            tr("No password files specified."));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Johnny"),
+                             tr("No password files specified."));
     }
 }
 
@@ -633,11 +758,12 @@ QStringList MainWindow::saveAttackParameters()
     m_sessionCurrent.setPasswordFiles(m_sessionPasswordFiles);
 
     QStringList parameters;
-    QString format = ""; // default
+    QString     format = ""; // default
     // We prepare parameters list from options section.
     // General options
     // Format
-    if (!m_ui->formatComboBox->currentText().startsWith(tr("Auto detect"))) {
+    if(!m_ui->formatComboBox->currentText().startsWith(tr("Default")))
+    {
         // We have one list for formats and subformats. Subformats
         // contain short description after it.
         // Strings could be like:
@@ -661,7 +787,8 @@ QStringList MainWindow::saveAttackParameters()
         // We try to find ')'.
         int index = format.indexOf(")");
         // We check that we have brace in string.
-        if (index >= 0) {
+        if(index >= 0)
+        {
             // We truncate line to index keeping index.
             format.truncate(index + 1);
         }
@@ -672,245 +799,368 @@ QStringList MainWindow::saveAttackParameters()
     m_sessionCurrent.setFormatUI(m_ui->formatComboBox->currentText());
 
     // Modes
-    QWidget* selectedMode = m_ui->attackModeTabWidget->currentWidget();
-    if (selectedMode == m_ui->defaultModeTab) {
+    QWidget *selectedMode = m_ui->attackModeTabWidget->currentWidget();
+    if(selectedMode == m_ui->defaultModeTab)
+    {
         // Default behaviour - no modes
         // There are no options here.
         m_sessionCurrent.setMode(JohnSession::DEFAULT_MODE);
-    } else if (selectedMode == m_ui->singleModeTab) {
+    }
+    else if(selectedMode == m_ui->singleModeTab)
+    {
         // "Single crack" mode
         parameters << "--single";
         m_sessionCurrent.setMode(JohnSession::SINGLECRACK_MODE);
         // External mode, filter
-        if (m_ui->checkBox_SingleCrackModeExternalName->isChecked()) {
-            m_sessionCurrent.setExternalName(m_ui->lineEditSingleCrackModeExternalName->text());
-            parameters << ("--external=" + m_ui->lineEditSingleCrackModeExternalName->text());
+        if(m_ui->checkBox_SingleCrackModeExternalName->isChecked())
+        {
+            m_sessionCurrent.setExternalName(
+                m_ui->lineEditSingleCrackModeExternalName->text());
+            parameters << ("--external=" +
+                           m_ui->lineEditSingleCrackModeExternalName->text());
         }
-
-    } else if (selectedMode == m_ui->wordlistModeTab) {
+    }
+    else if(selectedMode == m_ui->wordlistModeTab)
+    {
         // Wordlist mode
         m_sessionCurrent.setMode(JohnSession::WORDLIST_MODE);
-        if (m_isJumbo && m_ui->checkBoxWordlistLoopback->isChecked()) {
+        if(m_isJumbo && m_ui->checkBoxWordlistLoopback->isChecked())
+        {
             parameters << ("--loopback=" + m_ui->lineEditWordlistFile->text());
             m_sessionCurrent.setLoopback(true);
-        } else {
+        }
+        else
+        {
             parameters << ("--wordlist=" + m_ui->lineEditWordlistFile->text());
             m_sessionCurrent.setLoopback(false);
         }
         m_sessionCurrent.setWordlistFile(m_ui->lineEditWordlistFile->text());
 
         // Rules
-        if (m_ui->checkBox_WordlistModeRules->isChecked()) {
+        if(m_ui->checkBox_WordlistModeRules->isChecked())
+        {
             m_sessionCurrent.setRules(m_ui->lineEdit_WordlistRules->text());
-            if (!m_isJumbo || m_ui->lineEdit_WordlistRules->text().isEmpty()) {
+            if(!m_isJumbo || m_ui->lineEdit_WordlistRules->text().isEmpty())
+            {
                 parameters << "--rules";
-            } else {
+            }
+            else
+            {
                 parameters << ("--rules=" + m_ui->lineEdit_WordlistRules->text());
             }
         }
         // External mode, filter
-        if (m_ui->checkBox_WordlistModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->lineEditWordlistModeExternalName->text());
-            m_sessionCurrent.setExternalName(m_ui->lineEditWordlistModeExternalName->text());
+        if(m_ui->checkBox_WordlistModeExternalName->isChecked())
+        {
+            parameters << ("--external=" +
+                           m_ui->lineEditWordlistModeExternalName->text());
+            m_sessionCurrent.setExternalName(
+                m_ui->lineEditWordlistModeExternalName->text());
         }
         // Hybrid mask mode
-        if (m_isJumbo && m_ui->checkBoxWordlistModeMask->isChecked()) {
+        if(m_isJumbo && m_ui->checkBoxWordlistModeMask->isChecked())
+        {
             parameters << ("--mask=" + m_ui->lineEditWordlistModeMask->text());
             m_sessionCurrent.setMask(m_ui->lineEditWordlistModeMask->text());
         }
-    } else if (selectedMode == m_ui->incrementalModeTab) {
+    }
+    else if(selectedMode == m_ui->incrementalModeTab)
+    {
         // "Incremental" mode
         // It could be with or without name.
         m_sessionCurrent.setMode(JohnSession::INCREMENTAL_MODE);
-        if (m_ui->checkBox_IncrementalModeName->isChecked()) {
+        if(m_ui->checkBox_IncrementalModeName->isChecked())
+        {
             // With name
-            parameters << ("--incremental=" + m_ui->lineEditIncrementalModeName->text());
+            parameters << ("--incremental=" +
+                           m_ui->lineEditIncrementalModeName->text());
             m_sessionCurrent.setCharset(m_ui->lineEditIncrementalModeName->text());
-        } else {
+        }
+        else
+        {
             // Without name
             parameters << "--incremental";
         }
         // External mode, filter
-        if (m_ui->checkBox_IncrementalModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->lineEditIncrementalModeExternalName->text());
-            m_sessionCurrent.setExternalName(m_ui->lineEditIncrementalModeExternalName->text());
+        if(m_ui->checkBox_IncrementalModeExternalName->isChecked())
+        {
+            parameters << ("--external=" +
+                           m_ui->lineEditIncrementalModeExternalName->text());
+            m_sessionCurrent.setExternalName(
+                m_ui->lineEditIncrementalModeExternalName->text());
         }
         // Hybrid mask mode
-        if (m_isJumbo && m_ui->checkBoxIncrementalModeMask->isChecked()) {
+        if(m_isJumbo && m_ui->checkBoxIncrementalModeMask->isChecked())
+        {
             parameters << ("--mask=" + m_ui->lineEditIncrementalModeMask->text());
             m_sessionCurrent.setMask(m_ui->lineEditIncrementalModeMask->text());
         }
-    } else if (selectedMode == m_ui->externalModeTab) {
+    }
+    else if(selectedMode == m_ui->externalModeTab)
+    {
         // External mode
         m_sessionCurrent.setMode(JohnSession::EXTERNAL_MODE);
         parameters << ("--external=" + m_ui->lineEditExternalModeName->text());
         m_sessionCurrent.setExternalName(m_ui->lineEditExternalModeName->text());
         // Hybrid mask mode
-        if (m_isJumbo && m_ui->checkBoxExternalModeMask->isChecked()) {
+        if(m_isJumbo && m_ui->checkBoxExternalModeMask->isChecked())
+        {
             parameters << ("--mask=" + m_ui->lineEditExternalModeMask->text());
             m_sessionCurrent.setMask(m_ui->lineEditExternalModeMask->text());
         }
-    } else if (selectedMode == m_ui->maskModeTab) {
+    }
+    else if(selectedMode == m_ui->maskModeTab)
+    {
         // Pure mask mode
         m_sessionCurrent.setMode(JohnSession::MASK_MODE);
         parameters << ("--mask=" + m_ui->lineEditMaskModeMask->text());
         m_sessionCurrent.setMask(m_ui->lineEditMaskModeMask->text());
-        //Rules
-        if (m_ui->checkBoxMaskModeRules->isChecked()) {
+        // Rules
+        if(m_ui->checkBoxMaskModeRules->isChecked())
+        {
             m_sessionCurrent.setRules(m_ui->lineEditMaskModeRules->text());
             parameters << ("--rules=" + m_ui->lineEditMaskModeRules->text());
         }
         // External mode, filter
-        if (m_ui->checkBoxMaskModeExternalName->isChecked()) {
-            parameters << ("--external=" + m_ui->lineEditMaskModeExternalName->text());
-            m_sessionCurrent.setExternalName(m_ui->lineEditMaskModeExternalName->text());
+        if(m_ui->checkBoxMaskModeExternalName->isChecked())
+        {
+            parameters << ("--external=" +
+                           m_ui->lineEditMaskModeExternalName->text());
+            m_sessionCurrent.setExternalName(
+                m_ui->lineEditMaskModeExternalName->text());
         }
-    } else if (selectedMode == m_ui->markovModeTab) {
+    }
+    else if(selectedMode == m_ui->markovModeTab)
+    {
         m_sessionCurrent.setMode(JohnSession::MARKOV_MODE);
         m_sessionCurrent.setMarkovMode(m_ui->lineEditMarkovMode->text());
-        if (m_ui->checkBoxMarkovModeMinLevel->isChecked())
-            m_sessionCurrent.setMarkovMinLevel(m_ui->spinBoxMarkovModeMinLevel->value());
-        if (m_ui->checkBoxMarkovModeMaxLevel)
-            m_sessionCurrent.setMarkovMaxLevel(m_ui->spinBoxMarkovModeMaxLevel->value());
-        if (m_ui->checkBoxMarkovModeStartIndex->isChecked())
-            m_sessionCurrent.setMarkovStartIndex(m_ui->spinBoxMarkovModeStartIndex->value());
-        if (m_ui->checkBoxMarkovModeEndIndex->isChecked())
-            m_sessionCurrent.setMarkovEndIndex(m_ui->spinBoxMarkovModeEndIndex->value());
+        if(m_ui->checkBoxMarkovModeMinLevel->isChecked())
+            m_sessionCurrent.setMarkovMinLevel(
+                m_ui->spinBoxMarkovModeMinLevel->value());
+        if(m_ui->checkBoxMarkovModeMaxLevel)
+            m_sessionCurrent.setMarkovMaxLevel(
+                m_ui->spinBoxMarkovModeMaxLevel->value());
+        if(m_ui->checkBoxMarkovModeStartIndex->isChecked())
+            m_sessionCurrent.setMarkovStartIndex(
+                m_ui->spinBoxMarkovModeStartIndex->value());
+        if(m_ui->checkBoxMarkovModeEndIndex->isChecked())
+            m_sessionCurrent.setMarkovEndIndex(
+                m_ui->spinBoxMarkovModeEndIndex->value());
         QString markov;
         // --markov=MODE[:LEVEL[:START[:END[:LENGTH]]]]
-        // We don't use length parameter since magnum said it was deprecated, global option -min-leng and -max-len are the way to go
+        // We don't use length parameter since magnum said it was deprecated,
+        // global option -min-leng and -max-len are the way to go
         markov += m_ui->lineEditMarkovMode->text() + ":";
-        if (m_ui->checkBoxMarkovModeMinLevel->isChecked() && !m_ui->checkBoxMarkovModeMaxLevel->isChecked()) {
-                QMessageBox::warning(this, tr("Warning - johnny"), tr("Your specified minimum markov level will be ignored in the attack since you didn't specify a maximum markov level."
-                                                            " You can either specify a maximum markov level only or a maximum and a minimum."));
+        if(m_ui->checkBoxMarkovModeMinLevel->isChecked() &&
+           !m_ui->checkBoxMarkovModeMaxLevel->isChecked())
+        {
+            QMessageBox::warning(this, tr("Warning - johnny"),
+                                 tr("Your specified minimum markov level will "
+                                    "be ignored in the attack since you didn't "
+                                    "specify a maximum markov level."
+                                    " You can either specify a maximum markov "
+                                    "level only or a maximum and a minimum."));
         }
-        markov += (m_ui->checkBoxMarkovModeMinLevel->isChecked() && m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMinLevel->value()) + "-") : "");
-        markov += (m_ui->checkBoxMarkovModeMaxLevel->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeMaxLevel->value()) + ":") : ":");
-        markov += (m_ui->checkBoxMarkovModeStartIndex->isChecked() ? (QString::number(m_ui->spinBoxMarkovModeStartIndex->value()) + ":") : ":");
-        markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked() ? QString::number(m_ui->spinBoxMarkovModeEndIndex->value()) : "");
+        markov +=
+            (m_ui->checkBoxMarkovModeMinLevel->isChecked() &&
+                     m_ui->checkBoxMarkovModeMaxLevel->isChecked()
+                 ? (QString::number(m_ui->spinBoxMarkovModeMinLevel->value()) + "-")
+                 : "");
+        markov +=
+            (m_ui->checkBoxMarkovModeMaxLevel->isChecked()
+                 ? (QString::number(m_ui->spinBoxMarkovModeMaxLevel->value()) + ":")
+                 : ":");
+        markov +=
+            (m_ui->checkBoxMarkovModeStartIndex->isChecked()
+                 ? (QString::number(m_ui->spinBoxMarkovModeStartIndex->value()) +
+                    ":")
+                 : ":");
+        markov += (m_ui->checkBoxMarkovModeEndIndex->isChecked()
+                       ? QString::number(m_ui->spinBoxMarkovModeEndIndex->value())
+                       : "");
         parameters << ("--markov=" + markov);
 
         // External mode, filter
-        if (m_ui->checkBoxMarkovModeExternalName->isChecked()) {
-            m_sessionCurrent.setExternalName(m_ui->lineEditMarkovModeExternalName->text());
-            parameters << ("--external=" + m_ui->lineEditMarkovModeExternalName->text());
+        if(m_ui->checkBoxMarkovModeExternalName->isChecked())
+        {
+            m_sessionCurrent.setExternalName(
+                m_ui->lineEditMarkovModeExternalName->text());
+            parameters << ("--external=" +
+                           m_ui->lineEditMarkovModeExternalName->text());
         }
         // Hybrid mask mode
-        if (m_ui->checkBoxMarkovModeMask->isChecked()) {
+        if(m_ui->checkBoxMarkovModeMask->isChecked())
+        {
             m_sessionCurrent.setMask(m_ui->lineEditMarkovModeMask->text());
             parameters << ("--mask=" + m_ui->lineEditMarkovModeMask->text());
         }
-    } else if (selectedMode == m_ui->princeModeTab) {
+    }
+    else if(selectedMode == m_ui->princeModeTab)
+    {
         m_sessionCurrent.setMode(JohnSession::PRINCE_MODE);
-        m_sessionCurrent.setWordlistFile(m_ui->lineEditPrinceModeWordlistFile->text());
-        if (m_ui->checkBoxPrinceModeLoopback->isChecked()) {
-            parameters << ("--prince-loopback=" + m_ui->lineEditPrinceModeWordlistFile->text());
+        m_sessionCurrent.setWordlistFile(
+            m_ui->lineEditPrinceModeWordlistFile->text());
+        if(m_ui->checkBoxPrinceModeLoopback->isChecked())
+        {
+            parameters << ("--prince-loopback=" +
+                           m_ui->lineEditPrinceModeWordlistFile->text());
             m_sessionCurrent.setLoopback(true);
-        } else {
-            parameters << ("--prince=" + m_ui->lineEditPrinceModeWordlistFile->text());
+        }
+        else
+        {
+            parameters << ("--prince=" +
+                           m_ui->lineEditPrinceModeWordlistFile->text());
             m_sessionCurrent.setLoopback(false);
         }
-        //Rules
-        if (m_ui->checkBoxPrinceModeRules->isChecked()) {
+        // Rules
+        if(m_ui->checkBoxPrinceModeRules->isChecked())
+        {
             m_sessionCurrent.setRules(m_ui->lineEditPrinceModeRules->text());
             parameters << ("--rules=" + m_ui->lineEditPrinceModeRules->text());
         }
         // External mode, filter
-        if (m_ui->checkBoxPrinceModeExternalName->isChecked()) {
-            m_sessionCurrent.setExternalName(m_ui->lineEditPrinceModeExternalName->text());
-            parameters << ("--external=" + m_ui->lineEditPrinceModeExternalName->text());
+        if(m_ui->checkBoxPrinceModeExternalName->isChecked())
+        {
+            m_sessionCurrent.setExternalName(
+                m_ui->lineEditPrinceModeExternalName->text());
+            parameters << ("--external=" +
+                           m_ui->lineEditPrinceModeExternalName->text());
         }
         // Hybrid mask mode
-        if (m_ui->checkBoxPrinceModeMask->isChecked()) {
+        if(m_ui->checkBoxPrinceModeMask->isChecked())
+        {
             m_sessionCurrent.setMask(m_ui->lineEditPrinceModeMask->text());
             parameters << ("--mask=" + m_ui->lineEditPrinceModeMask->text());
         }
         // Minimum number of elements per chain
-        if (m_ui->checkBoxPrinceMinElementsPerChain->isChecked()) {
-            m_sessionCurrent.setPrinceMinElementsPerChain(m_ui->spinBoxPrinceMinElementsPerChain->value());
-            parameters << (QString("--prince-elem-cnt-min=%1").arg(m_ui->spinBoxPrinceMinElementsPerChain->value()));
+        if(m_ui->checkBoxPrinceMinElementsPerChain->isChecked())
+        {
+            m_sessionCurrent.setPrinceMinElementsPerChain(
+                m_ui->spinBoxPrinceMinElementsPerChain->value());
+            parameters
+                << (QString("--prince-elem-cnt-min=%1")
+                        .arg(m_ui->spinBoxPrinceMinElementsPerChain->value()));
         }
         // Maximum number of elements per chain
-        if (m_ui->checkBoxPrinceMaxElementsPerChain->isChecked()) {
-            m_sessionCurrent.setPrinceMaxElementsPerChain(m_ui->spinBoxPrinceMaxElementsPerChain->value());
-            parameters << (QString("--prince-elem-cnt-max=%1").arg(m_ui->spinBoxPrinceMaxElementsPerChain->value()));
+        if(m_ui->checkBoxPrinceMaxElementsPerChain->isChecked())
+        {
+            m_sessionCurrent.setPrinceMaxElementsPerChain(
+                m_ui->spinBoxPrinceMaxElementsPerChain->value());
+            parameters
+                << (QString("--prince-elem-cnt-max=%1")
+                        .arg(m_ui->spinBoxPrinceMaxElementsPerChain->value()));
         }
         // Initial skip
-        if (m_ui->checkBoxPrinceModeInitialSkip->isChecked()) {
-            m_sessionCurrent.setPrinceInitialSkip(m_ui->spinBoxPrinceModeInitialSkip->value());
-            parameters << (QString("--prince-skip=%1").arg(m_ui->spinBoxPrinceModeInitialSkip->value()));
+        if(m_ui->checkBoxPrinceModeInitialSkip->isChecked())
+        {
+            m_sessionCurrent.setPrinceInitialSkip(
+                m_ui->spinBoxPrinceModeInitialSkip->value());
+            parameters << (QString("--prince-skip=%1")
+                               .arg(m_ui->spinBoxPrinceModeInitialSkip->value()));
         }
         // Load only specified number of words from input wordlist
-        if (m_ui->checkBoxPrinceModeLimitInputWords->isChecked()) {
-            m_sessionCurrent.setPrinceLimitWordsFromWordlist(m_ui->spinBoxPrinceModeLimitInputWords->value());
-            parameters << (QString("--prince-wl-max=%1").arg(m_ui->spinBoxPrinceModeLimitInputWords->value()));
+        if(m_ui->checkBoxPrinceModeLimitInputWords->isChecked())
+        {
+            m_sessionCurrent.setPrinceLimitWordsFromWordlist(
+                m_ui->spinBoxPrinceModeLimitInputWords->value());
+            parameters
+                << (QString("--prince-wl-max=%1")
+                        .arg(m_ui->spinBoxPrinceModeLimitInputWords->value()));
         }
         // Limit number of password candidates
-        if (m_ui->checkBoxPrinceModeLimitCandidates->isChecked()) {
-            m_sessionCurrent.setPrinceLimitNbPasswordCandidates(m_ui->spinBoxPrinceModeLimitCandidates->value());
-            parameters << (QString("--prince-limit=%1").arg(m_ui->spinBoxPrinceModeLimitCandidates->value()));
+        if(m_ui->checkBoxPrinceModeLimitCandidates->isChecked())
+        {
+            m_sessionCurrent.setPrinceLimitNbPasswordCandidates(
+                m_ui->spinBoxPrinceModeLimitCandidates->value());
+            parameters
+                << (QString("--prince-limit=%1")
+                        .arg(m_ui->spinBoxPrinceModeLimitCandidates->value()));
         }
-        // Calculate length distribution from wordlist instead of using built-in table
-        m_sessionCurrent.setPrinceUseWordlistForLengthDistribution(m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked());
-        if (m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked())
+        // Calculate length distribution from wordlist instead of using built-in
+        // table
+        m_sessionCurrent.setPrinceUseWordlistForLengthDistribution(
+            m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked());
+        if(m_ui->checkBoxPrinceCalculateDistributionWithWordlist->isChecked())
             parameters << "--prince-wl-dist-len";
         // Permute first letter case
-        m_sessionCurrent.setPrincePermuteFirstLetterCase(m_ui->checkBoxPrinceModePermuteCase->isChecked());
-        if (m_ui->checkBoxPrinceModePermuteCase->isChecked())
+        m_sessionCurrent.setPrincePermuteFirstLetterCase(
+            m_ui->checkBoxPrinceModePermuteCase->isChecked());
+        if(m_ui->checkBoxPrinceModePermuteCase->isChecked())
             parameters << "--prince-case-permute";
         // Memory map
-        m_sessionCurrent.setPrinceMemoryMap(m_ui->checkBoxPrinceModeMapToMemory->isChecked());
-        if (m_ui->checkBoxPrinceModeMapToMemory->isChecked())
+        m_sessionCurrent.setPrinceMemoryMap(
+            m_ui->checkBoxPrinceModeMapToMemory->isChecked());
+        if(m_ui->checkBoxPrinceModeMapToMemory->isChecked())
             parameters << "--prince-mmap";
         // Show total keyspace
-        m_sessionCurrent.setPrinceShowTotalKeyspace(m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked());
-        if (m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked())
+        m_sessionCurrent.setPrinceShowTotalKeyspace(
+            m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked());
+        if(m_ui->checkBoxPrinceModeShowTotalKeyspace->isChecked())
             parameters << "--prince-keyspace";
     }
 
     // Selectors
-    if (m_ui->checkBox_LimitUsers->isChecked()) {
+    if(m_ui->checkBox_LimitUsers->isChecked())
+    {
         parameters << ("--users=" + m_ui->lineEditLimitUsers->text());
         m_sessionCurrent.setLimitUsers(m_ui->lineEditLimitUsers->text());
     }
-    if (m_ui->checkBox_LimitGroups->isChecked()) {
+    if(m_ui->checkBox_LimitGroups->isChecked())
+    {
         parameters << ("--groups=" + m_ui->lineEditLimitGroups->text());
         m_sessionCurrent.setLimitGroups(m_ui->lineEditLimitGroups->text());
     }
-    if (m_ui->checkBox_LimitShells->isChecked()) {
+    if(m_ui->checkBox_LimitShells->isChecked())
+    {
         parameters << ("--shells=" + m_ui->lineEditLimitShells->text());
         m_sessionCurrent.setLimitShells(m_ui->lineEditLimitShells->text());
     }
-    if (m_ui->checkBox_LimitSalts->isChecked()) {
-        parameters << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
+    if(m_ui->checkBox_LimitSalts->isChecked())
+    {
+        parameters
+            << (QString("--salts=%1").arg(m_ui->spinBox_LimitSalts->value()));
         m_sessionCurrent.setLimitSalts(m_ui->spinBox_LimitSalts->value());
     }
 
     // Advanced options
-    if (m_ui->checkBox_UseFork->isChecked() && m_ui->widgetFork->isVisible()) {
-        parameters << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
+    if(m_ui->checkBox_UseFork->isChecked() && m_ui->widgetFork->isVisible())
+    {
+        parameters
+            << (QString("--fork=%1").arg(m_ui->spinBox_nbOfProcess->value()));
         m_sessionCurrent.setForkProcesses(m_ui->spinBox_nbOfProcess->value());
     }
     m_sessionCurrent.setOpenMPThreads(m_ui->spinBox_openMPThreads->value());
-    if (m_ui->checkBox_EnvironmentVar->isChecked()) {
-       m_sessionCurrent.setEnvironmentVariables(m_ui->lineEdit_EnvironmentVar->text());
+    if(m_ui->checkBox_EnvironmentVar->isChecked())
+    {
+        m_sessionCurrent.setEnvironmentVariables(
+            m_ui->lineEdit_EnvironmentVar->text());
     }
     // Jumbo global options
-    if (m_isJumbo) {
-        if (m_ui->checkBoxMinCandidateLength->isChecked()) {
-            parameters << (QString("--min-len=%1").arg(m_ui->spinBoxMinCandidateLength->value()));
-            m_sessionCurrent.setMinPasswordCandidatesLength(m_ui->spinBoxMinCandidateLength->value());
+    if(m_isJumbo)
+    {
+        if(m_ui->checkBoxMinCandidateLength->isChecked())
+        {
+            parameters << (QString("--min-len=%1")
+                               .arg(m_ui->spinBoxMinCandidateLength->value()));
+            m_sessionCurrent.setMinPasswordCandidatesLength(
+                m_ui->spinBoxMinCandidateLength->value());
         }
-        if (m_ui->checkBoxMaxCandidateLength->isChecked()) {
-            parameters << (QString("--max-len=%1").arg(m_ui->spinBoxMaxCandidateLength->value()));
-            m_sessionCurrent.setMaxPasswordCandidatesLength(m_ui->spinBoxMaxCandidateLength->value());
+        if(m_ui->checkBoxMaxCandidateLength->isChecked())
+        {
+            parameters << (QString("--max-len=%1")
+                               .arg(m_ui->spinBoxMaxCandidateLength->value()));
+            m_sessionCurrent.setMaxPasswordCandidatesLength(
+                m_ui->spinBoxMaxCandidateLength->value());
         }
     }
 
     // Save unselected rows
     QList<int> unselectedRows;
-    for (int i = 0; i < m_hashTable->rowCount(); i++) {
-        if (m_hashTable->data(m_hashTable->index(i,0),Qt::CheckStateRole) == Qt::Unchecked) {
+    for(int i = 0; i < m_hashTable->rowCount(); i++)
+    {
+        if(m_hashTable->data(m_hashTable->index(i, 0), Qt::CheckStateRole) ==
+           Qt::Unchecked)
+        {
             unselectedRows.append(i);
         }
     }
@@ -925,30 +1175,40 @@ void MainWindow::startJohn(QStringList args)
     // signals are already connected with our slots. So we need only
     // start it.
 
-    appendLog(QTime::currentTime().toString("[hh:mm:ss] ") + m_pathToJohn + " " + args.join(" ") + '\n');
+    appendLog(QTime::currentTime().toString("[hh:mm:ss] ") + m_pathToJohn +
+              " " + args.join(" ") + '\n');
 
-    //We set up environment variables, ex : useful for openMP
+    // We set up environment variables, ex : useful for openMP
     QProcessEnvironment env;
-    // If default is chosen, we don't specify OMP_NUM_THREADS and john will choose the number of
-    // threads based on the number of processors.
-    if (m_ui->spinBox_openMPThreads->text() != m_ui->spinBox_openMPThreads->specialValueText()) {
-        env.insert("OMP_NUM_THREADS", m_ui->spinBox_openMPThreads->text()); // Add an environment variable
+    // If default is chosen, we don't specify OMP_NUM_THREADS and john will
+    // choose the number of threads based on the number of processors.
+    if(m_ui->spinBox_openMPThreads->text() !=
+       m_ui->spinBox_openMPThreads->specialValueText())
+    {
+        env.insert("OMP_NUM_THREADS", m_ui->spinBox_openMPThreads->text());
     }
 
     // User specified environment variables
-    if (m_ui->checkBox_EnvironmentVar->isChecked()) {
+    if(m_ui->checkBox_EnvironmentVar->isChecked())
+    {
         // Parse the input
-        QStringList varList = m_ui->lineEdit_EnvironmentVar->text().split(",", QString::SkipEmptyParts);
-        for (int i = 0; i < varList.size(); i++) {
+        QStringList varList =
+            m_ui->lineEdit_EnvironmentVar->text().split(",",
+                                                        QString::SkipEmptyParts);
+        for(int i = 0; i < varList.size(); i++)
+        {
+            // we assume value of variable doesn't have = inside
             QStringList varPair = varList[i].split("=", QString::SkipEmptyParts);
-            if (varPair.size() == 2) { // we assume value of variable doesn't have = inside
+            if(varPair.size() == 2)
+            {
                 env.insert(varPair[0].trimmed(), varPair[1].trimmed());
-            } else {
-                QMessageBox::warning(
-                        this,
-                        tr("Environment variables"),
-                        tr("The format to set environment variable must be in the format : varName1="
-                           "value, varName2=value etc.. "));
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Environment variables error"),
+                                     tr("The environment variables must be in"
+                                        " the format : varName1=value, "
+                                        "varName2=value, ..."));
             }
         }
     }
@@ -958,10 +1218,9 @@ void MainWindow::startJohn(QStringList args)
     m_johnAttack.start();
 }
 
-
 void MainWindow::resumeAttack()
 {
-    if (!checkSettings())
+    if(!checkSettings())
         return;
 
     QStringList parameters;
@@ -972,9 +1231,9 @@ void MainWindow::resumeAttack()
 
 void MainWindow::updateJohnOutput()
 {
-    //read output and error buffers
-    appendLog(m_johnAttack.readAllStandardOutput()
-              + m_johnAttack.readAllStandardError());
+    // read output and error buffers
+    appendLog(m_johnAttack.readAllStandardOutput() +
+              m_johnAttack.readAllStandardError());
 
     // NOTE: Probably here we want to parse John's output, catch newly
     //       cracked passwords and so on. However John's output is buffered.
@@ -1022,7 +1281,8 @@ void MainWindow::showJohnStarted()
 void MainWindow::showJohnError(QProcess::ProcessError error)
 {
     QString message;
-    switch (error) {
+    switch(error)
+    {
     case QProcess::FailedToStart:
         message = tr("John failed to start."
                      "Check your path to John."
@@ -1046,13 +1306,15 @@ void MainWindow::showJohnError(QProcess::ProcessError error)
         break;
 
     case QProcess::UnknownError:
-        message = tr("An unknown problem occurred to John. Verify Console Log for any details.");
+        message = tr("An unknown problem occurred to John. Verify Console Log "
+                     "for any details.");
         break;
     }
 
-    QMessageBox::critical(this, tr("Johnny"), message + " (john is " + m_pathToJohn + ")");
+    QMessageBox::critical(this, tr("Johnny"),
+                          message + " (john is " + m_pathToJohn + ")");
 
-    if (QObject::sender() == &m_johnGuess)
+    if(QObject::sender() == &m_johnGuess)
     {
         m_ui->actionGuessPassword->setEnabled(true);
     }
@@ -1065,23 +1327,29 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     QString sessionName(m_sessionCurrent.name());
 
     bool isNewSession = !m_sessionHistory.contains(sessionName);
-    bool isRecReadable = QFileInfo(m_sessionCurrent.filePath() + ".rec").isReadable();
-    if ((isNewSession == true) && (isRecReadable == true)) {
+    bool isRecReadable =
+        QFileInfo(m_sessionCurrent.filePath() + ".rec").isReadable();
+    if((isNewSession == true) && (isRecReadable == true))
+    {
         // New session saved by john, add it to the list
-        QAction* action = new QAction(sessionName, this);
+        QAction *action = new QAction(sessionName, this);
         m_sessionMenu->insertAction(m_sessionMenu->actions()[0], action);
         action->setData(sessionName);
         m_sessionHistory.append(sessionName);
         action->setToolTip(m_sessionPasswordFiles.join(" "));
-    } else if ((isNewSession == false) && (isRecReadable == false)) {
-        // An old session (which was resumed) terminated and it can no longer be resumed (john deleted .rec)
-        // so we remove it from the session history list to have an error-prone UI
+    }
+    else if(!isNewSession && !isRecReadable)
+    {
+        // An old session (which was resumed) terminated and it can no longer be
+        // resumed (john deleted .rec)
+        // so we remove it from the session history list to have an error-prone
+        // UI
         m_sessionHistory.removeOne(sessionName);
         m_sessionCurrent.remove();
-        foreach(QAction* actions, m_sessionMenu->actions()) {
-            if (actions->data().toString() == sessionName) {
-                    m_sessionMenu->removeAction(actions);
-            }
+        foreach(QAction *actions, m_sessionMenu->actions())
+        {
+            if(actions->data().toString() == sessionName)
+                m_sessionMenu->removeAction(actions);
         }
     }
 
@@ -1091,9 +1359,11 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
     m_ui->actionStartAttack->setEnabled(true);
     m_ui->actionOpenPassword->setEnabled(true);
     m_ui->actionOpenSession->setEnabled(true);
-    m_ui->actionResumeAttack->setEnabled(m_sessionHistory.contains(sessionName) && isRecReadable);
+    m_ui->actionResumeAttack->setEnabled(
+        m_sessionHistory.contains(sessionName) && isRecReadable);
 
-    if (exitStatus == QProcess::CrashExit) {
+    if(exitStatus == QProcess::CrashExit)
+    {
         qDebug() << "JtR seems to have crashed.";
         return;
     }
@@ -1105,12 +1375,13 @@ void MainWindow::showJohnFinished(int exitCode, QProcess::ExitStatus exitStatus)
 
 void MainWindow::callJohnShow()
 {
-    if (m_johnShow.state() == QProcess::NotRunning) {
+    if(m_johnShow.state() == QProcess::NotRunning)
+    {
         QStringList args;
         // We add current format key if it is not empty.
-        if (!m_sessionCurrent.format().isEmpty())
+        if(!m_sessionCurrent.format().isEmpty())
             args << "--format=" + m_sessionCurrent.format();
-        if (m_johnShowTemp)
+        if(m_johnShowTemp)
             args << "--show" << m_johnShowTemp->fileName();
         m_johnShow.setJohnProgram(m_pathToJohn);
         m_johnShow.setArgs(args);
@@ -1122,12 +1393,15 @@ void MainWindow::readJohnShow()
 {
     // We read all output.
     QString formattedFormat(m_sessionCurrent.format());
-    if (formattedFormat.isEmpty() && !m_sessionCurrent.defaultFormat().isEmpty()) { // default format was used
+    if(formattedFormat.isEmpty() && !m_sessionCurrent.defaultFormat().isEmpty())
+    { // default format was used
         formattedFormat = "format=" + m_sessionCurrent.defaultFormat();
-    } else {
+    }
+    else
+    {
         formattedFormat.prepend("format=");
     }
-    QByteArray output = m_johnShow.readAllStandardOutput();
+    QByteArray  output = m_johnShow.readAllStandardOutput();
     QTextStream outputStream(output);
     // We parse it.
     // We read output line by line and take user name and password.
@@ -1140,16 +1414,18 @@ void MainWindow::readJohnShow()
     firstLine = line;
     // We read to the end or before empty line.
     bool hasTableChanged = false;
-    while (!line.isNull() && line != "") {
+    while(!line.isNull() && line != "")
+    {
         line.remove(QRegExp("\\r?\\n"));
         // We split lines to fields.
-        int left = line.indexOf(":");
-        int right = line.lastIndexOf("::");
+        int     left     = line.indexOf(":");
+        int     right    = line.lastIndexOf("::");
         QString password = line.mid(left + 1, right - left - 1);
-        QString hash = line.mid(right + 2);
+        QString hash     = line.mid(right + 2);
         // We handle password.
         // If we found user then we put password in table.
-        foreach (int row, m_showTableMap.values(hash)) {
+        foreach(int row, m_showTableMap.values(hash))
+        {
             hasTableChanged = true;
             m_hashTable->setData(
                 m_hashTable->index(row, PasswordFileModel::PASSWORD_COL),
@@ -1160,45 +1436,56 @@ void MainWindow::readJohnShow()
         // We continue reading with next line.
         line = outputStream.readLine();
     }
-    if (hasTableChanged)
+    if(hasTableChanged)
         m_hashTableProxy->crackingHasChanged();
 
     QString lastLine;
-    if (!line.isNull()) {
+    if(!line.isNull())
+    {
         // We are on the last line.
         // We take counts of cracked passwords and of left hashes.
         // We read count of cracked password hashes.
         lastLine = outputStream.readLine();
-    } else {
+    }
+    else
+    {
         lastLine = firstLine;
     }
     QRegExp crackedLeft("(\\d+)\\D+(\\d+)");
-    int pos = crackedLeft.indexIn(lastLine);
-    if (pos > -1) {
+    int     pos = crackedLeft.indexIn(lastLine);
+    if(pos > -1)
+    {
         int crackedCount = crackedLeft.cap(1).toInt();
-        int leftCount = crackedLeft.cap(2).toInt();
+        int leftCount    = crackedLeft.cap(2).toInt();
         // Update progress bar
-        if (crackedCount + leftCount == 0) {
+        if((crackedCount + leftCount) == 0)
+        {
             // There are no hashes.
             m_ui->progressBar->setRange(0, 1);
             m_ui->progressBar->setValue(0);
             m_ui->progressBar->setFormat(
-                tr("No hashes loaded [%1], see Console log").arg(
-                    formattedFormat));
-        } else {
+                tr("No hashes loaded [%1], see Console log").arg(formattedFormat));
+        }
+        else
+        {
             m_ui->progressBar->setRange(0, crackedCount + leftCount);
             m_ui->progressBar->setValue(crackedCount);
             m_ui->progressBar->setFormat(
-                tr("%p% (%v/%m: %1 cracked, %2 left) [%3]").arg(crackedCount)
-                                                .arg(leftCount).arg(formattedFormat));
+                tr("%p% (%v/%m: %1 cracked, %2 left) [%3]")
+                    .arg(crackedCount)
+                    .arg(leftCount)
+                    .arg(formattedFormat));
         }
 #ifdef Q_OS_OSX
-            if(m_progressStatsLabel)
-                m_progressStatsLabel->setText(m_ui->progressBar->text());
+        if(m_progressStatsLabel)
+            m_progressStatsLabel->setText(m_ui->progressBar->text());
 #endif
-    } else {
+    }
+    else
+    {
         // TODO: Error: unexpected john output.
-        // TODO: Unknown cyphertext format is here. Read stderr to check exactly.
+        // TODO: Unknown cyphertext format is here. Read stderr to check
+        // exactly.
     }
 }
 
@@ -1217,49 +1504,57 @@ void MainWindow::readJohnShow()
 void MainWindow::warnAboutDefaultPathToJohn()
 {
     QMessageBox::warning(
-        this,
-        tr("Johnny: default path to john"),
-        tr("Currently Johnny filled settings with default path to John the Ripper (%1). "
+        this, tr("Johnny: default path to john"),
+        tr("Currently Johnny filled settings with default path to John the "
+           "Ripper (%1). "
            "You could set your preferred path in settings "
            "(just use 'john' there to make Johnny search for John the Ripper "
            "in PATH on every invocation of John the Ripper). "
-           "If you are satisfied with defaults then save settings to avoid this message.").arg(
-               m_ui->lineEditPathToJohn->text()));
+           "If you are satisfied with defaults then save settings to avoid "
+           "this message.")
+            .arg(m_ui->lineEditPathToJohn->text()));
 }
 
 void MainWindow::fillSettingsWithDefaults()
 {
     QStringList possiblePaths;
-    QString john;
-    // Find john on system path, which is determined by PATH variable
+    QString     john;
+// Find john on system path, which is determined by PATH variable
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    foreach (QString dir, env.value("PATH").split(":")) {
+    foreach(QString dir, env.value("PATH").split(":"))
+    {
         possiblePaths << QDir(dir).filePath("john");
     }
-    possiblePaths << QDir::current().filePath("john"); // in the same directory than johnny
+    possiblePaths << QDir::current().filePath(
+        "john"); // in the same directory than johnny
 #if defined Q_OS_WIN
-    foreach(QString dir, possiblePaths) {
+    foreach(QString dir, possiblePaths)
+    {
         possiblePaths.append(".exe");
     }
 #endif
 
 #else
-    QString johnSystemPath = QStandardPaths::findExecutable("john", QStringList());
+    QString johnSystemPath =
+        QStandardPaths::findExecutable("john", QStringList());
     if(!johnSystemPath.isEmpty())
         possiblePaths << johnSystemPath;
 
     // Predefined defaults
     // John might be in in the same directory than johnny
-    QString johnOtherPaths = QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
+    QString johnOtherPaths =
+        QStandardPaths::findExecutable("john", QStringList(QDir::currentPath()));
     if(!johnOtherPaths.isEmpty())
         possiblePaths << johnOtherPaths;
 #endif
 
     // Find first readable, executable file from possible
-    foreach (QString path, possiblePaths) {
+    foreach(QString path, possiblePaths)
+    {
         QFileInfo iJohn(path);
-        if (iJohn.isReadable() && iJohn.isExecutable()) {
+        if(iJohn.isReadable() && iJohn.isExecutable())
+        {
             john = path;
             break;
         }
@@ -1276,10 +1571,12 @@ void MainWindow::buttonBrowsePathToJohnClicked()
 {
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::ExistingFile);
-    if (dialog.exec()) {
+    if(dialog.exec())
+    {
         QString fileName = dialog.selectedFiles()[0];
         // We put file name into field for it.
-        if (m_ui->lineEditPathToJohn->text() != fileName) {
+        if(m_ui->lineEditPathToJohn->text() != fileName)
+        {
             m_ui->lineEditPathToJohn->setText(fileName);
             johnPathChanged();
         }
@@ -1290,10 +1587,13 @@ void MainWindow::applySettings()
 {
     // We verify john version
     QString newJohnPath = m_ui->lineEditPathToJohn->text();
-    if ((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty()) {
+    if((m_pathToJohn != newJohnPath) && !newJohnPath.isEmpty())
+    {
         m_johnVersionCheck.setJohnProgram(newJohnPath);
         m_johnVersionCheck.start();
-    } else if (newJohnPath.isEmpty()) {
+    }
+    else if(newJohnPath.isEmpty())
+    {
         invalidJohnPathDetected();
     }
     // We copy settings from elements on the form to the settings
@@ -1304,9 +1604,11 @@ void MainWindow::applySettings()
 
     // If the language changed, retranslate the UI
     Translator &translator = Translator::getInstance();
-    QString newLanguage = m_ui->comboBoxLanguageSelection->currentText().toLower();
-    if (newLanguage != translator.getCurrentLanguage().toLower()) {
-        translator.translateApplication(qApp,newLanguage);
+    QString     newLanguage =
+        m_ui->comboBoxLanguageSelection->currentText().toLower();
+    if(newLanguage != translator.getCurrentLanguage().toLower())
+    {
+        translator.translateApplication(qApp, newLanguage);
         m_ui->retranslateUi(this);
     }
 }
@@ -1315,8 +1617,10 @@ void MainWindow::applyAndSaveSettings()
 {
     applySettings();
     m_settings.setValue("PathToJohn", m_ui->lineEditPathToJohn->text());
-    m_settings.setValue("TimeIntervalPickCracked", m_ui->spinBoxTimeIntervalPickCracked->value());
-    m_settings.setValue("Language", m_ui->comboBoxLanguageSelection->currentText().toLower());
+    m_settings.setValue("TimeIntervalPickCracked",
+                        m_ui->spinBoxTimeIntervalPickCracked->value());
+    m_settings.setValue("Language",
+                        m_ui->comboBoxLanguageSelection->currentText().toLower());
 }
 
 void MainWindow::restoreSavedSettings()
@@ -1326,39 +1630,44 @@ void MainWindow::restoreSavedSettings()
     m_ui->spinBoxTimeIntervalPickCracked->blockSignals(true);
     m_ui->comboBoxLanguageSelection->blockSignals(true);
     QString settingsPathToJohn = m_settings.value("PathToJohn").toString();
-    if (!validateJohnPath(settingsPathToJohn)) {
+    if(!validateJohnPath(settingsPathToJohn))
+    {
         m_ui->lineEditPathToJohn->setText("");
-    } else {
-        m_ui->lineEditPathToJohn->setText(
-            settingsPathToJohn == ""
-        ? m_ui->lineEditPathToJohn->text()
-        : settingsPathToJohn);
+    }
+    else
+    {
+        m_ui->lineEditPathToJohn->setText(settingsPathToJohn.isEmpty()
+                                          ? m_ui->lineEditPathToJohn->text()
+                                          : settingsPathToJohn);
     }
     m_ui->spinBoxTimeIntervalPickCracked->setValue(
-        m_settings.value("TimeIntervalPickCracked").toString() == ""
+        m_settings.value("TimeIntervalPickCracked").toString().isEmpty()
         ? m_ui->spinBoxTimeIntervalPickCracked->value()
         : m_settings.value("TimeIntervalPickCracked").toInt());
-    int languageIndex = m_ui->comboBoxLanguageSelection->findText(m_settings.value("Language").toString());
-    if (languageIndex != -1) {
+    int languageIndex = m_ui->comboBoxLanguageSelection->findText(
+                                       m_settings.value("Language").toString());
+    if(languageIndex != -1)
+    {
         m_ui->comboBoxLanguageSelection->setCurrentIndex(languageIndex);
     }
     m_ui->lineEditPathToJohn->blockSignals(false);
     m_ui->spinBoxTimeIntervalPickCracked->blockSignals(false);
     m_ui->comboBoxLanguageSelection->blockSignals(false);
     applySettings();
-
 }
 
 void MainWindow::updateStatistics()
 {
-    if (m_johnAttack.state() == QProcess::Running) {
-        qint64 secondsElapsed = m_johnAttack.startTime().secsTo(QDateTime::currentDateTime());
+    if(m_johnAttack.state() == QProcess::Running)
+    {
+        qint64 secondsElapsed =
+            m_johnAttack.startTime().secsTo(QDateTime::currentDateTime());
         qint64 days    = secondsElapsed / 86400;
         qint64 hours   = (secondsElapsed % 86400) / 3600;
         qint64 minutes = ((secondsElapsed % 86400) % 3600) / 60;
         qint64 seconds = ((secondsElapsed % 86400) % 3600) % 60;
 
-        QString workingTime;
+        QString     workingTime;
         QTextStream stream(&workingTime);
         stream << days << tr(":");
         // Hours, minutes and seconds have padding with zeroes to two
@@ -1370,7 +1679,9 @@ void MainWindow::updateStatistics()
         stream << qSetFieldWidth(2) << seconds;
 
         m_ui->labelStatisticsWorkingTime->setText(workingTime);
-    } else {
+    }
+    else
+    {
         m_ui->labelStatisticsWorkingTime->setText("-");
     }
     callJohnShow();
@@ -1383,7 +1694,7 @@ void MainWindow::updateStatistics()
  * inserted at the end without new line by default.
 */
 
-void MainWindow::appendLog(const QString& text)
+void MainWindow::appendLog(const QString &text)
 {
     // Preserving cursor preserves selection by user
     QTextCursor prev_cursor = m_ui->consoleLogTextEdit->textCursor();
@@ -1393,26 +1704,33 @@ void MainWindow::appendLog(const QString& text)
 }
 
 /* This slot is triggered when the types changed. This is probably because :
- * 1) a new password file has been loaded OR 2) old file with a new jumbo john was used
+ * 1) a new password file has been loaded OR 2) old file with a new jumbo john
+ * was used
  */
-void MainWindow::updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
+void MainWindow::updateHashTypes(const QStringList &pathToPwdFile,
+                                 const QStringList &listOfTypesInFile,
                                  const QStringList &detailedTypesPerRow)
 {
-    PasswordFileModel* model = m_hashTable;
-    if ((model != NULL) && (pathToPwdFile == m_sessionPasswordFiles)) {
+    PasswordFileModel *model = m_hashTable;
+    if((model != NULL) && (pathToPwdFile == m_sessionPasswordFiles))
+    {
         // We know that the right file is still opened so the signal
         // isn't too late, otherwise we don't replace the model
         model->fillHashTypes(detailedTypesPerRow);
         QString savedFormat = m_ui->formatComboBox->currentText();
         // For jumbo, we list only available formats in file in attack option
         m_ui->formatComboBox->clear();
-        m_ui->formatComboBox->addItem(tr("Auto detect") + (m_sessionCurrent.defaultFormat().isEmpty() ? "" : " (" + m_sessionCurrent.defaultFormat() + ")"));
+        m_ui->formatComboBox->addItem(
+            tr("Default (%1)").arg(m_sessionCurrent.defaultFormat()));
         m_ui->formatComboBox->addItems(listOfTypesInFile);
         // Restore user's selection
         int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
-        if (indexSavedFormat != -1) {
+        if(indexSavedFormat != -1)
+        {
             m_ui->formatComboBox->setCurrentIndex(indexSavedFormat);
-        } else if(!savedFormat.isEmpty()){
+        }
+        else if(!savedFormat.isEmpty())
+        {
             m_ui->formatComboBox->setEditText(savedFormat);
         }
     }
@@ -1423,12 +1741,14 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 {
     bool wasLastVersionJumbo = m_isJumbo;
     m_isJumbo = isJumbo;
-    if ((wasLastVersionJumbo == false) && (isJumbo == true) && (!m_sessionPasswordFiles.isEmpty())) {
+    if(!wasLastVersionJumbo && isJumbo && !m_sessionPasswordFiles.isEmpty())
+    {
         m_hashTypeChecker.setJohnProgram(m_pathToJohn);
         m_hashTypeChecker.setPasswordFiles(m_sessionPasswordFiles);
         m_hashTypeChecker.start();
     }
-    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL, !isJumbo);
+    m_ui->passwordsTable->setColumnHidden(PasswordFileModel::FORMAT_COL,
+                                          !isJumbo);
     m_ui->actionFilterFormatColumn->setEnabled(isJumbo);
     m_ui->lineEdit_WordlistRules->setVisible(isJumbo);
     m_ui->princeModeTab->setEnabled(isJumbo);
@@ -1445,21 +1765,32 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
     m_ui->checkBoxMinCandidateLength->setVisible(isJumbo);
     m_ui->spinBoxMinCandidateLength->setVisible(isJumbo);
     m_ui->spinBoxMaxCandidateLength->setVisible(isJumbo);
-    if (!isJumbo) {
+    if(!isJumbo)
+    {
         m_ui->lineEdit_WordlistRules->clear();
         // Add default format list supported by core john
         QStringList defaultFormats;
-        defaultFormats << tr("Auto detect") + (m_sessionCurrent.defaultFormat().isEmpty() ? "" : " (" + m_sessionCurrent.defaultFormat() + ")")
-                       << "descrypt" << "bsdicrypt" << "md5crypt" << "bcrypt"
-                       << "AFS" << "LM" << "crypt" << "tripcode" << "dummy";
+        defaultFormats << tr("Default (%1)").arg(m_sessionCurrent.defaultFormat())
+                       << "descrypt"
+                       << "bsdicrypt"
+                       << "md5crypt"
+                       << "bcrypt"
+                       << "AFS"
+                       << "LM"
+                       << "crypt"
+                       << "tripcode"
+                       << "dummy";
         QString savedFormat = m_ui->formatComboBox->currentText();
         m_ui->formatComboBox->clear();
         m_ui->formatComboBox->addItems(defaultFormats);
         // Restore user's selection
         int indexSavedFormat = m_ui->formatComboBox->findText(savedFormat);
-        if (indexSavedFormat != -1) {
+        if(indexSavedFormat != -1)
+        {
             m_ui->formatComboBox->setCurrentIndex(indexSavedFormat);
-        } else if (!savedFormat.isEmpty()){
+        }
+        else if(!savedFormat.isEmpty())
+        {
             m_ui->formatComboBox->setEditText(savedFormat);
         }
     }
@@ -1467,18 +1798,28 @@ void MainWindow::setAvailabilityOfFeatures(bool isJumbo)
 
 void MainWindow::verifyJohnVersion()
 {
-    QString output = m_johnVersionCheck.readAllStandardOutput();
-    QStringList lines = output.split('\n');
-    if (!output.contains("John the Ripper", Qt::CaseInsensitive)) {
+    QString     output = m_johnVersionCheck.readAllStandardOutput();
+    QStringList lines  = output.split('\n');
+    if(!output.contains("John the Ripper", Qt::CaseInsensitive))
+    {
         invalidJohnPathDetected();
-    } else {
-        bool isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
-        QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]", Qt::CaseInsensitive);
+    }
+    else
+    {
+        bool    isJumbo = output.contains("jumbo", Qt::CaseInsensitive);
+        QRegExp exp("John the Ripper .+ version (\\S+)[\n| ]",
+                    Qt::CaseInsensitive);
         int pos = exp.indexIn(output);
-        if (pos > -1) {
-            m_ui->labelJohnPathValidator->setText(tr("Detected John the Ripper ") + exp.cap(1) + (isJumbo ? "" : " (core)"));
-        } else if (lines.size() > 0){
-            m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] + (isJumbo ? "" : " (core)"));
+        if(pos > -1)
+        {
+            m_ui->labelJohnPathValidator->setText(
+                tr("Detected John the Ripper ") + exp.cap(1) +
+                (isJumbo ? "" : " (core)"));
+        }
+        else if(lines.size() > 0)
+        {
+            m_ui->labelJohnPathValidator->setText(tr("Detected ") + lines[0] +
+                                                  (isJumbo ? "" : " (core)"));
         }
         m_ui->lineEditPathToJohn->setStyleSheet("");
         setAvailabilityOfFeatures(isJumbo);
@@ -1489,32 +1830,40 @@ void MainWindow::verifyJohnVersion()
 
 void MainWindow::invalidJohnPathDetected()
 {
-    m_ui->labelJohnPathValidator->setText(tr("No valid John The Ripper executable detected at this path !"));
+    m_ui->labelJohnPathValidator->setText(
+        tr("No valid John The Ripper executable detected at this path !"));
     m_ui->lineEditPathToJohn->setStyleSheet("color:red");
-    // We choose to disable jumbo features if no valid john path is detected but this could be changed by removing those 2 lines
+    // We choose to disable jumbo features if no valid john path is detected but
+    // this could be changed by removing those 2 lines
     setAvailabilityOfFeatures(false);
     m_ui->widgetFork->setVisible(false);
 }
 
-void MainWindow::actionOpenSessionTriggered(QAction* action)
+void MainWindow::actionOpenSessionTriggered(QAction *action)
 {
-    if ((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty()) {
+    if((action == m_ui->actionClearSessionHistory) && !m_sessionHistory.isEmpty())
+    {
         QDir dir(JohnSession::sessionDir());
-        dir.setNameFilters(QStringList() << "*.log" << "*.johnny" << "*.rec" << "*.pw");
+        dir.setNameFilters(QStringList() << "*.log"
+                                         << "*.johnny"
+                                         << "*.rec"
+                                         << "*.pw");
         dir.setFilter(QDir::Files);
-        foreach (QString dirFile, dir.entryList()) {
+        foreach(QString dirFile, dir.entryList())
             dir.remove(dirFile);
-        }
-        foreach(QAction* actions, m_sessionMenu->actions()) {
-            if (m_sessionHistory.removeOne(actions->data().toString())) {
-                    m_sessionMenu->removeAction(actions);
-            }
+        foreach(QAction *actions, m_sessionMenu->actions())
+        {
+            if(m_sessionHistory.removeOne(actions->data().toString()))
+                m_sessionMenu->removeAction(actions);
         }
         m_settings.remove("Sessions");
         m_ui->actionResumeAttack->setEnabled(false);
-    } else {
+    }
+    else
+    {
         QString fileName = action->data().toString();
-        if (!fileName.isEmpty()) {
+        if(!fileName.isEmpty())
+        {
             m_sessionCurrent = JohnSession(fileName, &m_settings);
             openLastSession();
         }
@@ -1523,11 +1872,11 @@ void MainWindow::actionOpenSessionTriggered(QAction* action)
 
 void MainWindow::guessPassword()
 {
-    bool proceed;
+    bool    proceed;
     QString pwGuess = QInputDialog::getText(this, tr("Password Guessing"),
                                             tr("Your passphrase guess:"),
                                             QLineEdit::Normal, "", &proceed);
-    if (proceed && !pwGuess.isEmpty())
+    if(proceed && !pwGuess.isEmpty())
     {
         m_ui->actionGuessPassword->setEnabled(false);
         m_johnGuess.setJohnProgram(m_pathToJohn);
@@ -1543,11 +1892,13 @@ void MainWindow::guessPassword()
     }
 }
 
-void MainWindow::guessPasswordFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void MainWindow::guessPasswordFinished(int                  exitCode,
+                                       QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
     m_ui->actionGuessPassword->setEnabled(true);
-    if (exitStatus == QProcess::CrashExit) {
+    if(exitStatus == QProcess::CrashExit)
+    {
         qDebug() << "JtR seems to have crashed.";
         return;
     }
@@ -1561,204 +1912,278 @@ void MainWindow::restoreSessionOptions()
     m_ui->sessionNameLabel->setText(m_sessionCurrent.name());
     m_ui->formatComboBox->setEditText(m_sessionCurrent.formatUI());
     JohnSession::AttackMode mode = m_sessionCurrent.mode();
-    if (mode == JohnSession::SINGLECRACK_MODE) {
+    if(mode == JohnSession::SINGLECRACK_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->singleModeTab);
         // External mode, filter
-        if(!m_sessionCurrent.externalName().isNull()) {
+        if(!m_sessionCurrent.externalName().isNull())
+        {
             m_ui->checkBox_SingleCrackModeExternalName->setChecked(true);
-            m_ui->lineEditSingleCrackModeExternalName->setText(m_sessionCurrent.externalName());
+            m_ui->lineEditSingleCrackModeExternalName->setText(
+                m_sessionCurrent.externalName());
         }
-    } else if (mode == JohnSession::WORDLIST_MODE) {
+    }
+    else if(mode == JohnSession::WORDLIST_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->wordlistModeTab);
         m_ui->lineEditWordlistFile->setText(m_sessionCurrent.wordlistFile());
-        //Rules
-        if (!m_sessionCurrent.rules().isNull()) {
+        // Rules
+        if(!m_sessionCurrent.rules().isNull())
+        {
             m_ui->checkBox_WordlistModeRules->setChecked(true);
             m_ui->lineEdit_WordlistRules->setText(m_sessionCurrent.rules());
         }
         // External mode, filter
-        if (!m_sessionCurrent.externalName().isNull()) {
+        if(!m_sessionCurrent.externalName().isNull())
+        {
             m_ui->checkBox_WordlistModeExternalName->setChecked(true);
-            m_ui->lineEditWordlistModeExternalName->setText(m_sessionCurrent.externalName());
+            m_ui->lineEditWordlistModeExternalName->setText(
+                m_sessionCurrent.externalName());
         }
         // Hybrid mask mode
-        if (!m_sessionCurrent.mask().isNull()) {
+        if(!m_sessionCurrent.mask().isNull())
+        {
             m_ui->checkBoxWordlistModeMask->setChecked(true);
             m_ui->lineEditWordlistModeMask->setText(m_sessionCurrent.mask());
         }
-    } else if (mode == JohnSession::INCREMENTAL_MODE) {
+    }
+    else if(mode == JohnSession::INCREMENTAL_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->incrementalModeTab);
         // "Incremental" mode
         // It could be with or without name.
-        if (!m_sessionCurrent.charset().isNull()) {
+        if(!m_sessionCurrent.charset().isNull())
+        {
             m_ui->checkBox_IncrementalModeName->setChecked(true);
             m_ui->lineEditIncrementalModeName->setText(m_sessionCurrent.charset());
         }
         // External mode, filter
-        if (!m_sessionCurrent.externalName().isNull()) {
+        if(!m_sessionCurrent.externalName().isNull())
+        {
             m_ui->checkBox_IncrementalModeExternalName->setChecked(true);
-            m_ui->lineEditIncrementalModeExternalName->setText(m_sessionCurrent.externalName());
+            m_ui->lineEditIncrementalModeExternalName->setText(
+                m_sessionCurrent.externalName());
         }
         // Hybrid mask mode
-        if (!m_sessionCurrent.mask().isNull()) {
+        if(!m_sessionCurrent.mask().isNull())
+        {
             m_ui->checkBoxIncrementalModeMask->setChecked(true);
             m_ui->lineEditIncrementalModeMask->setText(m_sessionCurrent.mask());
         }
-    } else if (mode == JohnSession::EXTERNAL_MODE) {
+    }
+    else if(mode == JohnSession::EXTERNAL_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->externalModeTab);
         m_ui->lineEditExternalModeName->setText(m_sessionCurrent.externalName());
         // Hybrid mask mode
-        if (!m_sessionCurrent.mask().isNull()) {
+        if(!m_sessionCurrent.mask().isNull())
+        {
             m_ui->checkBoxExternalModeMask->setChecked(true);
             m_ui->lineEditExternalModeMask->setText(m_sessionCurrent.mask());
         }
-    } else if (mode == JohnSession::MASK_MODE) {
+    }
+    else if(mode == JohnSession::MASK_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->maskModeTab);
         m_ui->lineEditMaskModeMask->setText(m_sessionCurrent.mask());
-        //Rules
-        if (!m_sessionCurrent.rules().isNull()) {
+        // Rules
+        if(!m_sessionCurrent.rules().isNull())
+        {
             m_ui->checkBoxMaskModeRules->setChecked(true);
             m_ui->lineEditMaskModeRules->setText(m_sessionCurrent.rules());
         }
         // External mode, filter
-        if (!m_sessionCurrent.externalName().isNull()) {
+        if(!m_sessionCurrent.externalName().isNull())
+        {
             m_ui->checkBoxMaskModeExternalName->setChecked(true);
-            m_ui->lineEditMaskModeExternalName->setText(m_sessionCurrent.externalName());
+            m_ui->lineEditMaskModeExternalName->setText(
+                m_sessionCurrent.externalName());
         }
-    } else if (mode == JohnSession::MARKOV_MODE) {
+    }
+    else if(mode == JohnSession::MARKOV_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->markovModeTab);
         m_ui->lineEditMarkovMode->setText(m_sessionCurrent.markovMode());
         // External mode, filter
-        if (!m_sessionCurrent.externalName().isNull()) {
+        if(!m_sessionCurrent.externalName().isNull())
+        {
             m_ui->checkBoxMarkovModeExternalName->setChecked(true);
-            m_ui->lineEditMarkovModeExternalName->setText(m_sessionCurrent.externalName());
+            m_ui->lineEditMarkovModeExternalName->setText(
+                m_sessionCurrent.externalName());
         }
         // Hybrid mask mode
-        if (!m_sessionCurrent.mask().isNull()) {
+        if(!m_sessionCurrent.mask().isNull())
+        {
             m_ui->checkBoxMarkovModeMask->setChecked(true);
             m_ui->lineEditMarkovModeMask->setText(m_sessionCurrent.mask());
         }
         // Minimum markov level
-        if (m_sessionCurrent.markovMinLevel() >= 0) {
+        if(m_sessionCurrent.markovMinLevel() >= 0)
+        {
             m_ui->checkBoxMarkovModeMinLevel->setChecked(true);
-            m_ui->spinBoxMarkovModeMinLevel->setValue(m_sessionCurrent.markovMinLevel());
+            m_ui->spinBoxMarkovModeMinLevel->setValue(
+                m_sessionCurrent.markovMinLevel());
         }
         // Maximum markov level
-        if (m_sessionCurrent.markovMaxLevel() >= 0) {
+        if(m_sessionCurrent.markovMaxLevel() >= 0)
+        {
             m_ui->checkBoxMarkovModeMaxLevel->setChecked(true);
-            m_ui->spinBoxMarkovModeMaxLevel->setValue(m_sessionCurrent.markovMaxLevel());
+            m_ui->spinBoxMarkovModeMaxLevel->setValue(
+                m_sessionCurrent.markovMaxLevel());
         }
         // Start index
-        if (m_sessionCurrent.markovStartIndex() >= 0) {
+        if(m_sessionCurrent.markovStartIndex() >= 0)
+        {
             m_ui->checkBoxMarkovModeStartIndex->setChecked(true);
-            m_ui->spinBoxMarkovModeStartIndex->setValue(m_sessionCurrent.markovStartIndex());
+            m_ui->spinBoxMarkovModeStartIndex->setValue(
+                m_sessionCurrent.markovStartIndex());
         }
         // End index
-        if (m_sessionCurrent.markovEndIndex() >= 0) {
+        if(m_sessionCurrent.markovEndIndex() >= 0)
+        {
             m_ui->checkBoxMarkovModeEndIndex->setChecked(true);
-            m_ui->spinBoxMarkovModeEndIndex->setValue(m_sessionCurrent.markovEndIndex());
+            m_ui->spinBoxMarkovModeEndIndex->setValue(
+                m_sessionCurrent.markovEndIndex());
         }
-    } else if (mode == JohnSession::PRINCE_MODE) {
+    }
+    else if(mode == JohnSession::PRINCE_MODE)
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->princeModeTab);
-        m_ui->lineEditPrinceModeWordlistFile->setText(m_sessionCurrent.wordlistFile());
-        //Rules
-        if (!m_sessionCurrent.rules().isNull()) {
+        m_ui->lineEditPrinceModeWordlistFile->setText(
+            m_sessionCurrent.wordlistFile());
+        // Rules
+        if(!m_sessionCurrent.rules().isNull())
+        {
             m_ui->checkBoxPrinceModeRules->setChecked(true);
             m_ui->lineEditPrinceModeRules->setText(m_sessionCurrent.rules());
         }
         // External mode, filter
-        if (!m_sessionCurrent.externalName().isNull()) {
+        if(!m_sessionCurrent.externalName().isNull())
+        {
             m_ui->checkBoxPrinceModeExternalName->setChecked(true);
-            m_ui->lineEditPrinceModeExternalName->setText(m_sessionCurrent.externalName());
+            m_ui->lineEditPrinceModeExternalName->setText(
+                m_sessionCurrent.externalName());
         }
         // Hybrid mask mode
-        if (!m_sessionCurrent.mask().isNull()) {
+        if(!m_sessionCurrent.mask().isNull())
+        {
             m_ui->checkBoxPrinceModeMask->setChecked(true);
             m_ui->lineEditPrinceModeMask->setText(m_sessionCurrent.mask());
         }
         // Minimum number of elements per chain
-        if (m_sessionCurrent.princeMinElementsPerChain() >= 0) {
+        if(m_sessionCurrent.princeMinElementsPerChain() >= 0)
+        {
             m_ui->checkBoxPrinceMinElementsPerChain->setChecked(true);
-            m_ui->spinBoxPrinceMinElementsPerChain->setValue(m_sessionCurrent.princeMinElementsPerChain());
+            m_ui->spinBoxPrinceMinElementsPerChain->setValue(
+                m_sessionCurrent.princeMinElementsPerChain());
         }
         // Maximum number of elements per chain
-        if (m_sessionCurrent.princeMaxElementsPerChain() >= 0) {
+        if(m_sessionCurrent.princeMaxElementsPerChain() >= 0)
+        {
             m_ui->checkBoxPrinceMaxElementsPerChain->setChecked(true);
-            m_ui->spinBoxPrinceMaxElementsPerChain->setValue(m_sessionCurrent.princeMaxElementsPerChain());
+            m_ui->spinBoxPrinceMaxElementsPerChain->setValue(
+                m_sessionCurrent.princeMaxElementsPerChain());
         }
         // Initial skip
-        if (m_sessionCurrent.princeInitialSkip() >= 0) {
+        if(m_sessionCurrent.princeInitialSkip() >= 0)
+        {
             m_ui->checkBoxPrinceModeInitialSkip->setChecked(true);
-            m_ui->spinBoxPrinceModeInitialSkip->setValue(m_sessionCurrent.princeInitialSkip());
+            m_ui->spinBoxPrinceModeInitialSkip->setValue(
+                m_sessionCurrent.princeInitialSkip());
         }
         // Load only specified number of words from input wordlist
-        if (m_sessionCurrent.princeLimitWordsFromWordlist() >= 0) {
+        if(m_sessionCurrent.princeLimitWordsFromWordlist() >= 0)
+        {
             m_ui->checkBoxPrinceModeLimitInputWords->setChecked(true);
-            m_ui->spinBoxPrinceModeLimitInputWords->setValue(m_sessionCurrent.princeLimitWordsFromWordlist());
+            m_ui->spinBoxPrinceModeLimitInputWords->setValue(
+                m_sessionCurrent.princeLimitWordsFromWordlist());
         }
         // Limit number of password candidates
-        if (m_sessionCurrent.princeLimitNbPasswordCandidates() >= 0) {
+        if(m_sessionCurrent.princeLimitNbPasswordCandidates() >= 0)
+        {
             m_ui->checkBoxPrinceModeLimitCandidates->setChecked(true);
-            m_ui->spinBoxPrinceModeLimitCandidates->setValue(m_sessionCurrent.princeLimitNbPasswordCandidates());
+            m_ui->spinBoxPrinceModeLimitCandidates->setValue(
+                m_sessionCurrent.princeLimitNbPasswordCandidates());
         }
-        m_ui->checkBoxPrinceCalculateDistributionWithWordlist->setChecked(m_sessionCurrent.princeUseWordlistForLengthDistribution());
-        m_ui->checkBoxPrinceModePermuteCase->setChecked(m_sessionCurrent.princePermuteFirstLetterCase());
-        m_ui->checkBoxPrinceModeMapToMemory->setChecked(m_sessionCurrent.princeMemoryMap());
-        m_ui->checkBoxPrinceModeShowTotalKeyspace->setChecked(m_sessionCurrent.princeShowTotalKeyspace());
-    } else {
+        m_ui->checkBoxPrinceCalculateDistributionWithWordlist->setChecked(
+            m_sessionCurrent.princeUseWordlistForLengthDistribution());
+        m_ui->checkBoxPrinceModePermuteCase->setChecked(
+            m_sessionCurrent.princePermuteFirstLetterCase());
+        m_ui->checkBoxPrinceModeMapToMemory->setChecked(
+            m_sessionCurrent.princeMemoryMap());
+        m_ui->checkBoxPrinceModeShowTotalKeyspace->setChecked(
+            m_sessionCurrent.princeShowTotalKeyspace());
+    }
+    else
+    {
         m_ui->attackModeTabWidget->setCurrentWidget(m_ui->defaultModeTab);
     }
 
     // Selectors
-    if (!m_sessionCurrent.limitUsers().isNull()) {
+    if(!m_sessionCurrent.limitUsers().isNull())
+    {
         m_ui->checkBox_LimitUsers->setChecked(true);
         m_ui->lineEditLimitUsers->setText(m_sessionCurrent.limitUsers());
     }
-    if (!m_sessionCurrent.limitGroups().isNull()) {
+    if(!m_sessionCurrent.limitGroups().isNull())
+    {
         m_ui->checkBox_LimitGroups->setChecked(true);
         m_ui->lineEditLimitGroups->setText(m_sessionCurrent.limitGroups());
     }
-    if (!m_sessionCurrent.limitShells().isNull()) {
+    if(!m_sessionCurrent.limitShells().isNull())
+    {
         m_ui->checkBox_LimitShells->setChecked(true);
         m_ui->lineEditLimitShells->setText(m_sessionCurrent.limitShells());
     }
-    if (m_sessionCurrent.limitSalts() >= 0) {
+    if(m_sessionCurrent.limitSalts() >= 0)
+    {
         m_ui->checkBox_LimitSalts->setChecked(true);
         m_ui->spinBox_LimitSalts->setValue(m_sessionCurrent.limitSalts());
     }
 
     // Advanced options
-    if (m_sessionCurrent.isForkEnabled()) {
+    if(m_sessionCurrent.isForkEnabled())
+    {
         m_ui->checkBox_UseFork->setChecked(true);
         int nbOfProcess = m_sessionCurrent.forkProcesses();
-        // In case the restored session ideal thread count is greather than current maximum (ex: user changed VM settings),
+        // In case the restored session ideal thread count is greather than
+        // current maximum (ex: user changed VM settings),
         // we have to restore the right previous session value.
-        if (nbOfProcess > m_ui->spinBox_nbOfProcess->maximum()) {
+        if(nbOfProcess > m_ui->spinBox_nbOfProcess->maximum())
+        {
             m_ui->spinBox_nbOfProcess->setMaximum(nbOfProcess);
         }
         m_ui->spinBox_nbOfProcess->setValue(nbOfProcess);
     }
     m_ui->spinBox_openMPThreads->setValue(m_sessionCurrent.openMPThreads());
 
-    if (!m_sessionCurrent.environmentVariables().isNull()) {
+    if(!m_sessionCurrent.environmentVariables().isNull())
+    {
         m_ui->checkBox_EnvironmentVar->setChecked(true);
-        m_ui->lineEdit_EnvironmentVar->setText(m_sessionCurrent.environmentVariables());
+        m_ui->lineEdit_EnvironmentVar->setText(
+            m_sessionCurrent.environmentVariables());
     }
-    if (m_sessionCurrent.minPasswordCandidatesLength() >= 0) {
+    if(m_sessionCurrent.minPasswordCandidatesLength() >= 0)
+    {
         m_ui->checkBoxMinCandidateLength->setChecked(true);
-        m_ui->spinBoxMinCandidateLength->setValue(m_sessionCurrent.minPasswordCandidatesLength());
+        m_ui->spinBoxMinCandidateLength->setValue(
+            m_sessionCurrent.minPasswordCandidatesLength());
     }
-    if (m_sessionCurrent.maxPasswordCandidatesLength() >= 0) {
+    if(m_sessionCurrent.maxPasswordCandidatesLength() >= 0)
+    {
         m_ui->checkBoxMaxCandidateLength->setChecked(true);
-        m_ui->spinBoxMaxCandidateLength->setValue(m_sessionCurrent.maxPasswordCandidatesLength());
+        m_ui->spinBoxMaxCandidateLength->setValue(
+            m_sessionCurrent.maxPasswordCandidatesLength());
     }
 
     // Unselected hashes
     QList<int> unselectedRows = m_sessionCurrent.unselectedRows();
-    for (int i = 0; i < unselectedRows.count(); i++) {
-        m_hashTable->setData(m_hashTable->index(unselectedRows[i],0),UNCHECKED_PROGRAMMATICALLY,Qt::CheckStateRole);
+    for(int i = 0; i < unselectedRows.count(); i++)
+    {
+        m_hashTable->setData(m_hashTable->index(unselectedRows[i], 0),
+                             UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
     }
-    if (unselectedRows.count() > 0)
+    if(unselectedRows.count() > 0)
         m_hashTableProxy->checkBoxHasChanged();
 }
 
@@ -1767,25 +2192,21 @@ void MainWindow::restoreSessionOptions()
 */
 void MainWindow::restoreDefaultAttackOptions(bool shouldClearFields)
 {
-    if (shouldClearFields) {
-        foreach(QCheckBox *widget, m_ui->optionsPage->findChildren<QCheckBox*>()) {
+    if(shouldClearFields)
+    {
+        foreach(QCheckBox *widget, m_ui->optionsPage->findChildren<QCheckBox *>())
             widget->setChecked(false);
-        }
-        foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox*>()) {
+        foreach(QComboBox *widget, m_ui->optionsPage->findChildren<QComboBox *>())
             widget->setEditText("");
-        }
-        foreach(QLineEdit *widget, m_ui->optionsPage->findChildren<QLineEdit*>()) {
+        foreach(QLineEdit *widget, m_ui->optionsPage->findChildren<QLineEdit *>())
             widget->setText("");
-        }
-        foreach(QSpinBox *widget, m_ui->optionsPage->findChildren<QSpinBox*>()) {
+        foreach(QSpinBox *widget, m_ui->optionsPage->findChildren<QSpinBox *>())
             widget->setValue(0);
-        }
     }
     int idealThreadCount = QThread::idealThreadCount();
     // john --fork will error if < 2, let's prevent it
-    if (idealThreadCount < 2) {
+    if(idealThreadCount < 2)
         idealThreadCount = 2;
-    }
     m_ui->spinBox_nbOfProcess->setMaximum(idealThreadCount);
     m_ui->spinBox_nbOfProcess->setValue(idealThreadCount);
     m_ui->spinBox_nbOfProcess->setMinimum(2);
@@ -1799,13 +2220,13 @@ void MainWindow::checkForUpdates()
     QDesktopServices::openUrl(QUrl("http://openwall.info/wiki/john/johnny"));
 }
 
-void MainWindow::showHashesTableContextMenu(const QPoint& pos)
+void MainWindow::showHashesTableContextMenu(const QPoint &pos)
 {
     QPoint globalPos = m_ui->passwordsTable->viewport()->mapToGlobal(pos);
     m_hashTableContextMenu->exec(globalPos);
 }
 
-void MainWindow::showConsoleLogContextMenu(const QPoint& pos)
+void MainWindow::showConsoleLogContextMenu(const QPoint &pos)
 {
     QPoint globalPos = m_ui->consoleLogTextEdit->viewport()->mapToGlobal(pos);
     m_consoleLogContextMenu->exec(globalPos);
@@ -1813,17 +2234,20 @@ void MainWindow::showConsoleLogContextMenu(const QPoint& pos)
 
 void MainWindow::filterHashesTable()
 {
-    QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()), Qt::CaseInsensitive);
+    QRegExp regExp(QRegExp::escape(m_ui->lineEditFilter->text()),
+                   Qt::CaseInsensitive);
     m_hashTableProxy->setFilterRegExp(regExp);
 }
 
 void MainWindow::includeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
-    for (int i = 0; i < indexes.count(); i++) {
-        if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Checked) {
-            m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), Qt::Checked, Qt::CheckStateRole);
-        }
+    QModelIndexList indexes =
+        m_ui->passwordsTable->selectionModel()->selectedIndexes();
+    for(int i = 0; i < indexes.count(); i++)
+    {
+        QModelIndex index = m_hashTableProxy->index(indexes[i].row(), 0);
+        if(m_hashTableProxy->data(index, Qt::CheckStateRole) != Qt::Checked)
+            m_hashTableProxy->setData(index, Qt::Checked, Qt::CheckStateRole);
     }
     m_ui->labelSelectionTip->show();
     m_labelSelectionHide.start(LABEL_SELECTION_DURATION);
@@ -1831,10 +2255,15 @@ void MainWindow::includeSelectedHashes()
 
 void MainWindow::excludeSelectedHashes()
 {
-    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
-    for (int i = 0; i < indexes.count(); i++) {
-        if (m_hashTableProxy->data(m_hashTableProxy->index(indexes[i].row(), 0), Qt::CheckStateRole) != Qt::Unchecked) {
-            m_hashTableProxy->setData(m_hashTableProxy->index(indexes[i].row(), 0), UNCHECKED_PROGRAMMATICALLY, Qt::CheckStateRole);
+    QModelIndexList indexes =
+        m_ui->passwordsTable->selectionModel()->selectedIndexes();
+    for(int i = 0; i < indexes.count(); i++)
+    {
+        QModelIndex index = m_hashTableProxy->index(indexes[i].row(), 0);
+        if(m_hashTableProxy->data(index, Qt::CheckStateRole) != Qt::Unchecked)
+        {
+            m_hashTableProxy->setData(index, UNCHECKED_PROGRAMMATICALLY,
+                                      Qt::CheckStateRole);
         }
     }
     m_hashTableProxy->checkBoxHasChanged();
@@ -1845,7 +2274,7 @@ void MainWindow::excludeSelectedHashes()
 void MainWindow::setFilteringColumns()
 {
     QList<int> selectedRows;
-    if (m_ui->actionFilterAllColumns->isChecked())
+    if(m_ui->actionFilterAllColumns->isChecked())
     {
         selectedRows.append(PasswordFileModel::USER_COL);
         selectedRows.append(PasswordFileModel::PASSWORD_COL);
@@ -1855,15 +2284,15 @@ void MainWindow::setFilteringColumns()
     }
     else
     {
-        if (m_ui->actionFilterUserColumn->isChecked())
+        if(m_ui->actionFilterUserColumn->isChecked())
             selectedRows.append(PasswordFileModel::USER_COL);
-        if (m_ui->actionFilterPasswordColumn->isChecked())
+        if(m_ui->actionFilterPasswordColumn->isChecked())
             selectedRows.append(PasswordFileModel::PASSWORD_COL);
-        if (m_ui->actionFilterHashColumn->isChecked())
+        if(m_ui->actionFilterHashColumn->isChecked())
             selectedRows.append(PasswordFileModel::HASH_COL);
-        if (m_ui->actionFilterFormatColumn->isChecked())
+        if(m_ui->actionFilterFormatColumn->isChecked())
             selectedRows.append(PasswordFileModel::FORMAT_COL);
-        if (m_ui->actionFilterGECOSColumn->isChecked())
+        if(m_ui->actionFilterGECOSColumn->isChecked())
             selectedRows.append(PasswordFileModel::GECOS_COL);
     }
 
@@ -1881,18 +2310,22 @@ void MainWindow::resetFilters()
     m_ui->actionFilterGECOSColumn->setChecked(true);
     m_ui->checkBoxShowOnlyCheckedHashes->setChecked(false);
     m_ui->checkBoxShowOnlyCrackedHashes->setChecked(false);
-    QList<int> defaultFilteredColumns = QList<int>() << PasswordFileModel::USER_COL << PasswordFileModel::PASSWORD_COL
-                                                << PasswordFileModel::HASH_COL << PasswordFileModel::FORMAT_COL
-                                                << PasswordFileModel::GECOS_COL;
+    QList<int> defaultFilteredColumns = QList<int>()
+                                        << PasswordFileModel::USER_COL
+                                        << PasswordFileModel::PASSWORD_COL
+                                        << PasswordFileModel::HASH_COL
+                                        << PasswordFileModel::FORMAT_COL
+                                        << PasswordFileModel::GECOS_COL;
     m_hashTableProxy->setFilteredColumns(defaultFilteredColumns, false);
-    m_hashTableProxy->setShowCrackedRowsOnly(false,false);
-    m_hashTableProxy->setShowCheckedRowsOnly(false,false);
+    m_hashTableProxy->setShowCrackedRowsOnly(false, false);
+    m_hashTableProxy->setShowCheckedRowsOnly(false, false);
     m_hashTableProxy->setFilterRegExp("");
 }
 
 void MainWindow::getDefaultFormat()
 {
-    // This signal may be called 1 ms before applySettings() so use the lineEdit text
+    // This signal may be called 1 ms before applySettings() so use the lineEdit
+    // text
     m_johnDefaultFormat.setJohnProgram(m_pathToJohn);
     QStringList args;
     args << "-stdin";
@@ -1904,44 +2337,52 @@ void MainWindow::getDefaultFormat()
     m_johnDefaultFormat.closeWriteChannel();
 }
 
-void MainWindow::getDefaultFormatFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void MainWindow::getDefaultFormatFinished(int                  exitCode,
+                                          QProcess::ExitStatus exitStatus)
 {
     Q_UNUSED(exitCode);
-    if (exitStatus == QProcess::CrashExit) {
+    if(exitStatus == QProcess::CrashExit)
+    {
         qDebug() << "JtR seems to have crashed.";
         return;
     }
 
-    QString output = m_johnDefaultFormat.readAllStandardOutput();
+    QString output        = m_johnDefaultFormat.readAllStandardOutput();
     QString defaultFormat = "";
     QRegExp exp("Loaded .+ \\((\\S+)[,| ].+\\)\n");
-    int pos = exp.indexIn(output);
-    if (pos > -1) {
+    int     pos = exp.indexIn(output);
+    if(pos > -1)
+    {
         defaultFormat = exp.cap(1);
-        if (defaultFormat.endsWith(','))
-            defaultFormat.remove(defaultFormat.length()-1, 1);
+        if(defaultFormat.endsWith(','))
+            defaultFormat.remove(defaultFormat.length() - 1, 1);
     }
     m_sessionCurrent.setDefaultFormat(defaultFormat);
     // Restore user's selection
-    QString editText = m_ui->formatComboBox->currentText();
+    QString editText          = m_ui->formatComboBox->currentText();
     QString defaultFormatText = m_ui->formatComboBox->itemText(0);
-    m_ui->formatComboBox->setItemText(0, tr("Auto detect") + (defaultFormat.isEmpty() ? "" : " (" + defaultFormat + ")"));
-    if (editText != defaultFormatText) {
+    m_ui->formatComboBox->setItemText(0, tr("Default (%1)").arg(defaultFormat));
+    if(editText != defaultFormatText)
+    {
         m_ui->formatComboBox->setEditText(editText);
     }
-    if (m_sessionCurrent.format().isEmpty()) {
+    if(m_sessionCurrent.format().isEmpty())
+    {
         // Update format on progress bar
         QString progressBarText = m_ui->progressBar->text();
-        progressBarText.replace(QRegExp("\\[.*\\]"), "[format=" + defaultFormat +"]");
+        progressBarText.replace(QRegExp("\\[.*\\]"),
+                                "[format=" + defaultFormat + "]");
         m_ui->progressBar->setFormat(progressBarText);
     }
 }
 
 void MainWindow::johnPathChanged()
 {
-    if (validateJohnPath(m_ui->lineEditPathToJohn->text())) {
+    if(validateJohnPath(m_ui->lineEditPathToJohn->text()))
+    {
         applyAndSaveSettings();
-        if (!m_sessionPasswordFiles.isEmpty()) {
+        if(!m_sessionPasswordFiles.isEmpty())
+        {
             callJohnShow();
             getDefaultFormat();
         }
@@ -1953,102 +2394,131 @@ bool MainWindow::validateJohnPath(QString path)
     // Check if user entered johnny as a JtR path
     QFileInfo userSelectedFile(path);
     QFileInfo johnnyFile(QCoreApplication::applicationFilePath());
-    if (userSelectedFile == johnnyFile) {
+    if(userSelectedFile == johnnyFile)
+    {
         invalidJohnPathDetected();
         return false;
-    } else {
+    }
+    else
+    {
         return true;
     }
 }
 
-void MainWindow::actionExportToTriggered(QAction* action)
+void MainWindow::actionExportToTriggered(QAction *action)
 {
     QString fileFormat;
-    char delimiter;
+    char    delimiter;
 
-    if (action == m_ui->actionExportToCSV) {
+    if(action == m_ui->actionExportToCSV)
+    {
         fileFormat = ".csv";
-        delimiter = ',';
-
-    } else if (action == m_ui->actionExportToColonSeparated) {
+        delimiter  = ',';
+    }
+    else if(action == m_ui->actionExportToColonSeparated)
+    {
         fileFormat = ".txt";
-        delimiter = ':';
-    } else {
+        delimiter  = ':';
+    }
+    else
+    {
         return;
     }
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), QDir::homePath(), "*"+ fileFormat);
-    if (!fileName.isEmpty()) {
-        if (!fileName.endsWith(fileFormat)) {
+    QString fileName =
+        QFileDialog::getSaveFileName(this, tr("Save file"), QDir::homePath(),
+                                     "*" + fileFormat);
+    if(!fileName.isEmpty())
+    {
+        if(!fileName.endsWith(fileFormat))
             fileName.append(fileFormat);
-        }
         exportTo(delimiter, fileName);
     }
 }
 
 void MainWindow::exportTo(char delimiter, QString fileName)
 {
-    if (!m_hashTable)
+    if(!m_hashTable)
         return;
 
-    bool shouldCopyToClipboard = fileName.isEmpty();
-    QString out;
-    QModelIndexList indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
-    if (indexes.count() == 0) {
+    bool            shouldCopyToClipboard = fileName.isEmpty();
+    QString         out;
+    QModelIndexList indexes =
+        m_ui->passwordsTable->selectionModel()->selectedIndexes();
+    if(indexes.count() == 0)
+    {
         m_ui->passwordsTable->selectAll();
         indexes = m_ui->passwordsTable->selectionModel()->selectedIndexes();
     }
 
-    if (indexes.count() == 1) {
+    if(indexes.count() == 1)
+    {
         out = indexes.at(0).data().toString();
-    } else {
+    }
+    else
+    {
         // We build a table that works good with ctrl+mouse selection
         qSort(indexes);
         QMap<int, bool> selectedColumnsMap;
-        foreach (QModelIndex current, indexes) {
+        foreach(QModelIndex current, indexes)
+        {
             selectedColumnsMap[current.column()] = true;
         }
         QList<int> selectedColumns = selectedColumnsMap.uniqueKeys();
 
-        int previousRow = -1;
+        int previousRow    = -1;
         int previousColumn = -1;
-        foreach (const QModelIndex &current, indexes) {
-            if (previousRow == current.row()) {
+        foreach(const QModelIndex &current, indexes)
+        {
+            if(previousRow == current.row())
+            {
                 out += delimiter;
-            } else if (previousRow != -1) {
+            }
+            else if(previousRow != -1)
+            {
                 out += "\n";
                 previousColumn = -1;
             }
 
-            // Not selected fields inside the rectangle will be exported as empty.
+            // Not selected fields inside the rectangle will be exported as
+            // empty.
             // so we must add some delimiters character
             int nbDelimiter = current.column() - previousColumn - 1;
-            for (int i= 0; i < nbDelimiter; i++) {
-                if (selectedColumns.contains(previousColumn+i+1))
+            for(int i = 0; i < nbDelimiter; i++)
+            {
+                if(selectedColumns.contains(previousColumn + i + 1))
                     out += delimiter;
             }
 
             QString data = current.data().toString();
-            // In case the field contains the delimiter character or " character, escape it.
-            if (data.contains(QRegExp( "(" + QString(delimiter) + "|\")"))) {
+            // In case the field contains the delimiter character or "
+            // character, escape it.
+            if(data.contains(QRegExp("(" + QString(delimiter) + "|\")")))
+            {
                 out += "\"" + data + "\"";
-            } else {
+            }
+            else
+            {
                 out += data;
             }
-            previousRow = current.row();
+            previousRow    = current.row();
             previousColumn = current.column();
         }
     }
 
     // Copy the result to the requested media
-    if (shouldCopyToClipboard) {
+    if(shouldCopyToClipboard)
+    {
         QClipboard *clipboard = QApplication::clipboard();
         clipboard->clear();
-        if (clipboard->supportsSelection())
+        if(clipboard->supportsSelection())
             clipboard->setText(out, QClipboard::Selection);
         clipboard->setText(out);
-    } else { // export to file
+    }
+    else
+    { // export to file
         QFile file(fileName);
-        if (file.open(QIODevice::WriteOnly)) {
+        if(file.open(QIODevice::WriteOnly))
+        {
             QTextStream outStream(&file);
             outStream << out;
             file.close();

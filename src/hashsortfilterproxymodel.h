@@ -8,8 +8,8 @@
 #ifndef HASHSORTFILTERPROXYMODEL_H
 #define HASHSORTFILTERPROXYMODEL_H
 
-#include <QSortFilterProxyModel>
 #include <QList>
+#include <QSortFilterProxyModel>
 
 class HashSortFilterProxyModel : public QSortFilterProxyModel
 {
@@ -17,12 +17,15 @@ class HashSortFilterProxyModel : public QSortFilterProxyModel
 
 public:
     HashSortFilterProxyModel(QObject *parent = 0);
-    void setFilteredColumns(const QList<int> &index, bool shouldInvalidateFilter = true);
+    void setFilteredColumns(const QList<int> &index,
+                            bool              shouldInvalidateFilter = true);
     QList<int> filteredColumns();
 
 public slots:
-    void setShowCheckedRowsOnly(bool showCheckedOnly, bool shouldInvalidateFilter = true);
-    void setShowCrackedRowsOnly(bool showCrackedOnly, bool shouldInvalidateFilter = true);
+    void setShowCheckedRowsOnly(bool showCheckedOnly,
+                                bool shouldInvalidateFilter = true);
+    void setShowCrackedRowsOnly(bool showCrackedOnly,
+                                bool shouldInvalidateFilter = true);
     void checkBoxHasChanged();
     void crackingHasChanged();
 

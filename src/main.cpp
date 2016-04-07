@@ -13,8 +13,8 @@
 #include <QDir>
 
 #ifdef Q_OS_WIN
-#include <windows.h>
 #include <wincon.h>
+#include <windows.h>
 #endif
 
 int main(int argc, char *argv[])
@@ -33,18 +33,22 @@ int main(int argc, char *argv[])
     // Setting the application version which is defined in johnny.pro
     app.setApplicationVersion(APP_VERSION);
 
-    QSettings settings(QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
-                QSettings::IniFormat);
-    QString settingLanguage = settings.value("Language").toString();
-    Translator& translator = Translator::getInstance();
+    QSettings settings(
+        QDir(QDir::home().filePath(".john")).filePath("johnny.conf"),
+        QSettings::IniFormat);
+    QString     settingLanguage = settings.value("Language").toString();
+    Translator &translator      = Translator::getInstance();
 
     // If no language is saved : default behavior is to use system language
-    if (settingLanguage.isEmpty()) {
-        QString systemLanguage =  QLocale::languageToString(QLocale().language());
+    if(settingLanguage.isEmpty())
+    {
+        QString systemLanguage = QLocale::languageToString(QLocale().language());
         translator.translateApplication(&app, systemLanguage);
         settings.setValue("Language", translator.getCurrentLanguage().toLower());
-    } else {
-        //Use the language specified in the settings
+    }
+    else
+    {
+        // Use the language specified in the settings
         translator.translateApplication(&app, settingLanguage);
     }
 

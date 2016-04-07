@@ -8,8 +8,8 @@
 #include "johnprocess.h"
 
 #ifdef Q_OS_WIN
-#include <windows.h>
 #include <wincon.h>
+#include <windows.h>
 #endif
 
 JohnProcess::JohnProcess()
@@ -34,7 +34,8 @@ void JohnProcess::setupChildProcess()
 void JohnProcess::terminate()
 {
 #ifdef Q_OS_UNIX
-    if (pid() != 0) {
+    if(pid() != 0)
+    {
         /* Send sigterm to all processes of the group
          * created previously with setsid()
          * This is done in Johnny because of a bug in john <= 1.8.0

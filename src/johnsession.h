@@ -8,25 +8,35 @@
 #ifndef JOHNSESSION_H
 #define JOHNSESSION_H
 
-#include <QString>
 #include <QSettings>
+#include <QString>
 #include <QStringList>
 
 class JohnSession
 {
 public:
-    enum AttackMode {DEFAULT_MODE, SINGLECRACK_MODE, WORDLIST_MODE, INCREMENTAL_MODE, EXTERNAL_MODE, MASK_MODE, MARKOV_MODE, PRINCE_MODE};
-    JohnSession(const QString &sessionName, QSettings* settings);
+    enum AttackMode
+    {
+        DEFAULT_MODE,
+        SINGLECRACK_MODE,
+        WORDLIST_MODE,
+        INCREMENTAL_MODE,
+        EXTERNAL_MODE,
+        MASK_MODE,
+        MARKOV_MODE,
+        PRINCE_MODE
+    };
+    JohnSession(const QString &sessionName, QSettings *settings);
     ~JohnSession();
     bool load();
     bool save();
     void remove();
 
     // Fields present in all sessions
-    QString name();
-    QString filePath();
+    QString        name();
+    QString        filePath();
     static QString sessionDir();
-    bool isForkEnabled();
+    bool           isForkEnabled();
 
     QStringList passwordFiles() const;
     void setPasswordFiles(const QStringList &passwordFiles);
@@ -40,13 +50,13 @@ public:
     QString environmentVariables() const;
     void setEnvironmentVariables(const QString &environmentVariables);
 
-    int openMPThreads() const;
+    int  openMPThreads() const;
     void setOpenMPThreads(int openMPThreads);
 
-    int forkProcesses() const;
+    int  forkProcesses() const;
     void setForkProcesses(int forkProcesses);
 
-    int limitSalts() const;
+    int  limitSalts() const;
     void setLimitSalts(int limitSalts);
 
     QString limitShells() const;
@@ -85,44 +95,45 @@ public:
     QString markovMode() const;
     void setMarkovMode(const QString &markovMode);
 
-    int markovEndIndex() const;
+    int  markovEndIndex() const;
     void setMarkovEndIndex(int markovEndIndex);
 
-    int markovStartIndex() const;
+    int  markovStartIndex() const;
     void setMarkovStartIndex(int markovStartIndex);
 
-    int markovMaxLevel() const;
+    int  markovMaxLevel() const;
     void setMarkovMaxLevel(int markovMaxLevel);
 
-    int markovMinLevel() const;
+    int  markovMinLevel() const;
     void setMarkovMinLevel(int markovMinLevel);
 
-    int minPasswordCandidatesLength() const;
+    int  minPasswordCandidatesLength() const;
     void setMinPasswordCandidatesLength(int minPasswordCandidatesLength);
 
-    int maxPasswordCandidatesLength() const;
+    int  maxPasswordCandidatesLength() const;
     void setMaxPasswordCandidatesLength(int maxPasswordCandidatesLength);
 
     bool loopback() const;
     void setLoopback(bool loopback);
 
-    int princeMinElementsPerChain() const;
+    int  princeMinElementsPerChain() const;
     void setPrinceMinElementsPerChain(int princeMinElementsPerChain);
 
-    int princeMaxElementsPerChain() const;
+    int  princeMaxElementsPerChain() const;
     void setPrinceMaxElementsPerChain(int princeMaxElementsPerChain);
 
-    int princeInitialSkip() const;
+    int  princeInitialSkip() const;
     void setPrinceInitialSkip(int princeInitialSkip);
 
-    int princeLimitWordsFromWordlist() const;
+    int  princeLimitWordsFromWordlist() const;
     void setPrinceLimitWordsFromWordlist(int princeLimitWordsFromWordlist);
 
-    int princeLimitNbPasswordCandidates() const;
+    int  princeLimitNbPasswordCandidates() const;
     void setPrinceLimitNbPasswordCandidates(int princeLimitNbPasswordCandidates);
 
     bool princeUseWordlistForLengthDistribution() const;
-    void setPrinceUseWordlistForLengthDistribution(bool princeUseWordlistForLengthDistribution);
+    void setPrinceUseWordlistForLengthDistribution(
+        bool princeUseWordlistForLengthDistribution);
 
     bool princePermuteFirstLetterCase() const;
     void setPrincePermuteFirstLetterCase(bool princePermuteFirstLetterCase);
@@ -134,20 +145,20 @@ public:
     void setPrinceShowTotalKeyspace(bool princeShowTotalKeyspace);
 
 private:
-    QString   m_name;
-    QSettings* m_settings;
-    QString   m_sessionGroup;
+    QString    m_name;
+    QSettings *m_settings;
+    QString    m_sessionGroup;
 
-    QString   m_format;
-    QString   m_formatUI;
-    QString   m_defaultFormat;
+    QString     m_format;
+    QString     m_formatUI;
+    QString     m_defaultFormat;
     QStringList m_passwordFiles;
-    AttackMode m_mode;
+    AttackMode  m_mode;
 
-    QString  m_externalName;
-    QString  m_wordlistFile;
-    QString  m_rules;
-    QString  m_charset;
+    QString m_externalName;
+    QString m_wordlistFile;
+    QString m_rules;
+    QString m_charset;
 
     QString m_limitUsers;
     QString m_limitGroups;
@@ -160,24 +171,24 @@ private:
     QList<int> m_unselectedRows;
 
     // JtR jumbo only fields
-    int m_minPasswordCandidatesLength;
-    int m_maxPasswordCandidatesLength;
+    int     m_minPasswordCandidatesLength;
+    int     m_maxPasswordCandidatesLength;
     QString m_mask;
-    bool m_loopback;
+    bool    m_loopback;
 
     // Markov-related
     QString m_markovMode;
-    int m_markovMinLevel;
-    int m_markovMaxLevel;
-    int m_markovStartIndex;
-    int m_markovEndIndex;
+    int     m_markovMinLevel;
+    int     m_markovMaxLevel;
+    int     m_markovStartIndex;
+    int     m_markovEndIndex;
 
     // Prince-related
-    int m_princeMinElementsPerChain;
-    int m_princeMaxElementsPerChain;
-    int m_princeInitialSkip;
-    int m_princeLimitWordsFromWordlist;
-    int m_princeLimitNbPasswordCandidates;
+    int  m_princeMinElementsPerChain;
+    int  m_princeMaxElementsPerChain;
+    int  m_princeInitialSkip;
+    int  m_princeLimitWordsFromWordlist;
+    int  m_princeLimitNbPasswordCandidates;
     bool m_princeUseWordlistForLengthDistribution;
     bool m_princePermuteFirstLetterCase;
     bool m_princeMemoryMap;

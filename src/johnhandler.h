@@ -11,8 +11,8 @@
 #include "johnprocess.h"
 
 #include <QObject>
-#include <QRunnable>
 #include <QProcess>
+#include <QRunnable>
 #include <QThread>
 
 class JohnHandler : public QObject
@@ -57,11 +57,11 @@ protected:
     bool terminate(bool kill = true);
 
 private:
-    JohnProcess             m_john;
-    QThread                 m_thread;
-    QString                 m_johnProgram;
-    QStringList             m_args;
-    QProcessEnvironment     m_env;
+    JohnProcess         m_john;
+    QThread             m_thread;
+    QString             m_johnProgram;
+    QStringList         m_args;
+    QProcessEnvironment m_env;
 };
 
 #endif // JOHNHANDLER_H

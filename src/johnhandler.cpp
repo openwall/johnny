@@ -8,7 +8,7 @@
 
 #include <QMetaType>
 
-JohnHandler::JohnHandler(): m_env(QProcessEnvironment::systemEnvironment())
+JohnHandler::JohnHandler() : m_env(QProcessEnvironment::systemEnvironment())
 {
     qRegisterMetaType<QProcess::ProcessError>("QProcess::ProcessError");
     qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
@@ -17,12 +17,18 @@ JohnHandler::JohnHandler(): m_env(QProcessEnvironment::systemEnvironment())
     moveToThread(&m_thread);
     m_thread.start();
 
-    connect(&m_john, SIGNAL(started()), this, SIGNAL(started()), Qt::QueuedConnection);
-    connect(&m_john, SIGNAL(finished(int,QProcess::ExitStatus)), this, SIGNAL(finished(int,QProcess::ExitStatus)), Qt::QueuedConnection);
-    connect(&m_john, SIGNAL(error(QProcess::ProcessError)), this, SIGNAL(error(QProcess::ProcessError)), Qt::QueuedConnection);
-    connect(&m_john, SIGNAL(readyReadStandardError()), this, SIGNAL(readyReadStandardError()), Qt::QueuedConnection);
-    connect(&m_john, SIGNAL(readyReadStandardOutput()), this, SIGNAL(readyReadStandardOutput()), Qt::QueuedConnection);
-    connect(&m_john, SIGNAL(stateChanged(QProcess::ProcessState)), this, SIGNAL(stateChanged(QProcess::ProcessState)), Qt::QueuedConnection);
+    connect(&m_john, SIGNAL(started()), this, SIGNAL(started()),
+            Qt::QueuedConnection);
+    connect(&m_john, SIGNAL(finished(int, QProcess::ExitStatus)), this,
+            SIGNAL(finished(int, QProcess::ExitStatus)), Qt::QueuedConnection);
+    connect(&m_john, SIGNAL(error(QProcess::ProcessError)), this,
+            SIGNAL(error(QProcess::ProcessError)), Qt::QueuedConnection);
+    connect(&m_john, SIGNAL(readyReadStandardError()), this,
+            SIGNAL(readyReadStandardError()), Qt::QueuedConnection);
+    connect(&m_john, SIGNAL(readyReadStandardOutput()), this,
+            SIGNAL(readyReadStandardOutput()), Qt::QueuedConnection);
+    connect(&m_john, SIGNAL(stateChanged(QProcess::ProcessState)), this,
+            SIGNAL(stateChanged(QProcess::ProcessState)), Qt::QueuedConnection);
 }
 
 JohnHandler::~JohnHandler()
@@ -40,7 +46,8 @@ void JohnHandler::exec()
 bool JohnHandler::terminate(bool kill)
 {
     bool success = false;
-    if((m_john.state() == QProcess::Running) || (m_john.state() == QProcess::Starting))
+    if((m_john.state() == QProcess::Running) ||
+       (m_john.state() == QProcess::Starting))
     {
         m_john.terminate();
         if(m_john.waitForFinished(1000))
@@ -103,7 +110,7 @@ void JohnHandler::setJohnProgram(const QString &johnProgram)
 void JohnHandler::start()
 {
     // Give a chance to terminate cleanly
-    if (m_john.state() != QProcess::NotRunning)
+    if(m_john.state() != QProcess::NotRunning)
         terminate();
     JohnHandler::exec();
 }

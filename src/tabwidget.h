@@ -8,8 +8,8 @@
 #ifndef TABWIDGET_H
 #define TABWIDGET_H
 
-#include <QTabWidget>
 #include <QEvent>
+#include <QTabWidget>
 
 class TabWidget : public QTabWidget
 {

@@ -15,7 +15,8 @@ class TextLabel : public QLabel
 {
     Q_OBJECT
 
-    Q_PROPERTY(Qt::TextElideMode elide READ elide WRITE setElide NOTIFY elideChanged DESIGNABLE true)
+    Q_PROPERTY(Qt::TextElideMode elide READ elide WRITE setElide NOTIFY
+                   elideChanged DESIGNABLE true)
     Q_ENUMS(Qt::TextElideMode)
 
 public:

@@ -8,13 +8,13 @@
 #ifndef JOHNPROCESS_H
 #define JOHNPROCESS_H
 
-#include <QtGlobal> // to define Q_OS_
 #include <QProcess>
+#include <QtGlobal> // to define Q_OS_
 
 #ifdef Q_OS_UNIX
-#include <unistd.h>
-#include <sys/types.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 class JohnProcess : public QProcess

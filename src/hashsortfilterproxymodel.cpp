@@ -11,91 +11,114 @@
 #include <QRegExp>
 
 HashSortFilterProxyModel::HashSortFilterProxyModel(QObject *parent)
-    :QSortFilterProxyModel(parent)
+    : QSortFilterProxyModel(parent)
 {
 }
 
-void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index, bool shouldInvalidateFilter)
+void HashSortFilterProxyModel::setFilteredColumns(const QList<int> &index,
+                                                  bool shouldInvalidateFilter)
 {
     m_filteredColumns = index;
-    if (shouldInvalidateFilter) {
+    if(shouldInvalidateFilter)
+    {
         invalidateFilter();
     }
 }
 
-void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly,  bool shouldInvalidateFilter)
+void HashSortFilterProxyModel::setShowCheckedRowsOnly(bool showCheckedOnly,
+                                                      bool shouldInvalidateFilter)
 {
     m_showCheckedRowsOnly = showCheckedOnly;
-    if (shouldInvalidateFilter) {
+    if(shouldInvalidateFilter)
+    {
         invalidateFilter();
     }
 }
 
-void HashSortFilterProxyModel::setShowCrackedRowsOnly(bool showCrackedOnly, bool shouldInvalidateFilter)
+void HashSortFilterProxyModel::setShowCrackedRowsOnly(bool showCrackedOnly,
+                                                      bool shouldInvalidateFilter)
 {
     m_showCrackedRowsOnly = showCrackedOnly;
-    if (shouldInvalidateFilter) {
+    if(shouldInvalidateFilter)
+    {
         invalidateFilter();
     }
 }
 
 void HashSortFilterProxyModel::checkBoxHasChanged()
 {
-    if (m_showCheckedRowsOnly) {
+    if(m_showCheckedRowsOnly)
+    {
         invalidateFilter();
     }
 }
 
 void HashSortFilterProxyModel::crackingHasChanged()
 {
-    if (m_showCrackedRowsOnly) {
+    if(m_showCrackedRowsOnly)
+    {
         invalidateFilter();
     }
 }
 
-bool HashSortFilterProxyModel::filterAcceptsRow(int sourceRow,
-        const QModelIndex &sourceParent) const
+bool HashSortFilterProxyModel::filterAcceptsRow(int                sourceRow,
+                                                const QModelIndex &sourceParent) const
 {
-    bool isAccepted = false;
+    bool        isAccepted = false;
     QModelIndex index;
-    int currentColumn = 0;
+    int         currentColumn = 0;
 
     QModelIndex index0 = sourceModel()->index(sourceRow, 0, sourceParent);
-    if (m_showCheckedRowsOnly && (sourceModel()->data(index0, Qt::CheckStateRole) == Qt::Unchecked)) {
+    if(m_showCheckedRowsOnly &&
+       (sourceModel()->data(index0, Qt::CheckStateRole) == Qt::Unchecked))
+    {
         return false;
     }
 
-    QModelIndex indexPassword = sourceModel()->index(sourceRow, PasswordFileModel::PASSWORD_COL, sourceParent);
-    if (m_showCrackedRowsOnly && sourceModel()->data(indexPassword).toString().isEmpty()) {
+    QModelIndex indexPassword =
+        sourceModel()->index(sourceRow, PasswordFileModel::PASSWORD_COL,
+                             sourceParent);
+    if(m_showCrackedRowsOnly &&
+       sourceModel()->data(indexPassword).toString().isEmpty())
+    {
         return false;
     }
 
-    if (filterRegExp().isEmpty()) {
+    if(filterRegExp().isEmpty())
+    {
         return true;
     }
 
-    while ((isAccepted == false) && (currentColumn < m_filteredColumns.count())) {
-        index = sourceModel()->index(sourceRow, m_filteredColumns[currentColumn], sourceParent);
-        if (sourceModel()->data(index).toString().contains(filterRegExp())) {
-        isAccepted = true;
-    }
+    while((isAccepted == false) && (currentColumn < m_filteredColumns.count()))
+    {
+        index = sourceModel()->index(sourceRow, m_filteredColumns[currentColumn],
+                                     sourceParent);
+        if(sourceModel()->data(index).toString().contains(filterRegExp()))
+        {
+            isAccepted = true;
+        }
         currentColumn++;
     }
     return isAccepted;
 }
 
 bool HashSortFilterProxyModel::lessThan(const QModelIndex &left,
-                                      const QModelIndex &right) const
+                                        const QModelIndex &right) const
 {
-    QString leftData = sourceModel()->data(left).toString();
+    QString leftData  = sourceModel()->data(left).toString();
     QString rightData = sourceModel()->data(right).toString();
-    int result = leftData.compare(rightData, Qt::CaseInsensitive);
+    int     result    = leftData.compare(rightData, Qt::CaseInsensitive);
 
-    if (result == 0) {
+    if(result == 0)
+    {
         return left.row() < right.row();
-    } else if (result < 0) {
+    }
+    else if(result < 0)
+    {
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }

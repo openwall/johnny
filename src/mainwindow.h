@@ -8,32 +8,33 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "johnprocess.h"
-#include "johnattack.h"
-#include "hashtypechecker.h"
-#include "menu.h"
-#include "johnsession.h"
-#include "passwordfilemodel.h"
 #include "hashsortfilterproxymodel.h"
+#include "hashtypechecker.h"
+#include "johnattack.h"
+#include "johnprocess.h"
+#include "johnsession.h"
+#include "menu.h"
 #include "openotherformatfiledialog.h"
+#include "passwordfilemodel.h"
 
-#include <QMainWindow>
-#include <QListWidgetItem>
 #include <QAbstractTableModel>
+#include <QByteArray>
+#include <QDateTime>
+#include <QLabel>
+#include <QListWidgetItem>
+#include <QMainWindow>
+#include <QMultiMap>
+#include <QPlainTextEdit>
+#include <QSettings>
 #include <QString>
 #include <QStringList>
-#include <QTimer>
-#include <QByteArray>
-#include <QTextStream>
-#include <QSettings>
-#include <QDateTime>
-#include <QMultiMap>
 #include <QTemporaryFile>
-#include <QPlainTextEdit>
-#include <QLabel>
+#include <QTextStream>
+#include <QTimer>
 
-namespace Ui {
-    class MainWindow;
+namespace Ui
+{
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -41,7 +42,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QSettings& settings);
+    explicit MainWindow(QSettings &settings);
     ~MainWindow();
 
 private slots:
@@ -50,7 +51,7 @@ private slots:
     void resumeAttack();
     void pauseAttack();
     void actionCopyToClipboardTriggered();
-    void actionOpenSessionTriggered(QAction* action);
+    void actionOpenSessionTriggered(QAction *action);
     void openPasswordFile(QStringList fileNames = QStringList());
     void openLastSession();
     void tabsSelectionChanged(QAction *action);
@@ -61,13 +62,13 @@ private slots:
     void restoreDefaultAttackOptions(bool shouldClearFields = true);
     void checkForUpdates();
     void filterHashesTable();
-    void showHashesTableContextMenu(const QPoint& pos);
-    void showConsoleLogContextMenu(const QPoint& pos);
+    void showHashesTableContextMenu(const QPoint &pos);
+    void showConsoleLogContextMenu(const QPoint &pos);
     void includeSelectedHashes();
     void excludeSelectedHashes();
     void setFilteringColumns();
     void resetFilters();
-    void actionExportToTriggered(QAction* action);
+    void actionExportToTriggered(QAction *action);
     void exportTo(char delimiter, QString fileName);
 
     // JtR backend
@@ -79,7 +80,8 @@ private slots:
     void startJohn(QStringList args);
     void callJohnShow();
     void readJohnShow();
-    void updateHashTypes(const QStringList &pathToPwdFile, const QStringList &listOfTypesInFile,
+    void updateHashTypes(const QStringList &pathToPwdFile,
+                         const QStringList &listOfTypesInFile,
                          const QStringList &detailedTypesPerRow);
 
     void guessPassword();
@@ -102,7 +104,7 @@ private slots:
     bool validateJohnPath(QString path);
 
     // Helpers
-    void appendLog(const QString& text);
+    void appendLog(const QString &text);
     QStringList saveAttackParameters();
 
 protected:
@@ -139,7 +141,7 @@ private:
     // is used during this instance of application work. Stored
     // settings are stored on the disk and will be loaded next time
     // application start.
-    QSettings&      m_settings;
+    QSettings      &m_settings;
     QString         m_pathToJohn;
     // Interval between loading of cracked passwords
     int             m_timeIntervalPickCracked;
@@ -152,15 +154,15 @@ private:
     JohnAttack      m_johnDefaultFormat;
     bool            m_isDynamicFilteringEnabled;
 
-    QWidget         m_aboutWindow;
-    OpenOtherFormatFileDialog* m_openOtherFormatDialog;
-    QTimer          m_labelSelectionHide;
+    QWidget                     m_aboutWindow;
+    QTimer                      m_labelSelectionHide;
+    OpenOtherFormatFileDialog  *m_openOtherFormatDialog;
 
 #ifdef Q_OS_OSX
-    QLabel         *m_progressStatsLabel;
+    QLabel *m_progressStatsLabel;
 #endif
 #if QT_VERSION < QT_VERSION_CHECK(4, 7, 0)
-    QLabel         *m_filterDirectivesLabel;
+    QLabel *m_filterDirectivesLabel;
 #endif
 };
 

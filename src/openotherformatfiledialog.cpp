@@ -375,7 +375,7 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
                                 << ConversionScriptParameter("keyfiles(s)",
                                                              FILE_PARAM))
 
-        << ConversionScript("uaf2john", ".",
+        << ConversionScript("uaf2john", "",
                             QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter("uaf_file",
                                                              FILE_PARAM))
@@ -385,7 +385,7 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
                                 << ConversionScriptParameter("pcapfiles",
                                                              FILE_PARAM))
 
-        << ConversionScript("wpapcap2john", ".py",
+        << ConversionScript("wpapcap2john", "",
                             QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter(
                                        "Show only complete auths (incomplete "
@@ -609,7 +609,7 @@ void OpenOtherFormatFileDialog::browseInputButtonClicked()
         fileMode = QFileDialog::Directory;
     else
         fileMode = QFileDialog::ExistingFile;
-    QFileDialog dialog;
+    QFileDialog dialog(this);
     dialog.setFileMode(fileMode);
     if(dialog.exec())
     {

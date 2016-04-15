@@ -20,6 +20,9 @@
   <property name="dockNestingEnabled">
    <bool>false</bool>
   </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <property name="spacing">

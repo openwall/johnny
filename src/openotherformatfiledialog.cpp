@@ -106,7 +106,7 @@ void OpenOtherFormatFileDialog::declare2johnFormats(QList<ConversionScript> &scr
                                 << ConversionScriptParameter(
                                     "1Password Agile Keychain(s)", FILE_PARAM))
 
-        << ConversionScript("7z2john", ".py",
+        << ConversionScript("7z2john", ".pl",
                             QList<ConversionScriptParameter>()
                                 << ConversionScriptParameter(
                                     "encrypted 7-Zip files", FILE_PARAM))
